@@ -73,21 +73,12 @@
 {
     NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     managedObjectContext.persistentStoreCoordinator = persistentStoreCoordinator;
-    
     return managedObjectContext;
 }
 
-#pragma mark Duplication
-
-- (SRGModelManager *)duplicate
+- (NSManagedObjectContext *)backgroundManagedObjectContext
 {
-    // Duplicate the context, the rest is the same
-    SRGModelManager *modelManager = [[[self class] alloc] init];
-    modelManager.managedObjectContext = [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
-    modelManager.managedObjectModel = self.managedObjectModel;
-    modelManager.persistentStoreCoordinator = self.persistentStoreCoordinator;
-    
-    return modelManager;
+    return [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
 }
 
 @end

@@ -16,9 +16,8 @@ API_DEPRECATED_WITH_REPLACEMENT("Use NSPersistentContainer instead", ios(9.0, 10
                              inBundle:(nullable NSBundle *)bundle
                    withStoreDirectory:(NSString *)storeDirectory;
 
-- (SRGModelManager *)duplicate;
-
 @property (nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, readonly) NSManagedObjectContext *backgroundManagedObjectContext;
 
 @end
 
