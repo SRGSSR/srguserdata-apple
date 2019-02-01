@@ -9,15 +9,15 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- *  The data store singleton ensures safe accesses to the application Core Data layer. In particular, work can be
- *  performed on or off the main thread, without context merging issues. This is achieved by having a single serialized
- *  worker queue process reads and writes in background, while only reads can be performed from the main thread. This
- *  avoids Core Data transaction overlaps (transactions are performed one after the other) and the usual problems related
+ *  A data store ensures safe accesses to the application Core Data layer. In particular, work can be performed on or
+ *  off the main thread, without context merging issues. This is achieved by having a single serialized worker queue
+ *  process reads and writes in background, while only reads can be performed from the main thread. This avoids Core
+ *  Data transaction overlaps (transactions are performed one after the other) and the usual problems related
  *  with context merging.
  *
- *  You should use asynchronous methods when possible. If you want a read to be performed in parallel without waiting
- *  for the serial queue to start processing it (this can take some time since other higher-priority pending tasks
- *  might exist), you can perform a synchronous read from the main thread.
+ *  You should use asynchronous methods when possible. If you want a read to be performed at the same time background
+ *  operations are made, you can perform a synchronous read from the main thread. This avoids using a background read
+ *  which would have to wait until pending background operations before it have been processed.
  *
  *  Background tasks can be prioritized, but for this mechanism to work effectively each submitted task should be short
  *  enough so that the worker queue can move on to pending items fast. Tasks submitted to the main thread should also
@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
  *  Credits: The strategy implemented by this class was inspired by the following talk: https://vimeo.com/89370886.
  */
 @interface SRGDataStore : NSObject
+
+// TODO: Restore debugging mode for read / writes, but not using preprocessor macros anymore
 
 /**
  *  Perform a read operation on the main thread. The read should be efficient since slow operations might block the main
