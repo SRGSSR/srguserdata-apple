@@ -18,56 +18,25 @@
 
 #pragma mark Object creation and destruction
 
-- (instancetype)initWithModelFileName:(NSString *)modelFileName
-                             inBundle:(NSBundle *)bundle
-                   withStoreDirectory:(NSString *)storeDirectory
+- (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model
 {
-    NSParameterAssert(modelFileName);
-    NSParameterAssert(storeDirectory);
-    
     if (self = [super init]) {
-        self.managedObjectModel = [self managedObjectModelFromModelFileName:modelFileName inBundle:bundle];
-        if (! self.managedObjectModel) {
-            return nil;
-        }
-        
         self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:self.managedObjectModel];
         
-        NSString *storeFilePath = [[storeDirectory stringByAppendingPathComponent:modelFileName] stringByAppendingPathExtension:@"sqlite"];
+        NSURL *storeURL = [[[NSURL fileURLWithPath:directory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
         NSPersistentStore *persistentStore = [self.persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
-                                                                                   configuration:nil
-                                                                                             URL:[NSURL fileURLWithPath:storeFilePath]
+                                                                                           configuration:nil
+                                                                                                     URL:storeURL
                                                                                                  options:@{ NSMigratePersistentStoresAutomaticallyOption : @YES,
                                                                                                             NSInferMappingModelAutomaticallyOption : @"YES" }
-                                                                                           error:NULL];
-        if (! persistentStore) {
-            return nil;
-        }
-        
+                                                                                                   error:NULL];
+        NSAssert(persistentStore, @"Persistence store could not be created");
         self.managedObjectContext = [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
-        if (! self.managedObjectContext) {
-            return nil;
-        }
     }
     return self;
 }
 
 #pragma mark Helpers
-
-- (NSManagedObjectModel *)managedObjectModelFromModelFileName:(NSString *)modelFileName inBundle:(NSBundle *)bundle
-{
-    if (! bundle) {
-        bundle = [NSBundle mainBundle];
-    }
-    
-    NSString *modelFilePath = [bundle pathForResource:modelFileName ofType:@"momd"];
-    if (! modelFilePath) {
-        return nil;
-    }
-    
-    NSURL *modelFileURL = [NSURL fileURLWithPath:modelFilePath];
-    return [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
-}
 
 - (NSManagedObjectContext *)managedObjectContextForPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCoordinator
 {

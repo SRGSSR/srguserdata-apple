@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 // TODO: Restore debugging mode for read / writes, but not using preprocessor macros anymore
 
+- (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model;
+
 /**
  *  Perform a read operation on the main thread. The read should be efficient since slow operations might block the main
  *  thread while performed.

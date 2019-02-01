@@ -31,17 +31,14 @@ static SRGDataStore *s_sharedDataStore;
 
 #pragma mark Object lifecycle
 
-- (instancetype)init
+- (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model
 {
     if (self = [super init]) {
-        // TODO: Will be a parameter in the future
-        NSString *libraryPath = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-        
         NSManagedObjectContext *viewContext = nil;
         if (@available(iOS 10, *)) {
-            NSPersistentContainer *persistentContainer = [NSPersistentContainer persistentContainerWithName:@"PlayData"];
+            NSPersistentContainer *persistentContainer = [NSPersistentContainer persistentContainerWithName:name managedObjectModel:model];
             
-            NSURL *storeURL = [[NSURL fileURLWithPath:libraryPath] URLByAppendingPathComponent:@"PlayData.sqlite"];
+            NSURL *storeURL = [[[NSURL fileURLWithPath:directory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
             NSPersistentStoreDescription *persistentStoreDescription = [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeURL];
             [persistentStoreDescription setOption:@YES forKey:NSMigratePersistentStoresAutomaticallyOption];
             [persistentStoreDescription setOption:@YES forKey:NSInferMappingModelAutomaticallyOption];
@@ -60,9 +57,7 @@ static SRGDataStore *s_sharedDataStore;
             viewContext.automaticallyMergesChangesFromParent = YES;
         }
         else {
-            self.modelManager = [[SRGModelManager alloc] initWithModelFileName:@"PlayData"
-                                                                      inBundle:NSBundle.srg_userDataBundle
-                                                            withStoreDirectory:libraryPath];
+            self.modelManager = [[SRGModelManager alloc] initWithName:name directory:directory model:model];
             
             // The main context is for reads only. We must therefore always match what has been persisted to the store,
             // thus discarding in-memory versions when background contexts are saved and automatically merged.

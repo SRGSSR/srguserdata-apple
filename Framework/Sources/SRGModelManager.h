@@ -12,9 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 API_DEPRECATED_WITH_REPLACEMENT("Use NSPersistentContainer instead", ios(9.0, 10.0))
 @interface SRGModelManager : NSObject
 
-- (instancetype)initWithModelFileName:(NSString *)modelFileName
-                             inBundle:(nullable NSBundle *)bundle
-                   withStoreDirectory:(NSString *)storeDirectory;
+- (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model;
 
 @property (nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, readonly) NSManagedObjectContext *backgroundManagedObjectContext;
