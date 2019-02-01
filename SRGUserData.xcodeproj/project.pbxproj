@@ -24,6 +24,7 @@
 		6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */; };
 		6F0178A2220482AF00B4BCD9 /* SRGUserDataError.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0178A0220482AE00B4BCD9 /* SRGUserDataError.m */; };
 		6F0178A3220482AF00B4BCD9 /* SRGUserDataError.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0178A1220482AE00B4BCD9 /* SRGUserDataError.h */; };
+		6F0178A522048B2800B4BCD9 /* DataStoreTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0178A422048B2800B4BCD9 /* DataStoreTestCase.m */; };
 		6F0432BD21006E7A002B090A /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6F0432BE21007340002B090A /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6F0432BF21007340002B090A /* SRGNetwork.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -147,6 +148,7 @@
 		6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGUserDataLogger.h; sourceTree = "<group>"; };
 		6F0178A0220482AE00B4BCD9 /* SRGUserDataError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGUserDataError.m; sourceTree = "<group>"; };
 		6F0178A1220482AE00B4BCD9 /* SRGUserDataError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGUserDataError.h; sourceTree = "<group>"; };
+		6F0178A422048B2800B4BCD9 /* DataStoreTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataStoreTestCase.m; sourceTree = "<group>"; };
 		6F0432BC21006E7A002B090A /* SRGNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGNetwork.framework; path = Carthage/Build/iOS/SRGNetwork.framework; sourceTree = "<group>"; };
 		6F0C98E62121E1C200073AB6 /* SRGUserData.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SRGUserData.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F0EB53120FC7F58009C02CF /* SRGUserData.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SRGUserData.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -377,6 +379,7 @@
 		6FB74D732101D5D600E2D365 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				6F0178A422048B2800B4BCD9 /* DataStoreTestCase.m */,
 				6FB74D742101D5D600E2D365 /* HistoryTestCase.m */,
 			);
 			path = Sources;
@@ -605,6 +608,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6FB74D772101D5D600E2D365 /* HistoryTestCase.m in Sources */,
+				6F0178A522048B2800B4BCD9 /* DataStoreTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
