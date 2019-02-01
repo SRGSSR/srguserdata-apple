@@ -19,6 +19,11 @@
 		0858B6A422010CD6000F00CF /* MAKVONotificationCenter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0858B6A522010CD6000F00CF /* SRGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; };
 		0858B6A622010CD6000F00CF /* SRGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F01789C22047A8D00B4BCD9 /* SRGDataStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F01789A22047A8D00B4BCD9 /* SRGDataStore.h */; };
+		6F01789D22047A8D00B4BCD9 /* SRGDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F01789B22047A8D00B4BCD9 /* SRGDataStore.m */; };
+		6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */; };
+		6F0178A2220482AF00B4BCD9 /* SRGUserDataError.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0178A0220482AE00B4BCD9 /* SRGUserDataError.m */; };
+		6F0178A3220482AF00B4BCD9 /* SRGUserDataError.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0178A1220482AE00B4BCD9 /* SRGUserDataError.h */; };
 		6F0432BD21006E7A002B090A /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6F0432BE21007340002B090A /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6F0432BF21007340002B090A /* SRGNetwork.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -137,6 +142,11 @@
 		0858B69522010C9E000F00CF /* SRGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGLogger.framework; path = Carthage/Build/iOS/SRGLogger.framework; sourceTree = "<group>"; };
 		0858B69622010C9E000F00CF /* libextobjc.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libextobjc.framework; path = Carthage/Build/iOS/libextobjc.framework; sourceTree = "<group>"; };
 		0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MAKVONotificationCenter.framework; path = Carthage/Build/iOS/MAKVONotificationCenter.framework; sourceTree = "<group>"; };
+		6F01789A22047A8D00B4BCD9 /* SRGDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGDataStore.h; sourceTree = "<group>"; };
+		6F01789B22047A8D00B4BCD9 /* SRGDataStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGDataStore.m; sourceTree = "<group>"; };
+		6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGUserDataLogger.h; sourceTree = "<group>"; };
+		6F0178A0220482AE00B4BCD9 /* SRGUserDataError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGUserDataError.m; sourceTree = "<group>"; };
+		6F0178A1220482AE00B4BCD9 /* SRGUserDataError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGUserDataError.h; sourceTree = "<group>"; };
 		6F0432BC21006E7A002B090A /* SRGNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGNetwork.framework; path = Carthage/Build/iOS/SRGNetwork.framework; sourceTree = "<group>"; };
 		6F0C98E62121E1C200073AB6 /* SRGUserData.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SRGUserData.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F0EB53120FC7F58009C02CF /* SRGUserData.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SRGUserData.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -268,12 +278,17 @@
 			isa = PBXGroup;
 			children = (
 				6F0EB54420FC8049009C02CF /* Categories */,
+				6F01789A22047A8D00B4BCD9 /* SRGDataStore.h */,
+				6F01789B22047A8D00B4BCD9 /* SRGDataStore.m */,
 				6F7B78682108A05C001E3BBE /* SRGHistory.h */,
 				6F7B78692108A05C001E3BBE /* SRGHistory.m */,
 				6F5A558822045311006647AC /* SRGModelManager.h */,
 				6F5A558922045311006647AC /* SRGModelManager.m */,
 				6F0EB53E20FC7FA9009C02CF /* SRGUserData.h */,
 				6F0EB54220FC7FF4009C02CF /* SRGUserData.m */,
+				6F0178A1220482AE00B4BCD9 /* SRGUserDataError.h */,
+				6F0178A0220482AE00B4BCD9 /* SRGUserDataError.m */,
+				6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -383,9 +398,12 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */,
+				6F01789C22047A8D00B4BCD9 /* SRGDataStore.h in Headers */,
 				6F0EB54020FC7FA9009C02CF /* SRGUserData.h in Headers */,
 				6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */,
 				6F7B786A2108A05C001E3BBE /* SRGHistory.h in Headers */,
+				6F0178A3220482AF00B4BCD9 /* SRGUserDataError.h in Headers */,
 				6F5A558A22045311006647AC /* SRGModelManager.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -563,9 +581,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F01789D22047A8D00B4BCD9 /* SRGDataStore.m in Sources */,
 				6F5A558B22045311006647AC /* SRGModelManager.m in Sources */,
 				6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */,
 				6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */,
+				6F0178A2220482AF00B4BCD9 /* SRGUserDataError.m in Sources */,
 				6F7B786B2108A05C001E3BBE /* SRGHistory.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
