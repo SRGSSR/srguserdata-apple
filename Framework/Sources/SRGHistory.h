@@ -41,8 +41,6 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  */
 @interface SRGHistory : NSObject
 
-// TODO: History will be one service among several. Instantiate SRGUserData instead, with these parameters (the service URL
-//       must be the Peach service root instead of the history endpoint)
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore;
 
 @end

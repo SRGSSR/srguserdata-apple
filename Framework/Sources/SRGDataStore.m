@@ -7,7 +7,7 @@
 #import "SRGDataStore.h"
 
 #import "NSBundle+SRGUserData.h"
-#import "SRGModelManager.h"
+#import "SRGPersistentContainer.h"
 #import "SRGUserDataError.h"
 #import "SRGUserDataLogger.h"
 
@@ -19,7 +19,7 @@ static SRGDataStore *s_sharedDataStore;
 
 @property (nonatomic) NSOperationQueue *serialOperationQueue;
 @property (nonatomic) NSPersistentContainer *persistentContainer API_AVAILABLE(ios(10.0));
-@property (nonatomic) SRGModelManager *modelManager NS_DEPRECATED_IOS(9_0, 10_0, "Remove when iOS 10 is the minimum deployment target");
+@property (nonatomic) SRGPersistentContainer *legacyPersistentContainer NS_DEPRECATED_IOS(9_0, 10_0, "Remove when iOS 10 is the minimum deployment target");
 
 @property (nonatomic) NSMapTable<NSString *, NSOperation *> *operations;
 
@@ -57,11 +57,11 @@ static SRGDataStore *s_sharedDataStore;
             viewContext.automaticallyMergesChangesFromParent = YES;
         }
         else {
-            self.modelManager = [[SRGModelManager alloc] initWithName:name directory:directory model:model];
+            self.legacyPersistentContainer = [[SRGPersistentContainer alloc] initWithName:name directory:directory model:model];
             
             // The main context is for reads only. We must therefore always match what has been persisted to the store,
             // thus discarding in-memory versions when background contexts are saved and automatically merged.
-            viewContext = self.modelManager.managedObjectContext;
+            viewContext = self.legacyPersistentContainer.viewContext;
         }
         
         viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy;
@@ -85,7 +85,7 @@ static SRGDataStore *s_sharedDataStore;
         return self.persistentContainer.viewContext;
     }
     else {
-        return self.modelManager.managedObjectContext;
+        return self.legacyPersistentContainer.viewContext;
     }
 }
 
@@ -95,7 +95,7 @@ static SRGDataStore *s_sharedDataStore;
         return self.persistentContainer.newBackgroundContext;
     }
     else {
-        return self.modelManager.backgroundManagedObjectContext;
+        return self.legacyPersistentContainer.backgroundManagedObjectContext;
     }
 }
 

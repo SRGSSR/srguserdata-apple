@@ -4,24 +4,23 @@
 //  License information is available from the LICENSE file.
 //
 
-#import "SRGModelManager.h"
+#import "SRGPersistentContainer.h"
 
-@interface SRGModelManager ()
+@interface SRGPersistentContainer ()
 
-@property (nonatomic) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-@property (nonatomic) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic) NSManagedObjectContext *viewContext;
 
 @end
 
-@implementation SRGModelManager
+@implementation SRGPersistentContainer
 
 #pragma mark Object creation and destruction
 
 - (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model
 {
     if (self = [super init]) {
-        self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:self.managedObjectModel];
+        self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
         
         NSURL *storeURL = [[[NSURL fileURLWithPath:directory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
         NSPersistentStore *persistentStore = [self.persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
@@ -31,7 +30,8 @@
                                                                                                             NSInferMappingModelAutomaticallyOption : @"YES" }
                                                                                                    error:NULL];
         NSAssert(persistentStore, @"Persistence store could not be created");
-        self.managedObjectContext = [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
+        NSAssert(NSThread.isMainThread, @"Must be instantiated from the main thread");
+        self.viewContext = [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
     }
     return self;
 }
