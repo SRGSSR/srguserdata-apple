@@ -45,20 +45,6 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
 //       must be the Peach service root instead of the history endpoint)
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore;
 
-/**
- *  Asynchronously (locally) dissociate the history from the current user, calling the specified block on completion.
- *
- *  @discussion The completion block is called on the main thread.
- */
-- (void)dissociateWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
-
-/**
- *  Asynchronously (locally) clear the history, calling the specified block on completion.
- *
- *  @discussion The completion block is called on the main thread.
- */
-- (void)clearWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
-
 @end
 
 NS_ASSUME_NONNULL_END
