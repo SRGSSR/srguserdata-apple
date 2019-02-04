@@ -30,6 +30,8 @@ NSString *SRGUserDataMarketingVersion(void)
 
 @implementation SRGUserData
 
+#pragma mark Class methods
+
 + (SRGUserData *)currentUserData
 {
     return s_currentUserData;
@@ -39,6 +41,8 @@ NSString *SRGUserDataMarketingVersion(void)
 {
     s_currentUserData = currentUserData;
 }
+
+#pragma mark Object lifecycle
 
 - (instancetype)initWithHistoryServiceURL:(NSURL *)historyServiceURL
                           identityService:(SRGIdentityService *)identityService
@@ -62,9 +66,20 @@ NSString *SRGUserDataMarketingVersion(void)
         } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
         
         self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
+        
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(userDidLogout:)
+                                                   name:SRGIdentityServiceUserDidLogoutNotification
+                                                 object:identityService];
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(didUpdateAccount:)
+                                                   name:SRGIdentityServiceDidUpdateAccountNotification
+                                                 object:identityService];
     }
     return self;
 }
+
+#pragma mark Public methods
 
 - (void)dissociateWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
@@ -111,5 +126,32 @@ NSString *SRGUserDataMarketingVersion(void)
         });
     }];
 }
+
+#pragma mark Notifications
+
+- (void)userDidLogout:(NSNotification *)notification
+{
+    if ([notification.userInfo[SRGIdentityServiceDeletedKey] boolValue]) {
+        [self clearWithCompletionBlock:nil];
+    }
+    
+    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
+        [mainUser detach];
+        return YES;
+    } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
+}
+
+- (void)didUpdateAccount:(NSNotification *)notification
+{
+    SRGAccount *account = notification.userInfo[SRGIdentityServiceAccountKey];
+    
+    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
+        mainUser.accountUid = account.uid;
+        return YES;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
+}
+
 
 @end
