@@ -47,6 +47,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 @interface SRGHistory ()
 
 @property (nonatomic) NSURL *serviceURL;
+@property (nonatomic) SRGIdentityService *identityService;
 @property (nonatomic) SRGDataStore *dataStore;
 
 @property (nonatomic) NSTimer *synchronizationTimer;
@@ -67,10 +68,11 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL dataStore:(SRGDataStore *)dataStore
+- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
 {
     if (self = [super init]) {
         self.serviceURL = serviceURL;
+        self.identityService = identityService;
         self.dataStore = dataStore;
         
         self.concurrentQueue = dispatch_queue_create("ch.srgssr.playsrg.datastore.concurrent", DISPATCH_QUEUE_CONCURRENT);
@@ -95,11 +97,11 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(userDidLogin:)
                                                    name:SRGIdentityServiceUserDidLoginNotification
-                                                 object:SRGIdentityService.currentIdentityService];
+                                                 object:identityService];
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(userDidLogout:)
                                                    name:SRGIdentityServiceUserDidLogoutNotification
-                                                 object:SRGIdentityService.currentIdentityService];
+                                                 object:identityService];
     }
     return self;
 }
@@ -319,14 +321,14 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         return;
     }
     
-    if (! SRGIdentityService.currentIdentityService.isLoggedIn) {
+    if (! self.identityService.isLoggedIn) {
         return;
     }
     
     self.synchronizing = YES;
     
     // There is currently at most one logged in user with SRG Identity
-    NSString *sessionToken = SRGIdentityService.currentIdentityService.sessionToken;
+    NSString *sessionToken = self.identityService.sessionToken;
     NSAssert(sessionToken != nil, @"A logged in User must have a token by construction");
     
     SRGUser *user = [self.dataStore performMainThreadReadTask:^id _Nonnull(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -343,7 +345,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
         }
         else if (SRGHistoryIsUnauthorizationError(pullError)) {
-            [SRGIdentityService.currentIdentityService reportUnauthorization];
+            [self.identityService reportUnauthorization];
             self.synchronizing = NO;
             return;
         }
@@ -356,7 +358,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                 self.synchronizing = NO;
                 
                 if (SRGHistoryIsUnauthorizationError(pushError)) {
-                    [SRGIdentityService.currentIdentityService reportUnauthorization];
+                    [self.identityService reportUnauthorization];
                 }
                 else if (! pushError && ! pullError) {
                     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {

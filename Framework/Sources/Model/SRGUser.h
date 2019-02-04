@@ -18,14 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
 // TODO: Hide implementation details, provide only read-only objects to SDK users
 
 /**
- *  Setup a main user.
- *
- *  @discussion An exception will be raised if `+mainUserInManagedObjectContext:` is called without a user having been
- *              setup (and properly committed).
- */
-+ (void)setupMainUserWithManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
-
-/**
  *  The main user of the application.
  */
 + (SRGUser *)mainUserInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
