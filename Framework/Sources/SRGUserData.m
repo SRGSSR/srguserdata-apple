@@ -23,8 +23,6 @@ NSString *SRGUserDataMarketingVersion(void)
 
 @interface SRGUserData ()
 
-@property (nonatomic) NSURL *serviceURL;
-@property (nonatomic) SRGIdentityService *identityService;
 @property (nonatomic) SRGDataStore *dataStore;
 @property (nonatomic) SRGHistory *history;
 
@@ -42,22 +40,20 @@ NSString *SRGUserDataMarketingVersion(void)
     s_currentUserData = currentUserData;
 }
 
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL
-                   identityService:(SRGIdentityService *)identityService
-                              name:(NSString *)name
-                         directory:(NSString *)directory
+- (instancetype)initWithHistoryServiceURL:(NSURL *)historyServiceURL
+                          identityService:(SRGIdentityService *)identityService
+                                     name:(NSString *)name
+                                directory:(NSString *)directory
 {
     if (self = [super init]) {
-        self.serviceURL = serviceURL;
-        self.identityService = identityService;
+        NSString *modelFilePath = [NSBundle.srg_userDataBundle pathForResource:@"SRGUserData" ofType:@"momd"];
+        NSAssert(modelFilePath, @"The model is missing");
         
-        // TODO: Instantiate model
-        NSManagedObjectModel *model = nil;
+        NSURL *modelFileURL = [NSURL fileURLWithPath:modelFilePath];
+        NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
         self.dataStore = [[SRGDataStore alloc] initWithName:name directory:directory model:model];
         
-        // TODO: Build from service URL
-        NSURL *historyServiceURL = nil;
-        self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:self.identityService dataStore:self.dataStore];
+        self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
     }
     return self;
 }

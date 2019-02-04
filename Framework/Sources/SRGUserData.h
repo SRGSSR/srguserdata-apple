@@ -17,10 +17,11 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 
 @property (class, nonatomic, nullable) SRGUserData *currentUserData;
 
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL
-                   identityService:(SRGIdentityService *)identityService
-                              name:(NSString *)name
-                         directory:(NSString *)directory;
+// TODO: Configuration object for URLs?
+- (instancetype)initWithHistoryServiceURL:(NSURL *)historyServiceURL
+                          identityService:(SRGIdentityService *)identityService
+                                     name:(NSString *)name
+                                directory:(NSString *)directory;
 
 - (void)dissociateWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
 - (void)clearWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
