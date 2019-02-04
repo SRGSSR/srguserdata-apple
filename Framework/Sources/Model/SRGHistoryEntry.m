@@ -10,7 +10,25 @@
 
 #import <libextobjc/libextobjc.h>
 
+@interface SRGHistoryEntry ()
+
+@property (nonatomic, copy) NSString *mediaURN;
+@property (nonatomic) double lastPlaybackPosition;
+@property (nonatomic, copy) NSDate *date;
+@property (nonatomic, copy) NSString *deviceName;
+@property (nonatomic) BOOL discarded;
+@property (nonatomic) BOOL dirty;
+
+@end
+
 @implementation SRGHistoryEntry
+
+@dynamic mediaURN;
+@dynamic lastPlaybackPosition;
+@dynamic date;
+@dynamic deviceName;
+@dynamic discarded;
+@dynamic dirty;
 
 #pragma mark Class methods
 
@@ -50,7 +68,7 @@
                                        sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
                                       inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSFetchRequest *fetchRequest = [self fetchRequest];
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
     fetchRequest.predicate = predicate;
     
     // Ensure stable sorting using the URN as fallback (same criterium applied by the history service)
@@ -86,7 +104,8 @@
 
 + (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:[self fetchRequest]];
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
+    NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
     [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
 }
 

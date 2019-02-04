@@ -66,13 +66,6 @@
     }
 }
 
-#pragma mark UITableViewDelegate protocol
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    
-}
-
 #pragma mark Actions
 
 - (void)login:(id)sender

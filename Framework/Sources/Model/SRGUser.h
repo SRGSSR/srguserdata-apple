@@ -6,8 +6,6 @@
 
 #import <CoreData/CoreData.h>
 
-@class SRGHistoryEntry;
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -15,20 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface SRGUser : NSManagedObject
 
-// TODO: Hide implementation details, provide only read-only objects to SDK users
-
 /**
  *  The main user of the application.
  */
 + (SRGUser *)mainUserInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
-/**
- *  Detach the user, returning it to a non-logged in state.
- */
-- (void)detach;
+@property (nonatomic, readonly, copy, nullable) NSString *accountUid;
+@property (nonatomic, readonly, nullable) NSDate *historyLocalSynchronizationDate;
 
 @end
 
 NS_ASSUME_NONNULL_END
-
-#import "SRGUser+CoreDataProperties.h"          // Generated and managed by Xcode

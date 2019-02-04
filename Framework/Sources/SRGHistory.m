@@ -7,8 +7,8 @@
 #import "SRGHistory.h"
 
 #import "NSTimer+SRGUserData.h"
-#import "SRGHistoryEntry.h"
-#import "SRGUser.h"
+#import "SRGHistoryEntry+Private.h"
+#import "SRGUser+Private.h"
 
 #import <FXReachability/FXReachability.h>
 #import <libextobjc/libextobjc.h>

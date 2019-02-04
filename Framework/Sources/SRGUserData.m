@@ -9,8 +9,8 @@
 #import "NSBundle+SRGUserData.h"
 #import "SRGDataStore.h"
 #import "SRGHistory.h"
-#import "SRGHistoryEntry.h"
-#import "SRGUser.h"
+#import "SRGHistoryEntry+Private.h"
+#import "SRGUser+Private.h"
 
 #import <libextobjc/libextobjc.h>
 
@@ -62,7 +62,8 @@ NSString *SRGUserDataMarketingVersion(void)
         self.dataStore = [[SRGDataStore alloc] initWithName:name directory:directory model:model];
         
         [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-            SRGUser *mainUser = [managedObjectContext executeFetchRequest:SRGUser.fetchRequest error:NULL].firstObject;
+            NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(SRGUser.class)];
+            SRGUser *mainUser = [managedObjectContext executeFetchRequest:fetchRequest error:NULL].firstObject;
             if (! mainUser) {
                 mainUser = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(SRGUser.class) inManagedObjectContext:managedObjectContext];
             }
@@ -117,7 +118,7 @@ NSString *SRGUserDataMarketingVersion(void)
     
     [self.dataStore cancelAllTasks];
     
-    // TODO: History cleanup should be made in history files
+    // TODO: History cleanup should be made in History.m
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
         if (mainUser) {

@@ -6,15 +6,26 @@
 
 #import "SRGUser.h"
 
-#import "SRGHistoryEntry+CoreDataProperties.h"
+@interface SRGUser ()
+
+@property (nonatomic, copy, nullable) NSString *accountUid;
+@property (nonatomic, nullable) NSDate *historyLocalSynchronizationDate;
+@property (nonatomic, nullable) NSDate *historyServerSynchronizationDate;
+
+@end
 
 @implementation SRGUser
+
+@dynamic accountUid;
+@dynamic historyLocalSynchronizationDate;
+@dynamic historyServerSynchronizationDate;
 
 #pragma mark Class methods
 
 + (SRGUser *)mainUserInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    SRGUser *mainUser = [managedObjectContext executeFetchRequest:[self fetchRequest] error:NULL].firstObject;
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
+    SRGUser *mainUser = [managedObjectContext executeFetchRequest:fetchRequest error:NULL].firstObject;
     NSAssert(mainUser != nil, @"A main user must always be available");
     return mainUser;
 }

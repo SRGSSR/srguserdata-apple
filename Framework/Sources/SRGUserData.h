@@ -11,7 +11,8 @@
 FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 
 // Public headers.
-// TODO:
+#import "SRGHistoryEntry.h"
+#import "SRGUser.h"
 
 @interface SRGUserData : NSObject
 
