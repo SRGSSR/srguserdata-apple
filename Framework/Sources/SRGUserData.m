@@ -53,6 +53,14 @@ NSString *SRGUserDataMarketingVersion(void)
         NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
         self.dataStore = [[SRGDataStore alloc] initWithName:name directory:directory model:model];
         
+        [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+            SRGUser *mainUser = [managedObjectContext executeFetchRequest:SRGUser.fetchRequest error:NULL].firstObject;
+            if (! mainUser) {
+                mainUser = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(SRGUser.class) inManagedObjectContext:managedObjectContext];
+            }
+            return YES;
+        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
+        
         self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
     }
     return self;
