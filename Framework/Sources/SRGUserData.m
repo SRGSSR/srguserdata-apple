@@ -8,7 +8,7 @@
 
 #import "NSBundle+SRGUserData.h"
 #import "SRGDataStore.h"
-#import "SRGHistory.h"
+#import "SRGHistory+Private.h"
 #import "SRGHistoryEntry+Private.h"
 #import "SRGUser+Private.h"
 
@@ -54,7 +54,7 @@ NSString *SRGUserDataMarketingVersion(void)
         //  - Code generation with categories must not be enabled.
         //  - At least one class must use class code generation (see https://forums.developer.apple.com/thread/107819)
         //    to suppress warnings, if we want to stick with Xcode new build system.
-        // If no class wants to use code generation, a dummy class can be used (`SRGUserDataDummyClassForWarningSuppression_`
+        // If no class wants to use code generation, a dummy class can be used (`SRGUserDataDummyClassForWarningSuppression`
         // in our model).
         NSString *modelFilePath = [NSBundle.srg_userDataBundle pathForResource:@"SRGUserData" ofType:@"momd"];
         NSAssert(modelFilePath, @"The model is missing");

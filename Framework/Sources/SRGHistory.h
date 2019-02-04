@@ -41,8 +41,6 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  */
 @interface SRGHistory : NSObject
 
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore;
-
 // TODO: Public methods for deletion / batch deletion
 
 @end
