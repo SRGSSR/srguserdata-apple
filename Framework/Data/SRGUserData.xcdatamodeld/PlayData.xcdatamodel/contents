@@ -13,8 +13,10 @@
         <attribute name="historyLocalSynchronizationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="historyServerSynchronizationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
     </entity>
+    <entity name="SRGUserDataDummyClassForWarningSuppression" representedClassName="SRGUserDataDummyClassForWarningSuppression" syncable="YES" codeGenerationType="class"/>
     <elements>
         <element name="SRGHistoryEntry" positionX="-63" positionY="-18" width="128" height="135"/>
         <element name="SRGUser" positionX="-63" positionY="27" width="128" height="90"/>
+        <element name="SRGUserDataDummyClassForWarningSuppression" positionX="-54" positionY="36" width="128" height="45"/>
     </elements>
 </model>

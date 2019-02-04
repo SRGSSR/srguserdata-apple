@@ -29,7 +29,6 @@
 		6F0178B022080FEC00B4BCD9 /* SRGUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0178AC22080FEC00B4BCD9 /* SRGUser.m */; };
 		6F0178B122080FEC00B4BCD9 /* SRGUser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0178AD22080FEC00B4BCD9 /* SRGUser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6F0178B222080FEC00B4BCD9 /* SRGHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0178AE22080FEC00B4BCD9 /* SRGHistoryEntry.m */; };
-		6F0178C82208137C00B4BCD9 /* SRGUserData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6F0178C62208137C00B4BCD9 /* SRGUserData.xcdatamodeld */; };
 		6F0178CB2208192B00B4BCD9 /* NSTimer+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0178C92208192B00B4BCD9 /* NSTimer+SRGUserData.m */; };
 		6F0178CC2208192B00B4BCD9 /* NSTimer+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0178CA2208192B00B4BCD9 /* NSTimer+SRGUserData.h */; };
 		6F0178D02208199800B4BCD9 /* SRGUserDataTimerTarget.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0178CE2208199800B4BCD9 /* SRGUserDataTimerTarget.h */; };
@@ -80,6 +79,7 @@
 		6FA62D71220439CF008569DC /* FXReachability.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6FA62D5C2204389A008569DC /* FXReachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6FA62D72220439CF008569DC /* SRGIdentity.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6FA62D5D2204389A008569DC /* SRGIdentity.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6FA62D73220439CF008569DC /* UICKeyChainStore.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6FA62D5E2204389A008569DC /* UICKeyChainStore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6FB521C02208838E0042FCC3 /* SRGUserData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */; };
 		6FB74D6C2101D4D200E2D365 /* SRGUserData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; };
 		6FB74D772101D5D600E2D365 /* HistoryTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FB74D742101D5D600E2D365 /* HistoryTestCase.m */; };
 		6FB74D7B2101D69F00E2D365 /* SRGNetwork.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -164,7 +164,6 @@
 		6F0178AC22080FEC00B4BCD9 /* SRGUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGUser.m; sourceTree = "<group>"; };
 		6F0178AD22080FEC00B4BCD9 /* SRGUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGUser.h; sourceTree = "<group>"; };
 		6F0178AE22080FEC00B4BCD9 /* SRGHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGHistoryEntry.m; sourceTree = "<group>"; };
-		6F0178C72208137C00B4BCD9 /* PlayData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlayData.xcdatamodel; sourceTree = "<group>"; };
 		6F0178C92208192B00B4BCD9 /* NSTimer+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+SRGUserData.m"; sourceTree = "<group>"; };
 		6F0178CA2208192B00B4BCD9 /* NSTimer+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTimer+SRGUserData.h"; sourceTree = "<group>"; };
 		6F0178CE2208199800B4BCD9 /* SRGUserDataTimerTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGUserDataTimerTarget.h; sourceTree = "<group>"; };
@@ -197,6 +196,7 @@
 		6FA62D5D2204389A008569DC /* SRGIdentity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGIdentity.framework; path = Carthage/Build/iOS/SRGIdentity.framework; sourceTree = "<group>"; };
 		6FA62D5E2204389A008569DC /* UICKeyChainStore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UICKeyChainStore.framework; path = Carthage/Build/iOS/UICKeyChainStore.framework; sourceTree = "<group>"; };
 		6FA62D682204394B008569DC /* Mantle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Mantle.framework; path = Carthage/Build/iOS/Mantle.framework; sourceTree = "<group>"; };
+		6FB521BF2208838E0042FCC3 /* PlayData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlayData.xcdatamodel; sourceTree = "<group>"; };
 		6FB74D672101D4D200E2D365 /* SRGUserData-tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SRGUserData-tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FB74D742101D5D600E2D365 /* HistoryTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistoryTestCase.m; sourceTree = "<group>"; };
 		6FB74D762101D5D600E2D365 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -279,14 +279,6 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		6F0178C52208137C00B4BCD9 /* Data */ = {
-			isa = PBXGroup;
-			children = (
-				6F0178C62208137C00B4BCD9 /* SRGUserData.xcdatamodeld */,
-			);
-			path = Data;
-			sourceTree = "<group>";
-		};
 		6F0178CD2208199800B4BCD9 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
@@ -321,7 +313,7 @@
 		6F0EB53C20FC7FA9009C02CF /* Framework */ = {
 			isa = PBXGroup;
 			children = (
-				6F0178C52208137C00B4BCD9 /* Data */,
+				6FB521BD2208838E0042FCC3 /* Data */,
 				6F0EB53D20FC7FA9009C02CF /* Sources */,
 				6FCBFEF6210B571C006BC355 /* Resources */,
 				6F0EB53F20FC7FA9009C02CF /* Info.plist */,
@@ -422,6 +414,14 @@
 				6FA62D5E2204389A008569DC /* UICKeyChainStore.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6FB521BD2208838E0042FCC3 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */,
+			);
+			path = Data;
 			sourceTree = "<group>";
 		};
 		6FB74D722101D5D600E2D365 /* Tests */ = {
@@ -640,6 +640,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6FB521C02208838E0042FCC3 /* SRGUserData.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -655,7 +656,6 @@
 				6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */,
 				6F0178B222080FEC00B4BCD9 /* SRGHistoryEntry.m in Sources */,
 				6F0178A2220482AF00B4BCD9 /* SRGUserDataError.m in Sources */,
-				6F0178C82208137C00B4BCD9 /* SRGUserData.xcdatamodeld in Sources */,
 				6F0178CB2208192B00B4BCD9 /* NSTimer+SRGUserData.m in Sources */,
 				6F7B786B2108A05C001E3BBE /* SRGHistory.m in Sources */,
 			);
@@ -1343,12 +1343,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		6F0178C62208137C00B4BCD9 /* SRGUserData.xcdatamodeld */ = {
+		6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				6F0178C72208137C00B4BCD9 /* PlayData.xcdatamodel */,
+				6FB521BF2208838E0042FCC3 /* PlayData.xcdatamodel */,
 			);
-			currentVersion = 6F0178C72208137C00B4BCD9 /* PlayData.xcdatamodel */;
+			currentVersion = 6FB521BF2208838E0042FCC3 /* PlayData.xcdatamodel */;
 			path = SRGUserData.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
