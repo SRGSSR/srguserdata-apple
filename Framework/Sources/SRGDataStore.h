@@ -9,10 +9,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- *  A data store ensures safe accesses to the application Core Data layer. In particular, work can be performed on or
- *  off the main thread, without context merging issues. This is achieved by having a single serialized worker queue
- *  process reads and writes in background, while only reads can be performed from the main thread. This avoids Core
- *  Data transaction overlaps (transactions are performed one after the other) and the usual problems related
+ *  An SQLite data store which ensures safe accesses to the application Core Data layer. In particular, work can be
+ *  performed on or off the main thread, without context merging issues. This is achieved by having a single serialized
+ *  worker queue process reads and writes in background, while only reads can be performed from the main thread. This
+ *  avoids Core Data transaction overlaps (transactions are performed one after the other) and the usual problems related
  *  with context merging.
  *
  *  You should use asynchronous methods when possible. If you want a read to be performed at the same time background
@@ -27,8 +27,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface SRGDataStore : NSObject
 
-// TODO: Restore debugging mode for read / writes, but not using preprocessor macros anymore
-
+/**
+ *  Create an SQLite datastore saved under the specified name (the .sqlite extension will be automatically appended),
+ *  stored in the provided directory, and governed by the model as parameter.
+ */
 - (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model;
 
 /**

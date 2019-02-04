@@ -6,11 +6,11 @@
 
 #import <XCTest/XCTest.h>
 
-@interface HistoryTestCase : XCTestCase
+@interface SRGHistoryTestCase : XCTestCase
 
 @end
 
-@implementation HistoryTestCase
+@implementation SRGHistoryTestCase
 
 #pragma mark Tests
 
