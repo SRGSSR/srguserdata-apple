@@ -196,7 +196,7 @@
 		6FA62D5D2204389A008569DC /* SRGIdentity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGIdentity.framework; path = Carthage/Build/iOS/SRGIdentity.framework; sourceTree = "<group>"; };
 		6FA62D5E2204389A008569DC /* UICKeyChainStore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UICKeyChainStore.framework; path = Carthage/Build/iOS/UICKeyChainStore.framework; sourceTree = "<group>"; };
 		6FA62D682204394B008569DC /* Mantle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Mantle.framework; path = Carthage/Build/iOS/Mantle.framework; sourceTree = "<group>"; };
-		6FB521BF2208838E0042FCC3 /* PlayData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlayData.xcdatamodel; sourceTree = "<group>"; };
+		6FB521BF2208838E0042FCC3 /* SRGUserData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData.xcdatamodel; sourceTree = "<group>"; };
 		6FB74D672101D4D200E2D365 /* SRGUserData-tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SRGUserData-tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FB74D742101D5D600E2D365 /* HistoryTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistoryTestCase.m; sourceTree = "<group>"; };
 		6FB74D762101D5D600E2D365 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1346,9 +1346,9 @@
 		6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				6FB521BF2208838E0042FCC3 /* PlayData.xcdatamodel */,
+				6FB521BF2208838E0042FCC3 /* SRGUserData.xcdatamodel */,
 			);
-			currentVersion = 6FB521BF2208838E0042FCC3 /* PlayData.xcdatamodel */;
+			currentVersion = 6FB521BF2208838E0042FCC3 /* SRGUserData.xcdatamodel */;
 			path = SRGUserData.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
