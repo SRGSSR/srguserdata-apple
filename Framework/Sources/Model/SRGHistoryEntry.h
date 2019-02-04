@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  The item unique identifier.
  */
+// TODO: Rename as itemUid
 @property (nonatomic, readonly, copy, nullable) NSString *mediaURN;
 
 /**
@@ -46,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  An identifier for the device which updated the entry.
  */
+// TODO: Rename as deviceUid
 @property (nonatomic, readonly, copy, nullable) NSString *deviceName;
 
 /**

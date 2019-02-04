@@ -166,7 +166,7 @@ NSString *SRGUserDataMarketingVersion(void)
     
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
-        mainUser.accountUid = account.uid;
+        [mainUser attachToAccountUid:account.uid];
         return YES;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
 }

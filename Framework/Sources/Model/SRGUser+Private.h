@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) NSDate *historyLocalSynchronizationDate;
 @property (nonatomic, nullable) NSDate *historyServerSynchronizationDate;
 
+- (void)attachToAccountUid:(NSString *)accountUid;
 - (void)detach;
 
 @end

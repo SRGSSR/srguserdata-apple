@@ -32,6 +32,11 @@
 
 #pragma mark Helpers
 
+- (void)attachToAccountUid:(NSString *)accountUid
+{
+    self.accountUid = accountUid;
+}
+
 - (void)detach
 {
     self.accountUid = nil;
