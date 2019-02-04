@@ -83,6 +83,18 @@ NSString *SRGUserDataMarketingVersion(void)
     return self;
 }
 
+#pragma mark Data reads
+
+- (id)performMainThreadReadTask:(id _Nullable (NS_NOESCAPE ^)(NSManagedObjectContext *))task
+{
+    return [self.dataStore performMainThreadReadTask:task];
+}
+
+- (NSString *)performBackgroundReadTask:(id _Nullable (^)(NSManagedObjectContext *))task withPriority:(NSOperationQueuePriority)priority completionBlock:(void (^)(id _Nullable))completionBlock
+{
+    return [self performBackgroundReadTask:task withPriority:priority completionBlock:completionBlock];
+}
+
 #pragma mark Public methods
 
 - (void)dissociateWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock

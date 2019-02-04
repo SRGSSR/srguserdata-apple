@@ -4,7 +4,7 @@
 //  License information is available from the LICENSE file.
 //
 
-#import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
 #import <SRGIdentity/SRGIdentity.h>
 
 // Official version number.
@@ -22,6 +22,11 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
                           identityService:(SRGIdentityService *)identityService
                                      name:(NSString *)name
                                 directory:(NSString *)directory;
+
+- (nullable id)performMainThreadReadTask:(id _Nullable (NS_NOESCAPE ^)(NSManagedObjectContext *managedObjectContext))task;
+- (NSString *)performBackgroundReadTask:(id _Nullable (^)(NSManagedObjectContext *managedObjectContext))task
+                           withPriority:(NSOperationQueuePriority)priority
+                        completionBlock:(void (^)(id _Nullable result))completionBlock;
 
 - (void)dissociateWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
 - (void)clearWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
