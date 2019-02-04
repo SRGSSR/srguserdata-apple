@@ -21,19 +21,25 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 
 @property (class, nonatomic, nullable) SRGUserData *currentUserData;
 
+@property (nonatomic, readonly) SRGHistory *history;
+
 // TODO: Configuration object for URLs?
 - (instancetype)initWithHistoryServiceURL:(NSURL *)historyServiceURL
                           identityService:(SRGIdentityService *)identityService
                                      name:(NSString *)name
                                 directory:(NSString *)directory;
 
+- (void)dissociateWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
+- (void)clearWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
+
+@end
+
+@interface SRGUserData (CoreData)
+
 - (nullable id)performMainThreadReadTask:(id _Nullable (NS_NOESCAPE ^)(NSManagedObjectContext *managedObjectContext))task;
 - (NSString *)performBackgroundReadTask:(id _Nullable (^)(NSManagedObjectContext *managedObjectContext))task
                            withPriority:(NSOperationQueuePriority)priority
                         completionBlock:(void (^)(id _Nullable result))completionBlock;
-
-- (void)dissociateWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
-- (void)clearWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
 
 @end
 

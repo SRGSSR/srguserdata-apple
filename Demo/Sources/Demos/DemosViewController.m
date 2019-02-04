@@ -57,11 +57,11 @@
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidStartSynchronization:)
                                                name:SRGHistoryDidStartSynchronizationNotification
-                                             object:nil /* Use userData.history property */];
+                                             object:SRGUserData.currentUserData.history];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidClear:)
                                                name:SRGHistoryDidClearNotification
-                                             object:nil /* Use userData.history property */];
+                                             object:SRGUserData.currentUserData.history];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     

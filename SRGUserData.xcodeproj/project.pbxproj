@@ -458,9 +458,9 @@
 		6FFB346722089A5E00E76E6D /* History */ = {
 			isa = PBXGroup;
 			children = (
-				6FFB346822089A5E00E76E6D /* SRGHistory+Private.h */,
 				6FFB346922089A5E00E76E6D /* SRGHistory.h */,
 				6FFB346A22089A5E00E76E6D /* SRGHistory.m */,
+				6FFB346822089A5E00E76E6D /* SRGHistory+Private.h */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -469,8 +469,8 @@
 			isa = PBXGroup;
 			children = (
 				6FFB346C22089A5E00E76E6D /* SRGDataStore.h */,
-				6FFB346D22089A5E00E76E6D /* SRGPersistentContainer.h */,
 				6FFB346E22089A5E00E76E6D /* SRGDataStore.m */,
+				6FFB346D22089A5E00E76E6D /* SRGPersistentContainer.h */,
 				6FFB346F22089A5E00E76E6D /* SRGPersistentContainer.m */,
 			);
 			path = CoreData;
