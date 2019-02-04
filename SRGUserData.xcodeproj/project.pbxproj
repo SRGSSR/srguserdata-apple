@@ -85,6 +85,8 @@
 		6FB74D772101D5D600E2D365 /* HistoryTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FB74D742101D5D600E2D365 /* HistoryTestCase.m */; };
 		6FB74D7B2101D69F00E2D365 /* SRGNetwork.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6FE91E7B2108A36A001B5E8F /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
+		6FFB346522088BA200E76E6D /* SRGDataProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFB346422088BA200E76E6D /* SRGDataProvider.framework */; };
+		6FFB346622088BA200E76E6D /* SRGDataProvider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFB346422088BA200E76E6D /* SRGDataProvider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +124,7 @@
 				6FA62D65220438DF008569DC /* SRGIdentity.framework in Embed Frameworks */,
 				6F0432BF21007340002B090A /* SRGNetwork.framework in Embed Frameworks */,
 				0858B6A422010CD6000F00CF /* MAKVONotificationCenter.framework in Embed Frameworks */,
+				6FFB346622088BA200E76E6D /* SRGDataProvider.framework in Embed Frameworks */,
 				0858B6A222010CD6000F00CF /* libextobjc.framework in Embed Frameworks */,
 				6FA62D6B22043955008569DC /* Mantle.framework in Embed Frameworks */,
 				6F8A940420FDD01B00AA6434 /* SRGUserData.framework in Embed Frameworks */,
@@ -208,6 +211,7 @@
 		6FCBFEFC210B57BE006BC355 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCBFEFD210B57BE006BC355 /* rm */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = rm; path = rm.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FE6E5E32148DC1D00228573 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6FFB346422088BA200E76E6D /* SRGDataProvider.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGDataProvider.framework; path = Carthage/Build/iOS/SRGDataProvider.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -241,6 +245,7 @@
 				6FA62D64220438DF008569DC /* SRGIdentity.framework in Frameworks */,
 				6F0432BE21007340002B090A /* SRGNetwork.framework in Frameworks */,
 				0858B6A322010CD6000F00CF /* MAKVONotificationCenter.framework in Frameworks */,
+				6FFB346522088BA200E76E6D /* SRGDataProvider.framework in Frameworks */,
 				0858B6A522010CD6000F00CF /* SRGLogger.framework in Frameworks */,
 				6FA62D6A22043955008569DC /* Mantle.framework in Frameworks */,
 				0858B69C22010C9E000F00CF /* libextobjc.framework in Frameworks */,
@@ -411,6 +416,7 @@
 				0858B69622010C9E000F00CF /* libextobjc.framework */,
 				0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */,
 				6FA62D682204394B008569DC /* Mantle.framework */,
+				6FFB346422088BA200E76E6D /* SRGDataProvider.framework */,
 				6FA62D5D2204389A008569DC /* SRGIdentity.framework */,
 				0858B69522010C9E000F00CF /* SRGLogger.framework */,
 				6F0432BC21006E7A002B090A /* SRGNetwork.framework */,
@@ -738,7 +744,6 @@
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
@@ -870,7 +875,6 @@
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
@@ -1052,7 +1056,6 @@
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
@@ -1116,7 +1119,6 @@
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
