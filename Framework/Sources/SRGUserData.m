@@ -67,9 +67,9 @@ NSString *SRGUserDataMarketingVersion(void)
                 mainUser = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(SRGUser.class) inManagedObjectContext:managedObjectContext];
             }
             return YES;
-        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
-        
-        self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
+        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
+            self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
+        }];
         
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(userDidLogout:)

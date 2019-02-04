@@ -331,48 +331,49 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     NSString *sessionToken = self.identityService.sessionToken;
     NSAssert(sessionToken != nil, @"A logged in User must have a token by construction");
     
-    SRGUser *user = [self.dataStore performMainThreadReadTask:^id _Nonnull(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser mainUserInManagedObjectContext:managedObjectContext];
-    }];
-    NSManagedObjectID *userID = user.objectID;
-    
-    [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historyServerSynchronizationDate completionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable pullError) {
-        if (! pullError) {
-            [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
-                user.historyServerSynchronizationDate = serverDate;
-                return YES;
-            } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
-        }
-        else if (SRGHistoryIsUnauthorizationError(pullError)) {
-            [self.identityService reportUnauthorization];
-            self.synchronizing = NO;
-            return;
-        }
-        
-        [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGHistoryEntry.new, dirty)];
-            return [SRGHistoryEntry historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries) {
-            [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pushError) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user) {
+        [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historyServerSynchronizationDate completionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable pullError) {
+            if (! pullError) {
+                NSManagedObjectID *userID = user.objectID;
+                [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                    SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
+                    user.historyServerSynchronizationDate = serverDate;
+                    return YES;
+                } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
+            }
+            else if (SRGHistoryIsUnauthorizationError(pullError)) {
+                [self.identityService reportUnauthorization];
                 self.synchronizing = NO;
-                
-                if (SRGHistoryIsUnauthorizationError(pushError)) {
-                    [self.identityService reportUnauthorization];
-                }
-                else if (! pushError && ! pullError) {
-                    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                        SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
-                        user.historyLocalSynchronizationDate = NSDate.date;
-                        return YES;
-                    } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-                        if (! error) {
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidFinishSynchronizationNotification object:self];
-                            });
-                        }
-                    }];
-                }
+                return;
+            }
+            
+            [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGHistoryEntry.new, dirty)];
+                return [SRGHistoryEntry historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+            } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries) {
+                [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pushError) {
+                    self.synchronizing = NO;
+                    
+                    if (SRGHistoryIsUnauthorizationError(pushError)) {
+                        [self.identityService reportUnauthorization];
+                    }
+                    else if (! pushError && ! pullError) {
+                        NSManagedObjectID *userID = user.objectID;
+                        [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                            SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
+                            user.historyLocalSynchronizationDate = NSDate.date;
+                            return YES;
+                        } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
+                            if (! error) {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidFinishSynchronizationNotification object:self];
+                                });
+                            }
+                        }];
+                    }
+                }];
             }];
         }];
     }];
