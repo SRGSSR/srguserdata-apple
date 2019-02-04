@@ -48,7 +48,7 @@
 		6F3246192201B1D20017D00E /* SRGLogger.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F5A558A22045311006647AC /* SRGModelManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F5A558822045311006647AC /* SRGModelManager.h */; };
 		6F5A558B22045311006647AC /* SRGModelManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5A558922045311006647AC /* SRGModelManager.m */; };
-		6F7B786A2108A05C001E3BBE /* SRGHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F7B78682108A05C001E3BBE /* SRGHistory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6F7B786A2108A05C001E3BBE /* SRGHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F7B78682108A05C001E3BBE /* SRGHistory.h */; };
 		6F7B786B2108A05C001E3BBE /* SRGHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F7B78692108A05C001E3BBE /* SRGHistory.m */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
 		6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F120FDCAA800AA6434 /* Images.xcassets */; };
