@@ -50,7 +50,11 @@ NSString *SRGUserDataMarketingVersion(void)
                                 directory:(NSString *)directory
 {
     if (self = [super init]) {
-        NSString *modelFilePath = [NSBundle.srg_userDataBundle pathForResource:@"SRGUserData" ofType:@"momd"];
+        // FIXME: Does not work for static framework packaging. Probable strategy:
+        //          - Keep model file in framework target so that Core Data code generation works.
+        //          - Add script phase to copy momd file into resource bundle as well (if we try to add it directly
+        //            at the xcodeproj level, code generation fails)
+        NSString *modelFilePath = [[NSBundle bundleForClass:self.class] pathForResource:@"SRGUserData" ofType:@"momd"];
         NSAssert(modelFilePath, @"The model is missing");
         
         NSURL *modelFileURL = [NSURL fileURLWithPath:modelFilePath];
