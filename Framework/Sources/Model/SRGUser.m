@@ -14,8 +14,7 @@
 
 + (SRGUser *)mainUserInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
-    SRGUser *mainUser = [managedObjectContext executeFetchRequest:fetchRequest error:NULL].firstObject;
+    SRGUser *mainUser = [managedObjectContext executeFetchRequest:[self fetchRequest] error:NULL].firstObject;
     NSAssert(mainUser != nil, @"A main user must always be available");
     return mainUser;
 }

@@ -50,7 +50,7 @@
                                        sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
                                       inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
+    NSFetchRequest *fetchRequest = [self fetchRequest];
     fetchRequest.predicate = predicate;
     
     // Ensure stable sorting using the URN as fallback (same criterium applied by the history service)
@@ -86,8 +86,7 @@
 
 + (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
-    NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
+    NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:[self fetchRequest]];
     [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
 }
 

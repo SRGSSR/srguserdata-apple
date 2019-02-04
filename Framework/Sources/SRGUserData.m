@@ -157,5 +157,4 @@ NSString *SRGUserDataMarketingVersion(void)
     } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
 }
 
-
 @end
