@@ -150,9 +150,8 @@ NSString *SRGUserDataMarketingVersion(void)
 
 - (void)userDidLogout:(NSNotification *)notification
 {
-    if ([notification.userInfo[SRGIdentityServiceDeletedKey] boolValue]) {
-        [self clearWithCompletionBlock:nil];
-    }
+    // TODO: Probably provide several modes for data cleanup on logout
+    [self clearWithCompletionBlock:nil];
     
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];

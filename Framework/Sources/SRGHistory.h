@@ -7,8 +7,6 @@
 #import <Foundation/Foundation.h>
 #import <SRGIdentity/SRGIdentity.h>
 
-#import "SRGDataStore.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**

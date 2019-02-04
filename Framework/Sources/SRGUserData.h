@@ -8,6 +8,7 @@
 #import <SRGIdentity/SRGIdentity.h>
 
 // Public headers.
+#import "SRGHistory.h"
 #import "SRGHistoryEntry.h"
 #import "SRGUser.h"
 

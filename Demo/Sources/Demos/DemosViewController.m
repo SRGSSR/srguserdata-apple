@@ -54,10 +54,28 @@
                                                name:SRGIdentityServiceDidUpdateAccountNotification
                                              object:SRGIdentityService.currentIdentityService];
     
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(historyDidStartSynchronization:)
+                                               name:SRGHistoryDidStartSynchronizationNotification
+                                             object:nil /* Use userData.history property */];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(historyDidClear:)
+                                               name:SRGHistoryDidClearNotification
+                                             object:nil /* Use userData.history property */];
+    
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     
     [self updateNavigationBar];
     [self refresh];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    if (self.movingFromParentViewController || self.beingDismissed) {
+        [self.request cancel];
+    }
 }
 
 #pragma mark Data
@@ -160,6 +178,16 @@
 - (void)didUpdateAccount:(NSNotification *)notification
 {
     [self updateNavigationBar];
+}
+
+- (void)historyDidStartSynchronization:(NSNotification *)notification
+{
+    [self refresh];
+}
+
+- (void)historyDidClear:(NSNotification *)notification
+{
+    [self refresh];
 }
 
 @end
