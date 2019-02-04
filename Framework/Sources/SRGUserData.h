@@ -7,12 +7,15 @@
 #import <CoreData/CoreData.h>
 #import <SRGIdentity/SRGIdentity.h>
 
-// Official version number.
-FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
-
 // Public headers.
+#import "SRGHistory.h"
 #import "SRGHistoryEntry.h"
 #import "SRGUser.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+// Official version number.
+FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 
 @interface SRGUserData : NSObject
 
@@ -33,3 +36,5 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 - (void)clearWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
 
 @end
+
+NS_ASSUME_NONNULL_END

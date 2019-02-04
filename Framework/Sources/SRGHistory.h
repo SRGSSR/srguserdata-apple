@@ -7,8 +7,6 @@
 #import <Foundation/Foundation.h>
 #import <SRGIdentity/SRGIdentity.h>
 
-#import "SRGDataStore.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -40,8 +38,6 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *              updates.
  */
 @interface SRGHistory : NSObject
-
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore;
 
 // TODO: Public methods for deletion / batch deletion
 

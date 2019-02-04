@@ -8,6 +8,7 @@
 
 #import "DemosViewController.h"
 
+#import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGUserData/SRGUserData.h>
 
@@ -28,6 +29,8 @@
                                                                  identityService:SRGIdentityService.currentIdentityService
                                                                             name:@"UserData-demo"
                                                                        directory:libraryDirectory];
+    
+    SRGDataProvider.currentDataProvider = [[SRGDataProvider alloc] initWithServiceURL:SRGIntegrationLayerProductionServiceURL()];
     
     DemosViewController *demosViewController = [[DemosViewController alloc] init];
     self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:demosViewController];

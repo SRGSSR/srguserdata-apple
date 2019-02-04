@@ -7,6 +7,7 @@
 #import "SRGHistory.h"
 
 #import "NSTimer+SRGUserData.h"
+#import "SRGDataStore.h"
 #import "SRGHistoryEntry+Private.h"
 #import "SRGUser+Private.h"
 
