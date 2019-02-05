@@ -10,6 +10,7 @@
 #import "SRGDataStore.h"
 #import "SRGHistoryEntry.h"
 #import "SRGUser+Private.h"
+#import "SRGUserDataService+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
 

@@ -89,6 +89,8 @@
 		6FFB347E2209773F00E76E6D /* SRGUserDataService.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FFB347D2209773F00E76E6D /* SRGUserDataService.m */; };
 		6FFB34812209B0DC00E76E6D /* SRGUserObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB347F2209B0DC00E76E6D /* SRGUserObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6FFB34822209B0DC00E76E6D /* SRGUserObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FFB34802209B0DC00E76E6D /* SRGUserObject.m */; };
+		6FFB34852209BF8D00E76E6D /* SRGUserObject+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB34832209BF8D00E76E6D /* SRGUserObject+Subclassing.h */; };
+		6FFB34892209C10800E76E6D /* SRGUserDataService+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB34872209C10800E76E6D /* SRGUserDataService+Subclassing.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -216,6 +218,8 @@
 		6FFB347D2209773F00E76E6D /* SRGUserDataService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGUserDataService.m; sourceTree = "<group>"; };
 		6FFB347F2209B0DC00E76E6D /* SRGUserObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGUserObject.h; sourceTree = "<group>"; };
 		6FFB34802209B0DC00E76E6D /* SRGUserObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGUserObject.m; sourceTree = "<group>"; };
+		6FFB34832209BF8D00E76E6D /* SRGUserObject+Subclassing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGUserObject+Subclassing.h"; sourceTree = "<group>"; };
+		6FFB34872209C10800E76E6D /* SRGUserDataService+Subclassing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataService+Subclassing.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -287,6 +291,7 @@
 				6F0178D722086F6D00B4BCD9 /* SRGUser+Private.h */,
 				6FFB347F2209B0DC00E76E6D /* SRGUserObject.h */,
 				6FFB34802209B0DC00E76E6D /* SRGUserObject.m */,
+				6FFB34832209BF8D00E76E6D /* SRGUserObject+Subclassing.h */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -348,6 +353,7 @@
 				6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */,
 				6FFB347B2209748900E76E6D /* SRGUserDataService.h */,
 				6FFB347D2209773F00E76E6D /* SRGUserDataService.m */,
+				6FFB34872209C10800E76E6D /* SRGUserDataService+Subclassing.h */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -499,6 +505,8 @@
 				6F0178CC2208192B00B4BCD9 /* NSTimer+SRGUserData.h in Headers */,
 				6FFB34812209B0DC00E76E6D /* SRGUserObject.h in Headers */,
 				6F0EB54020FC7FA9009C02CF /* SRGUserData.h in Headers */,
+				6FFB34892209C10800E76E6D /* SRGUserDataService+Subclassing.h in Headers */,
+				6FFB34852209BF8D00E76E6D /* SRGUserObject+Subclassing.h in Headers */,
 				6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */,
 				6F0178A3220482AF00B4BCD9 /* SRGUserDataError.h in Headers */,
 				6FFB347422089A5E00E76E6D /* SRGPersistentContainer.h in Headers */,

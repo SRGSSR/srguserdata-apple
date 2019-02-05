@@ -9,6 +9,8 @@
 #import "SRGDataStore.h"
 #import "SRGHistoryEntry.h"
 #import "SRGUser+Private.h"
+#import "SRGUserDataService+Subclassing.h"
+#import "SRGUserObject+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
 #import <MAKVONotificationCenter/MAKVONotificationCenter.h>

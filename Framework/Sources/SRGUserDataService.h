@@ -19,19 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) SRGIdentityService *identityService;
 @property (nonatomic, readonly) SRGDataStore *dataStore;
 
-- (void)synchronize;
-
-@end
-
-@interface SRGUserDataService (SubclassingHooks)
-
-- (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock;
-
-- (void)userDidLogin;
-- (void)userDidLogout;
-
-- (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock;
-
 @end
 
 NS_ASSUME_NONNULL_END
