@@ -51,6 +51,11 @@ typedef NSArray<SRGUserDataService *> * (^SRGUserDataServiceConfigurator)(SRGIde
                   sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
                         completionBlock:(void (^)(NSArray<SRGHistoryEntry *> *historyEntries))completionBlock;
 
+- (void)saveHistoryEntryForURN:(NSString *)URN
+      withLastPlaybackPosition:(CMTime)lastPlaybackPosition
+                    deviceName:(nullable NSString *)deviceName
+               completionBlock:(nullable void (^)(NSError *error))completionBlock;
+
 @end
 
 NS_ASSUME_NONNULL_END

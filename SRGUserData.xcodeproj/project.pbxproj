@@ -91,6 +91,7 @@
 		6FFB34822209B0DC00E76E6D /* SRGUserObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FFB34802209B0DC00E76E6D /* SRGUserObject.m */; };
 		6FFB34852209BF8D00E76E6D /* SRGUserObject+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB34832209BF8D00E76E6D /* SRGUserObject+Subclassing.h */; };
 		6FFB34892209C10800E76E6D /* SRGUserDataService+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB34872209C10800E76E6D /* SRGUserDataService+Subclassing.h */; };
+		6FFB348E2209D57400E76E6D /* SRGHistoryEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB348C2209D57400E76E6D /* SRGHistoryEntry+Private.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -220,6 +221,7 @@
 		6FFB34802209B0DC00E76E6D /* SRGUserObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGUserObject.m; sourceTree = "<group>"; };
 		6FFB34832209BF8D00E76E6D /* SRGUserObject+Subclassing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGUserObject+Subclassing.h"; sourceTree = "<group>"; };
 		6FFB34872209C10800E76E6D /* SRGUserDataService+Subclassing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataService+Subclassing.h"; sourceTree = "<group>"; };
+		6FFB348C2209D57400E76E6D /* SRGHistoryEntry+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGHistoryEntry+Private.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -286,6 +288,7 @@
 			children = (
 				6F0178AB22080FEC00B4BCD9 /* SRGHistoryEntry.h */,
 				6F0178AE22080FEC00B4BCD9 /* SRGHistoryEntry.m */,
+				6FFB348C2209D57400E76E6D /* SRGHistoryEntry+Private.h */,
 				6F0178AD22080FEC00B4BCD9 /* SRGUser.h */,
 				6F0178AC22080FEC00B4BCD9 /* SRGUser.m */,
 				6F0178D722086F6D00B4BCD9 /* SRGUser+Private.h */,
@@ -511,6 +514,7 @@
 				6F0178A3220482AF00B4BCD9 /* SRGUserDataError.h in Headers */,
 				6FFB347422089A5E00E76E6D /* SRGPersistentContainer.h in Headers */,
 				6F0178D822086F6D00B4BCD9 /* SRGUser+Private.h in Headers */,
+				6FFB348E2209D57400E76E6D /* SRGHistoryEntry+Private.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

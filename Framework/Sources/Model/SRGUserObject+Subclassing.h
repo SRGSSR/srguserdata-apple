@@ -49,6 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (__kindof SRGUserObject *)objectWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
++ (__kindof SRGUserObject *)upsertWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+
 /**
  *  Delete all history entries.
  */

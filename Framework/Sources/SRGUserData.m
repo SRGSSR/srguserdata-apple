@@ -8,7 +8,7 @@
 
 #import "NSBundle+SRGUserData.h"
 #import "SRGDataStore.h"
-#import "SRGHistoryEntry.h"
+#import "SRGHistoryEntry+Private.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataService+Subclassing.h"
 #import "SRGUserObject+Subclassing.h"
@@ -134,6 +134,24 @@ NSString *SRGUserDataMarketingVersion(void)
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
+}
+
+- (void)saveHistoryEntryForURN:(NSString *)URN withLastPlaybackTime:(CMTime)lastPlaybackTime deviceName:(NSString *)deviceName completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+{
+    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithURN:URN inManagedObjectContext:managedObjectContext];
+        historyEntry.lastPlaybackTime = lastPlaybackTime;
+        historyEntry.deviceName = deviceName;
+        return YES;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        if (! error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGHistoryURNsKey : @[ URN ] }];
+            });
+        }
+    }];
 }
 
 #pragma mark Notifications
