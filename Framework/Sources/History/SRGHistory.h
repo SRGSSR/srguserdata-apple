@@ -4,6 +4,7 @@
 //  License information is available from the LICENSE file.
 //
 
+#import "SRGHistoryEntry.h"
 #import "SRGUserDataService.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -40,6 +41,22 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *              updates.
  */
 @interface SRGHistory : SRGUserDataService
+
+- (NSArray<__kindof SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                                                   sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
+
+- (void)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                  sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
+                        completionBlock:(void (^)(NSArray<SRGHistoryEntry *> *historyEntries))completionBlock;
+
+- (void)saveHistoryEntryForURN:(NSString *)URN
+          withLastPlaybackTime:(CMTime)lastPlaybackTime
+                    deviceName:(nullable NSString *)deviceName
+               completionBlock:(nullable void (^)(NSError *error))completionBlock;
+
+// Use `nil` to discard all
+- (void)discardHistoryEntriesWithURNs:(nullable NSArray<NSString *> *)URNs
+                      completionBlock:(nullable void (^)(NSError *error))completionBlock;
 
 @end
 

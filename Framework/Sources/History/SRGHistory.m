@@ -7,7 +7,7 @@
 #import "SRGHistory.h"
 
 #import "SRGDataStore.h"
-#import "SRGHistoryEntry.h"
+#import "SRGHistoryEntry+Private.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataService+Subclassing.h"
 #import "SRGUserObject+Subclassing.h"
@@ -345,5 +345,57 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         completionBlock ? completionBlock() : nil;
     }];
 }
+
+- (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
+{
+    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+    }];
+}
+
+- (void)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGHistoryEntry *> * _Nonnull))completionBlock
+{
+    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
+}
+
+- (void)saveHistoryEntryForURN:(NSString *)URN withLastPlaybackTime:(CMTime)lastPlaybackTime deviceName:(NSString *)deviceName completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+{
+    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithURN:URN inManagedObjectContext:managedObjectContext];
+        historyEntry.lastPlaybackTime = lastPlaybackTime;
+        historyEntry.deviceName = deviceName;
+        return YES;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        if (! error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGHistoryURNsKey : @[ URN ] }];
+            });
+        }
+        completionBlock ? completionBlock(error) : nil;
+    }];
+}
+
+- (void)discardHistoryEntriesWithURNs:(NSArray<NSString *> *)URNs completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+{
+    __block NSArray<NSString *> *discardedURNs = nil;
+    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        discardedURNs = [SRGHistoryEntry discardObjectsWithURNs:URNs inManagedObjectContext:managedObjectContext];
+        return YES;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        if (! error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGHistoryURNsKey : discardedURNs }];
+            });
+        }
+        completionBlock ? completionBlock(error) : nil;
+    }];
+}
+
 
 @end

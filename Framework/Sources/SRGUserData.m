@@ -8,7 +8,7 @@
 
 #import "NSBundle+SRGUserData.h"
 #import "SRGDataStore.h"
-#import "SRGHistoryEntry+Private.h"
+#import "SRGHistory.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataService+Subclassing.h"
 #import "SRGUserObject+Subclassing.h"
@@ -25,7 +25,7 @@ NSString *SRGUserDataMarketingVersion(void)
 @interface SRGUserData ()
 
 @property (nonatomic) SRGDataStore *dataStore;
-@property (nonatomic) NSArray<SRGUserDataService *> *services;
+@property (nonatomic) SRGHistory *history;
 
 @end
 
@@ -46,9 +46,9 @@ NSString *SRGUserDataMarketingVersion(void)
 #pragma mark Object lifecycle
 
 - (instancetype)initWithIdentityService:(SRGIdentityService *)identityService
+                      historyServiceURL:(NSURL *)historyServiceURL
                                    name:(NSString *)name
                               directory:(NSString *)directory
-                           configurator:(SRGUserDataServiceConfigurator)configurator
 {
     if (self = [super init]) {
         // Bundling the model file in a resource bundle requires a few things:
@@ -72,7 +72,7 @@ NSString *SRGUserDataMarketingVersion(void)
             }
             return YES;
         } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-            self.services = configurator(identityService, self.dataStore);
+            self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
         }];
         
         [NSNotificationCenter.defaultCenter addObserver:self
@@ -106,70 +106,8 @@ NSString *SRGUserDataMarketingVersion(void)
 {
     [self.dataStore cancelAllBackgroundTasks];
     
-    dispatch_async(dispatch_queue_create("ch.srgssr.userdata.clear", NULL), ^{
-        dispatch_group_t group = dispatch_group_create();
-        for (SRGUserDataService *service in self.services) {
-            dispatch_group_enter(group);
-            [service clearDataWithCompletionBlock:^{
-                dispatch_group_leave(group);
-            }];
-        }
-        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-        
+    [self.history clearDataWithCompletionBlock:^{
         [self dissociateWithCompletionBlock:completionBlock];
-    });
-}
-
-#pragma mark History
-
-- (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
-{
-    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
-    }];
-}
-
-- (void)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGHistoryEntry *> * _Nonnull))completionBlock
-{
-    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
-}
-
-- (void)saveHistoryEntryForURN:(NSString *)URN withLastPlaybackTime:(CMTime)lastPlaybackTime deviceName:(NSString *)deviceName completionBlock:(void (^)(NSError * _Nonnull))completionBlock
-{
-    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithURN:URN inManagedObjectContext:managedObjectContext];
-        historyEntry.lastPlaybackTime = lastPlaybackTime;
-        historyEntry.deviceName = deviceName;
-        return YES;
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (! error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
-                                                                  object:self
-                                                                userInfo:@{ SRGHistoryURNsKey : @[ URN ] }];
-            });
-        }
-        completionBlock ? completionBlock(error) : nil;
-    }];
-}
-
-- (void)discardHistoryEntriesWithURNs:(NSArray<NSString *> *)URNs completionBlock:(void (^)(NSError * _Nonnull))completionBlock
-{
-    __block NSArray<NSString *> *discardedURNs = nil;
-    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        discardedURNs = [SRGHistoryEntry discardObjectsWithURNs:URNs inManagedObjectContext:managedObjectContext];
-        return YES;
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (! error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
-                                                                  object:self
-                                                                userInfo:@{ SRGHistoryURNsKey : discardedURNs }];
-            });
-        }
-        completionBlock ? completionBlock(error) : nil;
     }];
 }
 

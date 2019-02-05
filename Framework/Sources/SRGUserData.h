@@ -29,36 +29,17 @@ typedef NSArray<SRGUserDataService *> * (^SRGUserDataServiceConfigurator)(SRGIde
 
 @property (class, nonatomic, nullable) SRGUserData *currentUserData;
 
+// TODO: URL configuration object
 - (instancetype)initWithIdentityService:(SRGIdentityService *)identityService
+                      historyServiceURL:(nullable NSURL *)historyServiceURL
                                    name:(NSString *)name
-                              directory:(NSString *)directory
-                           configurator:(SRGUserDataServiceConfigurator)configurator;
+                              directory:(NSString *)directory;
 
-@property (nonatomic, readonly) SRGDataStore *dataStore;
+@property (nonatomic, readonly, nullable) SRGHistory *history;
 
 // Completion blocks called on background threads
 - (void)dissociateWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
 - (void)clearWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
-
-@end
-
-@interface SRGUserData (History)
-
-- (NSArray<__kindof SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
-                                                   sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
-
-- (void)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
-                  sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
-                        completionBlock:(void (^)(NSArray<SRGHistoryEntry *> *historyEntries))completionBlock;
-
-- (void)saveHistoryEntryForURN:(NSString *)URN
-      withLastPlaybackPosition:(CMTime)lastPlaybackPosition
-                    deviceName:(nullable NSString *)deviceName
-               completionBlock:(nullable void (^)(NSError *error))completionBlock;
-
-// Use `nil` to discard all
-- (void)discardHistoryEntriesWithURNs:(nullable NSArray<NSString *> *)URNs
-                      completionBlock:(nullable void (^)(NSError *error))completionBlock;
 
 @end
 
