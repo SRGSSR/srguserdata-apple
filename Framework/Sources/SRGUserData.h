@@ -32,6 +32,7 @@ typedef NSArray<SRGUserDataService *> * (^SRGUserDataServiceConfigurator)(SRGIde
 
 @property (nonatomic, readonly) SRGDataStore *dataStore;
 
+// Completion blocks called on background threads
 - (void)dissociateWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
 - (void)clearWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
 
