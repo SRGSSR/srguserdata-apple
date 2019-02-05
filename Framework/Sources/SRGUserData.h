@@ -30,10 +30,10 @@ typedef NSArray<SRGUserDataService *> * (^SRGUserDataServiceConfigurator)(SRGIde
                               directory:(NSString *)directory
                            configurator:(SRGUserDataServiceConfigurator)configurator;
 
-@property (nonatomic, readonly) SRGDataStore *store;
+@property (nonatomic, readonly) SRGDataStore *dataStore;
 
-- (void)dissociateWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
-- (void)clearWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
+- (void)dissociateWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
+- (void)clearWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
 
 @end
 

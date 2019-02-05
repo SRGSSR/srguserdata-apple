@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)userDidLogin;
 - (void)userDidLogout;
 
+- (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock;
+
 @end
 
 NS_ASSUME_NONNULL_END

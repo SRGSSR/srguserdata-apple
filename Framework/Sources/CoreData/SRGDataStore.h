@@ -100,13 +100,13 @@ NS_ASSUME_NONNULL_BEGIN
  *  be interrupted, rather cancelled and rollbacked when ending. A pending task is simply discarded. If the handle is
  *  invalid or if the task has already been executed, the method does nothing.
  */
-- (void)cancelTaskWithHandle:(NSString *)handle;
+- (void)cancelBackgroundTaskWithHandle:(NSString *)handle;
 
 /**
  *  Cancel all tasks being executed or pending. Tasks being executed will not be interrupted, rather cancelled and
  *  rollbacked when ending. Pending tasks are simply discarded.
  */
-- (void)cancelAllTasks;
+- (void)cancelAllBackgroundTasks;
 
 @end
 

@@ -196,7 +196,7 @@ static SRGDataStore *s_sharedDataStore;
     return handle;
 }
 
-- (void)cancelTaskWithHandle:(NSString *)handle
+- (void)cancelBackgroundTaskWithHandle:(NSString *)handle
 {
     dispatch_sync(self.concurrentQueue, ^{
         NSOperation *operation = [self.operations objectForKey:handle];
@@ -209,7 +209,7 @@ static SRGDataStore *s_sharedDataStore;
     });
 }
 
-- (void)cancelAllTasks
+- (void)cancelAllBackgroundTasks
 {
     dispatch_barrier_async(self.concurrentQueue, ^{
         [self.serialOperationQueue cancelAllOperations];

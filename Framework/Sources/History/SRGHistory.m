@@ -335,4 +335,29 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     [self.pushRequestQueue cancel];
 }
 
+- (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock
+{
+    __block NSSet<NSString *> *URNs = nil;
+    
+    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        URNs = [historyEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, mediaURN)]];
+        
+        [SRGHistoryEntry deleteAllInManagedObjectContext:managedObjectContext];
+        return YES;
+    } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (URNs.count > 0) {
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGHistoryURNsKey : URNs.allObjects }];
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidClearNotification
+                                                                  object:self
+                                                                userInfo:nil];
+            }
+        });
+        completionBlock ? completionBlock() : nil;
+    }];
+}
+
 @end
