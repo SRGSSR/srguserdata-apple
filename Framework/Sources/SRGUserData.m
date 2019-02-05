@@ -7,8 +7,7 @@
 #import "SRGUserData.h"
 
 #import "NSBundle+SRGUserData.h"
-#import "SRGDataStore+Private.h"
-#import "SRGHistory+Private.h"
+#import "SRGDataStore.h"
 #import "SRGHistoryEntry+Private.h"
 #import "SRGUser+Private.h"
 
@@ -24,7 +23,7 @@ NSString *SRGUserDataMarketingVersion(void)
 @interface SRGUserData ()
 
 @property (nonatomic) SRGDataStore *store;
-@property (nonatomic) SRGHistory *history;
+@property (nonatomic) NSArray<SRGUserDataService *> *services;
 
 @end
 
@@ -44,10 +43,10 @@ NSString *SRGUserDataMarketingVersion(void)
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithHistoryServiceURL:(NSURL *)historyServiceURL
-                          identityService:(SRGIdentityService *)identityService
-                                     name:(NSString *)name
-                                directory:(NSString *)directory
+- (instancetype)initWithIdentityService:(SRGIdentityService *)identityService
+                                   name:(NSString *)name
+                              directory:(NSString *)directory
+                           configurator:(SRGUserDataServiceConfigurator)configurator
 {
     if (self = [super init]) {
         // Bundling the model file in a resource bundle requires a few things:
@@ -71,7 +70,7 @@ NSString *SRGUserDataMarketingVersion(void)
             }
             return YES;
         } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-            self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.store];
+            self.services = configurator(identityService, self.store);
         }];
         
         [NSNotificationCenter.defaultCenter addObserver:self

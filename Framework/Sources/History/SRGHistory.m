@@ -7,7 +7,7 @@
 #import "SRGHistory.h"
 
 #import "NSTimer+SRGUserData.h"
-#import "SRGDataStore+Private.h"
+#import "SRGDataStore.h"
 #import "SRGHistoryEntry+Private.h"
 #import "SRGUser+Private.h"
 
@@ -47,10 +47,6 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 @interface SRGHistory ()
 
-@property (nonatomic) NSURL *serviceURL;
-@property (nonatomic) SRGIdentityService *identityService;
-@property (nonatomic) SRGDataStore *dataStore;
-
 @property (nonatomic) NSTimer *synchronizationTimer;
 @property (atomic /* custom */, getter=isSynchronizing) BOOL synchronizing;
 
@@ -71,11 +67,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
 {
-    if (self = [super init]) {
-        self.serviceURL = serviceURL;
-        self.identityService = identityService;
-        self.dataStore = dataStore;
-        
+    if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
         self.concurrentQueue = dispatch_queue_create("ch.srgssr.playsrg.datastore.concurrent", DISPATCH_QUEUE_CONCURRENT);
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
         

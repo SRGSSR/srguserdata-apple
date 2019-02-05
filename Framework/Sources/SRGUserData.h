@@ -12,24 +12,25 @@
 #import "SRGHistory.h"
 #import "SRGHistoryEntry.h"
 #import "SRGUser.h"
+#import "SRGUserDataService.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 // Official version number.
 FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 
+typedef NSArray<SRGUserDataService *> * (^SRGUserDataServiceConfigurator)(SRGIdentityService *identityService, SRGDataStore *dataStore);
+
 @interface SRGUserData : NSObject
 
 @property (class, nonatomic, nullable) SRGUserData *currentUserData;
 
-@property (nonatomic, readonly) SRGHistory *history;
-@property (nonatomic, readonly) SRGDataStore *store;
+- (instancetype)initWithIdentityService:(SRGIdentityService *)identityService
+                                   name:(NSString *)name
+                              directory:(NSString *)directory
+                           configurator:(SRGUserDataServiceConfigurator)configurator;
 
-// TODO: Configuration object for URLs?
-- (instancetype)initWithHistoryServiceURL:(NSURL *)historyServiceURL
-                          identityService:(SRGIdentityService *)identityService
-                                     name:(NSString *)name
-                                directory:(NSString *)directory;
+@property (nonatomic, readonly) SRGDataStore *store;
 
 - (void)dissociateWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;
 - (void)clearWithCompletionBlock:(void (^ _Nullable)(NSError * _Nullable error))completionBlock;

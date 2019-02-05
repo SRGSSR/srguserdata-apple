@@ -4,8 +4,7 @@
 //  License information is available from the LICENSE file.
 //
 
-#import <Foundation/Foundation.h>
-#import <SRGIdentity/SRGIdentity.h>
+#import "SRGUserDataService.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -37,9 +36,7 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *  @discussion Though similar methods exist on `SRGHistoryEntry`, use `SRGHistory` as the main entry point for local history
  *              updates.
  */
-@interface SRGHistory : NSObject
-
-// TODO: Public methods for deletion / batch deletion
+@interface SRGHistory : SRGUserDataService
 
 @end
 

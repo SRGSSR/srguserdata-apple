@@ -53,15 +53,14 @@
                                            selector:@selector(didUpdateAccount:)
                                                name:SRGIdentityServiceDidUpdateAccountNotification
                                              object:SRGIdentityService.currentIdentityService];
-    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidStartSynchronization:)
                                                name:SRGHistoryDidStartSynchronizationNotification
-                                             object:SRGUserData.currentUserData.history];
+                                             object:nil /* TODO */];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidClear:)
                                                name:SRGHistoryDidClearNotification
-                                             object:SRGUserData.currentUserData.history];
+                                             object:nil /* TODO */];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     
