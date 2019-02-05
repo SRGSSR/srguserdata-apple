@@ -137,7 +137,7 @@ NSString *SRGUserDataMarketingVersion(void)
 
 - (void)userDidLogout:(NSNotification *)notification
 {
-    // TODO: Probably provide several modes for data cleanup on logout
+    [self.store cancelAllTasks];
     [self clearWithCompletionBlock:nil];
     
     [self.store performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {

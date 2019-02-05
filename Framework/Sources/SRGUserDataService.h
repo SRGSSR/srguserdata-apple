@@ -13,13 +13,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SRGUserDataService : NSObject
 
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL
-                   identityService:(SRGIdentityService *)identityService
-                         dataStore:(SRGDataStore *)dataStore NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly) NSURL *serviceURL;
 @property (nonatomic, readonly) SRGIdentityService *identityService;
 @property (nonatomic, readonly) SRGDataStore *dataStore;
+
+@end
+
+@interface SRGUserDataService (SubclassingHooks)
+
+- (void)synchronize;
+
+- (void)userDidLogin;
+- (void)userDidLogout;
 
 @end
 

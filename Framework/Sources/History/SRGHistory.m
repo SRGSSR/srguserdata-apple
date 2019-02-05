@@ -6,12 +6,10 @@
 
 #import "SRGHistory.h"
 
-#import "NSTimer+SRGUserData.h"
 #import "SRGDataStore.h"
 #import "SRGHistoryEntry+Private.h"
 #import "SRGUser+Private.h"
 
-#import <FXReachability/FXReachability.h>
 #import <libextobjc/libextobjc.h>
 #import <MAKVONotificationCenter/MAKVONotificationCenter.h>
 #import <SRGIdentity/SRGIdentity.h>
@@ -47,13 +45,10 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 @interface SRGHistory ()
 
-@property (nonatomic) NSTimer *synchronizationTimer;
 @property (atomic /* custom */, getter=isSynchronizing) BOOL synchronizing;
 
 @property (nonatomic, weak) SRGPageRequest *pullRequest;
 @property (nonatomic) SRGRequestQueue *pushRequestQueue;
-
-@property (nonatomic) dispatch_queue_t concurrentQueue;
 
 @property (nonatomic) NSURLSession *session;
 
@@ -68,67 +63,14 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
 {
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
-        self.concurrentQueue = dispatch_queue_create("ch.srgssr.playsrg.datastore.concurrent", DISPATCH_QUEUE_CONCURRENT);
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
         
-        // TODO: Make sync interval a history configuration parameter
-        @weakify(self)
-        self.synchronizationTimer = [NSTimer srguserdata_timerWithTimeInterval:60. repeats:YES block:^(NSTimer * _Nonnull timer) {
-            @strongify(self)
-            [self synchronize];
-        }];
-        [self synchronize];
         
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(reachabilityDidChange:)
-                                                   name:FXReachabilityStatusDidChangeNotification
-                                                 object:nil];
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(applicationWillEnterForeground:)
-                                                   name:UIApplicationWillEnterForegroundNotification
-                                                 object:nil];
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(userDidLogin:)
-                                                   name:SRGIdentityServiceUserDidLoginNotification
-                                                 object:identityService];
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(userDidLogout:)
-                                                   name:SRGIdentityServiceUserDidLogoutNotification
-                                                 object:identityService];
     }
     return self;
 }
 
 #pragma clang diagnostic pop
-
-- (void)dealloc
-{
-    self.synchronizationTimer = nil;
-}
-
-#pragma mark Getters and setters
-
-- (void)setSynchronizationTimer:(NSTimer *)synchronizationTimer
-{
-    [_synchronizationTimer invalidate];
-    _synchronizationTimer = synchronizationTimer;
-}
-
-- (BOOL)isSynchronizing
-{
-    __block BOOL synchronizing = NO;
-    dispatch_sync(self.concurrentQueue, ^{
-        synchronizing = self->_synchronizing;
-    });
-    return synchronizing;
-}
-
-- (void)setSynchronizing:(BOOL)synchronizing
-{
-    dispatch_barrier_async(self.concurrentQueue, ^{
-        self->_synchronizing = synchronizing;
-    });
-}
 
 #pragma mark Requests
 
@@ -306,11 +248,11 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     [self.pushRequestQueue resume];
 }
 
-#pragma mark Synchronization
+#pragma mark Subclassing hooks
 
 - (void)synchronize
 {
-    if (! self.serviceURL || self.synchronizing) {
+    if (self.synchronizing) {
         return;
     }
     
@@ -372,21 +314,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     }];
 }
 
-#pragma mark Notifications
-
-- (void)reachabilityDidChange:(NSNotification *)notification
-{
-    if ([FXReachability sharedInstance].reachable) {
-        [self synchronize];
-    }
-}
-
-- (void)applicationWillEnterForeground:(NSNotification *)notification
-{
-    [self synchronize];
-}
-
-- (void)userDidLogin:(NSNotification *)notification
+- (void)userDidLogin
 {
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
@@ -401,13 +329,10 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     }];
 }
 
-- (void)userDidLogout:(NSNotification *)notification
+- (void)userDidLogout
 {
-    dispatch_sync(self.concurrentQueue, ^{
-        [self.pullRequest cancel];
-        [self.pushRequestQueue cancel];
-    });
-    [self.dataStore cancelAllTasks];
+    [self.pullRequest cancel];
+    [self.pushRequestQueue cancel];
 }
 
 @end
