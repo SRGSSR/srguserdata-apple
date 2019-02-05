@@ -13,13 +13,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface SRGUser : NSManagedObject
 
+@property (nonatomic, readonly, copy, nullable) NSString *accountUid;
+@property (nonatomic, readonly, nullable) NSDate *historyLocalSynchronizationDate;
+
+@end
+
+@interface SRGUser (Queries)
+
 /**
  *  The main user of the application.
  */
 + (SRGUser *)mainUserInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
-
-@property (nonatomic, readonly, copy, nullable) NSString *accountUid;
-@property (nonatomic, readonly, nullable) NSDate *historyLocalSynchronizationDate;
 
 @end
 

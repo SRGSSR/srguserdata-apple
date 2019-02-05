@@ -15,20 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SRGHistoryEntry : NSManagedObject
 
 /**
- *  Return history entries, optionally matching a specific predicate and / or sorted with descriptors.
- *
- *  @discussion Entries are returned in a stable order.
- */
-+ (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
-                                          sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
-                                         inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
-
-/**
- *  Return an entry matching the specified URN, `nil` if none is found.
- */
-+ (nullable SRGHistoryEntry *)historyEntryWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
-
-/**
  *  The item unique identifier.
  */
 // TODO: Rename as itemUid
@@ -54,6 +40,24 @@ NS_ASSUME_NONNULL_BEGIN
  *  `YES` iff the entry has been marked as discarded.
  */
 @property (nonatomic, readonly) BOOL discarded;
+
+@end
+
+@interface SRGHistoryEntry (Queries)
+
+/**
+ *  Return history entries, optionally matching a specific predicate and / or sorted with descriptors.
+ *
+ *  @discussion Entries are returned in a stable order.
+ */
++ (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                                          sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
+                                         inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+
+/**
+ *  Return an entry matching the specified URN, `nil` if none is found.
+ */
++ (nullable SRGHistoryEntry *)historyEntryWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 @end
 
