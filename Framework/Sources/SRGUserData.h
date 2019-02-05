@@ -56,6 +56,10 @@ typedef NSArray<SRGUserDataService *> * (^SRGUserDataServiceConfigurator)(SRGIde
                     deviceName:(nullable NSString *)deviceName
                completionBlock:(nullable void (^)(NSError *error))completionBlock;
 
+// Use `nil` to discard all
+- (void)discardHistoryEntriesWithURNs:(nullable NSArray<NSString *> *)URNs
+                      completionBlock:(nullable void (^)(NSError *error))completionBlock;
+
 @end
 
 NS_ASSUME_NONNULL_END

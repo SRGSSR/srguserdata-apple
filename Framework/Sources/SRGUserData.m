@@ -151,6 +151,25 @@ NSString *SRGUserDataMarketingVersion(void)
                                                                 userInfo:@{ SRGHistoryURNsKey : @[ URN ] }];
             });
         }
+        completionBlock ? completionBlock(error) : nil;
+    }];
+}
+
+- (void)discardHistoryEntriesWithURNs:(NSArray<NSString *> *)URNs completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+{
+    __block NSArray<NSString *> *discardedURNs = nil;
+    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        discardedURNs = [SRGHistoryEntry discardObjectsWithURNs:URNs inManagedObjectContext:managedObjectContext];
+        return YES;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        if (! error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGHistoryURNsKey : discardedURNs }];
+            });
+        }
+        completionBlock ? completionBlock(error) : nil;
     }];
 }
 

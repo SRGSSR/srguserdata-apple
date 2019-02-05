@@ -51,15 +51,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (__kindof SRGUserObject *)upsertWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
-/**
- *  Delete all history entries.
- */
-+ (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+// Returns the URNs which where deleted
++ (NSArray<NSString *> *)discardObjectsWithURNs:(NSArray<NSString *> *)URNs inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
-/**
- *  Discard the entry (actual deletion takes place when synchronizing with the service).
- */
-- (void)discard;
++ (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 @end
 

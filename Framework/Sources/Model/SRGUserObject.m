@@ -95,23 +95,31 @@
     return object;
 }
 
++ (NSArray<NSString *> *)discardObjectsWithURNs:(NSArray<NSString *> *)URNs inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ IN %@", @keypath(SRGUserObject.new, mediaURN), URNs];
+    NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+    NSArray<NSString *> *discardedURNs = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, mediaURN)]];
+    
+    for (SRGUserObject *object in objects) {
+        if (! [SRGUser mainUserInManagedObjectContext:managedObjectContext].accountUid) {
+            [managedObjectContext deleteObject:object];
+        }
+        else {
+            object.discarded = YES;
+            object.dirty = YES;
+            object.date = NSDate.date;
+        }
+    }
+    
+    return discardedURNs;
+}
+
 + (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
     NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
     [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
-}
-
-- (void)discard
-{
-    if (! [SRGUser mainUserInManagedObjectContext:self.managedObjectContext].accountUid) {
-        [self.managedObjectContext deleteObject:self];
-    }
-    else {
-        self.discarded = YES;
-        self.dirty = YES;
-        self.date = NSDate.date;
-    }
 }
 
 - (void)updateWithDictionary:(NSDictionary *)dictionary
