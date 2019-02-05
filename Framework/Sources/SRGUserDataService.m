@@ -82,6 +82,17 @@
 - (void)synchronize
 {}
 
+- (void)userDidLogin
+{}
+
+- (void)userDidLogout
+{}
+
+- (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock
+{
+    completionBlock();
+}
+
 #pragma mark Notifications
 
 - (void)reachabilityDidChange:(NSNotification *)notification
