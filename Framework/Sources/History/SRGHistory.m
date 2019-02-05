@@ -45,8 +45,6 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 @interface SRGHistory ()
 
-@property (atomic /* custom */, getter=isSynchronizing) BOOL synchronizing;
-
 @property (nonatomic, weak) SRGPageRequest *pullRequest;
 @property (nonatomic) SRGRequestQueue *pushRequestQueue;
 
@@ -55,8 +53,6 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 @end;
 
 @implementation SRGHistory
-
-@synthesize synchronizing = _synchronizing;
 
 #pragma mark Object lifecycle
 
@@ -250,21 +246,9 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 #pragma mark Subclassing hooks
 
-- (void)synchronize
+- (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock
 {
-    if (self.synchronizing) {
-        return;
-    }
-    
-    if (! self.identityService.isLoggedIn) {
-        return;
-    }
-    
-    self.synchronizing = YES;
-    
-    // There is currently at most one logged in user with SRG Identity
     NSString *sessionToken = self.identityService.sessionToken;
-    NSAssert(sessionToken != nil, @"A logged in User must have a token by construction");
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser mainUserInManagedObjectContext:managedObjectContext];
@@ -280,7 +264,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             }
             else if (SRGHistoryIsUnauthorizationError(pullError)) {
                 [self.identityService reportUnauthorization];
-                self.synchronizing = NO;
+                completionBlock();
                 return;
             }
             
@@ -289,7 +273,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                 return [SRGHistoryEntry historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
             } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries) {
                 [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pushError) {
-                    self.synchronizing = NO;
+                    completionBlock();
                     
                     if (SRGHistoryIsUnauthorizationError(pushError)) {
                         [self.identityService reportUnauthorization];

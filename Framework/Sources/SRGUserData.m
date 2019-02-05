@@ -105,6 +105,7 @@ NSString *SRGUserDataMarketingVersion(void)
 {
     [self.dataStore cancelAllBackgroundTasks];
     
+    // TODO: Warning: Bad idea on the main thread, dispatch to a bkgr thread
     dispatch_group_t group = dispatch_group_create();
     for (SRGUserDataService *service in self.services) {
         dispatch_group_enter(group);

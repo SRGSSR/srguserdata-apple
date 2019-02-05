@@ -17,6 +17,7 @@
 @property (nonatomic) SRGIdentityService *identityService;
 @property (nonatomic) SRGDataStore *dataStore;
 
+@property (nonatomic, getter=isSynchronizing) BOOL synchronizing;
 @property (nonatomic) NSTimer *synchronizationTimer;
 
 @end
@@ -79,7 +80,7 @@
 
 #pragma mark Subclassing hooks
 
-- (void)synchronize
+- (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock
 {}
 
 - (void)userDidLogin
@@ -91,6 +92,24 @@
 - (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock
 {
     completionBlock();
+}
+
+#pragma mark Public methods
+
+- (void)synchronize
+{
+    if (self.synchronizing) {
+        return;
+    }
+    
+    if (! self.identityService.isLoggedIn) {
+        return;
+    }
+    
+    self.synchronizing = YES;
+    [self synchronizeWithCompletionBlock:^{
+        self.synchronizing = NO;
+    }];
 }
 
 #pragma mark Notifications
