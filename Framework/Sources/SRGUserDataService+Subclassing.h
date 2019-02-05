@@ -10,10 +10,10 @@
 
 @interface SRGUserDataService (Subclassing)
 
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore;
+- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(nullable SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore;
 
 @property (nonatomic, readonly) NSURL *serviceURL;
-@property (nonatomic, readonly) SRGIdentityService *identityService;
+@property (nonatomic, readonly, nullable) SRGIdentityService *identityService;
 @property (nonatomic, readonly) SRGDataStore *dataStore;
 
 - (void)synchronize;

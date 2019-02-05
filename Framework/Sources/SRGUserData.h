@@ -24,7 +24,7 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 @property (class, nonatomic, nullable) SRGUserData *currentUserData;
 
 // TODO: URL configuration object
-- (instancetype)initWithIdentityService:(SRGIdentityService *)identityService
+- (instancetype)initWithIdentityService:(nullable SRGIdentityService *)identityService
                       historyServiceURL:(nullable NSURL *)historyServiceURL
                                    name:(NSString *)name
                               directory:(NSString *)directory;
