@@ -7,9 +7,11 @@
 #import "SRGUserDataService.h"
 
 #import "NSTimer+SRGUserData.h"
+#import "SRGDataStore.h"
 
 #import <FXReachability/FXReachability.h>
 #import <libextobjc/libextobjc.h>
+#import <SRGIdentity/SRGIdentity.h>
 
 @interface SRGUserDataService ()
 

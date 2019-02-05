@@ -81,7 +81,7 @@
 		6FFB346622088BA200E76E6D /* SRGDataProvider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFB346422088BA200E76E6D /* SRGDataProvider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6FFB347122089A5E00E76E6D /* SRGHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB346922089A5E00E76E6D /* SRGHistory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6FFB347222089A5E00E76E6D /* SRGHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FFB346A22089A5E00E76E6D /* SRGHistory.m */; };
-		6FFB347322089A5E00E76E6D /* SRGDataStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB346C22089A5E00E76E6D /* SRGDataStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6FFB347322089A5E00E76E6D /* SRGDataStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB346C22089A5E00E76E6D /* SRGDataStore.h */; };
 		6FFB347422089A5E00E76E6D /* SRGPersistentContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB346D22089A5E00E76E6D /* SRGPersistentContainer.h */; };
 		6FFB347522089A5E00E76E6D /* SRGDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FFB346E22089A5E00E76E6D /* SRGDataStore.m */; };
 		6FFB347622089A5E00E76E6D /* SRGPersistentContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FFB346F22089A5E00E76E6D /* SRGPersistentContainer.m */; };

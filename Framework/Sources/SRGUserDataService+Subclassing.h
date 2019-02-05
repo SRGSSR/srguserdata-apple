@@ -6,7 +6,15 @@
 
 #import "SRGUserDataService.h"
 
+#import <SRGIdentity/SRGIdentity.h>
+
 @interface SRGUserDataService (Subclassing)
+
+- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore;
+
+@property (nonatomic, readonly) NSURL *serviceURL;
+@property (nonatomic, readonly) SRGIdentityService *identityService;
+@property (nonatomic, readonly) SRGDataStore *dataStore;
 
 - (void)synchronize;
 

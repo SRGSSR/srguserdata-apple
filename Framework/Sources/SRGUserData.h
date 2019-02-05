@@ -8,10 +8,6 @@
 #import <SRGIdentity/SRGIdentity.h>
 
 // Public headers.
-
-// TODO: Hide completely
-#import "SRGDataStore.h"
-
 #import "SRGHistory.h"
 #import "SRGHistoryEntry.h"
 #import "SRGUser.h"
@@ -22,8 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Official version number.
 FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
-
-typedef NSArray<SRGUserDataService *> * (^SRGUserDataServiceConfigurator)(SRGIdentityService *identityService, SRGDataStore *dataStore);
 
 @interface SRGUserData : NSObject
 
