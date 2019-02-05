@@ -81,7 +81,9 @@
 #pragma mark Subclassing hooks
 
 - (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock
-{}
+{
+    completionBlock();
+}
 
 - (void)userDidLogin
 {}
