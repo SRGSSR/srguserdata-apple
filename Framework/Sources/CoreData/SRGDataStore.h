@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  operations are made, you can perform a synchronous read from the main thread. This avoids using a background read
  *  which would have to wait until pending background operations before it have been processed.
  *
- *  Background tasks can be prioritized, but for this mechanism to work effectively each submitted task should be short
+ *  Background tasks can be prioritized, but≠ for this mechanism to work effectively each submitted task should be short
  *  enough so that the worker queue can move on to pending items fast. Tasks submitted to the main thread should also
  *  be efficient to avoid blocking the user interface.
  *

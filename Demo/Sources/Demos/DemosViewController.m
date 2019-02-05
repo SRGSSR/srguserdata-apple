@@ -85,27 +85,25 @@
         return;
     }
     
-    NSArray<NSString *> *mediaURNs = [SRGUserData.currentUserData.dataStore performMainThreadReadTask:^id _Nonnull(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
-        NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
-        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] inManagedObjectContext:managedObjectContext];
-        return [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, mediaURN)];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
+    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
+    [SRGUserData.currentUserData historyEntriesMatchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries) {
+        NSArray<NSString *> *mediaURNs = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, mediaURN)];
+        SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:mediaURNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+            if (self.refreshControl.refreshing) {
+                [self.refreshControl endRefreshing];
+            }
+            
+            if (error) {
+                return;
+            }
+            
+            self.medias = medias;
+            [self.tableView reloadData];
+        }] requestWithPageSize:50];
+        [request resume];
+        self.request = request;
     }];
-
-    SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:mediaURNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        if (self.refreshControl.refreshing) {
-            [self.refreshControl endRefreshing];
-        }
-        
-        if (error) {
-            return;
-        }
-        
-        self.medias = medias;
-        [self.tableView reloadData];
-    }] requestWithPageSize:50];
-    [request resume];
-    self.request = request;
 }
 
 #pragma mark User interface

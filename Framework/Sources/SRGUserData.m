@@ -11,6 +11,7 @@
 #import "SRGHistoryEntry.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataService+Subclassing.h"
+#import "SRGUserObject+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
 
@@ -117,6 +118,22 @@ NSString *SRGUserDataMarketingVersion(void)
         
         [self dissociateWithCompletionBlock:completionBlock];
     });
+}
+
+#pragma mark History
+
+- (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
+{
+    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+    }];
+}
+
+- (void)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGHistoryEntry *> * _Nonnull))completionBlock
+{
+    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
 #pragma mark Notifications

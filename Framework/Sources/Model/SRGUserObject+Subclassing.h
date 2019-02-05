@@ -36,4 +36,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface SRGUserObject (Queries)
+
++ (NSArray<__kindof SRGUserObject *> *)objectsMatchingPredicate:(nullable NSPredicate *)predicate
+                                          sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
+                                         inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+
+/**
+ *  Insert a new entry, or return the existing one for update purposes.
+ *
+ *  @discussion The entry is properly setup for synchronization purposes.
+ */
++ (__kindof SRGUserObject *)objectWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+
+/**
+ *  Delete all history entries.
+ */
++ (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+
+/**
+ *  Discard the entry (actual deletion takes place when synchronizing with the service).
+ */
+- (void)discard;
+
+@end
+
 NS_ASSUME_NONNULL_END

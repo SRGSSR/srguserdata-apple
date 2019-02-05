@@ -8,7 +8,10 @@
 #import <SRGIdentity/SRGIdentity.h>
 
 // Public headers.
+
+// TODO: Hide completely
 #import "SRGDataStore.h"
+
 #import "SRGHistory.h"
 #import "SRGHistoryEntry.h"
 #import "SRGUser.h"
@@ -36,6 +39,17 @@ typedef NSArray<SRGUserDataService *> * (^SRGUserDataServiceConfigurator)(SRGIde
 // Completion blocks called on background threads
 - (void)dissociateWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
 - (void)clearWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
+
+@end
+
+@interface SRGUserData (History)
+
+- (NSArray<__kindof SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                                                   sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
+
+- (void)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                  sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
+                        completionBlock:(void (^)(NSArray<SRGHistoryEntry *> *historyEntries))completionBlock;
 
 @end
 
