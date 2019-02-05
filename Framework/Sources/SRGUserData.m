@@ -8,7 +8,7 @@
 
 #import "NSBundle+SRGUserData.h"
 #import "SRGDataStore.h"
-#import "SRGHistoryEntry+Private.h"
+#import "SRGHistoryEntry.h"
 #import "SRGUser+Private.h"
 
 #import <libextobjc/libextobjc.h>

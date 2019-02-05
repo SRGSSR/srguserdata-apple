@@ -7,7 +7,7 @@
 #import "SRGHistory.h"
 
 #import "SRGDataStore.h"
-#import "SRGHistoryEntry+Private.h"
+#import "SRGHistoryEntry.h"
 #import "SRGUser+Private.h"
 
 #import <libextobjc/libextobjc.h>
@@ -270,7 +270,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             
             [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
                 NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGHistoryEntry.new, dirty)];
-                return [SRGHistoryEntry historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+                return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
             } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries) {
                 [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pushError) {
                     completionBlock();
@@ -301,7 +301,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 - (void)userDidLogin
 {
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         for (SRGHistoryEntry *historyEntry in historyEntries) {
             historyEntry.dirty = YES;
         }
@@ -324,7 +324,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     __block NSSet<NSString *> *URNs = nil;
     
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         URNs = [historyEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, mediaURN)]];
         
         [SRGHistoryEntry deleteAllInManagedObjectContext:managedObjectContext];

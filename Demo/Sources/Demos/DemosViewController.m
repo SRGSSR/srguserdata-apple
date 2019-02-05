@@ -88,7 +88,7 @@
     NSArray<NSString *> *mediaURNs = [SRGUserData.currentUserData.dataStore performMainThreadReadTask:^id _Nonnull(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
         NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
-        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry historyEntriesMatchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] inManagedObjectContext:managedObjectContext];
+        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] inManagedObjectContext:managedObjectContext];
         return [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, mediaURN)];
     }];
 

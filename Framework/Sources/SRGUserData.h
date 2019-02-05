@@ -13,6 +13,7 @@
 #import "SRGHistoryEntry.h"
 #import "SRGUser.h"
 #import "SRGUserDataService.h"
+#import "SRGUserObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
