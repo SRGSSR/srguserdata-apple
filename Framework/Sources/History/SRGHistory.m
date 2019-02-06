@@ -153,8 +153,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                     }
                     
                     if (page.number == 0) {
-                        [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification
-                                                                          object:self];
+                        [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
                     }
                     
                     if (URNs.count > 0) {
@@ -167,8 +166,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         }
         else if (page.number == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification
-                                                                  object:self];
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
             });
         }
         

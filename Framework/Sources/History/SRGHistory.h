@@ -9,9 +9,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// TODO / FIXME: All notifications must be sent from the same object (ideally SRGUserData) and be exposed there. Maybe
-//               having a category with CRUD operations and notifications for the history service would be a good idea.
-
 /**
  *  Notification sent when the history changes. Use the `SRGHistoryURNsKey` to retrieve the updated URNs from the
  *  notification `userInfo` dictionary.
