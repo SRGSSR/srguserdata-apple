@@ -34,7 +34,7 @@
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
     fetchRequest.predicate = predicate;
     
-    // Ensure stable sorting using the URN as fallback (same criterium applied by the history service)
+    // Ensure stable sorting using the identifier as fallback (same criterium applied by the history service)
     NSMutableArray<NSSortDescriptor *> *allSortDescriptors = [NSMutableArray array];
     if (sortDescriptors) {
         [allSortDescriptors addObjectsFromArray:sortDescriptors];
@@ -46,18 +46,18 @@
     return [managedObjectContext executeFetchRequest:fetchRequest error:NULL];
 }
 
-+ (SRGUserObject *)objectWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)objectWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGUserObject.new, uid), URN];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGUserObject.new, uid), uid];
     return [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext].firstObject;
 }
 
-+ (SRGUserObject *)upsertWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)upsertWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    SRGUserObject *object = [self objectWithURN:URN inManagedObjectContext:managedObjectContext];
+    SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
     if (! object) {
         object = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(self) inManagedObjectContext:managedObjectContext];
-        object.uid = URN;
+        object.uid = uid;
     }
     object.dirty = YES;
     object.discarded = NO;
@@ -67,17 +67,17 @@
 
 + (NSString *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSString *URN = dictionary[@"item_id"];
-    if (! URN) {
+    NSString *uid = dictionary[@"item_id"];
+    if (! uid) {
         return nil;
     }
     
-    SRGUserObject *object = [self objectWithURN:URN inManagedObjectContext:managedObjectContext];
+    SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
     
     // If the local entry is dirty and more recent than server version, keep the local version as is.
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
     if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
-        return URN;
+        return uid;
     }
     
     BOOL isDeleted = [dictionary[@"deleted"] boolValue];
@@ -85,7 +85,7 @@
         if (object) {
             [managedObjectContext deleteObject:object];
         }
-        return URN;
+        return uid;
     }
     
     if (! object) {
@@ -94,14 +94,14 @@
     
     [object updateWithDictionary:dictionary];
     object.dirty = NO;
-    return URN;
+    return uid;
 }
 
-+ (NSArray<NSString *> *)discardObjectsWithURNs:(NSArray<NSString *> *)URNs inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ IN %@", @keypath(SRGUserObject.new, uid), URNs];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ IN %@", @keypath(SRGUserObject.new, uid), uids];
     NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-    NSArray<NSString *> *discardedURNs = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
+    NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
     
     for (SRGUserObject *object in objects) {
         if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
@@ -114,7 +114,7 @@
         }
     }
     
-    return discardedURNs;
+    return discardedUids;
 }
 
 + (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext

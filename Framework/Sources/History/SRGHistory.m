@@ -363,7 +363,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 - (void)saveHistoryEntryForURN:(NSString *)URN withLastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithURN:URN inManagedObjectContext:managedObjectContext];
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithUid:URN inManagedObjectContext:managedObjectContext];
         historyEntry.lastPlaybackTime = lastPlaybackTime;
         historyEntry.deviceUid = deviceUid;
         return YES;
@@ -383,7 +383,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 {
     __block NSArray<NSString *> *discardedURNs = nil;
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        discardedURNs = [SRGHistoryEntry discardObjectsWithURNs:URNs inManagedObjectContext:managedObjectContext];
+        discardedURNs = [SRGHistoryEntry discardObjectsWithUids:URNs inManagedObjectContext:managedObjectContext];
         return YES;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {

@@ -24,12 +24,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Return an existing object for the specified identifier, `nil` if none is found.
  */
-+ (nullable __kindof SRGUserObject *)objectWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (nullable __kindof SRGUserObject *)objectWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
- *  Create an entry with the specified URN, or return an existing one for update purposes.
+ *  Create an entry with the specified identifier, or return an existing one for update purposes.
  */
-+ (__kindof SRGUserObject *)upsertWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (__kindof SRGUserObject *)upsertWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Synchronize the receiver with the information from the provided dictionary. The entry might be created, updated
@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  Discard the objects with the specified identifiers. Since some of them might not be found, the method returns the actual
  *  list of identifiers which could be successfully removed.
  */
-+ (NSArray<NSString *> *)discardObjectsWithURNs:(NSArray<NSString *> *)URNs inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Discard all objects.
