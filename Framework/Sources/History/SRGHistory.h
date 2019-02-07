@@ -64,7 +64,7 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  */
 - (void)saveHistoryEntryForURN:(NSString *)URN
           withLastPlaybackTime:(CMTime)lastPlaybackTime
-                    deviceName:(nullable NSString *)deviceName
+                     deviceUid:(nullable NSString *)deviceUid
                completionBlock:(nullable void (^)(NSError *error))completionBlock;
 
 /**

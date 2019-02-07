@@ -325,7 +325,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        URNs = [historyEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, mediaURN)]];
+        URNs = [historyEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)]];
         
         [SRGHistoryEntry deleteAllInManagedObjectContext:managedObjectContext];
         return YES;
@@ -360,12 +360,12 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
-- (void)saveHistoryEntryForURN:(NSString *)URN withLastPlaybackTime:(CMTime)lastPlaybackTime deviceName:(NSString *)deviceName completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+- (void)saveHistoryEntryForURN:(NSString *)URN withLastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithURN:URN inManagedObjectContext:managedObjectContext];
         historyEntry.lastPlaybackTime = lastPlaybackTime;
-        historyEntry.deviceName = deviceName;
+        historyEntry.deviceUid = deviceUid;
         return YES;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {

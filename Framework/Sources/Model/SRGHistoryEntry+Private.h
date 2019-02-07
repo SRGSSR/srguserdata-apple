@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  @see `SRGHistoryEntry.h`
  */
 @property (nonatomic) CMTime lastPlaybackTime;
-@property (nonatomic, copy) NSString *deviceName;
+@property (nonatomic, copy) NSString *deviceUid;
 
 @end
 

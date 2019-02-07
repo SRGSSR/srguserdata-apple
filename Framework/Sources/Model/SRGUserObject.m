@@ -12,7 +12,7 @@
 
 @interface SRGUserObject ()
 
-@property (nonatomic, copy) NSString *mediaURN;
+@property (nonatomic, copy) NSString *uid;
 @property (nonatomic, copy) NSDate *date;
 @property (nonatomic) BOOL discarded;
 
@@ -20,7 +20,7 @@
 
 @implementation SRGUserObject
 
-@dynamic mediaURN;
+@dynamic uid;
 @dynamic date;
 @dynamic discarded;
 @dynamic dirty;
@@ -39,7 +39,7 @@
     if (sortDescriptors) {
         [allSortDescriptors addObjectsFromArray:sortDescriptors];
     }
-    [allSortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGUserObject.new, mediaURN) ascending:NO]];
+    [allSortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGUserObject.new, uid) ascending:NO]];
     fetchRequest.sortDescriptors = [allSortDescriptors copy];
     
     fetchRequest.fetchBatchSize = 100;
@@ -48,7 +48,7 @@
 
 + (SRGUserObject *)objectWithURN:(NSString *)URN inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGUserObject.new, mediaURN), URN];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGUserObject.new, uid), URN];
     return [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext].firstObject;
 }
 
@@ -57,7 +57,7 @@
     SRGUserObject *object = [self objectWithURN:URN inManagedObjectContext:managedObjectContext];
     if (! object) {
         object = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(self) inManagedObjectContext:managedObjectContext];
-        object.mediaURN = URN;
+        object.uid = URN;
     }
     object.dirty = YES;
     object.discarded = NO;
@@ -99,9 +99,9 @@
 
 + (NSArray<NSString *> *)discardObjectsWithURNs:(NSArray<NSString *> *)URNs inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ IN %@", @keypath(SRGUserObject.new, mediaURN), URNs];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ IN %@", @keypath(SRGUserObject.new, uid), URNs];
     NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-    NSArray<NSString *> *discardedURNs = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, mediaURN)]];
+    NSArray<NSString *> *discardedURNs = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
     
     for (SRGUserObject *object in objects) {
         if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
@@ -128,7 +128,7 @@
 
 - (void)updateWithDictionary:(NSDictionary *)dictionary
 {
-    self.mediaURN = dictionary[@"item_id"];
+    self.uid = dictionary[@"item_id"];
     self.date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
     self.discarded = [dictionary[@"deleted"] boolValue];
 }
@@ -136,7 +136,7 @@
 - (NSDictionary *)dictionary
 {
     NSMutableDictionary *JSONDictionary = [NSMutableDictionary dictionary];
-    JSONDictionary[@"item_id"] = self.mediaURN;
+    JSONDictionary[@"item_id"] = self.uid;
     JSONDictionary[@"date"] = @(round(self.date.timeIntervalSince1970 * 1000.));
     JSONDictionary[@"deleted"] = @(self.discarded);
     return [JSONDictionary copy];

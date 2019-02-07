@@ -16,8 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  The item unique identifier.
  */
-// TODO: Rename as itemUid, maybe simply uid. Update all method prototypes "with URN" accordingly
-@property (nonatomic, readonly, copy, nullable) NSString *mediaURN;
+@property (nonatomic, readonly, copy, nullable) NSString *uid;
 
 /**
  *  The date at which the entry was updated for the last time.
