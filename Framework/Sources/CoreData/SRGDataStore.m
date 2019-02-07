@@ -31,15 +31,14 @@ static SRGDataStore *s_sharedDataStore;
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model
+- (instancetype)initWithFileURL:(NSURL *)fileURL model:(NSManagedObjectModel *)model
 {
     if (self = [super init]) {
         NSManagedObjectContext *viewContext = nil;
         if (@available(iOS 10, *)) {
-            NSPersistentContainer *persistentContainer = [NSPersistentContainer persistentContainerWithName:name managedObjectModel:model];
+            NSPersistentContainer *persistentContainer = [NSPersistentContainer persistentContainerWithName:fileURL.lastPathComponent managedObjectModel:model];
             
-            NSURL *storeURL = [[[NSURL fileURLWithPath:directory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
-            NSPersistentStoreDescription *persistentStoreDescription = [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeURL];
+            NSPersistentStoreDescription *persistentStoreDescription = [NSPersistentStoreDescription persistentStoreDescriptionWithURL:fileURL];
             [persistentStoreDescription setOption:@YES forKey:NSMigratePersistentStoresAutomaticallyOption];
             [persistentStoreDescription setOption:@YES forKey:NSInferMappingModelAutomaticallyOption];
             persistentContainer.persistentStoreDescriptions = @[ persistentStoreDescription ];
@@ -57,7 +56,7 @@ static SRGDataStore *s_sharedDataStore;
             viewContext.automaticallyMergesChangesFromParent = YES;
         }
         else {
-            self.legacyPersistentContainer = [[SRGPersistentContainer alloc] initWithName:name directory:directory model:model];
+            self.legacyPersistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:fileURL model:model];
             
             // The main context is for reads only. We must therefore always match what has been persisted to the store,
             // thus discarding in-memory versions when background contexts are saved and automatically merged.

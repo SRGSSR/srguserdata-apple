@@ -16,13 +16,12 @@ API_DEPRECATED_WITH_REPLACEMENT("Use NSPersistentContainer instead", ios(9.0, 10
 @interface SRGPersistentContainer : NSObject
 
 /**
- *  Create an SQLite datastore saved under the specified name (the .sqlite extension will be automatically appended),
- *  stored in the provided directory, and governed by the model as parameter.
+ *  Create an SQLite datastore saved at the specified location, and governed by the model as parameter.
  */
-- (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model;
+- (instancetype)initWithFileURL:(NSURL *)fileURL model:(NSManagedObjectModel *)model;
 
 /**
- *  Contexts
+ *  Contexts.
  */
 @property (nonatomic, readonly) NSManagedObjectContext *viewContext;
 @property (nonatomic, readonly) NSManagedObjectContext *backgroundManagedObjectContext;

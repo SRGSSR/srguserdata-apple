@@ -10,8 +10,9 @@
 #import "SRGDataStore.h"
 #import "SRGHistory.h"
 #import "SRGUser+Private.h"
+#import "SRGUserDataService+Private.h"
 #import "SRGUserDataService+Subclassing.h"
-#import "SRGUserObject+Subclassing.h"
+#import "SRGUserObject+Private.h"
 
 #import <libextobjc/libextobjc.h>
 
@@ -47,8 +48,7 @@ NSString *SRGUserDataMarketingVersion(void)
 
 - (instancetype)initWithIdentityService:(SRGIdentityService *)identityService
                       historyServiceURL:(NSURL *)historyServiceURL
-                                   name:(NSString *)name
-                              directory:(NSString *)directory
+                           storeFileURL:(NSURL *)storeFileURL
 {
     if (self = [super init]) {
         // Bundling the model file in a resource bundle requires a few things:
@@ -62,7 +62,7 @@ NSString *SRGUserDataMarketingVersion(void)
         
         NSURL *modelFileURL = [NSURL fileURLWithPath:modelFilePath];
         NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
-        self.dataStore = [[SRGDataStore alloc] initWithName:name directory:directory model:model];
+        self.dataStore = [[SRGDataStore alloc] initWithFileURL:storeFileURL model:model];
         
         [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
             [SRGUser upsertInManagedObjectContext:managedObjectContext];
@@ -94,7 +94,7 @@ NSString *SRGUserDataMarketingVersion(void)
 
 #pragma mark Public methods
 
-- (void)dissociateWithCompletionBlock:(void (^)(void))completionBlock
+- (void)dissociateIdentityWithCompletionBlock:(void (^)(void))completionBlock
 {
     [self.dataStore cancelAllBackgroundTasks];
     
@@ -107,12 +107,12 @@ NSString *SRGUserDataMarketingVersion(void)
     }];
 }
 
-- (void)clearWithCompletionBlock:(void (^)(void))completionBlock
+- (void)eraseWithCompletionBlock:(void (^)(void))completionBlock
 {
     [self.dataStore cancelAllBackgroundTasks];
     
     [self.history clearDataWithCompletionBlock:^{
-        [self dissociateWithCompletionBlock:completionBlock];
+        [self dissociateIdentityWithCompletionBlock:completionBlock];
     }];
 }
 
@@ -130,7 +130,7 @@ NSString *SRGUserDataMarketingVersion(void)
     
     BOOL unexpectedLogout = [notification.userInfo[SRGIdentityServiceUnauthorizedKey] boolValue];
     if (! unexpectedLogout) {
-        [self clearWithCompletionBlock:detachUser];
+        [self eraseWithCompletionBlock:detachUser];
     }
     else {
         detachUser();

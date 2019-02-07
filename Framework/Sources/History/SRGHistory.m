@@ -9,7 +9,8 @@
 #import "SRGDataStore.h"
 #import "SRGHistoryEntry+Private.h"
 #import "SRGUser+Private.h"
-#import "SRGUserDataService+Subclassing.h"
+#import "SRGUserDataService+Private.h"
+#import "SRGUserObject+Private.h"
 #import "SRGUserObject+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
