@@ -74,6 +74,28 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
         }
         else {
             self.legacyPersistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:fileURL model:model];
+            self.legacyPersistentContainer.shouldInferMappingModelAutomatically = NO;
+            self.legacyPersistentContainer.shouldMigrateStoreAutomatically = NO;
+            [self.legacyPersistentContainer loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+                if (error) {
+                    if ([error.domain isEqualToString:NSCocoaErrorDomain] && error.code == NSPersistentStoreIncompatibleVersionHashError) {
+                        BOOL migrated = [self migratePersistentStoreWithFileURL:fileURL];
+                        if (migrated) {
+                            [self.legacyPersistentContainer loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+                                if (error) {
+                                    SRGUserDataLogError(@"SRGDataStore", @"Data store failed to load after migration. Reason: %@", error);
+                                }
+                            }];
+                        }
+                        else {
+                            SRGUserDataLogError(@"SRGDataStore", @"Data store failed to load and no migration found. Reason: %@", error);
+                        }
+                    }
+                    else {
+                        SRGUserDataLogError(@"SRGDataStore", @"Data store failed to load. Reason: %@", error);
+                    }
+                }
+            }];
             
             // The main context is for reads only. We must therefore always match what has been persisted to the store,
             // thus discarding in-memory versions when background contexts are saved and automatically merged.
