@@ -301,8 +301,7 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
     NSMigrationManager *migrationManager = [[NSMigrationManager alloc] initWithSourceModel:sourceModel destinationModel:destinationModel];
     BOOL migrated = [migrationManager migrateStoreFromURL:fileURL
                                                      type:NSSQLiteStoreType
-                                                  options:@{ NSMigratePersistentStoresAutomaticallyOption : @YES,
-                                                             NSInferMappingModelAutomaticallyOption : @YES }
+                                                  options:nil
                                          withMappingModel:mappingModel
                                          toDestinationURL:migratedFileURL
                                           destinationType:NSSQLiteStoreType
