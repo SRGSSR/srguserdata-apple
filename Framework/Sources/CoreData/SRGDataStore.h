@@ -28,10 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SRGDataStore : NSObject
 
 /**
- *  Create an SQLite datastore saved under the specified name (the .sqlite extension will be automatically appended),
- *  stored in the provided directory, and governed by the model as parameter.
+ *  Create an SQLite datastore saved at the specified location, and governed by the model as parameter.
  */
-- (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model;
+- (instancetype)initWithFileURL:(NSURL *)fileURL model:(NSManagedObjectModel *)model;
 
 /**
  *  Perform a read operation on the main thread. The read should be efficient since slow operations might block the main

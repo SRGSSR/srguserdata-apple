@@ -48,8 +48,7 @@ NSString *SRGUserDataMarketingVersion(void)
 
 - (instancetype)initWithIdentityService:(SRGIdentityService *)identityService
                       historyServiceURL:(NSURL *)historyServiceURL
-                                   name:(NSString *)name
-                              directory:(NSString *)directory
+                           storeFileURL:(NSURL *)storeFileURL
 {
     if (self = [super init]) {
         // Bundling the model file in a resource bundle requires a few things:
@@ -63,7 +62,7 @@ NSString *SRGUserDataMarketingVersion(void)
         
         NSURL *modelFileURL = [NSURL fileURLWithPath:modelFilePath];
         NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
-        self.dataStore = [[SRGDataStore alloc] initWithName:name directory:directory model:model];
+        self.dataStore = [[SRGDataStore alloc] initWithFileURL:storeFileURL model:model];
         
         [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
             [SRGUser upsertInManagedObjectContext:managedObjectContext];

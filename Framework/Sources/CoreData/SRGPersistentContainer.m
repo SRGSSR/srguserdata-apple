@@ -17,15 +17,14 @@
 
 #pragma mark Object creation and destruction
 
-- (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model
+- (instancetype)initWithFileURL:(NSURL *)fileURL model:(NSManagedObjectModel *)model
 {
     if (self = [super init]) {
         self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
         
-        NSURL *storeURL = [[[NSURL fileURLWithPath:directory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
         NSPersistentStore *persistentStore = [self.persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
                                                                                            configuration:nil
-                                                                                                     URL:storeURL
+                                                                                                     URL:fileURL
                                                                                                  options:@{ NSMigratePersistentStoresAutomaticallyOption : @YES,
                                                                                                             NSInferMappingModelAutomaticallyOption : @"YES" }
                                                                                                    error:NULL];

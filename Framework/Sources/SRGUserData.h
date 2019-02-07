@@ -38,13 +38,11 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 /**
  *  Create a user data repository, which optionally can be synced with the specified identity service.
  *
- *  @param name      The name of the file to store the data into (without extension).
- *  @param directory The directory in which the file will be saved.
+ *  @param storeFileURL The file URL where the data will be stored.
  */
 - (instancetype)initWithIdentityService:(nullable SRGIdentityService *)identityService
                       historyServiceURL:(nullable NSURL *)historyServiceURL
-                                   name:(NSString *)name
-                              directory:(NSString *)directory;
+                           storeFileURL:(NSURL *)storeFileURL;
 
 /**
  *  The user to which the data belongs. Might be offline or bound to a remote account.
