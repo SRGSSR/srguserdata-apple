@@ -53,15 +53,14 @@
                                            selector:@selector(didUpdateAccount:)
                                                name:SRGIdentityServiceDidUpdateAccountNotification
                                              object:SRGIdentityService.currentIdentityService];
-    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidStartSynchronization:)
                                                name:SRGHistoryDidStartSynchronizationNotification
-                                             object:nil /* Use userData.history property */];
+                                             object:nil /* TODO */];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidClear:)
                                                name:SRGHistoryDidClearNotification
-                                             object:nil /* Use userData.history property */];
+                                             object:nil /* TODO */];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     
@@ -86,27 +85,25 @@
         return;
     }
     
-    NSArray<NSString *> *mediaURNs = [SRGUserData.currentUserData performMainThreadReadTask:^id _Nonnull(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
-        NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
-        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry historyEntriesMatchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] inManagedObjectContext:managedObjectContext];
-        return [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, mediaURN)];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
+    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
+    [SRGUserData.currentUserData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries) {
+        NSArray<NSString *> *mediaURNs = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, mediaURN)];
+        SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:mediaURNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+            if (self.refreshControl.refreshing) {
+                [self.refreshControl endRefreshing];
+            }
+            
+            if (error) {
+                return;
+            }
+            
+            self.medias = medias;
+            [self.tableView reloadData];
+        }] requestWithPageSize:50];
+        [request resume];
+        self.request = request;
     }];
-
-    SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:mediaURNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        if (self.refreshControl.refreshing) {
-            [self.refreshControl endRefreshing];
-        }
-        
-        if (error) {
-            return;
-        }
-        
-        self.medias = medias;
-        [self.tableView reloadData];
-    }] requestWithPageSize:50];
-    [request resume];
-    self.request = request;
 }
 
 #pragma mark User interface

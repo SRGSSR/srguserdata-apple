@@ -22,21 +22,35 @@
 
 #pragma mark Class methods
 
-+ (SRGUser *)mainUserInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUser *)userInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
-    SRGUser *mainUser = [managedObjectContext executeFetchRequest:fetchRequest error:NULL].firstObject;
-    NSAssert(mainUser != nil, @"A main user must always be available");
-    return mainUser;
+    return [managedObjectContext executeFetchRequest:fetchRequest error:NULL].firstObject;
 }
 
-#pragma mark Helpers
++ (SRGUser *)upsertInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+{
+    SRGUser *user = [SRGUser userInManagedObjectContext:managedObjectContext];
+    if (! user) {
+        user = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(SRGUser.class) inManagedObjectContext:managedObjectContext];
+    }
+    return user;
+}
+
+#pragma mark Account binding
+
+- (void)attachToAccountUid:(NSString *)accountUid
+{
+    if (! [self.accountUid isEqualToString:accountUid]) {
+        self.historyLocalSynchronizationDate = nil;
+        self.historyServerSynchronizationDate = nil;
+    }
+    self.accountUid = accountUid;
+}
 
 - (void)detach
 {
     self.accountUid = nil;
-    self.historyLocalSynchronizationDate = nil;
-    self.historyServerSynchronizationDate = nil;
 }
 
 @end

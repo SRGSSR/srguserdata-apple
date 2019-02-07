@@ -6,12 +6,12 @@
 
 #import "SRGHistory.h"
 
-#import "NSTimer+SRGUserData.h"
 #import "SRGDataStore.h"
 #import "SRGHistoryEntry+Private.h"
 #import "SRGUser+Private.h"
+#import "SRGUserDataService+Subclassing.h"
+#import "SRGUserObject+Subclassing.h"
 
-#import <FXReachability/FXReachability.h>
 #import <libextobjc/libextobjc.h>
 #import <MAKVONotificationCenter/MAKVONotificationCenter.h>
 #import <SRGIdentity/SRGIdentity.h>
@@ -26,8 +26,6 @@ NSString * const SRGHistoryURNsKey = @"SRGHistoryURNsKey";
 NSString * const SRGHistoryDidStartSynchronizationNotification = @"SRGHistoryDidStartSynchronizationNotification";
 NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDidFinishSynchronizationNotification";
 NSString * const SRGHistoryDidClearNotification = @"SRGHistoryDidClearNotification";
-
-static SRGHistory *s_history;
 
 static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 {
@@ -47,17 +45,8 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 @interface SRGHistory ()
 
-@property (nonatomic) NSURL *serviceURL;
-@property (nonatomic) SRGIdentityService *identityService;
-@property (nonatomic) SRGDataStore *dataStore;
-
-@property (nonatomic) NSTimer *synchronizationTimer;
-@property (atomic /* custom */, getter=isSynchronizing) BOOL synchronizing;
-
 @property (nonatomic, weak) SRGPageRequest *pullRequest;
 @property (nonatomic) SRGRequestQueue *pushRequestQueue;
-
-@property (nonatomic) dispatch_queue_t concurrentQueue;
 
 @property (nonatomic) NSURLSession *session;
 
@@ -65,78 +54,17 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 @implementation SRGHistory
 
-@synthesize synchronizing = _synchronizing;
-
 #pragma mark Object lifecycle
 
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
 {
-    if (self = [super init]) {
-        self.serviceURL = serviceURL;
-        self.identityService = identityService;
-        self.dataStore = dataStore;
-        
-        self.concurrentQueue = dispatch_queue_create("ch.srgssr.playsrg.datastore.concurrent", DISPATCH_QUEUE_CONCURRENT);
+    if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
-        
-        // TODO: Make sync interval a history configuration parameter
-        @weakify(self)
-        self.synchronizationTimer = [NSTimer srguserdata_timerWithTimeInterval:60. repeats:YES block:^(NSTimer * _Nonnull timer) {
-            @strongify(self)
-            [self synchronize];
-        }];
-        [self synchronize];
-        
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(reachabilityDidChange:)
-                                                   name:FXReachabilityStatusDidChangeNotification
-                                                 object:nil];
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(applicationWillEnterForeground:)
-                                                   name:UIApplicationWillEnterForegroundNotification
-                                                 object:nil];
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(userDidLogin:)
-                                                   name:SRGIdentityServiceUserDidLoginNotification
-                                                 object:identityService];
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(userDidLogout:)
-                                                   name:SRGIdentityServiceUserDidLogoutNotification
-                                                 object:identityService];
     }
     return self;
 }
 
 #pragma clang diagnostic pop
-
-- (void)dealloc
-{
-    self.synchronizationTimer = nil;
-}
-
-#pragma mark Getters and setters
-
-- (void)setSynchronizationTimer:(NSTimer *)synchronizationTimer
-{
-    [_synchronizationTimer invalidate];
-    _synchronizationTimer = synchronizationTimer;
-}
-
-- (BOOL)isSynchronizing
-{
-    __block BOOL synchronizing = NO;
-    dispatch_sync(self.concurrentQueue, ^{
-        synchronizing = self->_synchronizing;
-    });
-    return synchronizing;
-}
-
-- (void)setSynchronizing:(BOOL)synchronizing
-{
-    dispatch_barrier_async(self.concurrentQueue, ^{
-        self->_synchronizing = synchronizing;
-    });
-}
 
 #pragma mark Requests
 
@@ -180,7 +108,8 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             NSMutableURLRequest *request = [URLRequest mutableCopy];
             request.URL = nextURL;
             return [request copy];
-        } else {
+        }
+        else {
             return nil;
         };
     } completionBlock:^(NSDictionary * _Nullable JSONDictionary, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -221,8 +150,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                     }
                     
                     if (page.number == 0) {
-                        [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification
-                                                                          object:self];
+                        [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
                     }
                     
                     if (URNs.count > 0) {
@@ -235,8 +163,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         }
         else if (page.number == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification
-                                                                  object:self];
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
             });
         }
         
@@ -311,29 +238,19 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     
     // TODO: Temporary workaround to SRG Network not being thread safe. Attempting to add & start requests leads
     //       to an concurrent resource in SRG Network, which we can avoided by starting all requests at once.
+    // FIXME: We should fix the issue by copying the list which gets enumerated instead. This is not perfect thread-safety,
+    //        but will be better until we properly implement it.
     [self.pushRequestQueue resume];
 }
 
-#pragma mark Synchronization
+#pragma mark Subclassing hooks
 
-- (void)synchronize
+- (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock
 {
-    if (! self.serviceURL || self.synchronizing) {
-        return;
-    }
-    
-    if (! self.identityService.isLoggedIn) {
-        return;
-    }
-    
-    self.synchronizing = YES;
-    
-    // There is currently at most one logged in user with SRG Identity
     NSString *sessionToken = self.identityService.sessionToken;
-    NSAssert(sessionToken != nil, @"A logged in User must have a token by construction");
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGUser mainUserInManagedObjectContext:managedObjectContext];
+        return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user) {
         [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historyServerSynchronizationDate completionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable pullError) {
             if (! pullError) {
@@ -346,16 +263,16 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             }
             else if (SRGHistoryIsUnauthorizationError(pullError)) {
                 [self.identityService reportUnauthorization];
-                self.synchronizing = NO;
+                completionBlock();
                 return;
             }
             
             [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
                 NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGHistoryEntry.new, dirty)];
-                return [SRGHistoryEntry historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+                return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
             } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries) {
                 [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pushError) {
-                    self.synchronizing = NO;
+                    completionBlock();
                     
                     if (SRGHistoryIsUnauthorizationError(pushError)) {
                         [self.identityService reportUnauthorization];
@@ -380,24 +297,10 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     }];
 }
 
-#pragma mark Notifications
-
-- (void)reachabilityDidChange:(NSNotification *)notification
-{
-    if ([FXReachability sharedInstance].reachable) {
-        [self synchronize];
-    }
-}
-
-- (void)applicationWillEnterForeground:(NSNotification *)notification
-{
-    [self synchronize];
-}
-
-- (void)userDidLogin:(NSNotification *)notification
+- (void)userDidLogin
 {
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         for (SRGHistoryEntry *historyEntry in historyEntries) {
             historyEntry.dirty = YES;
         }
@@ -409,13 +312,88 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     }];
 }
 
-- (void)userDidLogout:(NSNotification *)notification
+- (void)userDidLogout
 {
-    dispatch_sync(self.concurrentQueue, ^{
-        [self.pullRequest cancel];
-        [self.pushRequestQueue cancel];
-    });
-    [self.dataStore cancelAllTasks];
+    [self.pullRequest cancel];
+    [self.pushRequestQueue cancel];
+}
+
+- (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock
+{
+    __block NSSet<NSString *> *URNs = nil;
+    
+    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        URNs = [historyEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, mediaURN)]];
+        
+        [SRGHistoryEntry deleteAllInManagedObjectContext:managedObjectContext];
+        return YES;
+    } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (URNs.count > 0) {
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGHistoryURNsKey : URNs.allObjects }];
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidClearNotification
+                                                                  object:self
+                                                                userInfo:nil];
+            }
+        });
+        completionBlock ? completionBlock() : nil;
+    }];
+}
+
+#pragma mark Reads and writes
+
+- (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
+{
+    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+    }];
+}
+
+- (void)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGHistoryEntry *> * _Nonnull))completionBlock
+{
+    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
+}
+
+- (void)saveHistoryEntryForURN:(NSString *)URN withLastPlaybackTime:(CMTime)lastPlaybackTime deviceName:(NSString *)deviceName completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+{
+    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithURN:URN inManagedObjectContext:managedObjectContext];
+        historyEntry.lastPlaybackTime = lastPlaybackTime;
+        historyEntry.deviceName = deviceName;
+        return YES;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        if (! error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGHistoryURNsKey : @[ URN ] }];
+            });
+        }
+        completionBlock ? completionBlock(error) : nil;
+    }];
+}
+
+- (void)discardHistoryEntriesWithURNs:(NSArray<NSString *> *)URNs completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+{
+    __block NSArray<NSString *> *discardedURNs = nil;
+    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        discardedURNs = [SRGHistoryEntry discardObjectsWithURNs:URNs inManagedObjectContext:managedObjectContext];
+        return YES;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        if (! error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGHistoryURNsKey : discardedURNs }];
+            });
+        }
+        completionBlock ? completionBlock(error) : nil;
+    }];
 }
 
 @end

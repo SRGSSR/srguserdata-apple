@@ -8,9 +8,10 @@
 
 #import "NSBundle+SRGUserData.h"
 #import "SRGDataStore.h"
-#import "SRGHistory+Private.h"
-#import "SRGHistoryEntry+Private.h"
+#import "SRGHistory.h"
 #import "SRGUser+Private.h"
+#import "SRGUserDataService+Subclassing.h"
+#import "SRGUserObject+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
 
@@ -44,10 +45,10 @@ NSString *SRGUserDataMarketingVersion(void)
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithHistoryServiceURL:(NSURL *)historyServiceURL
-                          identityService:(SRGIdentityService *)identityService
-                                     name:(NSString *)name
-                                directory:(NSString *)directory
+- (instancetype)initWithIdentityService:(SRGIdentityService *)identityService
+                      historyServiceURL:(NSURL *)historyServiceURL
+                                   name:(NSString *)name
+                              directory:(NSString *)directory
 {
     if (self = [super init]) {
         // Bundling the model file in a resource bundle requires a few things:
@@ -64,11 +65,7 @@ NSString *SRGUserDataMarketingVersion(void)
         self.dataStore = [[SRGDataStore alloc] initWithName:name directory:directory model:model];
         
         [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-            NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(SRGUser.class)];
-            SRGUser *mainUser = [managedObjectContext executeFetchRequest:fetchRequest error:NULL].firstObject;
-            if (! mainUser) {
-                mainUser = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(SRGUser.class) inManagedObjectContext:managedObjectContext];
-            }
+            [SRGUser upsertInManagedObjectContext:managedObjectContext];
             return YES;
         } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
             self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
@@ -86,63 +83,36 @@ NSString *SRGUserDataMarketingVersion(void)
     return self;
 }
 
-#pragma mark Data reads
+#pragma mark Getters and setters
 
-- (id)performMainThreadReadTask:(id _Nullable (NS_NOESCAPE ^)(NSManagedObjectContext *))task
-{
-    return [self.dataStore performMainThreadReadTask:task];
-}
-
-- (NSString *)performBackgroundReadTask:(id _Nullable (^)(NSManagedObjectContext *))task withPriority:(NSOperationQueuePriority)priority completionBlock:(void (^)(id _Nullable))completionBlock
-{
-    return [self performBackgroundReadTask:task withPriority:priority completionBlock:completionBlock];
+- (SRGUser *)user
+{    
+    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGUser userInManagedObjectContext:managedObjectContext];
+    }];
 }
 
 #pragma mark Public methods
 
-- (void)dissociateWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
+- (void)dissociateWithCompletionBlock:(void (^)(void))completionBlock
 {
-    [self.dataStore cancelAllTasks];
+    [self.dataStore cancelAllBackgroundTasks];
+    
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
+        SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
         [mainUser detach];
         return YES;
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completionBlock ? completionBlock(error) : nil;
-        });
+        completionBlock ? completionBlock() : nil;
     }];
 }
 
-- (void)clearWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
+- (void)clearWithCompletionBlock:(void (^)(void))completionBlock
 {
-    __block NSSet<NSString *> *URNs = nil;
+    [self.dataStore cancelAllBackgroundTasks];
     
-    [self.dataStore cancelAllTasks];
-    
-    // TODO: History cleanup should be made in History.m
-    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
-        if (mainUser) {
-            NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-            URNs = [historyEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, mediaURN)]];
-            
-            [SRGHistoryEntry deleteAllInManagedObjectContext:managedObjectContext];
-            [mainUser detach];
-        }
-        return YES;
-    } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (URNs.count > 0) {
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
-                                                                  object:self
-                                                                userInfo:@{ SRGHistoryURNsKey : URNs.allObjects }];
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidClearNotification
-                                                                  object:self
-                                                                userInfo:nil];
-            }
-            completionBlock ? completionBlock(error) : nil;
-        });
+    [self.history clearDataWithCompletionBlock:^{
+        [self dissociateWithCompletionBlock:completionBlock];
     }];
 }
 
@@ -150,14 +120,21 @@ NSString *SRGUserDataMarketingVersion(void)
 
 - (void)userDidLogout:(NSNotification *)notification
 {
-    // TODO: Probably provide several modes for data cleanup on logout
-    [self clearWithCompletionBlock:nil];
+    void (^detachUser)(void) = ^{
+        [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+            SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
+            [mainUser detach];
+            return YES;
+        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
+    };
     
-    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
-        [mainUser detach];
-        return YES;
-    } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
+    BOOL unexpectedLogout = [notification.userInfo[SRGIdentityServiceUnauthorizedKey] boolValue];
+    if (! unexpectedLogout) {
+        [self clearWithCompletionBlock:detachUser];
+    }
+    else {
+        detachUser();
+    }
 }
 
 - (void)didUpdateAccount:(NSNotification *)notification
@@ -165,8 +142,8 @@ NSString *SRGUserDataMarketingVersion(void)
     SRGAccount *account = notification.userInfo[SRGIdentityServiceAccountKey];
     
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
-        mainUser.accountUid = account.uid;
+        SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
+        [mainUser attachToAccountUid:account.uid];
         return YES;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
 }

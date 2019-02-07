@@ -25,10 +25,10 @@
                                                                                        websiteURL:[NSURL URLWithString:@"https://www.rts.ch/profile"]];
     
     NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-    SRGUserData.currentUserData = [[SRGUserData alloc] initWithHistoryServiceURL:[NSURL URLWithString:@"https://history.rts.ch"]
-                                                                 identityService:SRGIdentityService.currentIdentityService
-                                                                            name:@"UserData-demo"
-                                                                       directory:libraryDirectory];
+    SRGUserData.currentUserData = [[SRGUserData alloc] initWithIdentityService:SRGIdentityService.currentIdentityService
+                                                             historyServiceURL:[NSURL URLWithString:@"https://history.rts.ch"]
+                                                                          name:@"UserData-demo"
+                                                                     directory:libraryDirectory];
     
     SRGDataProvider.currentDataProvider = [[SRGDataProvider alloc] initWithServiceURL:SRGIntegrationLayerProductionServiceURL()];
     

@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  operations are made, you can perform a synchronous read from the main thread. This avoids using a background read
  *  which would have to wait until pending background operations before it have been processed.
  *
- *  Background tasks can be prioritized, but for this mechanism to work effectively each submitted task should be short
+ *  Background tasks can be prioritized, but≠ for this mechanism to work effectively each submitted task should be short
  *  enough so that the worker queue can move on to pending items fast. Tasks submitted to the main thread should also
  *  be efficient to avoid blocking the user interface.
  *
@@ -100,13 +100,13 @@ NS_ASSUME_NONNULL_BEGIN
  *  be interrupted, rather cancelled and rollbacked when ending. A pending task is simply discarded. If the handle is
  *  invalid or if the task has already been executed, the method does nothing.
  */
-- (void)cancelTaskWithHandle:(NSString *)handle;
+- (void)cancelBackgroundTaskWithHandle:(NSString *)handle;
 
 /**
  *  Cancel all tasks being executed or pending. Tasks being executed will not be interrupted, rather cancelled and
  *  rollbacked when ending. Pending tasks are simply discarded.
  */
-- (void)cancelAllTasks;
+- (void)cancelAllBackgroundTasks;
 
 @end
 
