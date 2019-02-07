@@ -27,8 +27,6 @@ NSString * const SRGHistoryDidStartSynchronizationNotification = @"SRGHistoryDid
 NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDidFinishSynchronizationNotification";
 NSString * const SRGHistoryDidClearNotification = @"SRGHistoryDidClearNotification";
 
-static SRGHistory *s_history;
-
 static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 {
     if ([error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorMultiple) {
@@ -62,8 +60,6 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 {
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
-        
-        
     }
     return self;
 }
@@ -112,7 +108,8 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             NSMutableURLRequest *request = [URLRequest mutableCopy];
             request.URL = nextURL;
             return [request copy];
-        } else {
+        }
+        else {
             return nil;
         };
     } completionBlock:^(NSDictionary * _Nullable JSONDictionary, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -241,6 +238,8 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     
     // TODO: Temporary workaround to SRG Network not being thread safe. Attempting to add & start requests leads
     //       to an concurrent resource in SRG Network, which we can avoided by starting all requests at once.
+    // FIXME: We should fix the issue by copying the list which gets enumerated instead. This is not perfect thread-safety,
+    //        but will be better until we properly implement it.
     [self.pushRequestQueue resume];
 }
 
@@ -344,6 +343,8 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     }];
 }
 
+#pragma mark Reads and writes
+
 - (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
 {
     return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -394,6 +395,5 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         completionBlock ? completionBlock(error) : nil;
     }];
 }
-
 
 @end

@@ -32,26 +32,43 @@ OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
 OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
 
 /**
- *  Service for history and playback resume.
- *
- *  @discussion Though similar methods exist on `SRGHistoryEntry`, use `SRGHistory` as the main entry point for local history
- *              updates.
+ *  Manages a local cache for history entries. History entries are characterized by an identifier and an associated
+ *  playback position. Based on a local cache, this class ensures efficient history retrieval from a webservice and
+ *  keeps local and distant histories in sync.
  */
 @interface SRGHistory : SRGUserDataService
 
+/**
+ *  Return history entries, optionally matching a specific predicate and / or sorted with descriptors. If no sort
+ *  descriptors are provided, entries are still returned in a stable order.
+ *
+ *  @discussion This method can only be called from the main thread. Reads on other threads must occur asynchronously
+ *              with `historyEntriesMatchingPredicate:sortedWithDescriptors:completionBlock:`.
+ */
 - (NSArray<__kindof SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
                                                    sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
 
+/**
+ *  Return history entries, optionally matching a specific predicate and / or sorted with descriptors. If no sort
+ *  descriptors are provided, entries are still returned in a stable order. The read occurs asynchronously, calling
+ *  the provided block on completion.
+ */
 - (void)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
                   sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
                         completionBlock:(void (^)(NSArray<SRGHistoryEntry *> *historyEntries))completionBlock;
 
+/**
+ *  Asynchronously save a history entry for a given identifier, calling the specified block on completion.
+ */
 - (void)saveHistoryEntryForURN:(NSString *)URN
           withLastPlaybackTime:(CMTime)lastPlaybackTime
                     deviceName:(nullable NSString *)deviceName
                completionBlock:(nullable void (^)(NSError *error))completionBlock;
 
-// Use `nil` to discard all
+/**
+ *  Asynchronously discard history entries matching an identifier list, calling the provided block on completion. If no
+ *  list is provided, all entries are discarded.
+ */
 - (void)discardHistoryEntriesWithURNs:(nullable NSArray<NSString *> *)URNs
                       completionBlock:(nullable void (^)(NSError *error))completionBlock;
 
