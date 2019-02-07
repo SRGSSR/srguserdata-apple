@@ -20,28 +20,20 @@
 @dynamic historyLocalSynchronizationDate;
 @dynamic historyServerSynchronizationDate;
 
-#pragma mark Class methods
-
-+ (SRGUser *)mainUserInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
-{
-    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
-    SRGUser *mainUser = [managedObjectContext executeFetchRequest:fetchRequest error:NULL].firstObject;
-    NSAssert(mainUser != nil, @"A main user must always be available");
-    return mainUser;
-}
-
 #pragma mark Helpers
 
 - (void)attachToAccountUid:(NSString *)accountUid
 {
+    if (! [self.accountUid isEqualToString:accountUid]) {
+        self.historyLocalSynchronizationDate = nil;
+        self.historyServerSynchronizationDate = nil;
+    }
     self.accountUid = accountUid;
 }
 
 - (void)detach
 {
     self.accountUid = nil;
-    self.historyLocalSynchronizationDate = nil;
-    self.historyServerSynchronizationDate = nil;
 }
 
 @end

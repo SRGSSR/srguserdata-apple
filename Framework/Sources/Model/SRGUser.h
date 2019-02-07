@@ -9,28 +9,22 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- *  User information.
+ *  Local user information.
  */
 @interface SRGUser : NSManagedObject
 
 /**
- *  The unique identifier of the associated account, or `nil` if no user is logged in.
+ *  The unique identifier of the associated remote account, or `nil` if no user is logged in.
  */
 @property (nonatomic, readonly, copy, nullable) NSString *accountUid;
 
 /**
- *  The (device) date at which the history was synchronized for the last time.
+ *  The (device) date at which the history was synchronized for the last time. Can be
+ *  used for information purposes.
+ *
+ *  @discussion `nil` if no user is logged (no synchronization).
  */
 @property (nonatomic, readonly, nullable) NSDate *historyLocalSynchronizationDate;
-
-@end
-
-@interface SRGUser (Queries)
-
-/**
- *  The main user of the application.
- */
-+ (SRGUser *)mainUserInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 @end
 

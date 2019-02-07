@@ -8,6 +8,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ *  Abstract base class for objects supporting synchronization with a remote server.
+ */
 @interface SRGUserObject : NSManagedObject
 
 /**
@@ -17,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy, nullable) NSString *mediaURN;
 
 /**
- *  The date at which the entry was updated.
+ *  The date at which the entry was updated for the last time.
  */
 @property (nonatomic, readonly, copy, nullable) NSDate *date;
 
