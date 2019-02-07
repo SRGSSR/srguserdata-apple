@@ -54,11 +54,12 @@
     
     XCTAssertEqual(itemUids2.count, 0);
     
-    NSString *URN = @"urn:rts:video:10085364";
-    NSPredicate *predicate3 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), URN];
+    NSString *URN1 = @"urn:rts:video:10085364";
+    NSPredicate *predicate3 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), URN1];
     SRGHistoryEntry *historyEntry = [userData.history historyEntriesMatchingPredicate:predicate3 sortedWithDescriptors:nil].firstObject;
     
     XCTAssertNotNil(historyEntry);
+    XCTAssertEqualObjects(historyEntry.uid, URN1);
     XCTAssertTrue(CMTimeCompare(historyEntry.lastPlaybackTime, kCMTimeZero) != 0);
     XCTAssertNotNil([historyEntry valueForKey:@"discarded"]);
     XCTAssertNotNil([historyEntry valueForKey:@"deviceUid"]);
@@ -69,6 +70,25 @@
     XCTAssertNotNil([user valueForKey:@"historyLocalSynchronizationDate"]);
     XCTAssertNotNil([user valueForKey:@"historyServerSynchronizationDate"]);
     XCTAssertNil([user valueForKey:@"accountUid"]);
+    
+    // Database is writable.
+    NSString *URN2 = @"urn:rts:video:1234567890";
+    [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue([NSThread isMainThread]);
+        NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryURNsKey];
+        return [URNs containsObject:URN2];
+    }];
+    
+    [userData.history saveHistoryEntryForURN:URN2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    NSArray<NSString *> *itemUids3 = [[userData.history historyEntriesMatchingPredicate:predicate1
+                                                                  sortedWithDescriptors:@[sortDescriptor1]] valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
+    
+    XCTAssertEqual(itemUids3.count, 104);
 }
 
 - (void)testMigrationFromV2
@@ -110,11 +130,12 @@
     
     XCTAssertEqual(itemUids2.count, 0);
     
-    NSString *URN = @"urn:rts:video:10085364";
-    NSPredicate *predicate3 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), URN];
+    NSString *URN1 = @"urn:rts:video:10085364";
+    NSPredicate *predicate3 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), URN1];
     SRGHistoryEntry *historyEntry = [userData.history historyEntriesMatchingPredicate:predicate3 sortedWithDescriptors:nil].firstObject;
     
     XCTAssertNotNil(historyEntry);
+    XCTAssertEqualObjects(historyEntry.uid, URN1);
     XCTAssertTrue(CMTimeCompare(historyEntry.lastPlaybackTime, kCMTimeZero) != 0);
     XCTAssertNotNil([historyEntry valueForKey:@"discarded"]);
     XCTAssertNotNil([historyEntry valueForKey:@"deviceUid"]);
@@ -125,6 +146,25 @@
     XCTAssertNotNil([user valueForKey:@"historyLocalSynchronizationDate"]);
     XCTAssertNotNil([user valueForKey:@"historyServerSynchronizationDate"]);
     XCTAssertNotNil([user valueForKey:@"accountUid"]);
+    
+    // Database is writable.
+    NSString *URN2 = @"urn:rts:video:1234567890";
+    [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue([NSThread isMainThread]);
+        NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryURNsKey];
+        return [URNs containsObject:URN2];
+    }];
+    
+    [userData.history saveHistoryEntryForURN:URN2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    NSArray<NSString *> *itemUids3 = [[userData.history historyEntriesMatchingPredicate:predicate1
+                                                                  sortedWithDescriptors:@[sortDescriptor1]] valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
+    
+    XCTAssertEqual(itemUids3.count, 104);
 }
 
 @end
