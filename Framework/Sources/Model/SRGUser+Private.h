@@ -14,18 +14,17 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SRGUser (Private)
 
 /**
- *  The (device) date at which the history was synchronized for the last time. Can be
- *  used for information purposes.
- *
- *  @discussion `nil` if no user is logged (no synchronization).
+ *  Return the main user.
  */
-@property (nonatomic, nullable) NSDate *historyLocalSynchronizationDate;
++ (nullable SRGUser *)userInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
- *  Server date at which the history was synchronized for the last time.
- *
- *  @discussion `nil` if no user is logged (no synchronization).
+ *  Create or return a main user for update.
  */
++ (SRGUser *)upsertInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+
+// See `SRGUser.h`
+@property (nonatomic, nullable) NSDate *historyLocalSynchronizationDate;
 @property (nonatomic, nullable) NSDate *historyServerSynchronizationDate;
 
 /**

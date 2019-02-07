@@ -11,10 +11,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SRGUserObject (Subclassing)
 
 /**
- *  Synchronize the local history with the information from the provided dictionary, in the format delivered by the
- *  history service. Entries are created, updated or deleted appropriately to synchronize the local history status
- *  with the one obtained from the history service. If a local entry was created, updated or deleted, its URN
- *  is returned. If the dictionary data is invalid, the method returns `nil`.
+ *  Synchronize the receiver with the information from the provided dictionary. The entry might be created, updated
+ *  or deleted automatically, in which case its identifier is returned. If the dictionary data is invalid, the method
+ *  returns `nil`.
  *
  *  @discussion To persist changes, the Core Data managed object context needs to be saved.
  */
@@ -42,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
                                           sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
                                          inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
+// TODO: Nullability
 /**
  *  Insert a new entry, or return the existing one for update purposes.
  *

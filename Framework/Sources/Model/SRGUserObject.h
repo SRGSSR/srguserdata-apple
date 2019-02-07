@@ -29,7 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL discarded;
 
-// TODO: Hide from view
+/**
+ *  Set to `YES` to flag the object as requiring a synchronization.
+ */
 @property (nonatomic) BOOL dirty;
 
 @end

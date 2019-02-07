@@ -250,7 +250,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     NSString *sessionToken = self.identityService.sessionToken;
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGUser mainUserInManagedObjectContext:managedObjectContext];
+        return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user) {
         [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historyServerSynchronizationDate completionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable pullError) {
             if (! pullError) {

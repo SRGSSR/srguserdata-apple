@@ -19,15 +19,27 @@ NS_ASSUME_NONNULL_BEGIN
 // Official version number.
 FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 
+/**
+ *  Manages data associated with a user, either offline or logged in using SRG Identity. For logged in users,
+ *  playback history is transparently kept synchronized with the corresponding remote service.
+ *
+ *  Several instances can coexist in an application, though in general one should suffice. This global instance
+ *  can be accessed easily from anywhere by assigning it to the `currentUserData` class property.
+ */
 @interface SRGUserData : NSObject
 
+/**
+ *  The instance currently set as shared instance, if any.
+ */
 @property (class, nonatomic, nullable) SRGUserData *currentUserData;
 
-// TODO: URL configuration object
+// TODO: URL conxfiguration object
 - (instancetype)initWithIdentityService:(nullable SRGIdentityService *)identityService
                       historyServiceURL:(nullable NSURL *)historyServiceURL
                                    name:(NSString *)name
                               directory:(NSString *)directory;
+
+@property (nonatomic, readonly) SRGUser *user;
 
 @property (nonatomic, readonly, nullable) SRGHistory *history;
 

@@ -65,11 +65,7 @@ NSString *SRGUserDataMarketingVersion(void)
         self.dataStore = [[SRGDataStore alloc] initWithName:name directory:directory model:model];
         
         [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-            NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(SRGUser.class)];
-            SRGUser *mainUser = [managedObjectContext executeFetchRequest:fetchRequest error:NULL].firstObject;
-            if (! mainUser) {
-                mainUser = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(SRGUser.class) inManagedObjectContext:managedObjectContext];
-            }
+            [SRGUser upsertInManagedObjectContext:managedObjectContext];
             return YES;
         } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
             self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
@@ -87,6 +83,15 @@ NSString *SRGUserDataMarketingVersion(void)
     return self;
 }
 
+#pragma mark Getters and setters
+
+- (SRGUser *)user
+{    
+    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGUser userInManagedObjectContext:managedObjectContext];
+    }];
+}
+
 #pragma mark Public methods
 
 - (void)dissociateWithCompletionBlock:(void (^)(void))completionBlock
@@ -94,7 +99,7 @@ NSString *SRGUserDataMarketingVersion(void)
     [self.dataStore cancelAllBackgroundTasks];
     
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
+        SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
         [mainUser detach];
         return YES;
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
@@ -117,7 +122,7 @@ NSString *SRGUserDataMarketingVersion(void)
 {
     void (^detachUser)(void) = ^{
         [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-            SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
+            SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
             [mainUser detach];
             return YES;
         } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
@@ -137,7 +142,7 @@ NSString *SRGUserDataMarketingVersion(void)
     SRGAccount *account = notification.userInfo[SRGIdentityServiceAccountKey];
     
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGUser *mainUser = [SRGUser mainUserInManagedObjectContext:managedObjectContext];
+        SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
         [mainUser attachToAccountUid:account.uid];
         return YES;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];

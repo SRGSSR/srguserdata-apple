@@ -8,8 +8,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ *  Private interface for implementation purposes.
+ */
 @interface SRGHistoryEntry (Private)
 
+// See `SRGHistoryEntry.h`
 @property (nonatomic) CMTime lastPlaybackTime;
 @property (nonatomic, copy) NSString *deviceName;
 

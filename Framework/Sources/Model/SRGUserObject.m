@@ -6,7 +6,7 @@
 
 #import "SRGUserObject.h"
 
-#import "SRGUser.h"
+#import "SRGUser+Private.h"
 
 #import <libextobjc/libextobjc.h>
 
@@ -24,6 +24,8 @@
 @dynamic date;
 @dynamic discarded;
 @dynamic dirty;
+
+#pragma mark Class methods
 
 + (NSString *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
@@ -102,7 +104,7 @@
     NSArray<NSString *> *discardedURNs = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, mediaURN)]];
     
     for (SRGUserObject *object in objects) {
-        if (! [SRGUser mainUserInManagedObjectContext:managedObjectContext].accountUid) {
+        if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
             [managedObjectContext deleteObject:object];
         }
         else {

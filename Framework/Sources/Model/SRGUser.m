@@ -20,7 +20,24 @@
 @dynamic historyLocalSynchronizationDate;
 @dynamic historyServerSynchronizationDate;
 
-#pragma mark Helpers
+#pragma mark Class methods
+
++ (SRGUser *)userInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+{
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
+    return [managedObjectContext executeFetchRequest:fetchRequest error:NULL].firstObject;
+}
+
++ (SRGUser *)upsertInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+{
+    SRGUser *user = [SRGUser userInManagedObjectContext:managedObjectContext];
+    if (! user) {
+        user = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(SRGUser.class) inManagedObjectContext:managedObjectContext];
+    }
+    return user;
+}
+
+#pragma mark Account binding
 
 - (void)attachToAccountUid:(NSString *)accountUid
 {
