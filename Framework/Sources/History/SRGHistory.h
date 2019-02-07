@@ -35,6 +35,8 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *  Manages a local cache for history entries. History entries are characterized by an identifier and an associated
  *  playback position. Based on a local cache, this class ensures efficient history retrieval from a webservice and
  *  keeps local and distant histories in sync.
+ *
+ *  You can register for notifications about history updates, see above.
  */
 @interface SRGHistory : SRGUserDataService
 

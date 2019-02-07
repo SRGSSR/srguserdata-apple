@@ -27,38 +27,6 @@
 
 #pragma mark Class methods
 
-+ (NSString *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
-{
-    NSString *URN = dictionary[@"item_id"];
-    if (! URN) {
-        return nil;
-    }
-    
-    SRGUserObject *object = [self objectWithURN:URN inManagedObjectContext:managedObjectContext];
-    
-    // If the local entry is dirty and more recent than server version, keep the local version as is.
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
-    if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
-        return URN;
-    }
-    
-    BOOL isDeleted = [dictionary[@"deleted"] boolValue];
-    if (isDeleted) {
-        if (object) {
-            [managedObjectContext deleteObject:object];
-        }
-        return URN;
-    }
-    
-    if (! object) {
-        object = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(self) inManagedObjectContext:managedObjectContext];
-    }
-    
-    [object updateWithDictionary:dictionary];
-    object.dirty = NO;
-    return URN;
-}
-
 + (NSArray<SRGUserObject *> *)objectsMatchingPredicate:(NSPredicate *)predicate
                                  sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
                                 inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
@@ -97,6 +65,38 @@
     return object;
 }
 
++ (NSString *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+{
+    NSString *URN = dictionary[@"item_id"];
+    if (! URN) {
+        return nil;
+    }
+    
+    SRGUserObject *object = [self objectWithURN:URN inManagedObjectContext:managedObjectContext];
+    
+    // If the local entry is dirty and more recent than server version, keep the local version as is.
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
+    if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
+        return URN;
+    }
+    
+    BOOL isDeleted = [dictionary[@"deleted"] boolValue];
+    if (isDeleted) {
+        if (object) {
+            [managedObjectContext deleteObject:object];
+        }
+        return URN;
+    }
+    
+    if (! object) {
+        object = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(self) inManagedObjectContext:managedObjectContext];
+    }
+    
+    [object updateWithDictionary:dictionary];
+    object.dirty = NO;
+    return URN;
+}
+
 + (NSArray<NSString *> *)discardObjectsWithURNs:(NSArray<NSString *> *)URNs inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ IN %@", @keypath(SRGUserObject.new, mediaURN), URNs];
@@ -123,6 +123,8 @@
     NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
     [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
 }
+
+#pragma mark Default implementations
 
 - (void)updateWithDictionary:(NSDictionary *)dictionary
 {

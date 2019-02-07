@@ -23,7 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (SRGUser *)upsertInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
-// See `SRGUser.h`
+/**
+ * @see `SRGUser.h`
+ */
 @property (nonatomic, nullable) NSDate *historyLocalSynchronizationDate;
 @property (nonatomic, nullable) NSDate *historyServerSynchronizationDate;
 

@@ -10,8 +10,9 @@
 #import "SRGDataStore.h"
 #import "SRGHistory.h"
 #import "SRGUser+Private.h"
+#import "SRGUserDataService+Private.h"
 #import "SRGUserDataService+Subclassing.h"
-#import "SRGUserObject+Subclassing.h"
+#import "SRGUserObject+Private.h"
 
 #import <libextobjc/libextobjc.h>
 
@@ -94,7 +95,7 @@ NSString *SRGUserDataMarketingVersion(void)
 
 #pragma mark Public methods
 
-- (void)dissociateWithCompletionBlock:(void (^)(void))completionBlock
+- (void)dissociateIdentityWithCompletionBlock:(void (^)(void))completionBlock
 {
     [self.dataStore cancelAllBackgroundTasks];
     
@@ -107,12 +108,12 @@ NSString *SRGUserDataMarketingVersion(void)
     }];
 }
 
-- (void)clearWithCompletionBlock:(void (^)(void))completionBlock
+- (void)eraseWithCompletionBlock:(void (^)(void))completionBlock
 {
     [self.dataStore cancelAllBackgroundTasks];
     
     [self.history clearDataWithCompletionBlock:^{
-        [self dissociateWithCompletionBlock:completionBlock];
+        [self dissociateIdentityWithCompletionBlock:completionBlock];
     }];
 }
 
@@ -130,7 +131,7 @@ NSString *SRGUserDataMarketingVersion(void)
     
     BOOL unexpectedLogout = [notification.userInfo[SRGIdentityServiceUnauthorizedKey] boolValue];
     if (! unexpectedLogout) {
-        [self clearWithCompletionBlock:detachUser];
+        [self eraseWithCompletionBlock:detachUser];
     }
     else {
         detachUser();

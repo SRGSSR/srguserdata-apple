@@ -8,6 +8,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ *  An abstract base class for services synchronizing user data.
+ */
 @interface SRGUserDataService : NSObject
 
 @end

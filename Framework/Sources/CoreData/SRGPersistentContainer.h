@@ -22,7 +22,7 @@ API_DEPRECATED_WITH_REPLACEMENT("Use NSPersistentContainer instead", ios(9.0, 10
 - (instancetype)initWithName:(NSString *)name directory:(NSString *)directory model:(NSManagedObjectModel *)model;
 
 /**
- *  Contexts
+ *  Contexts.
  */
 @property (nonatomic, readonly) NSManagedObjectContext *viewContext;
 @property (nonatomic, readonly) NSManagedObjectContext *backgroundManagedObjectContext;
