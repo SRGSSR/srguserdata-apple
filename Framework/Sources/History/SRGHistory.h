@@ -36,7 +36,8 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *  playback position. Based on a local cache, this class ensures efficient history retrieval from a webservice and
  *  keeps local and distant histories in sync.
  *
- *  You can register for history update notifications, see above.
+ *  You can register for history update notifications, see above. These will be sent by the `SRGHistory` instance
+ *  itself.
  */
 @interface SRGHistory : SRGUserDataService
 
