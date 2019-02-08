@@ -6,6 +6,9 @@
 
 #import <XCTest/XCTest.h>
 
+// Private headers
+#import "SRGUser+Private.h"
+
 #import <libextobjc/libextobjc.h>
 #import <SRGUserData/SRGUserData.h>
 
@@ -24,8 +27,12 @@
         NSString *sqliteFilePath = [[NSBundle bundleForClass:[self class]] pathForResource:name ofType:extension inDirectory:@"Play_DB_v1"];
         NSURL *sqliteFileURL = [NSURL fileURLWithPath:sqliteFilePath];
         NSURL *sqliteDestinationFileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:extension];
-        [[NSFileManager defaultManager] removeItemAtURL:sqliteDestinationFileURL error:nil];
-        [[NSFileManager defaultManager] copyItemAtURL:sqliteFileURL toURL:sqliteDestinationFileURL error:nil];
+        [NSFileManager.defaultManager replaceItemAtURL:sqliteDestinationFileURL
+                                         withItemAtURL:sqliteFileURL
+                                        backupItemName:nil
+                                               options:NSFileManagerItemReplacementUsingNewMetadataOnly
+                                      resultingItemURL:NULL
+                                                 error:NULL];
     }
     
     NSURL *fileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
@@ -60,21 +67,21 @@
     
     XCTAssertNotNil(historyEntry);
     XCTAssertEqualObjects(historyEntry.uid, URN1);
-    XCTAssertTrue(CMTimeCompare(historyEntry.lastPlaybackTime, kCMTimeZero) != 0);
-    XCTAssertNotNil([historyEntry valueForKey:@"discarded"]);
-    XCTAssertNotNil([historyEntry valueForKey:@"deviceUid"]);
+    XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, !=, kCMTimeZero));
+    XCTAssertNotNil([historyEntry valueForKey:@keypath(SRGHistoryEntry.new, discarded)]);
+    XCTAssertNotNil([historyEntry valueForKey:@keypath(SRGHistoryEntry.new, deviceUid)]);
     
     SRGUser *user = userData.user;
     
     XCTAssertNotNil(user);
-    XCTAssertNotNil([user valueForKey:@"historyLocalSynchronizationDate"]);
-    XCTAssertNotNil([user valueForKey:@"historyServerSynchronizationDate"]);
-    XCTAssertNil([user valueForKey:@"accountUid"]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyLocalSynchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyServerSynchronizationDate)]);
+    XCTAssertNil([user valueForKey:@keypath(SRGUser.new, accountUid)]);
     
     // Database is writable.
     NSString *URN2 = @"urn:rts:video:1234567890";
     [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue([NSThread isMainThread]);
+        XCTAssertTrue(NSThread.isMainThread);
         NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryURNsKey];
         return [URNs containsObject:URN2];
     }];
@@ -100,8 +107,12 @@
         NSString *sqliteFilePath = [[NSBundle bundleForClass:[self class]] pathForResource:name ofType:extension inDirectory:@"Play_DB_v2"];
         NSURL *sqliteFileURL = [NSURL fileURLWithPath:sqliteFilePath];
         NSURL *sqliteDestinationFileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:extension];
-        [[NSFileManager defaultManager] removeItemAtURL:sqliteDestinationFileURL error:nil];
-        [[NSFileManager defaultManager] copyItemAtURL:sqliteFileURL toURL:sqliteDestinationFileURL error:nil];
+        [NSFileManager.defaultManager replaceItemAtURL:sqliteDestinationFileURL
+                                         withItemAtURL:sqliteFileURL
+                                        backupItemName:nil
+                                               options:NSFileManagerItemReplacementUsingNewMetadataOnly
+                                      resultingItemURL:NULL
+                                                 error:NULL];
     }
     
     NSURL *fileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
@@ -136,21 +147,21 @@
     
     XCTAssertNotNil(historyEntry);
     XCTAssertEqualObjects(historyEntry.uid, URN1);
-    XCTAssertTrue(CMTimeCompare(historyEntry.lastPlaybackTime, kCMTimeZero) != 0);
-    XCTAssertNotNil([historyEntry valueForKey:@"discarded"]);
-    XCTAssertNotNil([historyEntry valueForKey:@"deviceUid"]);
+    XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, !=, kCMTimeZero));
+    XCTAssertNotNil([historyEntry valueForKey:@keypath(SRGHistoryEntry.new, discarded)]);
+    XCTAssertNotNil([historyEntry valueForKey:@keypath(SRGHistoryEntry.new, deviceUid)]);
     
     SRGUser *user = userData.user;
     
     XCTAssertNotNil(user);
-    XCTAssertNotNil([user valueForKey:@"historyLocalSynchronizationDate"]);
-    XCTAssertNotNil([user valueForKey:@"historyServerSynchronizationDate"]);
-    XCTAssertNotNil([user valueForKey:@"accountUid"]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyLocalSynchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyServerSynchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, accountUid)]);
     
     // Database is writable.
     NSString *URN2 = @"urn:rts:video:1234567890";
     [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue([NSThread isMainThread]);
+        XCTAssertTrue(NSThread.isMainThread);
         NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryURNsKey];
         return [URNs containsObject:URN2];
     }];
