@@ -30,6 +30,8 @@
     return self;
 }
 
+#pragma mark SRGPersistentContainer protocol
+
 - (void)srg_loadPersistentStoreWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
     NSAssert(NSThread.isMainThread, @"Must be instantiated from the main thread");
@@ -52,6 +54,11 @@
     }
 }
 
+- (NSManagedObjectContext *)newBackgroundContext
+{
+    return [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
+}
+
 #pragma mark Helpers
 
 - (NSManagedObjectContext *)managedObjectContextForPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)persistentStoreCoordinator
@@ -59,11 +66,6 @@
     NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     managedObjectContext.persistentStoreCoordinator = persistentStoreCoordinator;
     return managedObjectContext;
-}
-
-- (NSManagedObjectContext *)newBackgroundContext
-{
-    return [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
 }
 
 @end

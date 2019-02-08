@@ -9,18 +9,24 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ *  Persistent container compatibility protocol.
+ */
 @protocol SRGPersistentContainer <NSObject>
 
 /**
- * Load store from the file URL initialisation that have not already been successfully added to the container.
- * The completion handler is called once the store that succeeds or fails.
+ *  Load the associated store, calling the provided handler on completion.
  */
 - (void)srg_loadPersistentStoreWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler;
 
 /**
- *  Contexts.
+ *  Main thread context.
  */
 @property (nonatomic, readonly, nullable) NSManagedObjectContext *viewContext;
+
+/**
+ *  New background context
+ */
 - (NSManagedObjectContext *)newBackgroundContext NS_RETURNS_RETAINED;
 
 @end
