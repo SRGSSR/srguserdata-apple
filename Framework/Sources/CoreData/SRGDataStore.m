@@ -259,8 +259,14 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
                                        destinationOptions:nil
                                                     error:NULL];
     if (migrated) {
-        [[NSFileManager defaultManager] removeItemAtURL:fileURL error:NULL];
-        [[NSFileManager defaultManager] moveItemAtURL:migratedFileURL toURL:fileURL error:NULL];
+        if (! [NSFileManager.defaultManager replaceItemAtURL:fileURL
+                                               withItemAtURL:migratedFileURL
+                                              backupItemName:nil
+                                                     options:NSFileManagerItemReplacementUsingNewMetadataOnly
+                                            resultingItemURL:NULL
+                                                       error:NULL]) {
+            return NO;
+        }
         
         if (toVersion < s_currentPersistentStoreVersion) {
             return [self migratePersistentStoreWithFileURL:fileURL fromVersion:toVersion];
