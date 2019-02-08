@@ -56,7 +56,8 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *  descriptors are provided, entries are still returned in a stable order. The read occurs asynchronously, calling
  *  the provided block on completion.
  *
- *  @discussion The completion block is called on a background thread.
+ *  @discussion The completion block is called on a background thread. You can only use the returned object on this
+ *              thread.
  */
 - (void)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
                   sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
@@ -73,7 +74,8 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *  Return the history entry matching the specified identifier, if any. The read occurs asynchronously, calling the
  *  provided block on completion.
  *
- *  @discussion The completion block is called on a background thread.
+ *  @discussion The completion block is called on a background thread. You can only use the returned object on this
+ *              thread.
  */
 - (void)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable historyEntry))completionBlock;
 
