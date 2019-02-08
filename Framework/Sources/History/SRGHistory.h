@@ -10,11 +10,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- *  Notification sent when the history changes. Use the `SRGHistoryURNsKey` to retrieve the updated URNs from the
+ *  Notification sent when the history changes. Use the `SRGHistoryUidsKey` to retrieve the updated uids from the
  *  notification `userInfo` dictionary.
  */
 OBJC_EXPORT NSString * const SRGHistoryDidChangeNotification;                    // Notification name.
-OBJC_EXPORT NSString * const SRGHistoryURNsKey;                                  // Key to access the updated URNs as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGHistoryUidsKey;                                  // Key to access the updated uids as an `NSArray` of `NSString` objects.
 
 /**
  *  Notification sent when history synchronization has started.
@@ -36,7 +36,7 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *  playback position. Based on a local cache, this class ensures efficient history retrieval from a webservice and
  *  keeps local and distant histories in sync.
  *
- *  You can register for notifications about history updates, see above.
+ *  You can register for history update notifications, see above.
  */
 @interface SRGHistory : SRGUserDataService
 
@@ -45,7 +45,7 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *  descriptors are provided, entries are still returned in a stable order.
  *
  *  @discussion This method can only be called from the main thread. Reads on other threads must occur asynchronously
- *              with `historyEntriesMatchingPredicate:sortedWithDescriptors:completionBlock:`.
+ *              with `-historyEntriesMatchingPredicate:sortedWithDescriptors:completionBlock:`.
  */
 - (NSArray<__kindof SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
                                                    sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
@@ -62,7 +62,7 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
 /**
  *  Asynchronously save a history entry for a given identifier, calling the specified block on completion.
  */
-- (void)saveHistoryEntryForURN:(NSString *)URN
+- (void)saveHistoryEntryForUid:(NSString *)Uid
           withLastPlaybackTime:(CMTime)lastPlaybackTime
                      deviceUid:(nullable NSString *)deviceUid
                completionBlock:(nullable void (^)(NSError *error))completionBlock;
@@ -71,7 +71,7 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *  Asynchronously discard history entries matching an identifier list, calling the provided block on completion. If no
  *  list is provided, all entries are discarded.
  */
-- (void)discardHistoryEntriesWithURNs:(nullable NSArray<NSString *> *)URNs
+- (void)discardHistoryEntriesWithUids:(nullable NSArray<NSString *> *)uids
                       completionBlock:(nullable void (^)(NSError *error))completionBlock;
 
 @end

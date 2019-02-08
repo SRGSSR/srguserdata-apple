@@ -82,11 +82,11 @@
     NSString *URN2 = @"urn:rts:video:1234567890";
     [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryURNsKey];
+        NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
         return [URNs containsObject:URN2];
     }];
     
-    [userData.history saveHistoryEntryForURN:URN2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryForUid:URN2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -162,11 +162,11 @@
     NSString *URN2 = @"urn:rts:video:1234567890";
     [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryURNsKey];
+        NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
         return [URNs containsObject:URN2];
     }];
     
-    [userData.history saveHistoryEntryForURN:URN2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryForUid:URN2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
