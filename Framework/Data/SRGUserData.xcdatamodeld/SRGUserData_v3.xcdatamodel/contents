@@ -9,7 +9,6 @@
         <attribute name="historyLocalSynchronizationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="historyServerSynchronizationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
     </entity>
-    <entity name="SRGUserDataDummyClassForWarningSuppression" representedClassName="SRGUserDataDummyClassForWarningSuppression" syncable="YES" codeGenerationType="class"/>
     <entity name="SRGUserObject" representedClassName="SRGUserObject" isAbstract="YES" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="dirty" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
@@ -19,7 +18,6 @@
     <elements>
         <element name="SRGHistoryEntry" positionX="-63" positionY="-18" width="128" height="75"/>
         <element name="SRGUser" positionX="-63" positionY="27" width="128" height="90"/>
-        <element name="SRGUserDataDummyClassForWarningSuppression" positionX="-54" positionY="36" width="128" height="45"/>
         <element name="SRGUserObject" positionX="-45" positionY="36" width="128" height="105"/>
     </elements>
 </model>
