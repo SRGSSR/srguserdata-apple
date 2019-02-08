@@ -55,6 +55,8 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *  Return history entries, optionally matching a specific predicate and / or sorted with descriptors. If no sort
  *  descriptors are provided, entries are still returned in a stable order. The read occurs asynchronously, calling
  *  the provided block on completion.
+ *
+ *  @discussion The completion block is called on a background thread.
  */
 - (void)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
                   sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
@@ -62,6 +64,8 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
 
 /**
  *  Asynchronously save a history entry for a given identifier, calling the specified block on completion.
+ *
+ *  @discussion The completion block is called on a background thread.
  */
 - (void)saveHistoryEntryForUid:(NSString *)Uid
           withLastPlaybackTime:(CMTime)lastPlaybackTime
@@ -71,6 +75,8 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
 /**
  *  Asynchronously discard history entries matching an identifier list, calling the provided block on completion. If no
  *  list is provided, all entries are discarded.
+ *
+ *  @discussion The completion block is called on a background thread.
  */
 - (void)discardHistoryEntriesWithUids:(nullable NSArray<NSString *> *)uids
                       completionBlock:(nullable void (^)(NSError *error))completionBlock;
