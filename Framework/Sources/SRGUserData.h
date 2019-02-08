@@ -34,7 +34,6 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
  */
 @property (class, nonatomic, nullable) SRGUserData *currentUserData;
 
-// TODO: URL conxfiguration object
 /**
  *  Create a user data repository, which optionally can be synced with the specified identity service.
  *

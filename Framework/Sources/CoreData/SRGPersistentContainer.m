@@ -27,7 +27,6 @@
         self.shouldMigrateStoreAutomatically = YES;
         self.shouldInferMappingModelAutomatically = YES;
         
-        
         NSAssert(NSThread.isMainThread, @"Must be instantiated from the main thread");
         self.viewContext = [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
     }
@@ -39,7 +38,7 @@
     NSAssert(NSThread.isMainThread, @"Must be instantiated from the main thread");
 
     if (self.persistentStoreCoordinator.persistentStores.count == 0) {
-        NSError *error;
+        NSError *error = nil;
         NSPersistentStore *persistentStore = [self.persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
                                                                                            configuration:nil
                                                                                                      URL:self.fileURL
