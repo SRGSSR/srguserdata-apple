@@ -63,6 +63,21 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
                         completionBlock:(void (^)(NSArray<SRGHistoryEntry *> *historyEntries))completionBlock;
 
 /**
+ *  Return the history entry matching the specified identifier, if any.
+ *
+ *  @discussion This method can only be called from the main thread.
+ */
+- (nullable SRGHistoryEntry *)historyEntryWithUid:(NSString *)uid;
+
+/**
+ *  Return the history entry matching the specified identifier, if any. The read occurs asynchronously, calling the
+ *  provided block on completion.
+ *
+ *  @discussion The completion block is called on a background thread.
+ */
+- (void)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable historyEntry))completionBlock;
+
+/**
  *  Asynchronously save a history entry for a given identifier, calling the specified block on completion.
  *
  *  @discussion The completion block is called on a background thread.

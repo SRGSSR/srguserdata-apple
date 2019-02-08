@@ -360,6 +360,20 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
+- (SRGHistoryEntry *)historyEntryWithUid:(NSString *)uid
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), uid];
+    return [self historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
+}
+
+- (void)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable))completionBlock
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), uid];
+    return [self historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries) {
+        completionBlock(historyEntries.firstObject);
+    }];
+}
+
 - (void)saveHistoryEntryForUid:(NSString *)uid withLastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
