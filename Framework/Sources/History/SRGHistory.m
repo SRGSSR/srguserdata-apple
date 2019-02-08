@@ -362,16 +362,16 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 - (SRGHistoryEntry *)historyEntryWithUid:(NSString *)uid
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), uid];
-    return [self historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
+    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:managedObjectContext];
+    }];
 }
 
 - (void)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable))completionBlock
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), uid];
-    return [self historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries) {
-        completionBlock(historyEntries.firstObject);
-    }];
+    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
 - (void)saveHistoryEntryForUid:(NSString *)uid withLastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
