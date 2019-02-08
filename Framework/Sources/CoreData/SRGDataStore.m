@@ -15,11 +15,12 @@
 
 static SRGDataStore *s_sharedDataStore;
 
+static NSUInteger s_currentPersistentStoreVersion = 3;
+
 @interface SRGDataStore ()
 
 @property (nonatomic) NSOperationQueue *serialOperationQueue;
-@property (nonatomic) NSPersistentContainer *persistentContainer API_AVAILABLE(ios(10.0));
-@property (nonatomic) SRGPersistentContainer *legacyPersistentContainer NS_DEPRECATED_IOS(9_0, 10_0, "Remove when iOS 10 is the minimum deployment target");
+@property (nonatomic) id<SRGPersistentContainer> persistentContainer;
 
 @property (nonatomic) NSMapTable<NSString *, NSOperation *> *operations;
 
@@ -34,35 +35,45 @@ static SRGDataStore *s_sharedDataStore;
 - (instancetype)initWithFileURL:(NSURL *)fileURL model:(NSManagedObjectModel *)model
 {
     if (self = [super init]) {
-        NSManagedObjectContext *viewContext = nil;
         if (@available(iOS 10, *)) {
             NSPersistentContainer *persistentContainer = [NSPersistentContainer persistentContainerWithName:fileURL.lastPathComponent managedObjectModel:model];
             
             NSPersistentStoreDescription *persistentStoreDescription = [NSPersistentStoreDescription persistentStoreDescriptionWithURL:fileURL];
-            [persistentStoreDescription setOption:@YES forKey:NSMigratePersistentStoresAutomaticallyOption];
-            [persistentStoreDescription setOption:@YES forKey:NSInferMappingModelAutomaticallyOption];
+            persistentStoreDescription.shouldInferMappingModelAutomatically = NO;
+            persistentStoreDescription.shouldMigrateStoreAutomatically = NO;
             persistentContainer.persistentStoreDescriptions = @[ persistentStoreDescription ];
             
-            [persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription * _Nonnull persistentStoreDescription, NSError * _Nullable error) {
-                if (error) {
-                    SRGUserDataLogError(@"SRGDataStore", @"Data store failed to load. Reason: %@", error);
-                }
-            }];
             self.persistentContainer = persistentContainer;
-            
-            // The main context is for reads only. We must therefore always match what has been persisted to the store,
-            // thus discarding in-memory versions when background contexts are saved and automatically merged.
-            viewContext = self.persistentContainer.viewContext;
-            viewContext.automaticallyMergesChangesFromParent = YES;
         }
         else {
-            self.legacyPersistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:fileURL model:model];
-            
-            // The main context is for reads only. We must therefore always match what has been persisted to the store,
-            // thus discarding in-memory versions when background contexts are saved and automatically merged.
-            viewContext = self.legacyPersistentContainer.viewContext;
+            self.persistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:fileURL model:model];
         }
         
+        [self.persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+            if ([error.domain isEqualToString:NSCocoaErrorDomain] && error.code == NSPersistentStoreIncompatibleVersionHashError) {
+                BOOL migrated = [self migratePersistentStoreWithFileURL:fileURL];
+                if (migrated) {
+                    [self.persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+                        if (error) {
+                            SRGUserDataLogError(@"store", @"Data store failed to load after migration. Reason: %@", error);
+                        }
+                    }];
+                }
+                else {
+                    SRGUserDataLogError(@"store", @"Data store failed to load and no migration found. Reason: %@", error);
+                }
+            }
+            else if (error) {
+                SRGUserDataLogError(@"store", @"Data store failed to load. Reason: %@", error);
+            }
+        }];
+        
+        // The main context is for reads only. We must therefore always match what has been persisted to the store,
+        // thus discarding in-memory versions when background contexts are saved and automatically merged.
+        NSManagedObjectContext *viewContext = self.persistentContainer.viewContext;
+        if (@available(iOS 10, *)) {
+            viewContext.automaticallyMergesChangesFromParent = YES;
+        }
         viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy;
         viewContext.undoManager = nil;
         
@@ -76,35 +87,13 @@ static SRGDataStore *s_sharedDataStore;
     return self;
 }
 
-#pragma mark Getters and setters
-
-- (NSManagedObjectContext *)viewContext
-{
-    if (@available(iOS 10, *)) {
-        return self.persistentContainer.viewContext;
-    }
-    else {
-        return self.legacyPersistentContainer.viewContext;
-    }
-}
-
-- (NSManagedObjectContext *)backgroundContext
-{
-    if (@available(iOS 10, *)) {
-        return self.persistentContainer.newBackgroundContext;
-    }
-    else {
-        return self.legacyPersistentContainer.backgroundManagedObjectContext;
-    }
-}
-
 #pragma mark Task execution
 
 - (id)performMainThreadReadTask:(id (NS_NOESCAPE ^)(NSManagedObjectContext *managedObjectContext))task
 {
     NSAssert(NSThread.isMainThread, @"Must be called from the main thread only");
     
-    NSManagedObjectContext *managedObjectContext = self.viewContext;
+    NSManagedObjectContext *managedObjectContext = self.persistentContainer.viewContext;
     id result = task(managedObjectContext);
     NSAssert(! managedObjectContext.hasChanges, @"The managed object context must not be altered");
     return result;
@@ -117,7 +106,7 @@ static SRGDataStore *s_sharedDataStore;
     NSString *handle = NSUUID.UUID.UUIDString;
     
     __block NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
-        NSManagedObjectContext *managedObjectContext = self.backgroundContext;
+        NSManagedObjectContext *managedObjectContext = self.persistentContainer.newBackgroundContext;
         managedObjectContext.undoManager = nil;
         
         __block id result = nil;
@@ -149,7 +138,7 @@ static SRGDataStore *s_sharedDataStore;
         // be enforced during development), merging behavior setup is not really required for background contexts, as
         // transactions can never be made in parallel. But if this happens for some reason, ignore those changes and keep
         // the in-memory ones.
-        NSManagedObjectContext *managedObjectContext = self.backgroundContext;
+        NSManagedObjectContext *managedObjectContext = self.persistentContainer.newBackgroundContext;
         if (@available(iOS 10, *)) {
             managedObjectContext.automaticallyMergesChangesFromParent = YES;
         }
@@ -216,6 +205,79 @@ static SRGDataStore *s_sharedDataStore;
         // Removal at the end of task execution does not take place for pending tasks. Must remove entries manually.
         [self.operations removeAllObjects];
     });
+}
+
+#pragma mark Migration
+
+- (BOOL)migratePersistentStoreWithFileURL:(NSURL *)fileURL
+{
+    NSUInteger fromVersion = s_currentPersistentStoreVersion - 1;
+    BOOL migrated = NO;
+    while (! migrated && fromVersion > 0) {
+        migrated = [self migratePersistentStoreWithFileURL:fileURL fromVersion:fromVersion];
+        fromVersion--;
+    }
+    
+    return migrated;
+}
+
+- (BOOL)migratePersistentStoreWithFileURL:(NSURL *)fileURL fromVersion:(NSUInteger)fromVersion
+{
+    NSUInteger toVersion = fromVersion + 1;
+    
+    NSString *mappingModelFilePath = [NSBundle.srg_userDataBundle pathForResource:[NSString stringWithFormat:@"SRGUserData_v%@_v%@", @(fromVersion), @(toVersion)] ofType:@"cdm"];
+    if (! mappingModelFilePath) {
+        return NO;
+    }
+    NSURL *mappingModelFileURL = [NSURL fileURLWithPath:mappingModelFilePath];
+    NSMappingModel *mappingModel = [[NSMappingModel alloc] initWithContentsOfURL:mappingModelFileURL];
+    
+    NSString *sourceModelFilePath = [NSBundle.srg_userDataBundle pathForResource:[NSString stringWithFormat:@"SRGUserData_v%@", @(fromVersion)] ofType:@"mom" inDirectory:@"SRGUserData.momd"];
+    if (! sourceModelFilePath) {
+        return NO;
+    }
+    NSURL *sourceModelFileURL = [NSURL fileURLWithPath:sourceModelFilePath];
+    NSManagedObjectModel *sourceModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:sourceModelFileURL];
+    
+    NSString *destinationModelFilePath = [NSBundle.srg_userDataBundle pathForResource:[NSString stringWithFormat:@"SRGUserData_v%@", @(toVersion)] ofType:@"mom" inDirectory:@"SRGUserData.momd"];
+    if (! destinationModelFilePath) {
+        return NO;
+    }
+    NSURL *destinationeModelFileURL = [NSURL fileURLWithPath:destinationModelFilePath];
+    NSManagedObjectModel *destinationModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:destinationeModelFileURL];
+    
+    NSString *migratedLastPathComponent = [fileURL.lastPathComponent stringByAppendingString:@"-migrated"];
+    NSURL *migratedFileURL = [fileURL.URLByDeletingLastPathComponent URLByAppendingPathComponent:migratedLastPathComponent];
+    
+    NSMigrationManager *migrationManager = [[NSMigrationManager alloc] initWithSourceModel:sourceModel destinationModel:destinationModel];
+    BOOL migrated = [migrationManager migrateStoreFromURL:fileURL
+                                                     type:NSSQLiteStoreType
+                                                  options:nil
+                                         withMappingModel:mappingModel
+                                         toDestinationURL:migratedFileURL
+                                          destinationType:NSSQLiteStoreType
+                                       destinationOptions:nil
+                                                    error:NULL];
+    if (migrated) {
+        if (! [NSFileManager.defaultManager replaceItemAtURL:fileURL
+                                               withItemAtURL:migratedFileURL
+                                              backupItemName:nil
+                                                     options:NSFileManagerItemReplacementUsingNewMetadataOnly
+                                            resultingItemURL:NULL
+                                                       error:NULL]) {
+            return NO;
+        }
+        
+        if (toVersion < s_currentPersistentStoreVersion) {
+            return [self migratePersistentStoreWithFileURL:fileURL fromVersion:toVersion];
+        }
+        else {
+            return YES;
+        }
+    }
+    else {
+        return NO;
+    }
 }
 
 @end

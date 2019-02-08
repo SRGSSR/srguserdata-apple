@@ -23,8 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  An identifier for the device which updated the entry.
  */
-// TODO: Rename as deviceUid
-@property (nonatomic, readonly, copy, nullable) NSString *deviceName;
+@property (nonatomic, readonly, copy, nullable) NSString *deviceUid;
 
 @end
 

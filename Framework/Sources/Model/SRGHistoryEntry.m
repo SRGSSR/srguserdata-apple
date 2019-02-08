@@ -14,14 +14,14 @@
 @interface SRGHistoryEntry ()
 
 @property (nonatomic) double lastPlaybackPosition;
-@property (nonatomic, copy) NSString *deviceName;
+@property (nonatomic, copy) NSString *deviceUid;
 
 @end
 
 @implementation SRGHistoryEntry
 
 @dynamic lastPlaybackPosition;
-@dynamic deviceName;
+@dynamic deviceUid;
 
 #pragma mark Getters and Setters
 
@@ -38,7 +38,7 @@
 - (NSDictionary *)dictionary
 {
     NSMutableDictionary *JSONDictionary = [[super dictionary] mutableCopy];
-    JSONDictionary[@"device_id"] = self.deviceName;
+    JSONDictionary[@"device_id"] = self.deviceUid;
     JSONDictionary[@"last_playback_position"] = @(self.lastPlaybackPosition);
     return [JSONDictionary copy];
 }
@@ -49,7 +49,7 @@
 {
     [super updateWithDictionary:dictionary];
     
-    self.deviceName = dictionary[@"device_id"];
+    self.deviceUid = dictionary[@"device_id"];
     self.lastPlaybackPosition = [dictionary[@"last_playback_position"] doubleValue];
 }
 

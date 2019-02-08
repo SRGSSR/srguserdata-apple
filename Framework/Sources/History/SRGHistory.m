@@ -22,7 +22,7 @@ typedef void (^SRGHistoryUpdatesCompletionBlock)(NSArray<NSDictionary *> * _Null
 typedef void (^SRGHistoryPullCompletionBlock)(NSDate * _Nullable serverDate, NSError * _Nullable error);
 
 NSString * const SRGHistoryDidChangeNotification = @"SRGHistoryDidChangeNotification";
-NSString * const SRGHistoryURNsKey = @"SRGHistoryURNsKey";
+NSString * const SRGHistoryUidsKey = @"SRGHistoryUidsKey";
 
 NSString * const SRGHistoryDidStartSynchronizationNotification = @"SRGHistoryDidStartSynchronizationNotification";
 NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDidFinishSynchronizationNotification";
@@ -135,12 +135,12 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         }
         
         if (historyEntryDictionaries.count != 0) {
-            NSMutableArray<NSString *> *URNs = [NSMutableArray array];
+            NSMutableArray<NSString *> *uids = [NSMutableArray array];
             [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
                 for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
-                    NSString *URN = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
-                    if (URN) {
-                        [URNs addObject:URN];
+                    NSString *uid = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
+                    if (uid) {
+                        [uids addObject:uid];
                     }
                 }
                 return YES;
@@ -154,10 +154,10 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                         [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
                     }
                     
-                    if (URNs.count > 0) {
+                    if (uids.count > 0) {
                         [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                           object:self
-                                                                        userInfo:@{ SRGHistoryURNsKey : [URNs copy] }];
+                                                                        userInfo:@{ SRGHistoryUidsKey : [uids copy] }];
                     }
                 });
             }];
@@ -321,20 +321,20 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 - (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock
 {
-    __block NSSet<NSString *> *URNs = nil;
+    __block NSSet<NSString *> *uids = nil;
     
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        URNs = [historyEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, mediaURN)]];
+        uids = [historyEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)]];
         
         [SRGHistoryEntry deleteAllInManagedObjectContext:managedObjectContext];
         return YES;
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (URNs.count > 0) {
+            if (uids.count > 0) {
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryURNsKey : URNs.allObjects }];
+                                                                userInfo:@{ SRGHistoryUidsKey : uids.allObjects }];
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidClearNotification
                                                                   object:self
                                                                 userInfo:nil];
@@ -360,37 +360,51 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
-- (void)saveHistoryEntryForURN:(NSString *)URN withLastPlaybackTime:(CMTime)lastPlaybackTime deviceName:(NSString *)deviceName completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+- (SRGHistoryEntry *)historyEntryWithUid:(NSString *)uid
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), uid];
+    return [self historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
+}
+
+- (void)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable))completionBlock
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), uid];
+    return [self historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries) {
+        completionBlock(historyEntries.firstObject);
+    }];
+}
+
+- (void)saveHistoryEntryForUid:(NSString *)uid withLastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithURN:URN inManagedObjectContext:managedObjectContext];
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithUid:uid inManagedObjectContext:managedObjectContext];
         historyEntry.lastPlaybackTime = lastPlaybackTime;
-        historyEntry.deviceName = deviceName;
+        historyEntry.deviceUid = deviceUid;
         return YES;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryURNsKey : @[ URN ] }];
+                                                                userInfo:@{ SRGHistoryUidsKey : @[ uid ] }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
     }];
 }
 
-- (void)discardHistoryEntriesWithURNs:(NSArray<NSString *> *)URNs completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+- (void)discardHistoryEntriesWithUids:(NSArray<NSString *> *)uids completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
-    __block NSArray<NSString *> *discardedURNs = nil;
+    __block NSArray<NSString *> *discardedUids = nil;
     [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        discardedURNs = [SRGHistoryEntry discardObjectsWithURNs:URNs inManagedObjectContext:managedObjectContext];
+        discardedUids = [SRGHistoryEntry discardObjectsWithUids:uids inManagedObjectContext:managedObjectContext];
         return YES;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryURNsKey : discardedURNs }];
+                                                                userInfo:@{ SRGHistoryUidsKey : discardedUids }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
