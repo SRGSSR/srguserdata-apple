@@ -49,11 +49,9 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 @property (nonatomic, readonly) SRGUser *user;
 
 /**
- *  Acess to playback history for the user.
+ *  Access to playback history for the user.
  */
 @property (nonatomic, readonly, nullable) SRGHistory *history;
-
-// Completion blocks called on background threads
 
 /**
  *  Dissociate the current identity (if any) from the local user, calling an optional block on completion. Local data
