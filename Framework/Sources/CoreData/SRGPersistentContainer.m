@@ -30,7 +30,7 @@
     return self;
 }
 
-- (void)loadPersistentStoreWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler
+- (void)srg_loadPersistentStoreWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
     NSAssert(NSThread.isMainThread, @"Must be instantiated from the main thread");
 
@@ -61,9 +61,20 @@
     return managedObjectContext;
 }
 
-- (NSManagedObjectContext *)backgroundManagedObjectContext
+- (NSManagedObjectContext *)newBackgroundContext
 {
-    return (self.viewContext) ? [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator] : nil;
+    return [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
+}
+
+@end
+
+@implementation NSPersistentContainer (SRGPersistentContainerCompatibility)
+
+- (void)srg_loadPersistentStoreWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler
+{
+    [self loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription * _Nonnull persistentStoreDescription, NSError * _Nullable error) {
+        completionHandler(error);
+    }];
 }
 
 @end

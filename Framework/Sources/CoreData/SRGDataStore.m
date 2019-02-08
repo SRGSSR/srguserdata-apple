@@ -20,8 +20,7 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
 @interface SRGDataStore ()
 
 @property (nonatomic) NSOperationQueue *serialOperationQueue;
-@property (nonatomic) NSPersistentContainer *persistentContainer API_AVAILABLE(ios(10.0));
-@property (nonatomic) SRGPersistentContainer *legacyPersistentContainer NS_DEPRECATED_IOS(9_0, 10_0, "Remove when iOS 10 is the minimum deployment target");
+@property (nonatomic) id<SRGPersistentContainer> persistentContainer;
 
 @property (nonatomic) NSMapTable<NSString *, NSOperation *> *operations;
 
@@ -36,7 +35,6 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
 - (instancetype)initWithFileURL:(NSURL *)fileURL model:(NSManagedObjectModel *)model
 {
     if (self = [super init]) {
-        NSManagedObjectContext *viewContext = nil;
         if (@available(iOS 10, *)) {
             NSPersistentContainer *persistentContainer = [NSPersistentContainer persistentContainerWithName:fileURL.lastPathComponent managedObjectModel:model];
             
@@ -45,61 +43,37 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
             persistentStoreDescription.shouldMigrateStoreAutomatically = NO;
             persistentContainer.persistentStoreDescriptions = @[ persistentStoreDescription ];
             
-            [persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription * _Nonnull persistentStoreDescription, NSError * _Nullable error) {
-                if (error) {
-                    if ([error.domain isEqualToString:NSCocoaErrorDomain] && error.code == NSPersistentStoreIncompatibleVersionHashError) {
-                        BOOL migrated = [self migratePersistentStoreWithFileURL:fileURL];
-                        if (migrated) {
-                            [persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription * _Nonnull persistentStoreDescription, NSError * _Nullable error) {
-                                if (error) {
-                                    SRGUserDataLogError(@"SRGDataStore", @"Data store failed to load after migration. Reason: %@", error);
-                                }
-                            }];
-                        }
-                        else {
-                            SRGUserDataLogError(@"SRGDataStore", @"Data store failed to load and no migration found. Reason: %@", error);
-                        }
-                    }
-                    else {
-                        SRGUserDataLogError(@"SRGDataStore", @"Data store failed to load. Reason: %@", error);
-                    }
-                }
-            }];
             self.persistentContainer = persistentContainer;
-            
-            // The main context is for reads only. We must therefore always match what has been persisted to the store,
-            // thus discarding in-memory versions when background contexts are saved and automatically merged.
-            viewContext = self.persistentContainer.viewContext;
-            viewContext.automaticallyMergesChangesFromParent = YES;
         }
         else {
-            self.legacyPersistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:fileURL model:model];
-            [self.legacyPersistentContainer loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
-                if (error) {
-                    if ([error.domain isEqualToString:NSCocoaErrorDomain] && error.code == NSPersistentStoreIncompatibleVersionHashError) {
-                        BOOL migrated = [self migratePersistentStoreWithFileURL:fileURL];
-                        if (migrated) {
-                            [self.legacyPersistentContainer loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
-                                if (error) {
-                                    SRGUserDataLogError(@"SRGDataStore", @"Data store failed to load after migration. Reason: %@", error);
-                                }
-                            }];
-                        }
-                        else {
-                            SRGUserDataLogError(@"SRGDataStore", @"Data store failed to load and no migration found. Reason: %@", error);
-                        }
-                    }
-                    else {
-                        SRGUserDataLogError(@"SRGDataStore", @"Data store failed to load. Reason: %@", error);
-                    }
-                }
-            }];
-            
-            // The main context is for reads only. We must therefore always match what has been persisted to the store,
-            // thus discarding in-memory versions when background contexts are saved and automatically merged.
-            viewContext = self.legacyPersistentContainer.viewContext;
+            self.persistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:fileURL model:model];
         }
         
+        [self.persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+            if ([error.domain isEqualToString:NSCocoaErrorDomain] && error.code == NSPersistentStoreIncompatibleVersionHashError) {
+                BOOL migrated = [self migratePersistentStoreWithFileURL:fileURL];
+                if (migrated) {
+                    [self.persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+                        if (error) {
+                            SRGUserDataLogError(@"store", @"Data store failed to load after migration. Reason: %@", error);
+                        }
+                    }];
+                }
+                else {
+                    SRGUserDataLogError(@"store", @"Data store failed to load and no migration found. Reason: %@", error);
+                }
+            }
+            else if (error) {
+                SRGUserDataLogError(@"store", @"Data store failed to load. Reason: %@", error);
+            }
+        }];
+        
+        // The main context is for reads only. We must therefore always match what has been persisted to the store,
+        // thus discarding in-memory versions when background contexts are saved and automatically merged.
+        NSManagedObjectContext *viewContext = self.persistentContainer.viewContext;
+        if (@available(iOS 10, *)) {
+            viewContext.automaticallyMergesChangesFromParent = YES;
+        }
         viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy;
         viewContext.undoManager = nil;
         
@@ -113,35 +87,13 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
     return self;
 }
 
-#pragma mark Getters and setters
-
-- (NSManagedObjectContext *)viewContext
-{
-    if (@available(iOS 10, *)) {
-        return self.persistentContainer.viewContext;
-    }
-    else {
-        return self.legacyPersistentContainer.viewContext;
-    }
-}
-
-- (NSManagedObjectContext *)backgroundContext
-{
-    if (@available(iOS 10, *)) {
-        return self.persistentContainer.newBackgroundContext;
-    }
-    else {
-        return self.legacyPersistentContainer.backgroundManagedObjectContext;
-    }
-}
-
 #pragma mark Task execution
 
 - (id)performMainThreadReadTask:(id (NS_NOESCAPE ^)(NSManagedObjectContext *managedObjectContext))task
 {
     NSAssert(NSThread.isMainThread, @"Must be called from the main thread only");
     
-    NSManagedObjectContext *managedObjectContext = self.viewContext;
+    NSManagedObjectContext *managedObjectContext = self.persistentContainer.viewContext;
     id result = task(managedObjectContext);
     NSAssert(! managedObjectContext.hasChanges, @"The managed object context must not be altered");
     return result;
@@ -154,7 +106,7 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
     NSString *handle = NSUUID.UUID.UUIDString;
     
     __block NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
-        NSManagedObjectContext *managedObjectContext = self.backgroundContext;
+        NSManagedObjectContext *managedObjectContext = self.persistentContainer.newBackgroundContext;
         managedObjectContext.undoManager = nil;
         
         __block id result = nil;
@@ -186,7 +138,7 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
         // be enforced during development), merging behavior setup is not really required for background contexts, as
         // transactions can never be made in parallel. But if this happens for some reason, ignore those changes and keep
         // the in-memory ones.
-        NSManagedObjectContext *managedObjectContext = self.backgroundContext;
+        NSManagedObjectContext *managedObjectContext = self.persistentContainer.newBackgroundContext;
         if (@available(iOS 10, *)) {
             managedObjectContext.automaticallyMergesChangesFromParent = YES;
         }
