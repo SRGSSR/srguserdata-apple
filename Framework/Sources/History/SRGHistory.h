@@ -48,8 +48,8 @@ OBJC_EXPORT NSString * const SRGHistoryDidClearNotification;
  *  @discussion This method can only be called from the main thread. Reads on other threads must occur asynchronously
  *              with `-historyEntriesMatchingPredicate:sortedWithDescriptors:completionBlock:`.
  */
-- (NSArray<__kindof SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
-                                                   sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
+- (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                                          sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
 
 /**
  *  Return history entries, optionally matching a specific predicate and / or sorted with descriptors. If no sort
