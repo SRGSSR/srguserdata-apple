@@ -61,12 +61,11 @@
     
     XCTAssertEqual(itemUids2.count, 0);
     
-    NSString *URN1 = @"urn:rts:video:10085364";
-    NSPredicate *predicate3 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), URN1];
-    SRGHistoryEntry *historyEntry = [userData.history historyEntriesMatchingPredicate:predicate3 sortedWithDescriptors:nil].firstObject;
+    NSString *uid1 = @"urn:rts:video:10085364";
+    SRGHistoryEntry *historyEntry = [userData.history historyEntryWithUid:uid1];
     
     XCTAssertNotNil(historyEntry);
-    XCTAssertEqualObjects(historyEntry.uid, URN1);
+    XCTAssertEqualObjects(historyEntry.uid, uid1);
     XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, !=, kCMTimeZero));
     XCTAssertNotNil([historyEntry valueForKey:@keypath(SRGHistoryEntry.new, discarded)]);
     XCTAssertNotNil([historyEntry valueForKey:@keypath(SRGHistoryEntry.new, deviceUid)]);
@@ -79,14 +78,14 @@
     XCTAssertNil([user valueForKey:@keypath(SRGUser.new, accountUid)]);
     
     // Database is writable.
-    NSString *URN2 = @"urn:rts:video:1234567890";
+    NSString *uid2 = @"urn:rts:video:1234567890";
     [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
-        return [URNs containsObject:URN2];
+        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
+        return [uids containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryForUid:URN2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryForUid:uid2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -141,12 +140,11 @@
     
     XCTAssertEqual(itemUids2.count, 0);
     
-    NSString *URN1 = @"urn:rts:video:10085364";
-    NSPredicate *predicate3 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), URN1];
-    SRGHistoryEntry *historyEntry = [userData.history historyEntriesMatchingPredicate:predicate3 sortedWithDescriptors:nil].firstObject;
+    NSString *uid1 = @"urn:rts:video:10085364";
+    SRGHistoryEntry *historyEntry = [userData.history historyEntryWithUid:uid1];
     
     XCTAssertNotNil(historyEntry);
-    XCTAssertEqualObjects(historyEntry.uid, URN1);
+    XCTAssertEqualObjects(historyEntry.uid, uid1);
     XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, !=, kCMTimeZero));
     XCTAssertNotNil([historyEntry valueForKey:@keypath(SRGHistoryEntry.new, discarded)]);
     XCTAssertNotNil([historyEntry valueForKey:@keypath(SRGHistoryEntry.new, deviceUid)]);
@@ -159,14 +157,14 @@
     XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, accountUid)]);
     
     // Database is writable.
-    NSString *URN2 = @"urn:rts:video:1234567890";
+    NSString *uid2 = @"urn:rts:video:1234567890";
     [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
-        return [URNs containsObject:URN2];
+        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
+        return [uids containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryForUid:URN2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryForUid:uid2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
