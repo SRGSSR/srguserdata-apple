@@ -74,8 +74,6 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
         }
         else {
             self.legacyPersistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:fileURL model:model];
-            self.legacyPersistentContainer.shouldInferMappingModelAutomatically = NO;
-            self.legacyPersistentContainer.shouldMigrateStoreAutomatically = NO;
             [self.legacyPersistentContainer loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
                 if (error) {
                     if ([error.domain isEqualToString:NSCocoaErrorDomain] && error.code == NSPersistentStoreIncompatibleVersionHashError) {

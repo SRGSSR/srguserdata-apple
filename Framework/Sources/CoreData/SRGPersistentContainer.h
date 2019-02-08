@@ -20,12 +20,6 @@ API_DEPRECATED_WITH_REPLACEMENT("Use NSPersistentContainer instead", ios(9.0, 10
  */
 - (instancetype)initWithFileURL:(NSURL *)fileURL model:(NSManagedObjectModel *)model;
 
-/*
- *  Same as `NSPersistentStoreDescription`
- */
-@property BOOL shouldMigrateStoreAutomatically;
-@property BOOL shouldInferMappingModelAutomatically;
-
 /**
  * Load store from the file URL initialisation that have not already been successfully added to the container.
  * The completion handler is called once the store that succeeds or fails.

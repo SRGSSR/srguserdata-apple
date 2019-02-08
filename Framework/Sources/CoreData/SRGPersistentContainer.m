@@ -24,9 +24,6 @@
         self.fileURL = fileURL;
         self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
         
-        self.shouldMigrateStoreAutomatically = YES;
-        self.shouldInferMappingModelAutomatically = YES;
-        
         NSAssert(NSThread.isMainThread, @"Must be instantiated from the main thread");
         self.viewContext = [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
     }
@@ -42,8 +39,8 @@
         NSPersistentStore *persistentStore = [self.persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
                                                                                            configuration:nil
                                                                                                      URL:self.fileURL
-                                                                                                 options:@{ NSMigratePersistentStoresAutomaticallyOption : @(self.shouldMigrateStoreAutomatically),
-                                                                                                            NSInferMappingModelAutomaticallyOption : @(self.shouldInferMappingModelAutomatically) }
+                                                                                                 options:@{ NSMigratePersistentStoresAutomaticallyOption : @NO,
+                                                                                                            NSInferMappingModelAutomaticallyOption : @NO }
                                                                                                    error:&error];
         if (persistentStore) {
             self.viewContext = [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
