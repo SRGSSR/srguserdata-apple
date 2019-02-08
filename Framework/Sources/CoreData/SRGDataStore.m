@@ -224,29 +224,30 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
 - (BOOL)migratePersistentStoreWithFileURL:(NSURL *)fileURL fromVersion:(NSUInteger)fromVersion
 {
     NSUInteger toVersion = fromVersion + 1;
-    NSString *migratedLastPathComponent = [fileURL.lastPathComponent stringByAppendingString:@"-migrated"];
-    NSURL *migratedFileURL = [[fileURL URLByDeletingLastPathComponent] URLByAppendingPathComponent:migratedLastPathComponent];
     
-    NSString *mappingModelFilePath = [NSBundle.srg_userDataBundle pathForResource:[NSString stringWithFormat:@"SRGUserData_v%lu_v%lu", (unsigned long)fromVersion, (unsigned long)toVersion] ofType:@"cdm"];
+    NSString *mappingModelFilePath = [NSBundle.srg_userDataBundle pathForResource:[NSString stringWithFormat:@"SRGUserData_v%@_v%@", @(fromVersion), @(toVersion)] ofType:@"cdm"];
     if (! mappingModelFilePath) {
         return NO;
     }
     NSURL *mappingModelFileURL = [NSURL fileURLWithPath:mappingModelFilePath];
     NSMappingModel *mappingModel = [[NSMappingModel alloc] initWithContentsOfURL:mappingModelFileURL];
     
-    NSString *sourceModelFilePath = [NSBundle.srg_userDataBundle pathForResource:[NSString stringWithFormat:@"SRGUserData_v%lu", (unsigned long)fromVersion] ofType:@"mom" inDirectory:@"SRGUserData.momd"];
+    NSString *sourceModelFilePath = [NSBundle.srg_userDataBundle pathForResource:[NSString stringWithFormat:@"SRGUserData_v%@", @(fromVersion)] ofType:@"mom" inDirectory:@"SRGUserData.momd"];
     if (! sourceModelFilePath) {
         return NO;
     }
     NSURL *sourceModelFileURL = [NSURL fileURLWithPath:sourceModelFilePath];
     NSManagedObjectModel *sourceModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:sourceModelFileURL];
     
-    NSString *destinationModelFilePath = [NSBundle.srg_userDataBundle pathForResource:[NSString stringWithFormat:@"SRGUserData_v%lu", (unsigned long)toVersion] ofType:@"mom" inDirectory:@"SRGUserData.momd"];
+    NSString *destinationModelFilePath = [NSBundle.srg_userDataBundle pathForResource:[NSString stringWithFormat:@"SRGUserData_v%@", @(toVersion)] ofType:@"mom" inDirectory:@"SRGUserData.momd"];
     if (! destinationModelFilePath) {
         return NO;
     }
     NSURL *destinationeModelFileURL = [NSURL fileURLWithPath:destinationModelFilePath];
     NSManagedObjectModel *destinationModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:destinationeModelFileURL];
+    
+    NSString *migratedLastPathComponent = [fileURL.lastPathComponent stringByAppendingString:@"-migrated"];
+    NSURL *migratedFileURL = [fileURL.URLByDeletingLastPathComponent URLByAppendingPathComponent:migratedLastPathComponent];
     
     NSMigrationManager *migrationManager = [[NSMigrationManager alloc] initWithSourceModel:sourceModel destinationModel:destinationModel];
     BOOL migrated = [migrationManager migrateStoreFromURL:fileURL
@@ -258,8 +259,8 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
                                        destinationOptions:nil
                                                     error:NULL];
     if (migrated) {
-        [[NSFileManager defaultManager] removeItemAtURL:fileURL error:nil];
-        [[NSFileManager defaultManager] moveItemAtURL:migratedFileURL toURL:fileURL error:nil];
+        [[NSFileManager defaultManager] removeItemAtURL:fileURL error:NULL];
+        [[NSFileManager defaultManager] moveItemAtURL:migratedFileURL toURL:fileURL error:NULL];
         
         if (toVersion < s_currentPersistentStoreVersion) {
             return [self migratePersistentStoreWithFileURL:fileURL fromVersion:toVersion];
