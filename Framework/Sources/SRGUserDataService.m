@@ -93,10 +93,8 @@
 - (void)userDidLogout
 {}
 
-- (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock
-{
-    completionBlock();
-}
+- (void)clearData
+{}
 
 #pragma mark Public methods
 

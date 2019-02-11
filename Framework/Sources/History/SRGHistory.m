@@ -319,7 +319,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     [self.pushRequestQueue cancel];
 }
 
-- (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock
+- (void)clearData
 {
     __block NSSet<NSString *> *uids = nil;
     
@@ -340,7 +340,6 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                                                                 userInfo:nil];
             }
         });
-        completionBlock ? completionBlock() : nil;
     }];
 }
 

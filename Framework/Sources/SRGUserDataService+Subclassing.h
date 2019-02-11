@@ -34,10 +34,7 @@
 
 /**
  *  Method called when local service data needs to be cleared.
- *
- *  The provided completion block must be called on completion, otherwise the behavior is undefined. The block can
- *  be called from any thread.
  */
-- (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock;
+- (void)clearData;
 
 @end

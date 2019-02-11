@@ -53,22 +53,6 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
  */
 @property (nonatomic, readonly, nullable) SRGHistory *history;
 
-/**
- *  Dissociate the current identity (if any) from the local user, calling an optional block on completion. Local data
- *  is kept and can be synchronized with another account after logging in again.
- *
- *  @discussion The completion block is called on a background thread.
- */
-- (void)dissociateIdentityWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
-
-/**
- *  Erase all local data and the identity associated with it (if any), calling an optional block on completion. The
- *  account itself is not deleted and the user can login to retrieve her data again.
- *
- *  @discussion The completion block is called on a background thread.
- */
-- (void)eraseWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
-
 @end
 
 NS_ASSUME_NONNULL_END
