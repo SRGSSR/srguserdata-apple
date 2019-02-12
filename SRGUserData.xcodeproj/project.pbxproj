@@ -23,6 +23,7 @@
 		0858B6A422010CD6000F00CF /* MAKVONotificationCenter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0858B6A522010CD6000F00CF /* SRGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; };
 		0858B6A622010CD6000F00CF /* SRGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		08B327A7221324810051DDA6 /* HistoryTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 08B327A6221324810051DDA6 /* HistoryTestCase.m */; };
 		6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */; };
 		6F0178A522048B2800B4BCD9 /* DataStoreTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0178A422048B2800B4BCD9 /* DataStoreTestCase.m */; };
 		6F0178AF22080FEC00B4BCD9 /* SRGHistoryEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0178AB22080FEC00B4BCD9 /* SRGHistoryEntry.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -83,7 +84,7 @@
 		6FA62D73220439CF008569DC /* UICKeyChainStore.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6FA62D5E2204389A008569DC /* UICKeyChainStore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6FB521C02208838E0042FCC3 /* SRGUserData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */; };
 		6FB74D6C2101D4D200E2D365 /* SRGUserData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; };
-		6FB74D772101D5D600E2D365 /* HistoryTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FB74D742101D5D600E2D365 /* HistoryTestCase.m */; };
+		6FB74D772101D5D600E2D365 /* HistorySynchronizationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */; };
 		6FB74D7B2101D69F00E2D365 /* SRGNetwork.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6FCCE4812212BFD600423EFF /* MigrationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FCCE4802212BFD600423EFF /* MigrationTestCase.m */; };
 		6FE91E7B2108A36A001B5E8F /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
@@ -179,6 +180,7 @@
 		0858B69522010C9E000F00CF /* SRGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGLogger.framework; path = Carthage/Build/iOS/SRGLogger.framework; sourceTree = "<group>"; };
 		0858B69622010C9E000F00CF /* libextobjc.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libextobjc.framework; path = Carthage/Build/iOS/libextobjc.framework; sourceTree = "<group>"; };
 		0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MAKVONotificationCenter.framework; path = Carthage/Build/iOS/MAKVONotificationCenter.framework; sourceTree = "<group>"; };
+		08B327A6221324810051DDA6 /* HistoryTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistoryTestCase.m; sourceTree = "<group>"; };
 		6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGUserDataLogger.h; sourceTree = "<group>"; };
 		6F0178A422048B2800B4BCD9 /* DataStoreTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataStoreTestCase.m; sourceTree = "<group>"; };
 		6F0178AB22080FEC00B4BCD9 /* SRGHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGHistoryEntry.h; sourceTree = "<group>"; };
@@ -222,7 +224,7 @@
 		6FA62D682204394B008569DC /* Mantle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Mantle.framework; path = Carthage/Build/iOS/Mantle.framework; sourceTree = "<group>"; };
 		6FB521BF2208838E0042FCC3 /* SRGUserData_v1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v1.xcdatamodel; sourceTree = "<group>"; };
 		6FB74D672101D4D200E2D365 /* SRGUserData-tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SRGUserData-tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6FB74D742101D5D600E2D365 /* HistoryTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistoryTestCase.m; sourceTree = "<group>"; };
+		6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistorySynchronizationTestCase.m; sourceTree = "<group>"; };
 		6FB74D762101D5D600E2D365 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6FCBFEF8210B578B006BC355 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCBFEFA210B57BD006BC355 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -516,7 +518,8 @@
 				6F3234302212ED230046E265 /* Helpers */,
 				6F46DD73221429100013C10A /* Model */,
 				6F0178A422048B2800B4BCD9 /* DataStoreTestCase.m */,
-				6FB74D742101D5D600E2D365 /* HistoryTestCase.m */,
+				6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */,
+				08B327A6221324810051DDA6 /* HistoryTestCase.m */,
 				6FCCE4802212BFD600423EFF /* MigrationTestCase.m */,
 			);
 			path = Sources;
@@ -789,7 +792,8 @@
 			files = (
 				6F46DD76221429110013C10A /* Person.m in Sources */,
 				6FCCE4812212BFD600423EFF /* MigrationTestCase.m in Sources */,
-				6FB74D772101D5D600E2D365 /* HistoryTestCase.m in Sources */,
+				6FB74D772101D5D600E2D365 /* HistorySynchronizationTestCase.m in Sources */,
+				08B327A7221324810051DDA6 /* HistoryTestCase.m in Sources */,
 				6F0178A522048B2800B4BCD9 /* DataStoreTestCase.m in Sources */,
 				6F3234322212ED240046E265 /* UserDataBaseTestCase.m in Sources */,
 				6F32342D2212E9B90046E265 /* TestData.xcdatamodeld in Sources */,
