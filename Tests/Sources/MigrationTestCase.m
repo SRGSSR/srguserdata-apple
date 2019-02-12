@@ -36,15 +36,8 @@
     
     NSURL *fileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
     SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil
-                                                       historyServiceURL:[NSURL URLWithString:@"https://history.rts.ch"]
+                                                       historyServiceURL:nil
                                                             storeFileURL:fileURL];
-    
-    // History property is loaded asynchronously
-    [self keyValueObservingExpectationForObject:userData keyPath:@keypath(SRGUserData.new, history) handler:^BOOL(SRGUserData * _Nonnull userData, NSDictionary * _Nonnull change) {
-        return (userData.history != nil);
-    }];
-    
-    [self waitForExpectationsWithTimeout:30. handler:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -115,16 +108,9 @@
     
     NSURL *fileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
     SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil
-                                                       historyServiceURL:[NSURL URLWithString:@"https://history.rts.ch"]
+                                                       historyServiceURL:nil
                                                             storeFileURL:fileURL];
-    
-    // History property is loaded asynchronously
-    [self keyValueObservingExpectationForObject:userData keyPath:@keypath(SRGUserData.new, history) handler:^BOOL(SRGUserData * _Nonnull userData, NSDictionary * _Nonnull change) {
-        return (userData.history != nil);
-    }];
-    
-    [self waitForExpectationsWithTimeout:30. handler:nil];
-    
+        
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
     NSArray<NSString *> *itemUids1 = [[userData.history historyEntriesMatchingPredicate:predicate1
