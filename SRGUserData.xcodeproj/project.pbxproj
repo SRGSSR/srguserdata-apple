@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		082442A8220CA16300F39785 /* SRGUserData_v2_v3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 082442A7220CA16300F39785 /* SRGUserData_v2_v3.xcmappingmodel */; };
 		082442AA220CA21600F39785 /* SRGUserData_v1_v2.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 082442A9220CA21600F39785 /* SRGUserData_v1_v2.xcmappingmodel */; };
-		082442AF220CB0DD00F39785 /* Play_DB_v2 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AD220CB0DD00F39785 /* Play_DB_v2 */; };
-		082442B0220CB0DD00F39785 /* Play_DB_v1 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AE220CB0DD00F39785 /* Play_DB_v1 */; };
+		082442AF220CB0DD00F39785 /* DB_v2 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AD220CB0DD00F39785 /* DB_v2 */; };
+		082442B0220CB0DD00F39785 /* DB_v1 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AE220CB0DD00F39785 /* DB_v1 */; };
 		0858B69822010C9E000F00CF /* SRGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; };
 		0858B69A22010C9E000F00CF /* SRGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; };
 		0858B69B22010C9E000F00CF /* libextobjc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69622010C9E000F00CF /* libextobjc.framework */; };
@@ -99,6 +99,7 @@
 		6FFB34852209BF8D00E76E6D /* SRGUserObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB34832209BF8D00E76E6D /* SRGUserObject+Private.h */; };
 		6FFB34892209C10800E76E6D /* SRGUserDataService+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB34872209C10800E76E6D /* SRGUserDataService+Private.h */; };
 		6FFB348E2209D57400E76E6D /* SRGHistoryEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB348C2209D57400E76E6D /* SRGHistoryEntry+Private.h */; };
+		6FFEB7452212CBE60098F131 /* DB_invalid in Resources */ = {isa = PBXBuildFile; fileRef = 6FFEB7442212CBE60098F131 /* DB_invalid */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -171,8 +172,8 @@
 		082442A6220C8BA000F39785 /* SRGUserData_v3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v3.xcdatamodel; sourceTree = "<group>"; };
 		082442A7220CA16300F39785 /* SRGUserData_v2_v3.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v2_v3.xcmappingmodel; sourceTree = "<group>"; };
 		082442A9220CA21600F39785 /* SRGUserData_v1_v2.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v1_v2.xcmappingmodel; sourceTree = "<group>"; };
-		082442AD220CB0DD00F39785 /* Play_DB_v2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Play_DB_v2; sourceTree = "<group>"; };
-		082442AE220CB0DD00F39785 /* Play_DB_v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Play_DB_v1; sourceTree = "<group>"; };
+		082442AD220CB0DD00F39785 /* DB_v2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DB_v2; sourceTree = "<group>"; };
+		082442AE220CB0DD00F39785 /* DB_v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DB_v1; sourceTree = "<group>"; };
 		0858B69522010C9E000F00CF /* SRGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGLogger.framework; path = Carthage/Build/iOS/SRGLogger.framework; sourceTree = "<group>"; };
 		0858B69622010C9E000F00CF /* libextobjc.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libextobjc.framework; path = Carthage/Build/iOS/libextobjc.framework; sourceTree = "<group>"; };
 		0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MAKVONotificationCenter.framework; path = Carthage/Build/iOS/MAKVONotificationCenter.framework; sourceTree = "<group>"; };
@@ -238,6 +239,7 @@
 		6FFB34832209BF8D00E76E6D /* SRGUserObject+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGUserObject+Private.h"; sourceTree = "<group>"; };
 		6FFB34872209C10800E76E6D /* SRGUserDataService+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataService+Private.h"; sourceTree = "<group>"; };
 		6FFB348C2209D57400E76E6D /* SRGHistoryEntry+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGHistoryEntry+Private.h"; sourceTree = "<group>"; };
+		6FFEB7442212CBE60098F131 /* DB_invalid */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DB_invalid; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -302,8 +304,9 @@
 		082442AC220CB0B900F39785 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				082442AE220CB0DD00F39785 /* Play_DB_v1 */,
-				082442AD220CB0DD00F39785 /* Play_DB_v2 */,
+				6FFEB7442212CBE60098F131 /* DB_invalid */,
+				082442AE220CB0DD00F39785 /* DB_v1 */,
+				082442AD220CB0DD00F39785 /* DB_v2 */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -689,6 +692,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6FFEB7452212CBE60098F131 /* DB_invalid in Resources */,
 				6F0C98F12121E26A00073AB6 /* SRGUserData.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -707,8 +711,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				082442AF220CB0DD00F39785 /* Play_DB_v2 in Resources */,
-				082442B0220CB0DD00F39785 /* Play_DB_v1 in Resources */,
+				082442AF220CB0DD00F39785 /* DB_v2 in Resources */,
+				082442B0220CB0DD00F39785 /* DB_v1 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

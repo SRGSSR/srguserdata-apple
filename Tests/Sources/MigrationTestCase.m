@@ -17,6 +17,29 @@
 
 @implementation MigrationTestCase
 
+#pragma mark Helpers
+
+- (NSURL *)prepareDataBaseWithName:(NSString *)name
+{
+    NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
+    NSString *fileName = @"UserData";
+    
+    for (NSString *extension in @[ @"sqlite", @"sqlite-shm", @"sqlite-wal"]) {
+        NSString *sqliteFilePath = [[NSBundle bundleForClass:[self class]] pathForResource:fileName ofType:extension inDirectory:name];
+        NSURL *sqliteFileURL = [NSURL fileURLWithPath:sqliteFilePath];
+        NSURL *sqliteDestinationFileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:fileName] URLByAppendingPathExtension:extension];
+        XCTAssertTrue([NSFileManager.defaultManager replaceItemAtURL:sqliteDestinationFileURL
+                                                       withItemAtURL:sqliteFileURL
+                                                      backupItemName:nil
+                                                             options:NSFileManagerItemReplacementUsingNewMetadataOnly
+                                                    resultingItemURL:NULL
+                                                               error:NULL]);
+    }
+    return [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:fileName] URLByAppendingPathExtension:@"sqlite"];
+}
+
+#pragma mark Tests
+
 - (void)testFailingMigration
 {
     
@@ -24,25 +47,8 @@
 
 - (void)testMigrationFromV1
 {
-    NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-    NSString *name = @"UserData-test";
-    
-    for (NSString *extension in @[ @"sqlite", @"sqlite-shm", @"sqlite-wal"]) {
-        NSString *sqliteFilePath = [[NSBundle bundleForClass:[self class]] pathForResource:name ofType:extension inDirectory:@"Play_DB_v1"];
-        NSURL *sqliteFileURL = [NSURL fileURLWithPath:sqliteFilePath];
-        NSURL *sqliteDestinationFileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:extension];
-        [NSFileManager.defaultManager replaceItemAtURL:sqliteDestinationFileURL
-                                         withItemAtURL:sqliteFileURL
-                                        backupItemName:nil
-                                               options:NSFileManagerItemReplacementUsingNewMetadataOnly
-                                      resultingItemURL:NULL
-                                                 error:NULL];
-    }
-    
-    NSURL *fileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil
-                                                       historyServiceURL:nil
-                                                            storeFileURL:fileURL];
+    NSURL *fileURL = [self prepareDataBaseWithName:@"DB_v1"];
+    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -96,25 +102,8 @@
 
 - (void)testMigrationFromV2
 {
-    NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-    NSString *name = @"UserData-test";
-    
-    for (NSString *extension in @[ @"sqlite", @"sqlite-shm", @"sqlite-wal"]) {
-        NSString *sqliteFilePath = [[NSBundle bundleForClass:[self class]] pathForResource:name ofType:extension inDirectory:@"Play_DB_v2"];
-        NSURL *sqliteFileURL = [NSURL fileURLWithPath:sqliteFilePath];
-        NSURL *sqliteDestinationFileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:extension];
-        [NSFileManager.defaultManager replaceItemAtURL:sqliteDestinationFileURL
-                                         withItemAtURL:sqliteFileURL
-                                        backupItemName:nil
-                                               options:NSFileManagerItemReplacementUsingNewMetadataOnly
-                                      resultingItemURL:NULL
-                                                 error:NULL];
-    }
-    
-    NSURL *fileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil
-                                                       historyServiceURL:nil
-                                                            storeFileURL:fileURL];
+    NSURL *fileURL = [self prepareDataBaseWithName:@"DB_v2"];
+    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
