@@ -42,7 +42,8 @@
 
 - (void)testFailingMigration
 {
-    
+    NSURL *fileURL = [self prepareDataBaseWithName:@"DB_invalid"];
+    XCTAssertNil([[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL]);
 }
 
 - (void)testMigrationFromV1

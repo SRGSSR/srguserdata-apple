@@ -45,6 +45,7 @@
 		6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54220FC7FF4009C02CF /* SRGUserData.m */; };
 		6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */; };
 		6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */; };
+		6F308A682212CE7E003D3385 /* DB_invalid in Resources */ = {isa = PBXBuildFile; fileRef = 6FFEB7442212CBE60098F131 /* DB_invalid */; };
 		6F3246172201B1CA0017D00E /* libextobjc.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 0858B69622010C9E000F00CF /* libextobjc.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F3246182201B1CD0017D00E /* MAKVONotificationCenter.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F3246192201B1D20017D00E /* SRGLogger.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -99,7 +100,6 @@
 		6FFB34852209BF8D00E76E6D /* SRGUserObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB34832209BF8D00E76E6D /* SRGUserObject+Private.h */; };
 		6FFB34892209C10800E76E6D /* SRGUserDataService+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB34872209C10800E76E6D /* SRGUserDataService+Private.h */; };
 		6FFB348E2209D57400E76E6D /* SRGHistoryEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB348C2209D57400E76E6D /* SRGHistoryEntry+Private.h */; };
-		6FFEB7452212CBE60098F131 /* DB_invalid in Resources */ = {isa = PBXBuildFile; fileRef = 6FFEB7442212CBE60098F131 /* DB_invalid */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -692,7 +692,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6FFEB7452212CBE60098F131 /* DB_invalid in Resources */,
 				6F0C98F12121E26A00073AB6 /* SRGUserData.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -712,6 +711,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				082442AF220CB0DD00F39785 /* DB_v2 in Resources */,
+				6F308A682212CE7E003D3385 /* DB_invalid in Resources */,
 				082442B0220CB0DD00F39785 /* DB_v1 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

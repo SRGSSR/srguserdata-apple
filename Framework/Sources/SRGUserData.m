@@ -69,6 +69,9 @@ NSString *SRGUserDataMarketingVersion(void)
         NSURL *modelFileURL = [NSURL fileURLWithPath:modelFilePath];
         NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
         self.dataStore = [[SRGDataStore alloc] initWithFileURL:storeFileURL model:model];
+        if (! self.dataStore) {
+            return nil;
+        }
         
         [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
             [SRGUser upsertInManagedObjectContext:managedObjectContext];

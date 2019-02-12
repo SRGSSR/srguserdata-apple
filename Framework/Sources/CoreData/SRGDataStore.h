@@ -28,9 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SRGDataStore : NSObject
 
 /**
- *  Create an SQLite datastore saved at the specified location, and governed by the model as parameter.
+ *  Create an SQLite datastore saved at the specified location, and governed by the model as parameter. The method
+ *  returns `nil` if the stored could not be created or opened.
  */
-- (instancetype)initWithFileURL:(NSURL *)fileURL model:(NSManagedObjectModel *)model;
+- (nullable instancetype)initWithFileURL:(NSURL *)fileURL model:(NSManagedObjectModel *)model;
 
 /**
  *  Perform a read operation on the main thread. The read should be efficient since slow operations might block the main
