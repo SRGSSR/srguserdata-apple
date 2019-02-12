@@ -73,11 +73,11 @@ NSString *SRGUserDataMarketingVersion(void)
         [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
             [SRGUser upsertInManagedObjectContext:managedObjectContext];
             return YES;
-        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-            NSMutableDictionary<SRGUserDataServiceType, SRGUserDataService *> *services = [NSMutableDictionary dictionary];
-            services[SRGUserDataServiceTypeHistory] = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
-            self.services = [services copy];
-        }];
+        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
+        
+        NSMutableDictionary<SRGUserDataServiceType, SRGUserDataService *> *services = [NSMutableDictionary dictionary];
+        services[SRGUserDataServiceTypeHistory] = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
+        self.services = [services copy];
         
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(userDidLogout:)
