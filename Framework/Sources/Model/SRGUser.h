@@ -10,6 +10,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  Local user information.
+ *
+ *  @discussion Instances must not be shared among threads.
  */
 @interface SRGUser : NSManagedObject
 

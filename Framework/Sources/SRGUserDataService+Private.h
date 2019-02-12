@@ -16,13 +16,16 @@
 /**
  *  Instantiate a service retrieving data from the specified URL on behalf of a user provided by an identity service
  *  (if any), saving data to the given store.
+ *
+ *  If no service URL or identity providers are supplied, the data will be kept locally only and no synchronization
+ *  will be made.
  */
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(nullable SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore;
+- (instancetype)initWithServiceURL:(nullable NSURL *)serviceURL identityService:(nullable SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore;
 
 /**
  *  The service URL.
  */
-@property (nonatomic, readonly) NSURL *serviceURL;
+@property (nonatomic, readonly, nullable) NSURL *serviceURL;
 
 /**
  *  The service which identities are retrieved from.

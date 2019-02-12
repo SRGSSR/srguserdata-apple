@@ -212,13 +212,13 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
 - (BOOL)migratePersistentStoreWithFileURL:(NSURL *)fileURL
 {
     NSUInteger fromVersion = s_currentPersistentStoreVersion - 1;
-    BOOL migrated = NO;
-    while (! migrated && fromVersion > 0) {
-        migrated = [self migratePersistentStoreWithFileURL:fileURL fromVersion:fromVersion];
+    while (fromVersion > 0) {
+        if ([self migratePersistentStoreWithFileURL:fileURL fromVersion:fromVersion]) {
+            return YES;
+        }
         fromVersion--;
     }
-    
-    return migrated;
+    return NO;
 }
 
 - (BOOL)migratePersistentStoreWithFileURL:(NSURL *)fileURL fromVersion:(NSUInteger)fromVersion
@@ -258,25 +258,24 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
                                           destinationType:NSSQLiteStoreType
                                        destinationOptions:nil
                                                     error:NULL];
-    if (migrated) {
-        if (! [NSFileManager.defaultManager replaceItemAtURL:fileURL
-                                               withItemAtURL:migratedFileURL
-                                              backupItemName:nil
-                                                     options:NSFileManagerItemReplacementUsingNewMetadataOnly
-                                            resultingItemURL:NULL
-                                                       error:NULL]) {
-            return NO;
-        }
-        
-        if (toVersion < s_currentPersistentStoreVersion) {
-            return [self migratePersistentStoreWithFileURL:fileURL fromVersion:toVersion];
-        }
-        else {
-            return YES;
-        }
+    if (! migrated) {
+        return NO;
+    }
+    
+    if (! [NSFileManager.defaultManager replaceItemAtURL:fileURL
+                                           withItemAtURL:migratedFileURL
+                                          backupItemName:nil
+                                                 options:NSFileManagerItemReplacementUsingNewMetadataOnly
+                                        resultingItemURL:NULL
+                                                   error:NULL]) {
+        return NO;
+    }
+    
+    if (toVersion < s_currentPersistentStoreVersion) {
+        return [self migratePersistentStoreWithFileURL:fileURL fromVersion:toVersion];
     }
     else {
-        return NO;
+        return YES;
     }
 }
 

@@ -16,6 +16,9 @@
 
 #import <libextobjc/libextobjc.h>
 
+typedef NSString * SRGUserDataServiceType NS_TYPED_ENUM;
+static SRGUserDataServiceType const SRGUserDataServiceTypeHistory = @"History";
+
 static SRGUserData *s_currentUserData = nil;
 
 NSString *SRGUserDataMarketingVersion(void)
@@ -25,8 +28,9 @@ NSString *SRGUserDataMarketingVersion(void)
 
 @interface SRGUserData ()
 
+@property (nonatomic) SRGIdentityService *identityService;
 @property (nonatomic) SRGDataStore *dataStore;
-@property (nonatomic) SRGHistory *history;
+@property (nonatomic) NSDictionary<SRGUserDataServiceType, SRGUserDataService *> *services;
 
 @end
 
@@ -51,6 +55,8 @@ NSString *SRGUserDataMarketingVersion(void)
                            storeFileURL:(NSURL *)storeFileURL
 {
     if (self = [super init]) {
+        self.identityService = identityService;
+        
         // Bundling the model file in a resource bundle requires a few things:
         //  - Code generation with categories must not be enabled.
         //  - At least one class must use class code generation (see https://forums.developer.apple.com/thread/107819)
@@ -67,9 +73,11 @@ NSString *SRGUserDataMarketingVersion(void)
         [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
             [SRGUser upsertInManagedObjectContext:managedObjectContext];
             return YES;
-        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-            self.history = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
-        }];
+        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
+        
+        NSMutableDictionary<SRGUserDataServiceType, SRGUserDataService *> *services = [NSMutableDictionary dictionary];
+        services[SRGUserDataServiceTypeHistory] = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
+        self.services = [services copy];
         
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(userDidLogout:)
@@ -92,9 +100,16 @@ NSString *SRGUserDataMarketingVersion(void)
     }];
 }
 
-#pragma mark Public methods
+- (SRGHistory *)history
+{
+    SRGUserDataService *history = self.services[SRGUserDataServiceTypeHistory];
+    NSAssert([history isKindOfClass:SRGHistory.class], @"History service expected");
+    return (SRGHistory *)history;
+}
 
-- (void)dissociateIdentityWithCompletionBlock:(void (^)(void))completionBlock
+#pragma mark Notifications
+
+- (void)userDidLogout:(NSNotification *)notification
 {
     [self.dataStore cancelAllBackgroundTasks];
     
@@ -103,38 +118,13 @@ NSString *SRGUserDataMarketingVersion(void)
         [mainUser detach];
         return YES;
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-        completionBlock ? completionBlock() : nil;
+        BOOL unexpectedLogout = [notification.userInfo[SRGIdentityServiceUnauthorizedKey] boolValue];
+        if (! unexpectedLogout) {
+            [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
+                [service clearData];
+            }];
+        }
     }];
-}
-
-- (void)eraseWithCompletionBlock:(void (^)(void))completionBlock
-{
-    [self.dataStore cancelAllBackgroundTasks];
-    
-    [self.history clearDataWithCompletionBlock:^{
-        [self dissociateIdentityWithCompletionBlock:completionBlock];
-    }];
-}
-
-#pragma mark Notifications
-
-- (void)userDidLogout:(NSNotification *)notification
-{
-    void (^detachUser)(void) = ^{
-        [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
-            SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
-            [mainUser detach];
-            return YES;
-        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
-    };
-    
-    BOOL unexpectedLogout = [notification.userInfo[SRGIdentityServiceUnauthorizedKey] boolValue];
-    if (! unexpectedLogout) {
-        [self eraseWithCompletionBlock:detachUser];
-    }
-    else {
-        detachUser();
-    }
 }
 
 - (void)didUpdateAccount:(NSNotification *)notification

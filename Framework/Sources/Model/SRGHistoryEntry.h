@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  Entry in the media playback history.
+ *
+ *  @discussion Instances must not be shared among threads.
  */
 @interface SRGHistoryEntry : SRGUserObject
 

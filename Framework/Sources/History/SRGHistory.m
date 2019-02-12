@@ -128,7 +128,10 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-    __block SRGFirstPageRequest *firstRequest = [[[self historyUpdatesForSessionToken:sessionToken afterDate:date withCompletionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    @weakify(self)
+    __block SRGFirstPageRequest*firstRequest = [[[self historyUpdatesForSessionToken:sessionToken afterDate:date withCompletionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        @strongify(self)
+        
         if (error) {
             completionBlock(nil, error);
             return;
@@ -319,7 +322,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     [self.pushRequestQueue cancel];
 }
 
-- (void)clearDataWithCompletionBlock:(void (^)(void))completionBlock
+- (void)clearData
 {
     __block NSSet<NSString *> *uids = nil;
     
@@ -340,7 +343,6 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                                                                 userInfo:nil];
             }
         });
-        completionBlock ? completionBlock() : nil;
     }];
 }
 

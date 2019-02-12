@@ -4,7 +4,6 @@
 //  License information is available from the LICENSE file.
 //
 
-#import <CoreData/CoreData.h>
 #import <SRGIdentity/SRGIdentity.h>
 
 // Public headers.
@@ -20,8 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 
 /**
- *  Manages data associated with a user, either offline or logged in using SRG Identity. For logged in users,
- *  data is transparently kept synchronized with the corresponding remote service.
+ *  Manages data associated with a user. An identity service and service endpoints can be optionally provided, so that
+ *  logged in users can synchronize their data with their account.
  *
  *  Several instances of `SRGUserData` can coexist in an application, though in general one should suffice. This
  *  global instance can be accessed easily from anywhere by assigning it to the `currentUserData` class property
@@ -35,9 +34,14 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 @property (class, nonatomic, nullable) SRGUserData *currentUserData;
 
 /**
- *  Create a user data repository, which optionally can be synced with the specified identity service.
+ *  Create a user data repository. The repository can be used to store data on device. Provided it is setup appropriately,
+ *  logged in users can keep their data synchronized with their account.
  *
- *  @param storeFileURL The file URL where the data will be stored.
+ *  @param identityService   The service which identities can be retrieved from. If none, no data synchronization will
+ *                           occur.
+ *  @param historyServiceURL The URL of the service with which local history information can be synchronized. If none
+ *                           is provided, no history data synchronization will occur.
+ *  @param storeFileURL      The file URL where the data is locally stored.
  */
 - (instancetype)initWithIdentityService:(nullable SRGIdentityService *)identityService
                       historyServiceURL:(nullable NSURL *)historyServiceURL
@@ -49,25 +53,9 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 @property (nonatomic, readonly) SRGUser *user;
 
 /**
- *  Access to playback history for the user.
+ *  Access to the user playback history.
  */
-@property (nonatomic, readonly, nullable) SRGHistory *history;
-
-/**
- *  Dissociate the current identity (if any) from the local user, calling an optional block on completion. Local data
- *  is kept and can be synchronized with another account after logging in again.
- *
- *  @discussion The completion block is called on a background thread.
- */
-- (void)dissociateIdentityWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
-
-/**
- *  Erase all local data and the identity associated with it (if any), calling an optional block on completion. The
- *  account itself is not deleted and the user can login to retrieve her data again.
- *
- *  @discussion The completion block is called on a background thread.
- */
-- (void)eraseWithCompletionBlock:(void (^ _Nullable)(void))completionBlock;
+@property (nonatomic, readonly) SRGHistory *history;
 
 @end
 
