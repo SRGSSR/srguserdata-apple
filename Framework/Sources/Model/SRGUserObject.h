@@ -10,6 +10,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  Abstract base class for objects supporting synchronization with a remote server.
+ *
+ *  @discussion Instances must not be shared among threads.
  */
 @interface SRGUserObject : NSManagedObject
 

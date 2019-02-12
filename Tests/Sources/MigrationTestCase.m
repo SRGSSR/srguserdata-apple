@@ -17,6 +17,11 @@
 
 @implementation MigrationTestCase
 
+- (void)testFailingMigration
+{
+    
+}
+
 - (void)testMigrationFromV1
 {
     NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
@@ -110,7 +115,7 @@
     SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil
                                                        historyServiceURL:nil
                                                             storeFileURL:fileURL];
-        
+    
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
     NSArray<NSString *> *itemUids1 = [[userData.history historyEntriesMatchingPredicate:predicate1
