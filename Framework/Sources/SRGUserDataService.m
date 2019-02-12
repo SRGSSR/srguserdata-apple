@@ -33,13 +33,14 @@
         self.identityService = identityService;
         self.dataStore = dataStore;
         
-        // TODO: Make sync interval a service property
-        @weakify(self)
-        self.synchronizationTimer = [NSTimer srguserdata_timerWithTimeInterval:60. repeats:YES block:^(NSTimer * _Nonnull timer) {
-            @strongify(self)
+        if (serviceURL && identityService) {
+            @weakify(self)
+            self.synchronizationTimer = [NSTimer srguserdata_timerWithTimeInterval:60. repeats:YES block:^(NSTimer * _Nonnull timer) {
+                @strongify(self)
+                [self synchronize];
+            }];
             [self synchronize];
-        }];
-        [self synchronize];
+        }
         
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(reachabilityDidChange:)
@@ -100,7 +101,7 @@
 
 - (void)synchronize
 {
-    if (self.synchronizing) {
+    if (self.synchronizing || ! self.serviceURL) {
         return;
     }
     

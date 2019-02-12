@@ -51,7 +51,7 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 /**
  *  Access to playback history for the user.
  */
-@property (nonatomic, readonly, nullable) SRGHistory *history;
+@property (nonatomic, readonly) SRGHistory *history;
 
 @end
 
