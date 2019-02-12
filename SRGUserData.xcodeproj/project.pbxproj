@@ -312,10 +312,10 @@
 			isa = PBXGroup;
 			children = (
 				6F3234342212F61D0046E265 /* TestData_1 */,
+				6F32342A2212E9890046E265 /* TestData.xcdatamodeld */,
 				6FFEB7442212CBE60098F131 /* UserData_DB_invalid */,
 				082442AE220CB0DD00F39785 /* UserData_DB_v1 */,
 				082442AD220CB0DD00F39785 /* UserData_DB_v2 */,
-				6F32342A2212E9890046E265 /* TestData.xcdatamodeld */,
 			);
 			path = Resources;
 			sourceTree = "<group>";

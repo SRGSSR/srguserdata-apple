@@ -44,11 +44,6 @@
     XCTAssertNotNil(dataStore);
 }
 
-- (void)testCreationFailureFromExistingFile
-{
-    
-}
-
 - (void)testMainThreadReadTask
 {
     
