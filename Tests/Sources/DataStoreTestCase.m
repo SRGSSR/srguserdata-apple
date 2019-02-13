@@ -4,7 +4,7 @@
 //  License information is available from the LICENSE file.
 //
 
-#import "TestData+CoreDataModel.h"
+#import "Person.h"
 #import "UserDataBaseTestCase.h"
 
 // Private headers
@@ -44,13 +44,13 @@
 
 #pragma mark Tests
 
-- (void)testSuccessfulCreation
+- (void)testSuccessfulDataStoreCreation
 {
     SRGDataStore *dataStore = [self testDataStoreFromPackage:nil];
     XCTAssertNotNil(dataStore);
 }
 
-- (void)testSuccessfulCreationFromExistingFile
+- (void)testSuccessfulDataStoreCreationFromExistingFile
 {
     SRGDataStore *dataStore = [self testDataStoreFromPackage:@"TestData_1"];
     XCTAssertNotNil(dataStore);
@@ -128,7 +128,8 @@
     }];
     
     [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        person.name = @"Kate";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -138,7 +139,8 @@
     }];
     
     [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        person.name = @"Jade";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -164,7 +166,8 @@
     }];
     
     [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        person.name = @"Maddie";
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -174,7 +177,8 @@
     }];
     
     [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        person.name = @"Joe";
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -227,21 +231,24 @@
     SRGDataStore *dataStore = [self testDataStoreFromPackage:nil];
     
     NSString *writeTask1 = [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        person.name = @"Eva";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         XCTFail(@"Must not be called when a task has been cancelled");
     }];
     [dataStore cancelBackgroundTaskWithHandle:writeTask1];
     
     NSString *writeTask2 = [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        person.name = @"Jim";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         XCTFail(@"Must not be called when a task has been cancelled");
     }];
     [dataStore cancelBackgroundTaskWithHandle:writeTask2];
     
     NSString *writeTask3 = [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        person.name = @"Clara";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         XCTFail(@"Must not be called when a task has been cancelled");
     }];
@@ -251,6 +258,24 @@
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons) {
         XCTAssertEqual(persons.count, 0);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)testBackgroundWriteTaskFailure
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Write finished"];
+    
+    SRGDataStore *dataStore = [self testDataStoreFromPackage:nil];
+    
+    [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        __unused Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+        // No name provided. Entry won't pass validation (see Person.m)
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        XCTAssertEqual(error.domain, @"ch.srgssr.userdata-tests.validation");
+        XCTAssertEqual(error.code, 1012);
         [expectation fulfill];
     }];
     
