@@ -289,19 +289,53 @@
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)testCancelExecutedTask
+- (void)testHeavyWriteActivity
 {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"All operations finished"];
     
+    SRGDataStore *dataStore = [self testDataStoreFromPackage:nil];
+    
+    for (NSInteger i = 0; i < 1000; ++i) {
+        [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+            Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+            person.name = @(i).stringValue;
+        } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
+    }
+    
+    [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons) {
+        XCTAssertEqual(persons.count, 1000);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:20. handler:nil];
 }
 
-- (void)testHeavyMulutithreadedActivity
+- (void)testParallelMainThreadReads
 {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"All operations finished"];
     
-}
-
-- (void)testFromBackgroundThreads
-{
+    SRGDataStore *dataStore = [self testDataStoreFromPackage:nil];
     
+    for (NSInteger i = 0; i < 1000; ++i) {
+        [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+            Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
+            person.name = @(i).stringValue;
+        } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
+    }
+    
+    while (1) {
+        NSArray<Person *> *persons = [dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+            return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
+        }];
+        if (persons.count == 1000) {
+            [expectation fulfill];
+            break;
+        }
+    }
+    
+    [self waitForExpectationsWithTimeout:20. handler:nil];
 }
 
 @end
