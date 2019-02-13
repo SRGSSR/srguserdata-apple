@@ -84,6 +84,7 @@
 		6FA62D73220439CF008569DC /* UICKeyChainStore.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6FA62D5E2204389A008569DC /* UICKeyChainStore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6FB19597221442BF00D3BF88 /* UserObjectTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FB19596221442BF00D3BF88 /* UserObjectTestCase.m */; };
 		6FB195992214474A00D3BF88 /* UserData_DB_loggedIn in Resources */ = {isa = PBXBuildFile; fileRef = 6FB195982214474A00D3BF88 /* UserData_DB_loggedIn */; };
+		6FB1959B221467E900D3BF88 /* UserData_DB_loggedOut in Resources */ = {isa = PBXBuildFile; fileRef = 6FB1959A221467E900D3BF88 /* UserData_DB_loggedOut */; };
 		6FB521C02208838E0042FCC3 /* SRGUserData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */; };
 		6FB74D6C2101D4D200E2D365 /* SRGUserData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; };
 		6FB74D772101D5D600E2D365 /* HistorySynchronizationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */; };
@@ -226,6 +227,7 @@
 		6FA62D682204394B008569DC /* Mantle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Mantle.framework; path = Carthage/Build/iOS/Mantle.framework; sourceTree = "<group>"; };
 		6FB19596221442BF00D3BF88 /* UserObjectTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserObjectTestCase.m; sourceTree = "<group>"; };
 		6FB195982214474A00D3BF88 /* UserData_DB_loggedIn */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_loggedIn; sourceTree = "<group>"; };
+		6FB1959A221467E900D3BF88 /* UserData_DB_loggedOut */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_loggedOut; sourceTree = "<group>"; };
 		6FB521BF2208838E0042FCC3 /* SRGUserData_v1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v1.xcdatamodel; sourceTree = "<group>"; };
 		6FB74D672101D4D200E2D365 /* SRGUserData-tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SRGUserData-tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistorySynchronizationTestCase.m; sourceTree = "<group>"; };
@@ -318,6 +320,7 @@
 			children = (
 				6F3234342212F61D0046E265 /* TestData_1 */,
 				6F32342A2212E9890046E265 /* TestData.xcdatamodeld */,
+				6FB1959A221467E900D3BF88 /* UserData_DB_loggedOut */,
 				6FB195982214474A00D3BF88 /* UserData_DB_loggedIn */,
 				6FFEB7442212CBE60098F131 /* UserData_DB_invalid */,
 				082442AE220CB0DD00F39785 /* UserData_DB_v1 */,
@@ -746,6 +749,7 @@
 			files = (
 				6F3234352212F61D0046E265 /* TestData_1 in Resources */,
 				082442AF220CB0DD00F39785 /* UserData_DB_v2 in Resources */,
+				6FB1959B221467E900D3BF88 /* UserData_DB_loggedOut in Resources */,
 				6F308A682212CE7E003D3385 /* UserData_DB_invalid in Resources */,
 				6FB195992214474A00D3BF88 /* UserData_DB_loggedIn in Resources */,
 				082442B0220CB0DD00F39785 /* UserData_DB_v1 in Resources */,

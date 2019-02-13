@@ -104,7 +104,28 @@
 
 - (void)testDiscardLoggedOutUser
 {
+    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedOut"];
     
+    NSManagedObjectContext *viewContext = persistentContainer.viewContext;
+    [viewContext performBlockAndWait:^{
+        // Does not exist
+        NSArray<NSString *> *discardedUids1 = [SRGHistoryEntry discardObjectsWithUids:@[@"123456"] inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(discardedUids1, @[]);
+        
+        // Exist
+        NSArray<NSString *> *expectedUids2 = @[@"urn:rts:video:9992865", @"urn:rts:video:9910664"];
+        NSArray<NSString *> *discardedUids2 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992865", @"urn:rts:video:9910664"] inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects([NSSet setWithArray:discardedUids2], [NSSet setWithArray:expectedUids2]);
+        
+        // Objects are immediately erased
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K IN %@", @keypath(SRGHistoryEntry.new, uid), expectedUids2];
+        XCTAssertEqual([SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:viewContext].count, 0);
+        
+        // Mixed
+        NSArray<NSString *> *expectedUids3 = @[@"urn:rts:video:9992229", @"urn:rts:video:9996461"];
+        NSArray<NSString *> *discardedUids3 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992229", @"45678", @"urn:rts:video:9996461", @"urn:rts:video:9910664"] inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects([NSSet setWithArray:discardedUids3], [NSSet setWithArray:expectedUids3]);
+    }];
 }
 
 - (void)testDiscardLoggedInUser
@@ -121,6 +142,10 @@
         NSArray<NSString *> *expectedUids2 = @[@"urn:rts:video:9992865", @"urn:rts:video:9910664"];
         NSArray<NSString *> *discardedUids2 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992865", @"urn:rts:video:9910664"] inManagedObjectContext:viewContext];
         XCTAssertEqualObjects([NSSet setWithArray:discardedUids2], [NSSet setWithArray:expectedUids2]);
+        
+        // Objects still exist, they are only marked for later synchronization
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K IN %@", @keypath(SRGHistoryEntry.new, uid), expectedUids2];
+        XCTAssertEqual([SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:viewContext].count, 2);
         
         // Mixed
         NSArray<NSString *> *expectedUids3 = @[@"urn:rts:video:9992229", @"urn:rts:video:9996461"];
