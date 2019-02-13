@@ -43,9 +43,9 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
  *                           is provided, no history data synchronization will occur.
  *  @param storeFileURL      The file URL where the data is locally stored.
  */
-- (instancetype)initWithIdentityService:(nullable SRGIdentityService *)identityService
-                      historyServiceURL:(nullable NSURL *)historyServiceURL
-                           storeFileURL:(NSURL *)storeFileURL;
+- (nullable instancetype)initWithIdentityService:(nullable SRGIdentityService *)identityService
+                               historyServiceURL:(nullable NSURL *)historyServiceURL
+                                    storeFileURL:(NSURL *)storeFileURL;
 
 /**
  *  The user to which the data belongs. Might be offline or bound to a remote account.

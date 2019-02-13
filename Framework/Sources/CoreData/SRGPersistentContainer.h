@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Load the associated store, calling the provided handler on completion.
  */
-- (void)srg_loadPersistentStoreWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler;
+- (void)srg_loadPersistentStoreWithCompletionHandler:(void (^)(NSError * _Nullable error))completionHandler;
 
 /**
  *  Main thread context.

@@ -23,11 +23,23 @@
     NSString *modelFilePath = [[NSBundle bundleForClass:self.class] pathForResource:@"TestData" ofType:@"momd"];
     NSURL *modelFileURL = [NSURL fileURLWithPath:modelFilePath];
     NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
-    
     NSURL *storeFileURL = [self URLForStoreFromPackage:package];
-    SRGDataStore *dataStore = [[SRGDataStore alloc] initWithFileURL:storeFileURL model:model];
-    XCTAssertNotNil(dataStore);
-    return dataStore;
+    
+    id<SRGPersistentContainer> persistentContainer = nil;
+    if (@available(iOS 10, *)) {
+        NSPersistentContainer *nativePersistentContainer = [NSPersistentContainer persistentContainerWithName:storeFileURL.lastPathComponent managedObjectModel:model];
+        nativePersistentContainer.persistentStoreDescriptions = @[ [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeFileURL] ];
+        persistentContainer = nativePersistentContainer;
+    }
+    else {
+        persistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:storeFileURL model:model];
+    }
+    
+    [persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+    }];
+    
+    return [[SRGDataStore alloc] initWithPersistentContainer:persistentContainer];
 }
 
 #pragma mark Tests
