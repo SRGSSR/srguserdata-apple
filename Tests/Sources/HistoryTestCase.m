@@ -20,18 +20,13 @@
 
 - (void)setUp
 {
-    NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-    NSURL *fileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:self.name] URLByAppendingPathExtension:@"sqlite"];
+    NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
     self.userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
 }
 
 - (void)tearDown
 {
     self.userData = nil;
-    
-    NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-    NSURL *fileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:self.name] URLByAppendingPathExtension:@"sqlite"];
-    [NSFileManager.defaultManager removeItemAtURL:fileURL error:NULL];
 }
 
 #pragma mark Tests
