@@ -7,6 +7,7 @@
 #import "SRGUserObject.h"
 
 #import "SRGUser+Private.h"
+#import "SRGUserObject+Private.h"
 
 #import <libextobjc/libextobjc.h>
 
@@ -15,6 +16,7 @@
 @property (nonatomic, copy) NSString *uid;
 @property (nonatomic, copy) NSDate *date;
 @property (nonatomic) BOOL discarded;
+@property (nonatomic) BOOL dirty;
 
 @end
 

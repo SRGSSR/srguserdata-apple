@@ -30,12 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL discarded;
 
-/**
- *  Set to `YES` to flag the object as requiring a synchronization.
- */
-// TODO: Hide
-@property (nonatomic) BOOL dirty;
-
 @end
 
 NS_ASSUME_NONNULL_END

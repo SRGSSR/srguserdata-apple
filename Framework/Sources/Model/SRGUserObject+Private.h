@@ -51,6 +51,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
+/**
+ *  Set to `YES` to flag the object as requiring a synchronization.
+ */
+@property (nonatomic) BOOL dirty;
+
 @end
 
 NS_ASSUME_NONNULL_END
