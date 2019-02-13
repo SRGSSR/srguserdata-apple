@@ -138,12 +138,16 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    SRGHistoryEntry *historyEntry = [self.userData.history historyEntryWithUid:uid];
+    SRGHistoryEntry *historyEntry1 = [self.userData.history historyEntryWithUid:uid];
     
-    XCTAssertEqualObjects(historyEntry.uid, uid);
-    XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, time));
-    XCTAssertEqualObjects(historyEntry.deviceUid, deviceUid);
-    XCTAssertEqual(historyEntry.discarded, NO);
+    XCTAssertEqualObjects(historyEntry1.uid, uid);
+    XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry1.lastPlaybackTime, ==, time));
+    XCTAssertEqualObjects(historyEntry1.deviceUid, deviceUid);
+    XCTAssertEqual(historyEntry1.discarded, NO);
+    
+    SRGHistoryEntry *historyEntry2 = [self.userData.history historyEntryWithUid:@"notFound"];
+    
+    XCTAssertNil(historyEntry2);
 }
 
 - (void)testHistoryEntryWithUidAsynchronously
@@ -174,10 +178,24 @@
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntryWithUid:@"notFound" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry) {
+        XCTAssertNil(historyEntry);
+        [expectation3 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
 - (void)testHistoryEntriesMatchingEmptyPredicateEmptySortedhDescriptor
 {
+    NSArray<SRGHistoryEntry *> *historyEntries1 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
+    
+    XCTAssertNotNil(historyEntries1);
+    XCTAssertEqual(historyEntries1.count, 0);
+    
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
     NSString *deviceUid = @"Test device";
     
@@ -203,12 +221,12 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    NSArray<SRGHistoryEntry *> *historyEntries = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
+    NSArray<SRGHistoryEntry *> *historyEntries2 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
     
-    XCTAssertEqual(historyEntries.count, uids.count);
+    XCTAssertEqual(historyEntries2.count, uids.count);
     
-    NSArray<NSString *> *queryUids = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
-    XCTAssertEqualObjects(queryUids, [[uids reverseObjectEnumerator] allObjects]);
+    NSArray<NSString *> *queryUids2 = [historyEntries2 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
+    XCTAssertEqualObjects(queryUids2, [[uids reverseObjectEnumerator] allObjects]);
 }
 
 - (void)testHistoryEntriesMatchingPredicatesOrSortedDescriptors
