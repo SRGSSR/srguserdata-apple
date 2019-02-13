@@ -42,17 +42,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  Discard the objects with the specified identifiers. Since some of them might not be found, the method returns the actual
- *  list of identifiers which could be successfully removed.
+ *  list of identifiers which will be discarded. For logged in users, objects will be deleted when the next synchronization
+ *  is performed. For logged out users, objects are removed immediately.
+ *
+ *  @discussion Order is not preserved in the rerturned value (in comparison to the original list). Already discarded objects
+ *              are omitted.
  */
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
- *  Discard all objects.
+ *  Delete all objects, removing them from the database directly. No synchronization will be triggered for logged in users.
  */
 + (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
- *  Set to `YES` to flag the object as requiring a synchronization.
+ *  Set to `YES` to flag the object as requiring a synchronization for the currently logged in user.
+ *
+ *  @discussion The value of this flag is unspecified when no user is logged in.
  */
 @property (nonatomic) BOOL dirty;
 
