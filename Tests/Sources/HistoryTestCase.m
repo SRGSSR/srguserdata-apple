@@ -85,6 +85,7 @@
     XCTAssertEqualObjects(historyEntry.uid, uid);
     XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, time));
     XCTAssertEqualObjects(historyEntry.deviceUid, deviceUid);
+    XCTAssertEqual(historyEntry.discarded, NO);
 }
 
 - (void)testHistoryEntryWithUidAsynchronously
@@ -110,6 +111,7 @@
         XCTAssertEqualObjects(historyEntry.uid, uid);
         XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, time));
         XCTAssertEqualObjects(historyEntry.deviceUid, deviceUid);
+        XCTAssertEqual(historyEntry.discarded, NO);
         [expectation2 fulfill];
     }];
     
@@ -141,6 +143,7 @@
     XCTAssertEqualObjects(historyEntry.uid, uid);
     XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, time));
     XCTAssertEqualObjects(historyEntry.deviceUid, deviceUid);
+    XCTAssertEqual(historyEntry.discarded, NO);
 }
 
 @end
