@@ -4,45 +4,32 @@
 //  License information is available from the LICENSE file.
 //
 
+#import "UserDataBaseTestCase.h"
+
 // Private headers
 #import "SRGUser+Private.h"
 
 #import <libextobjc/libextobjc.h>
-#import <SRGUserData/SRGUserData.h>
-#import <XCTest/XCTest.h>
 
-@interface MigrationTestCase : XCTestCase
+@interface MigrationTestCase : UserDataBaseTestCase
 
 @end
 
 @implementation MigrationTestCase
 
+#pragma mark Tests
+
 - (void)testFailingMigration
 {
-    
+    NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_invalid"];
+    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
+    XCTAssertNil(userData);
 }
 
 - (void)testMigrationFromV1
 {
-    NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-    NSString *name = @"UserData-test";
-    
-    for (NSString *extension in @[ @"sqlite", @"sqlite-shm", @"sqlite-wal"]) {
-        NSString *sqliteFilePath = [[NSBundle bundleForClass:[self class]] pathForResource:name ofType:extension inDirectory:@"Play_DB_v1"];
-        NSURL *sqliteFileURL = [NSURL fileURLWithPath:sqliteFilePath];
-        NSURL *sqliteDestinationFileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:extension];
-        [NSFileManager.defaultManager replaceItemAtURL:sqliteDestinationFileURL
-                                         withItemAtURL:sqliteFileURL
-                                        backupItemName:nil
-                                               options:NSFileManagerItemReplacementUsingNewMetadataOnly
-                                      resultingItemURL:NULL
-                                                 error:NULL];
-    }
-    
-    NSURL *fileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil
-                                                       historyServiceURL:nil
-                                                            storeFileURL:fileURL];
+    NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v1"];
+    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -96,25 +83,8 @@
 
 - (void)testMigrationFromV2
 {
-    NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-    NSString *name = @"UserData-test";
-    
-    for (NSString *extension in @[ @"sqlite", @"sqlite-shm", @"sqlite-wal"]) {
-        NSString *sqliteFilePath = [[NSBundle bundleForClass:[self class]] pathForResource:name ofType:extension inDirectory:@"Play_DB_v2"];
-        NSURL *sqliteFileURL = [NSURL fileURLWithPath:sqliteFilePath];
-        NSURL *sqliteDestinationFileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:extension];
-        [NSFileManager.defaultManager replaceItemAtURL:sqliteDestinationFileURL
-                                         withItemAtURL:sqliteFileURL
-                                        backupItemName:nil
-                                               options:NSFileManagerItemReplacementUsingNewMetadataOnly
-                                      resultingItemURL:NULL
-                                                 error:NULL];
-    }
-    
-    NSURL *fileURL = [[[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:name] URLByAppendingPathExtension:@"sqlite"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil
-                                                       historyServiceURL:nil
-                                                            storeFileURL:fileURL];
+    NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v2"];
+    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
