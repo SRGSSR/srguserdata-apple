@@ -80,11 +80,10 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Write"];
     
     SRGDataStore *dataStore = [self testDataStoreFromPackage:nil];
-    [dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         XCTAssertFalse(NSThread.isMainThread);
         Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
         person.name = @"James";
-        return YES;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertNil(error);
@@ -108,12 +107,65 @@
     
 }
 
-- (void)testTaskCancellation
+- (void)testBackgroundReadTaskCancellation
+{
+    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    
+    SRGDataStore *dataStore = [self testDataStoreFromPackage:@"TestData_1"];
+    
+    NSString *readTask1 = [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        XCTAssertFalse(NSThread.isMainThread);
+        return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result) {
+        XCTFail(@"Must not be called when a task has been cancelled");
+    }];
+    [dataStore cancelBackgroundTaskWithHandle:readTask1];
+    
+    NSString *readTask2 = [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        XCTAssertFalse(NSThread.isMainThread);
+        return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result) {
+        XCTFail(@"Must not be called when a task has been cancelled");
+    }];
+    [dataStore cancelBackgroundTaskWithHandle:readTask2];
+    
+    NSString *readTask3 = [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        XCTAssertFalse(NSThread.isMainThread);
+        return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result) {
+        XCTFail(@"Must not be called when a task has been cancelled");
+    }];
+    [dataStore cancelBackgroundTaskWithHandle:readTask3];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)testReadWriteReadSerialTasks
 {
     
 }
 
-- (void)testHeavyActivity
+- (void)testBackgroundWriteTaskCancellation
+{
+    
+}
+
+- (void)testGlobalCancellation
+{
+    
+}
+
+- (void)testCancelExecutedTask
+{
+    
+}
+
+- (void)testHeavyMulutithreadedActivity
+{
+    
+}
+
+- (void)testFromBackgroundThreads
 {
     
 }

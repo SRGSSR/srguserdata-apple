@@ -8,7 +8,6 @@
 
 #import "NSBundle+SRGUserData.h"
 #import "SRGPersistentContainer.h"
-#import "SRGUserDataError.h"
 #import "SRGUserDataLogger.h"
 
 #import <objc/runtime.h>
@@ -119,11 +118,17 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
         
         __block id result = nil;
         
+        // We don't want to provide a way for a task block being executed to know its operation was cancelled (unlike
+        // `NSOperation`s whose subclasses can periodically check for cancellation). This would create additional
+        // complexity and not make sense anyway, as tasks should be individually small.
         [managedObjectContext performBlockAndWait:^{
             result = task(managedObjectContext);
             [self.operations removeObjectForKey:handle];
         }];
-        completionBlock ? completionBlock(result) : nil;
+        
+        if (! operation.cancelled) {
+            completionBlock ? completionBlock(result) : nil;
+        }
     }];
     operation.queuePriority = priority;
     
@@ -135,7 +140,7 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
     return handle;
 }
 
-- (NSString *)performBackgroundWriteTask:(BOOL (^)(NSManagedObjectContext *managedObjectContext))task
+- (NSString *)performBackgroundWriteTask:(void (^)(NSManagedObjectContext *managedObjectContext))task
                             withPriority:(NSOperationQueuePriority)priority
                          completionBlock:(void (^)(NSError *error))completionBlock;
 {
@@ -153,23 +158,13 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
         managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
         managedObjectContext.undoManager = nil;
         
-        __block BOOL success = NO;
         __block NSError *error = nil;
         
         [managedObjectContext performBlockAndWait:^{
-            success = task(managedObjectContext);
+            task(managedObjectContext);
             
             if (managedObjectContext.hasChanges) {
-                if (! success) {
-                    error = [NSError errorWithDomain:SRGUserDataErrorDomain
-                                                code:SRGUserDataErrorFailed
-                                            userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataNonLocalizedString(@"The task has failed") }];
-                    [managedObjectContext rollback];
-                }
-                else if (operation.cancelled) {
-                    error = [NSError errorWithDomain:SRGUserDataErrorDomain
-                                                code:SRGUserDataErrorCancelled
-                                            userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataNonLocalizedString(@"The task has been cancelled") }];
+                if (operation.cancelled) {
                     [managedObjectContext rollback];
                 }
                 else if (! [managedObjectContext save:&error]) {
@@ -180,7 +175,10 @@ static NSUInteger s_currentPersistentStoreVersion = 3;
                 [self.operations removeObjectForKey:handle];
             });
         }];
-        completionBlock ? completionBlock(error) : nil;
+        
+        if (! operation.cancelled) {
+            completionBlock ? completionBlock(error) : nil;
+        }
     }];
     operation.queuePriority = priority;
     

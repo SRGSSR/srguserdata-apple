@@ -73,9 +73,8 @@ NSString *SRGUserDataMarketingVersion(void)
             return nil;
         }
         
-        [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
             [SRGUser upsertInManagedObjectContext:managedObjectContext];
-            return YES;
         } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
         
         NSMutableDictionary<SRGUserDataServiceType, SRGUserDataService *> *services = [NSMutableDictionary dictionary];
@@ -116,10 +115,9 @@ NSString *SRGUserDataMarketingVersion(void)
 {
     [self.dataStore cancelAllBackgroundTasks];
     
-    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
         [mainUser detach];
-        return YES;
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
         BOOL unexpectedLogout = [notification.userInfo[SRGIdentityServiceUnauthorizedKey] boolValue];
         if (! unexpectedLogout) {
@@ -134,10 +132,9 @@ NSString *SRGUserDataMarketingVersion(void)
 {
     SRGAccount *account = notification.userInfo[SRGIdentityServiceAccountKey];
     
-    [self.dataStore performBackgroundWriteTask:^BOOL(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
         [mainUser attachToAccountUid:account.uid];
-        return YES;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
 }
 

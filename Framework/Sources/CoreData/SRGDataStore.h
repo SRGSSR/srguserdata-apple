@@ -19,9 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
  *  operations are made, you can perform a synchronous read from the main thread. This avoids using a background read
  *  which would have to wait until pending background operations before it have been processed.
  *
- *  Background tasks can be prioritized, but≠ for this mechanism to work effectively each submitted task should be short
+ *  Background tasks can be prioritized, but for this mechanism to work efficiently each submitted task should be short
  *  enough so that the worker queue can move on to pending items fast. Tasks submitted to the main thread should also
- *  be efficient to avoid blocking the user interface.
+ *  be lightweight enough to avoid blocking the user interface.
  *
  *  Credits: The strategy implemented by this class was inspired by the following talk: https://vimeo.com/89370886.
  */
@@ -54,16 +54,15 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @parameter task             The read task to be executed. The background context is provided, on which Core Data
  *                              operations must be performed. A single result can be returned from the task block and
- *                              will be returned in the provided completion block.
+ *                              will be forwarded to the provided completion block.
  *  @parameter priority         The priority to apply.
- *  @parameter completionBlock  The block to be called on completion. The block is called on a the same background
- *                              thread the read was performed on. Work performed within this block should therefore
- *                              be lightweight, otherwise use GCD to send it on another thread. Beware that if
- *                              managed objects are returned, they can only be used from within the block associated
- *                              thread, not on another thread you would dispatch work onto. Note that started read
- *                              tasks cannot be cancelled.
+ *  @parameter completionBlock  The block to be called on completion. The block is part of the task itself and should
+ *                              therefore be lightweight (otherwise use GCD to send time-consuming operations on another
+ *                              thread). Beware that if managed objects are returned, they can only be used from within
+ *                              the block associated thread, not on another thread you would dispatch work onto.
  *
- *  @return `NSString` An opaque task handle which can be used to cancel it.
+ *  @return `NSString` An opaque task handle which can be used to cancel it. Cancelled started tasks are executed until
+ *                     the end without their completion block being called. Cancelled pending tasks are discarded.
  *
  *  @discussion This method can be called from any thread.
  */
@@ -79,19 +78,21 @@ NS_ASSUME_NONNULL_BEGIN
  *                              operations must be performed. A single success boolean must be returned from the task
  *                              block (failed tasks will be rollbacked).
  *  @parameter priority         The priority to apply.
- *  @parameter completionBlock  The block to be called on completion. The block is called on a the same background
- *                              thread the write was performed on. Work performed within this block should therefore
- *                              be lightweight, otherwise use GCD to perform it on another thread. Started write tasks
- *                              can be cancelled, in which case the corresponding transaction will be rollbacked, with
- *                              error information returned to the completion block.
+ *  @parameter completionBlock  The block to be called on completion. The block is part of the task itself and should
+ *                              therefore be lightweight, otherwise use GCD to send time-consuming operations on another
+ *                              thread.
  *
- *  @return `NSString` An opaque task handle which can be used to cancel it.
+ *  @return `NSString` An opaque task handle which can be used to cancel it. Started write tasks can be cancelled, in
+ *                     which case the completion block will not be called and the transaction rollbacked. Cancelled
+ *                     pending tasks are discarded.
  *
- *  @discussion Once the task successfully completes, a save is automaticaly performed. If the task or save operation
- *              fails, or if the task is cancelled, the work is rollbacked automatically, and the completion block is
- *              called with corresponding error information. This method can be called from any thread.
+ *  @discussion Once the task successfully completes, a save is automaticaly performed. If the save operation fails (e.g.
+ *              because of model validation errors), the work is rollbacked automatically and the completion block is
+ *              called with corresponding error information.
+ *
+ *              This method can be called from any thread.
  */
-- (NSString *)performBackgroundWriteTask:(BOOL (^)(NSManagedObjectContext *managedObjectContext))task
+- (NSString *)performBackgroundWriteTask:(void (^)(NSManagedObjectContext *managedObjectContext))task
                             withPriority:(NSOperationQueuePriority)priority
                          completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
