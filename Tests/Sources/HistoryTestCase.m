@@ -332,10 +332,19 @@
     NSSortDescriptor *sortDescriptor6 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:YES];
     NSArray<SRGHistoryEntry *> *historyEntries6 = [self.userData.history historyEntriesMatchingPredicate:predicate6 sortedWithDescriptors:@[sortDescriptor6]];
     
-    XCTAssertEqual(historyEntries6.count, 2);
-    NSArray<NSString *> *queryUids6 = [historyEntries6 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
     NSArray<NSString *> *expectedQueryUids6 = @[@"12", @"90"];
+    XCTAssertEqual(historyEntries6.count, expectedQueryUids6.count);
+    NSArray<NSString *> *queryUids6 = [historyEntries6 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
     XCTAssertEqualObjects(queryUids6, expectedQueryUids6);
+    
+    NSPredicate *predicate7 = [NSPredicate predicateWithFormat:@"%K < 60", @keypath(SRGHistoryEntry.new, lastPlaybackPosition)];
+    NSSortDescriptor *sortDescriptor7 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
+    NSArray<SRGHistoryEntry *> *historyEntries7 = [self.userData.history historyEntriesMatchingPredicate:predicate7 sortedWithDescriptors:@[sortDescriptor7]];
+    
+    NSArray<NSString *> *expectedQueryUids7 = @[@"56", @"34", @"12"];
+    XCTAssertEqual(historyEntries7.count, expectedQueryUids7.count);
+    NSArray<NSString *> *queryUids7 = [historyEntries7 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
+    XCTAssertEqualObjects(queryUids7, expectedQueryUids7);
 }
 
 - (void)testHistoryEntriesMatchingPredicatesOrSortedDescriptorsAsynchronously
@@ -419,11 +428,26 @@
     NSSortDescriptor *sortDescriptor6 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:YES];
     [self.userData.history historyEntriesMatchingPredicate:predicate6 sortedWithDescriptors:@[sortDescriptor6] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries6) {
         XCTAssertFalse(NSThread.isMainThread);
-        XCTAssertEqual(historyEntries6.count, 2);
-        NSArray<NSString *> *queryUids6 = [historyEntries6 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
         NSArray<NSString *> *expectedQueryUids6 = @[@"12", @"90"];
+        XCTAssertEqual(historyEntries6.count, expectedQueryUids6.count);
+        NSArray<NSString *> *queryUids6 = [historyEntries6 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
         XCTAssertEqualObjects(queryUids6, expectedQueryUids6);
         [expectation6 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    XCTestExpectation *expectation7 = [self expectationWithDescription:@"History entries fetched"];
+    
+    NSPredicate *predicate7 = [NSPredicate predicateWithFormat:@"%K < 60", @keypath(SRGHistoryEntry.new, lastPlaybackPosition)];
+    NSSortDescriptor *sortDescriptor7 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
+    [self.userData.history historyEntriesMatchingPredicate:predicate7 sortedWithDescriptors:@[sortDescriptor7] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries7) {
+        XCTAssertFalse(NSThread.isMainThread);
+        NSArray<NSString *> *expectedQueryUids7 = @[@"56", @"34", @"12"];
+        XCTAssertEqual(historyEntries7.count, expectedQueryUids7.count);
+        NSArray<NSString *> *queryUids7 = [historyEntries7 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
+        XCTAssertEqualObjects(queryUids7, expectedQueryUids7);
+        [expectation7 fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
