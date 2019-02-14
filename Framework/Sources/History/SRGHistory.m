@@ -76,7 +76,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-    NSURL *URL = [self.serviceURL URLByAppendingPathComponent:@"historyapi/v2"];
+    NSURL *URL = [self.serviceURL URLByAppendingPathComponent:@"v2"];
     NSURLComponents *URLComponents = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:NO];
     
     NSMutableArray<NSURLQueryItem *> *queryItems = [NSMutableArray array];
@@ -191,7 +191,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-    NSURL *URL = [self.serviceURL URLByAppendingPathComponent:@"historyapi/v2"];
+    NSURL *URL = [self.serviceURL URLByAppendingPathComponent:@"v2"];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
     request.HTTPMethod = @"POST";
     [request setValue:[NSString stringWithFormat:@"sessionToken %@", sessionToken] forHTTPHeaderField:@"Authorization"];
