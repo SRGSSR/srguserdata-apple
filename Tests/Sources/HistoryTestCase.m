@@ -4,12 +4,11 @@
 //  License information is available from the LICENSE file.
 //
 
-#import <XCTest/XCTest.h>
+#import "UserDataBaseTestCase.h"
 
 #import <libextobjc/libextobjc.h>
-#import <SRGUserData/SRGUserData.h>
 
-@interface SRGHistoryTestCase : XCTestCase
+@interface SRGHistoryTestCase : UserDataBaseTestCase
 
 @property (nonatomic) SRGUserData *userData;
 
@@ -91,6 +90,17 @@
     }
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    // No more history did change notifications must be received
+    id historyDidChangeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"History must not send more did change notifications.");
+    }];
+    
+    [self expectationForElapsedTimeInterval:2. withHandler:nil];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:historyDidChangeObserver];
+    }];
 }
 
 - (void)testSaveSameHistoryEntry
@@ -120,6 +130,17 @@
     }
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    // No more history did change notifications must be received
+    id historyDidChangeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"History must not send more did change notifications.");
+    }];
+    
+    [self expectationForElapsedTimeInterval:2. withHandler:nil];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:historyDidChangeObserver];
+    }];
 }
 
 - (void)testHistoryEntryWithUid
@@ -520,6 +541,17 @@
     
     NSArray<SRGHistoryEntry *> *historyEntries = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
     XCTAssertEqual(historyEntries.count, 3);
+    
+    // No more history did change notifications must be received
+    id historyDidChangeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"History must not send more did change notifications.");
+    }];
+    
+    [self expectationForElapsedTimeInterval:2. withHandler:nil];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:historyDidChangeObserver];
+    }];
 }
 
 - (void)testDiscardAllHistoryEntries
@@ -571,6 +603,17 @@
     
     NSArray<SRGHistoryEntry *> *historyEntries = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
     XCTAssertEqual(historyEntries.count, 0);
+    
+    // No more history did change notifications must be received
+    id historyDidChangeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"History must not send more did change notifications.");
+    }];
+    
+    [self expectationForElapsedTimeInterval:2. withHandler:nil];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:historyDidChangeObserver];
+    }];
 }
 
 @end
