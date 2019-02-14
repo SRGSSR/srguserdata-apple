@@ -92,14 +92,129 @@
         // Exists
         SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry upsertWithUid:@"urn:rts:video:9992865" inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry2.uid, @"urn:rts:video:9992865");
-        
-        XCTAssertEqualObjects(viewContext.insertedObjects, [NSSet setWithObject:historyEntry1]);
     }];
 }
 
-- (void)testSynchronize
+- (void)testSynchronizeWithInvalidData
 {
+    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
+    NSManagedObjectContext *viewContext = persistentContainer.viewContext;
+    [viewContext performBlockAndWait:^{
+        NSString *uid1 = [SRGHistoryEntry synchronizeWithDictionary:@{} inManagedObjectContext:viewContext];
+        XCTAssertNil(uid1);
+        
+        NSString *uid2 = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"123456" } inManagedObjectContext:viewContext];
+        XCTAssertNil(uid2);
+    }];
+}
+
+- (void)testSynchronizeNewServerEntry
+{
+    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    
+    NSManagedObjectContext *viewContext = persistentContainer.viewContext;
+    [viewContext performBlockAndWait:^{
+        NSString *uid = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"123456",
+                                                                      @"date" : @1550134222000,
+                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(uid, @"123456");
+        
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(historyEntry.uid, @"123456");
+        XCTAssertEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1550134222]);
+        XCTAssertEqualObjects(historyEntry.deviceUid, @"other_device");
+    }];
+}
+
+- (void)testSynchronizeNonDirtyLocalEntry
+{
+    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    
+    NSManagedObjectContext *viewContext = persistentContainer.viewContext;
+    [viewContext performBlockAndWait:^{
+        NSString *uid = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:video:9992865",
+                                                                      @"date" : @1550134222000,
+                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(uid, @"urn:rts:video:9992865");
+        
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:video:9992865");
+        XCTAssertEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1550134222]);
+        XCTAssertEqualObjects(historyEntry.deviceUid, @"other_device");
+    }];
+}
+
+- (void)testSynchronizeOlderDirtyLocalEntry
+{
+    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    
+    NSManagedObjectContext *viewContext = persistentContainer.viewContext;
+    [viewContext performBlockAndWait:^{
+        NSString *uid = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:audio:10110418",
+                                                                      @"date" : @1550134222000,
+                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(uid, @"urn:rts:audio:10110418");
+        
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:audio:10110418");
+        XCTAssertEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1550134222]);
+        XCTAssertEqualObjects(historyEntry.deviceUid, @"other_device");
+    }];
+}
+
+- (void)testSynchronizeMoreRecentDirtyLocalEntry
+{
+    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    
+    NSManagedObjectContext *viewContext = persistentContainer.viewContext;
+    [viewContext performBlockAndWait:^{
+        NSString *uid = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:audio:10110418",
+                                                                      @"date" : @1266137422000,
+                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(uid, @"urn:rts:audio:10110418");
+        
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:audio:10110418");
+        XCTAssertNotEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1266137422]);
+        XCTAssertNotEqualObjects(historyEntry.deviceUid, @"other_device");
+    }];
+}
+
+- (void)testSynchronizeDeletedEntryExistingLocally
+{
+    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    
+    NSManagedObjectContext *viewContext = persistentContainer.viewContext;
+    [viewContext performBlockAndWait:^{
+        NSString *uid = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:video:9992865",
+                                                                      @"date" : @1266137422000,
+                                                                      @"device_id" : @"other_device",
+                                                                      @"deleted" : @YES } inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(uid, @"urn:rts:video:9992865");
+        
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:viewContext];
+        XCTAssertNil(historyEntry);
+    }];
+}
+
+- (void)testSynchronizeDeletedEntryMoreRecentLocally
+{
+    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    
+    NSManagedObjectContext *viewContext = persistentContainer.viewContext;
+    [viewContext performBlockAndWait:^{
+        NSString *uid = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:audio:10110418",
+                                                                      @"date" : @1266137422000,
+                                                                      @"device_id" : @"other_device",
+                                                                      @"deleted" : @YES } inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(uid, @"urn:rts:audio:10110418");
+        
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:viewContext];
+        XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:audio:10110418");
+        XCTAssertNotEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1266137422]);
+        XCTAssertNotEqualObjects(historyEntry.deviceUid, @"other_device");
+    }];
 }
 
 - (void)testDiscardForLoggedOutUser
@@ -180,7 +295,6 @@
         XCTAssertNotEqual(historyEntries1.count, 0);
         
         [SRGHistoryEntry deleteAllInManagedObjectContext:viewContext];
-        [viewContext save:NULL];
         
         NSArray<SRGHistoryEntry *> *historyEntries2 = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:viewContext];
         XCTAssertEqual(historyEntries2.count, 0);

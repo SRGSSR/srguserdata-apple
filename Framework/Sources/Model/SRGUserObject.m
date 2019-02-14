@@ -74,10 +74,14 @@
         return nil;
     }
     
-    SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
+    NSNumber *timestamp = dictionary[@"date"];
+    if (! timestamp) {
+        return nil;
+    }
     
-    // If the local entry is dirty and more recent than server version, keep the local version as is.
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
+    // If the local entry is dirty and more recent than the server version, keep the local version as is.
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.];
+    SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
     if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
         return uid;
     }
