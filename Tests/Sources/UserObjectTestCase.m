@@ -102,7 +102,7 @@
     
 }
 
-- (void)testDiscardLoggedOutUser
+- (void)testDiscardForLoggedOutUser
 {
     id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedOut"];
     
@@ -128,7 +128,7 @@
     }];
 }
 
-- (void)testDiscardLoggedInUser
+- (void)testDiscardForLoggedInUser
 {
     id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
@@ -154,9 +154,37 @@
     }];
 }
 
-- (void)testDeleteAll
+- (void)testDeleteAllForLoggedInUser
 {
+    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedOut"];
     
+    NSManagedObjectContext *viewContext = persistentContainer.viewContext;
+    [viewContext performBlockAndWait:^{
+        NSArray<SRGHistoryEntry *> *historyEntries1 = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:viewContext];
+        XCTAssertNotEqual(historyEntries1.count, 0);
+        
+        [SRGHistoryEntry deleteAllInManagedObjectContext:viewContext];
+        
+        NSArray<SRGHistoryEntry *> *historyEntries2 = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:viewContext];
+        XCTAssertEqual(historyEntries2.count, 0);
+    }];
+}
+
+- (void)testDeleteAllForLoggedOutUser
+{
+    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    
+    NSManagedObjectContext *viewContext = persistentContainer.viewContext;
+    [viewContext performBlockAndWait:^{
+        NSArray<SRGHistoryEntry *> *historyEntries1 = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:viewContext];
+        XCTAssertNotEqual(historyEntries1.count, 0);
+        
+        [SRGHistoryEntry deleteAllInManagedObjectContext:viewContext];
+        [viewContext save:NULL];
+        
+        NSArray<SRGHistoryEntry *> *historyEntries2 = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:viewContext];
+        XCTAssertEqual(historyEntries2.count, 0);
+    }];
 }
 
 @end
