@@ -6,7 +6,9 @@
 
 #import "PlayerViewController.h"
 
+#import <libextobjc/libextobjc.h>
 #import <SRGLetterbox/SRGLetterbox.h>
+#import <SRGUserData/SRGUserData.h>
 
 @interface PlayerViewController ()
 
@@ -38,6 +40,12 @@
     if (self.URN) {
         [self.letterboxController playURN:self.URN atPosition:nil withPreferredSettings:nil];
     }
+    
+    @weakify(self)
+    [self.letterboxController addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1., NSEC_PER_SEC) queue:NULL usingBlock:^(CMTime time) {
+        @strongify(self)
+        [SRGUserData.currentUserData.history saveHistoryEntryForUid:self.URN withLastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+    }];
 }
 
 #pragma mark Home indicator

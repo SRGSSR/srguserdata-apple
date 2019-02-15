@@ -45,6 +45,11 @@
     self.refreshControl = refreshControl;
 
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
     
     [self refresh];
 }
