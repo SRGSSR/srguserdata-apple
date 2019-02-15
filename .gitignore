@@ -7,8 +7,13 @@ xcuserdata
 /build
 
 /Carthage
+/Cartfile.private
+/Cartfile.resolved
+
+/.env
 
 /fastlane/*.xml
+/fastlane/last-nightlies-success-git-commit-hash.txt
 
 /vendor
 /.bundle

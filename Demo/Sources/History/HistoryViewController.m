@@ -4,21 +4,23 @@
 //  License information is available from the LICENSE file.
 //
 
-#import "DemosViewController.h"
+#import "HistoryViewController.h"
+
+#import "PlayerViewController.h"
 
 #import <libextobjc/libextobjc.h>
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGUserData/SRGUserData.h>
 
-@interface DemosViewController ()
+@interface HistoryViewController ()
 
 @property (nonatomic) NSArray<SRGMedia *> *medias;
 @property (nonatomic, weak) SRGBaseRequest *request;
 
 @end
 
-@implementation DemosViewController
+@implementation HistoryViewController
 
 #pragma mark Object lifecycle
 
@@ -32,7 +34,7 @@
 
 - (NSString *)title
 {
-    return NSLocalizedString(@"Demos", nil);
+    return NSLocalizedString(@"History", nil);
 }
 
 #pragma mark View lifecycle
@@ -56,15 +58,21 @@
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidStartSynchronization:)
                                                name:SRGHistoryDidStartSynchronizationNotification
-                                             object:nil /* TODO */];
+                                             object:SRGUserData.currentUserData.history];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidClear:)
                                                name:SRGHistoryDidClearNotification
-                                             object:nil /* TODO */];
+                                             object:SRGUserData.currentUserData.history];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     
     [self updateNavigationBar];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
     [self refresh];
 }
 
@@ -76,6 +84,25 @@
         [self.request cancel];
     }
 }
+
+#pragma mark UI
+
+- (void)updateNavigationBar
+{
+    if (! SRGIdentityService.currentIdentityService.loggedIn) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Login", nil)
+                                                                                  style:UIBarButtonItemStylePlain
+                                                                                 target:self
+                                                                                 action:@selector(login:)];
+    }
+    else {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Logout", nil)
+                                                                                  style:UIBarButtonItemStylePlain
+                                                                                 target:self
+                                                                                 action:@selector(logout:)];
+    }
+}
+
 
 #pragma mark Data
 
@@ -106,24 +133,6 @@
     }];
 }
 
-#pragma mark User interface
-
-- (void)updateNavigationBar
-{
-    if (! SRGIdentityService.currentIdentityService.loggedIn) {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Login", nil)
-                                                                                  style:UIBarButtonItemStylePlain
-                                                                                 target:self
-                                                                                 action:@selector(login:)];
-    }
-    else {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Logout", nil)
-                                                                                  style:UIBarButtonItemStylePlain
-                                                                                 target:self
-                                                                                 action:@selector(logout:)];
-    }
-}
-
 #pragma mark UITableViewDataSource protocol
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -146,6 +155,33 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    SRGMedia *media = self.medias[indexPath.row];
+    SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
+    
+    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime];
+    [self presentViewController:playerViewController animated:YES completion:nil];
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return UITableViewCellEditingStyleDelete;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete){
+        SRGMedia *media = self.medias[indexPath.row];
+        [SRGUserData.currentUserData.history discardHistoryEntriesWithUids:@[media.URN] completionBlock:^(NSError * _Nonnull error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSMutableArray<SRGMedia *> *medias = [self.medias mutableCopy];
+                [medias removeObjectAtIndex:indexPath.row];
+                self.medias = [medias copy];
+                
+                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            });
+        }];
+    }
 }
 
 #pragma mark Actions

@@ -8,6 +8,8 @@
 
 #import <SRGIdentity/SRGIdentity.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  Private interface for implementation purposes.
  */
@@ -43,3 +45,5 @@
 - (void)synchronize;
 
 @end
+
+NS_ASSUME_NONNULL_END
