@@ -4,21 +4,21 @@
 //  License information is available from the LICENSE file.
 //
 
-#import "DemosViewController.h"
+#import "HistoryViewController.h"
 
 #import <libextobjc/libextobjc.h>
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGUserData/SRGUserData.h>
 
-@interface DemosViewController ()
+@interface HistoryViewController ()
 
 @property (nonatomic) NSArray<SRGMedia *> *medias;
 @property (nonatomic, weak) SRGBaseRequest *request;
 
 @end
 
-@implementation DemosViewController
+@implementation HistoryViewController
 
 #pragma mark Object lifecycle
 
@@ -32,7 +32,7 @@
 
 - (NSString *)title
 {
-    return NSLocalizedString(@"Demos", nil);
+    return NSLocalizedString(@"History", nil);
 }
 
 #pragma mark View lifecycle
@@ -56,11 +56,11 @@
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidStartSynchronization:)
                                                name:SRGHistoryDidStartSynchronizationNotification
-                                             object:nil /* TODO */];
+                                             object:SRGUserData.currentUserData.history];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidClear:)
                                                name:SRGHistoryDidClearNotification
-                                             object:nil /* TODO */];
+                                             object:SRGUserData.currentUserData.history];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     

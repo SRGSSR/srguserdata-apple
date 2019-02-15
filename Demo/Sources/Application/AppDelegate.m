@@ -6,7 +6,8 @@
 
 #import "AppDelegate.h"
 
-#import "DemosViewController.h"
+#import "HistoryViewController.h"
+#import "MediasViewController.h"
 
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGIdentity/SRGIdentity.h>
@@ -37,8 +38,18 @@
                                                name:SRGIdentityServiceUserDidLogoutNotification
                                              object:nil];
     
-    DemosViewController *demosViewController = [[DemosViewController alloc] init];
-    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:demosViewController];
+    MediasViewController *mediasViewController = [[MediasViewController alloc] init];
+    UINavigationController *mediasNavigationController = [[UINavigationController alloc] initWithRootViewController:mediasViewController];
+    mediasNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Medias", nil) image:[UIImage imageNamed:@"media_30"] tag:0];
+    
+    HistoryViewController *historyViewController = [[HistoryViewController alloc] init];
+    UINavigationController *historyNavigationController = [[UINavigationController alloc] initWithRootViewController:historyViewController];
+    historyNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"History", nil) image:[UIImage imageNamed:@"history_30"] tag:0];
+    
+    UITabBarController *tabBarController = [[UITabBarController alloc] init];
+    tabBarController.viewControllers = @[mediasNavigationController, historyNavigationController];
+    
+    self.window.rootViewController = tabBarController;
     return YES;
 }
 
