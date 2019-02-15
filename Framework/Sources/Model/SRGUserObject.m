@@ -74,10 +74,14 @@
         return nil;
     }
     
-    SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
+    NSNumber *timestamp = dictionary[@"date"];
+    if (! timestamp) {
+        return nil;
+    }
     
-    // If the local entry is dirty and more recent than server version, keep the local version as is.
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
+    // If the local entry is dirty and more recent than the server version, keep the local version as is.
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.];
+    SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
     if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
         return uid;
     }
@@ -101,7 +105,7 @@
 
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 {
-    NSPredicate *predicate = (uids) ? [NSPredicate predicateWithFormat:@"%K IN %@", @keypath(SRGUserObject.new, uid), uids] : nil;
+    NSPredicate *predicate = uids ? [NSPredicate predicateWithFormat:@"%K IN %@ AND discarded == NO", @keypath(SRGUserObject.new, uid), uids] : nil;
     NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
     
