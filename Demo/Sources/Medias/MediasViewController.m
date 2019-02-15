@@ -112,7 +112,7 @@
     
     SRGMedia *media = self.medias[indexPath.row];
     PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN];
-    [self.navigationController pushViewController:playerViewController animated:YES];
+    [self presentViewController:playerViewController animated:YES completion:nil];
 }
 
 #pragma mark Actions

@@ -17,6 +17,8 @@
 @property (nonatomic, weak) IBOutlet SRGLetterboxView *letterboxView;
 @property (nonatomic) IBOutlet SRGLetterboxController *letterboxController;     // top-level object, retained
 
+@property (nonatomic, weak) IBOutlet UIButton *closeButton;
+
 @end
 
 @implementation PlayerViewController
@@ -59,11 +61,22 @@
 
 - (void)letterboxViewWillAnimateUserInterface:(SRGLetterboxView *)letterboxView
 {
-    [letterboxView animateAlongsideUserInterfaceWithAnimations:nil completion:^(BOOL finished) {
+    [self.view layoutIfNeeded];
+    [letterboxView animateAlongsideUserInterfaceWithAnimations:^(BOOL hidden, BOOL minimal, CGFloat heightOffset) {
+        self.closeButton.alpha = (minimal || ! hidden) ? 1.f : 0.f;
+        [self.view layoutIfNeeded];
+    } completion:^(BOOL finished) {
         if (@available(iOS 11, *)) {
             [self setNeedsUpdateOfHomeIndicatorAutoHidden];
         }
     }];
+}
+
+#pragma mark Actions
+
+- (IBAction)close:(id)sender
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end
