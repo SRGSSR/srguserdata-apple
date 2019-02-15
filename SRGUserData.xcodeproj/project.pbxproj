@@ -55,6 +55,34 @@
 		6F41C9782216A9C1003F434A /* HistoryViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F41C9762216A9C1003F434A /* HistoryViewController.storyboard */; };
 		6F41C97C2216AA0D003F434A /* MediasViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F41C97B2216AA0D003F434A /* MediasViewController.m */; };
 		6F41C97E2216AA18003F434A /* MediasViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F41C97D2216AA18003F434A /* MediasViewController.storyboard */; };
+		6F41C9862216B969003F434A /* TCCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C97F2216B968003F434A /* TCCore.framework */; };
+		6F41C9872216B969003F434A /* TCCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C97F2216B968003F434A /* TCCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C9882216B969003F434A /* TCSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9802216B968003F434A /* TCSDK.framework */; };
+		6F41C9892216B969003F434A /* TCSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9802216B968003F434A /* TCSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C98A2216B969003F434A /* SRGMediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9812216B968003F434A /* SRGMediaPlayer.framework */; };
+		6F41C98B2216B969003F434A /* SRGMediaPlayer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9812216B968003F434A /* SRGMediaPlayer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C98C2216B969003F434A /* SRGDiagnostics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9822216B969003F434A /* SRGDiagnostics.framework */; };
+		6F41C98D2216B969003F434A /* SRGDiagnostics.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9822216B969003F434A /* SRGDiagnostics.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C98E2216B969003F434A /* SRGContentProtection.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9832216B969003F434A /* SRGContentProtection.framework */; };
+		6F41C98F2216B969003F434A /* SRGContentProtection.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9832216B969003F434A /* SRGContentProtection.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C9902216B969003F434A /* Masonry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; };
+		6F41C9912216B969003F434A /* Masonry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C9922216B969003F434A /* SRGAppearance.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9852216B969003F434A /* SRGAppearance.framework */; };
+		6F41C9932216B969003F434A /* SRGAppearance.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9852216B969003F434A /* SRGAppearance.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C9952216BA0C003F434A /* ComScore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9942216BA0C003F434A /* ComScore.framework */; };
+		6F41C9962216BA0C003F434A /* ComScore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9942216BA0C003F434A /* ComScore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C99C2216BBB0003F434A /* SRGAnalytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9972216BBB0003F434A /* SRGAnalytics.framework */; };
+		6F41C99D2216BBB0003F434A /* SRGAnalytics.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9972216BBB0003F434A /* SRGAnalytics.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C99E2216BBB0003F434A /* SRGAnalytics_DataProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9982216BBB0003F434A /* SRGAnalytics_DataProvider.framework */; };
+		6F41C99F2216BBB1003F434A /* SRGAnalytics_DataProvider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9982216BBB0003F434A /* SRGAnalytics_DataProvider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C9A02216BBB1003F434A /* YYWebImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9992216BBB0003F434A /* YYWebImage.framework */; };
+		6F41C9A12216BBB1003F434A /* YYWebImage.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9992216BBB0003F434A /* YYWebImage.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C9A22216BBB1003F434A /* SRGAnalytics_MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C99A2216BBB0003F434A /* SRGAnalytics_MediaPlayer.framework */; };
+		6F41C9A32216BBB1003F434A /* SRGAnalytics_MediaPlayer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C99A2216BBB0003F434A /* SRGAnalytics_MediaPlayer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C9A42216BBB1003F434A /* SRGLetterbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C99B2216BBB0003F434A /* SRGLetterbox.framework */; };
+		6F41C9A52216BBB1003F434A /* SRGLetterbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C99B2216BBB0003F434A /* SRGLetterbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F41C9AB2216C3CC003F434A /* PlayerViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F41C9A82216C3CB003F434A /* PlayerViewController.storyboard */; };
+		6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F41C9AA2216C3CB003F434A /* PlayerViewController.m */; };
 		6F46DD76221429110013C10A /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F46DD75221429100013C10A /* Person.m */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
 		6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F120FDCAA800AA6434 /* Images.xcassets */; };
@@ -143,14 +171,27 @@
 			files = (
 				6FA62D67220438DF008569DC /* UICKeyChainStore.framework in Embed Frameworks */,
 				6FA62D65220438DF008569DC /* SRGIdentity.framework in Embed Frameworks */,
+				6F41C98B2216B969003F434A /* SRGMediaPlayer.framework in Embed Frameworks */,
 				6F0432BF21007340002B090A /* SRGNetwork.framework in Embed Frameworks */,
+				6F41C9A52216BBB1003F434A /* SRGLetterbox.framework in Embed Frameworks */,
 				0858B6A422010CD6000F00CF /* MAKVONotificationCenter.framework in Embed Frameworks */,
+				6F41C9962216BA0C003F434A /* ComScore.framework in Embed Frameworks */,
 				6FFB346622088BA200E76E6D /* SRGDataProvider.framework in Embed Frameworks */,
+				6F41C99F2216BBB1003F434A /* SRGAnalytics_DataProvider.framework in Embed Frameworks */,
+				6F41C9912216B969003F434A /* Masonry.framework in Embed Frameworks */,
 				0858B6A222010CD6000F00CF /* libextobjc.framework in Embed Frameworks */,
 				6FA62D6B22043955008569DC /* Mantle.framework in Embed Frameworks */,
+				6F41C9A12216BBB1003F434A /* YYWebImage.framework in Embed Frameworks */,
+				6F41C9A32216BBB1003F434A /* SRGAnalytics_MediaPlayer.framework in Embed Frameworks */,
+				6F41C98D2216B969003F434A /* SRGDiagnostics.framework in Embed Frameworks */,
 				6F8A940420FDD01B00AA6434 /* SRGUserData.framework in Embed Frameworks */,
+				6F41C9892216B969003F434A /* TCSDK.framework in Embed Frameworks */,
+				6F41C9872216B969003F434A /* TCCore.framework in Embed Frameworks */,
 				0858B6A622010CD6000F00CF /* SRGLogger.framework in Embed Frameworks */,
+				6F41C9932216B969003F434A /* SRGAppearance.framework in Embed Frameworks */,
+				6F41C98F2216B969003F434A /* SRGContentProtection.framework in Embed Frameworks */,
 				6FA62D63220438DF008569DC /* FXReachability.framework in Embed Frameworks */,
+				6F41C99D2216BBB0003F434A /* SRGAnalytics.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -215,6 +256,22 @@
 		6F41C97A2216AA0D003F434A /* MediasViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MediasViewController.h; sourceTree = "<group>"; };
 		6F41C97B2216AA0D003F434A /* MediasViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MediasViewController.m; sourceTree = "<group>"; };
 		6F41C97D2216AA18003F434A /* MediasViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MediasViewController.storyboard; sourceTree = "<group>"; };
+		6F41C97F2216B968003F434A /* TCCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TCCore.framework; path = Carthage/Build/iOS/TCCore.framework; sourceTree = "<group>"; };
+		6F41C9802216B968003F434A /* TCSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TCSDK.framework; path = Carthage/Build/iOS/TCSDK.framework; sourceTree = "<group>"; };
+		6F41C9812216B968003F434A /* SRGMediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGMediaPlayer.framework; path = Carthage/Build/iOS/SRGMediaPlayer.framework; sourceTree = "<group>"; };
+		6F41C9822216B969003F434A /* SRGDiagnostics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGDiagnostics.framework; path = Carthage/Build/iOS/SRGDiagnostics.framework; sourceTree = "<group>"; };
+		6F41C9832216B969003F434A /* SRGContentProtection.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGContentProtection.framework; path = Carthage/Build/iOS/SRGContentProtection.framework; sourceTree = "<group>"; };
+		6F41C9842216B969003F434A /* Masonry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Masonry.framework; path = Carthage/Build/iOS/Masonry.framework; sourceTree = "<group>"; };
+		6F41C9852216B969003F434A /* SRGAppearance.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGAppearance.framework; path = Carthage/Build/iOS/SRGAppearance.framework; sourceTree = "<group>"; };
+		6F41C9942216BA0C003F434A /* ComScore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ComScore.framework; path = Carthage/Build/iOS/ComScore.framework; sourceTree = "<group>"; };
+		6F41C9972216BBB0003F434A /* SRGAnalytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGAnalytics.framework; path = Carthage/Build/iOS/SRGAnalytics.framework; sourceTree = "<group>"; };
+		6F41C9982216BBB0003F434A /* SRGAnalytics_DataProvider.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGAnalytics_DataProvider.framework; path = Carthage/Build/iOS/SRGAnalytics_DataProvider.framework; sourceTree = "<group>"; };
+		6F41C9992216BBB0003F434A /* YYWebImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = YYWebImage.framework; path = Carthage/Build/iOS/YYWebImage.framework; sourceTree = "<group>"; };
+		6F41C99A2216BBB0003F434A /* SRGAnalytics_MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGAnalytics_MediaPlayer.framework; path = Carthage/Build/iOS/SRGAnalytics_MediaPlayer.framework; sourceTree = "<group>"; };
+		6F41C99B2216BBB0003F434A /* SRGLetterbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGLetterbox.framework; path = Carthage/Build/iOS/SRGLetterbox.framework; sourceTree = "<group>"; };
+		6F41C9A82216C3CB003F434A /* PlayerViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = PlayerViewController.storyboard; sourceTree = "<group>"; };
+		6F41C9A92216C3CB003F434A /* PlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerViewController.h; sourceTree = "<group>"; };
+		6F41C9AA2216C3CB003F434A /* PlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerViewController.m; sourceTree = "<group>"; };
 		6F46DD74221429100013C10A /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 		6F46DD75221429100013C10A /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -290,14 +347,27 @@
 			files = (
 				6FA62D66220438DF008569DC /* UICKeyChainStore.framework in Frameworks */,
 				6FA62D64220438DF008569DC /* SRGIdentity.framework in Frameworks */,
+				6F41C98A2216B969003F434A /* SRGMediaPlayer.framework in Frameworks */,
 				6F0432BE21007340002B090A /* SRGNetwork.framework in Frameworks */,
+				6F41C9A42216BBB1003F434A /* SRGLetterbox.framework in Frameworks */,
 				0858B6A322010CD6000F00CF /* MAKVONotificationCenter.framework in Frameworks */,
+				6F41C9952216BA0C003F434A /* ComScore.framework in Frameworks */,
 				6FFB346522088BA200E76E6D /* SRGDataProvider.framework in Frameworks */,
+				6F41C99E2216BBB0003F434A /* SRGAnalytics_DataProvider.framework in Frameworks */,
+				6F41C9902216B969003F434A /* Masonry.framework in Frameworks */,
 				0858B6A522010CD6000F00CF /* SRGLogger.framework in Frameworks */,
 				6FA62D6A22043955008569DC /* Mantle.framework in Frameworks */,
+				6F41C9A02216BBB1003F434A /* YYWebImage.framework in Frameworks */,
+				6F41C9A22216BBB1003F434A /* SRGAnalytics_MediaPlayer.framework in Frameworks */,
+				6F41C98C2216B969003F434A /* SRGDiagnostics.framework in Frameworks */,
 				0858B69C22010C9E000F00CF /* libextobjc.framework in Frameworks */,
+				6F41C9882216B969003F434A /* TCSDK.framework in Frameworks */,
+				6F41C9862216B969003F434A /* TCCore.framework in Frameworks */,
 				6F8A940320FDD01B00AA6434 /* SRGUserData.framework in Frameworks */,
+				6F41C9922216B969003F434A /* SRGAppearance.framework in Frameworks */,
+				6F41C98E2216B969003F434A /* SRGContentProtection.framework in Frameworks */,
 				6FA62D62220438DF008569DC /* FXReachability.framework in Frameworks */,
+				6F41C99C2216BBB0003F434A /* SRGAnalytics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,6 +522,16 @@
 			path = Medias;
 			sourceTree = "<group>";
 		};
+		6F41C9A72216C3CB003F434A /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				6F41C9A82216C3CB003F434A /* PlayerViewController.storyboard */,
+				6F41C9A92216C3CB003F434A /* PlayerViewController.h */,
+				6F41C9AA2216C3CB003F434A /* PlayerViewController.m */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
 		6F46DD73221429100013C10A /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -486,6 +566,7 @@
 				6F8A93F320FDCAA800AA6434 /* Application */,
 				6F41C9732216A9C1003F434A /* History */,
 				6F41C9792216A9F9003F434A /* Medias */,
+				6F41C9A72216C3CB003F434A /* Player */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -503,15 +584,28 @@
 		6F8A945521006A9E00AA6434 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6F41C9942216BA0C003F434A /* ComScore.framework */,
 				6FA62D5C2204389A008569DC /* FXReachability.framework */,
 				0858B69622010C9E000F00CF /* libextobjc.framework */,
 				0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */,
 				6FA62D682204394B008569DC /* Mantle.framework */,
+				6F41C9842216B969003F434A /* Masonry.framework */,
+				6F41C9982216BBB0003F434A /* SRGAnalytics_DataProvider.framework */,
+				6F41C99A2216BBB0003F434A /* SRGAnalytics_MediaPlayer.framework */,
+				6F41C9972216BBB0003F434A /* SRGAnalytics.framework */,
+				6F41C9852216B969003F434A /* SRGAppearance.framework */,
+				6F41C9832216B969003F434A /* SRGContentProtection.framework */,
 				6FFB346422088BA200E76E6D /* SRGDataProvider.framework */,
+				6F41C9822216B969003F434A /* SRGDiagnostics.framework */,
 				6FA62D5D2204389A008569DC /* SRGIdentity.framework */,
+				6F41C99B2216BBB0003F434A /* SRGLetterbox.framework */,
 				0858B69522010C9E000F00CF /* SRGLogger.framework */,
+				6F41C9812216B968003F434A /* SRGMediaPlayer.framework */,
 				6F0432BC21006E7A002B090A /* SRGNetwork.framework */,
+				6F41C97F2216B968003F434A /* TCCore.framework */,
+				6F41C9802216B968003F434A /* TCSDK.framework */,
 				6FA62D5E2204389A008569DC /* UICKeyChainStore.framework */,
+				6F41C9992216BBB0003F434A /* YYWebImage.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -754,6 +848,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F41C97E2216AA18003F434A /* MediasViewController.storyboard in Resources */,
+				6F41C9AB2216C3CC003F434A /* PlayerViewController.storyboard in Resources */,
 				6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */,
 				6F41C9782216A9C1003F434A /* HistoryViewController.storyboard in Resources */,
 				6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */,
@@ -812,6 +907,7 @@
 				6F8A93FD20FDCAA800AA6434 /* main.m in Sources */,
 				6F41C9772216A9C1003F434A /* HistoryViewController.m in Sources */,
 				6F41C97C2216AA0D003F434A /* MediasViewController.m in Sources */,
+				6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

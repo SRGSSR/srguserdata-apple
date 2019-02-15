@@ -6,6 +6,8 @@
 
 #import "MediasViewController.h"
 
+#import "PlayerViewController.h"
+
 #import <SRGDataProvider/SRGDataProvider.h>
 
 @interface MediasViewController ()
@@ -102,6 +104,10 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    SRGMedia *media = self.medias[indexPath.row];
+    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN];
+    [self.navigationController pushViewController:playerViewController animated:YES];
 }
 
 #pragma mark Actions
