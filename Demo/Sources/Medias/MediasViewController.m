@@ -9,6 +9,7 @@
 #import "PlayerViewController.h"
 
 #import <SRGDataProvider/SRGDataProvider.h>
+#import <SRGUserData/SRGUserData.h>
 
 @interface MediasViewController ()
 
@@ -111,7 +112,9 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     SRGMedia *media = self.medias[indexPath.row];
-    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN];
+    SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
+    
+    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime];
     [self presentViewController:playerViewController animated:YES completion:nil];
 }
 

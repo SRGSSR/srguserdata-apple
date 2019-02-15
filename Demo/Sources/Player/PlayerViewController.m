@@ -13,6 +13,7 @@
 @interface PlayerViewController ()
 
 @property (nonatomic, copy) NSString *URN;
+@property (nonatomic) SRGPosition *position;
 
 @property (nonatomic, weak) IBOutlet SRGLetterboxView *letterboxView;
 @property (nonatomic) IBOutlet SRGLetterboxController *letterboxController;     // top-level object, retained
@@ -25,11 +26,12 @@
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithURN:(NSString *)URN
+- (instancetype)initWithURN:(NSString *)URN time:(CMTime)time
 {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
     PlayerViewController *viewController = [storyboard instantiateInitialViewController];
     viewController.URN = URN;
+    viewController.position = [SRGPosition positionBeforeTime:time];
     return viewController;
 }
 
@@ -40,7 +42,7 @@
     [super viewDidLoad];
     
     if (self.URN) {
-        [self.letterboxController playURN:self.URN atPosition:nil withPreferredSettings:nil];
+        [self.letterboxController playURN:self.URN atPosition:self.position withPreferredSettings:nil];
     }
     
     @weakify(self)

@@ -6,6 +6,8 @@
 
 #import "HistoryViewController.h"
 
+#import "PlayerViewController.h"
+
 #import <libextobjc/libextobjc.h>
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGIdentity/SRGIdentity.h>
@@ -152,6 +154,12 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    SRGMedia *media = self.medias[indexPath.row];
+    SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
+    
+    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime];
+    [self presentViewController:playerViewController animated:YES completion:nil];
 }
 
 #pragma mark Actions
