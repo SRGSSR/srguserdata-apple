@@ -43,13 +43,13 @@
     
     if (self.URN) {
         [self.letterboxController playURN:self.URN atPosition:self.position withPreferredSettings:nil];
+        
+        @weakify(self)
+        [self.letterboxController addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1., NSEC_PER_SEC) queue:NULL usingBlock:^(CMTime time) {
+            @strongify(self)
+            [SRGUserData.currentUserData.history saveHistoryEntryForUid:self.URN withLastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+        }];
     }
-    
-    @weakify(self)
-    [self.letterboxController addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1., NSEC_PER_SEC) queue:NULL usingBlock:^(CMTime time) {
-        @strongify(self)
-        [SRGUserData.currentUserData.history saveHistoryEntryForUid:self.URN withLastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
-    }];
 }
 
 #pragma mark Home indicator
