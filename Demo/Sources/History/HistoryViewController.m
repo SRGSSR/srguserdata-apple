@@ -56,12 +56,8 @@
                                                name:SRGIdentityServiceDidUpdateAccountNotification
                                              object:SRGIdentityService.currentIdentityService];
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(historyDidStartSynchronization:)
-                                               name:SRGHistoryDidStartSynchronizationNotification
-                                             object:SRGUserData.currentUserData.history];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(historyDidClear:)
-                                               name:SRGHistoryDidClearNotification
+                                           selector:@selector(historyDidChange:)
+                                               name:SRGHistoryDidChangeNotification
                                              object:SRGUserData.currentUserData.history];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
@@ -213,14 +209,13 @@
     [self updateNavigationBar];
 }
 
-- (void)historyDidStartSynchronization:(NSNotification *)notification
+- (void)historyDidChange:(NSNotification *)notification
 {
-    [self refresh];
-}
-
-- (void)historyDidClear:(NSNotification *)notification
-{
-    [self refresh];
+    NSArray<NSString *> *previousURNs = notification.userInfo[SRGHistoryPreviousUidsKey];
+    NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
+    if (URNs.count == 0 || previousURNs.count == 0) {
+        [self refresh];
+    }
 }
 
 @end
