@@ -14,7 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
  *  notification `userInfo` dictionary.
  */
 OBJC_EXPORT NSString * const SRGHistoryDidChangeNotification;                    // Notification name.
-OBJC_EXPORT NSString * const SRGHistoryUidsKey;                                  // Key to access the updated uids as an `NSArray` of `NSString` objects.
+
+OBJC_EXPORT NSString * const SRGHistoryPreviousUidsKey;                          // Key to access the previous uid list as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGHistoryUidsKey;                                  // Key to access the current uid list as an `NSArray` of `NSString` objects.
 
 /**
  *  Notification sent when history synchronization has started.
