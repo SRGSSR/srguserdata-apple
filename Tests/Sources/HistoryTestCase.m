@@ -18,7 +18,7 @@
 
 #pragma mark Helpers
 
-- (void)saveUids:(NSArray<NSString *> *)uids withDeviceUid:(NSString *)deviceUid
+- (void)saveUids:(NSArray<NSString *> *)uids
 {
     NSMutableArray<NSString *> *expectedSavedNotifications = uids.mutableCopy;
     
@@ -33,7 +33,7 @@
         CMTime time = CMTimeMakeWithSeconds(uid.integerValue, NSEC_PER_SEC);
         XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
         
-        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
+        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:time deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
@@ -240,8 +240,7 @@
     XCTAssertEqual(historyEntries1.count, 0);
     
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     NSArray<SRGHistoryEntry *> *historyEntries2 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
     
@@ -265,8 +264,7 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entries fetched"];
     
@@ -285,8 +283,7 @@
 - (void)testHistoryEntriesMatchingPredicatesOrSortDescriptors
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:YES];
     NSArray<SRGHistoryEntry *> *historyEntries1 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor1]];
@@ -309,7 +306,7 @@
     NSArray<NSString *> *queryUids3 = [historyEntries3 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
     XCTAssertEqualObjects(queryUids3, [[uids reverseObjectEnumerator] allObjects]);
     
-    NSPredicate *predicate4 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, deviceUid), deviceUid];
+    NSPredicate *predicate4 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, deviceUid), @"Test device"];
     NSArray<SRGHistoryEntry *> *historyEntries4 = [self.userData.history historyEntriesMatchingPredicate:predicate4 sortedWithDescriptors:nil];
     
     XCTAssertEqual(historyEntries4.count, uids.count);
@@ -324,7 +321,7 @@
     SRGHistoryEntry *historyEntry = historyEntries5.firstObject;
     XCTAssertEqualObjects(historyEntry.uid, queryUid);
     XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, CMTimeMakeWithSeconds(queryUid.integerValue, NSEC_PER_SEC)));
-    XCTAssertEqualObjects(historyEntry.deviceUid, deviceUid);
+    XCTAssertEqualObjects(historyEntry.deviceUid, @"Test device");
     XCTAssertFalse(historyEntry.discarded);
     
     NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ || %K CONTAINS[cd] %@", @keypath(SRGHistoryEntry.new, uid), @"1", @keypath(SRGHistoryEntry.new, uid), @"9"];
@@ -349,8 +346,7 @@
 - (void)testHistoryEntriesMatchingPredicatesOrSortDescriptorsAsynchronously
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entries fetched"];
     
@@ -393,7 +389,7 @@
     
     XCTestExpectation *expectation4 = [self expectationWithDescription:@"History entries fetched"];
     
-    NSPredicate *predicate4 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, deviceUid), deviceUid];
+    NSPredicate *predicate4 = [NSPredicate predicateWithFormat:@"%K == 'Test device'", @keypath(SRGHistoryEntry.new, deviceUid)];
     [self.userData.history historyEntriesMatchingPredicate:predicate4 sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries4) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertEqual(historyEntries4.count, uids.count);
@@ -414,7 +410,7 @@
         SRGHistoryEntry *historyEntry = historyEntries5.firstObject;
         XCTAssertEqualObjects(historyEntry.uid, queryUid);
         XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, CMTimeMakeWithSeconds(queryUid.integerValue, NSEC_PER_SEC)));
-        XCTAssertEqualObjects(historyEntry.deviceUid, deviceUid);
+        XCTAssertEqualObjects(historyEntry.deviceUid, @"Test device");
         XCTAssertFalse(historyEntry.discarded);
         [expectation5 fulfill];
     }];
@@ -455,8 +451,7 @@
 - (void)testDiscardHistoryEntries
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     NSArray<NSString *> *discardedUids = @[@"12", @"90"];
     NSArray<NSString *> *remainingUids = @[@"34", @"56", @"78"];
@@ -496,8 +491,7 @@
 - (void)testDiscardAllHistoryEntries
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     [self expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
