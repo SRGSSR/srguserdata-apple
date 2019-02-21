@@ -92,10 +92,10 @@
                                                                                  action:@selector(login:)];
     }
     else {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Logout", nil)
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
                                                                                   style:UIBarButtonItemStylePlain
                                                                                  target:self
-                                                                                 action:@selector(logout:)];
+                                                                                 action:@selector(showAccount:)];
     }
 }
 
@@ -187,9 +187,9 @@
     [SRGIdentityService.currentIdentityService loginWithEmailAddress:nil];
 }
 
-- (void)logout:(id)sender
+- (void)showAccount:(id)sender
 {
-    [SRGIdentityService.currentIdentityService logout];
+    [SRGIdentityService.currentIdentityService showAccountView];
 }
 
 - (void)refresh:(id)sender
