@@ -22,14 +22,14 @@
 - (void)testFailingMigration
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_invalid"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:nil];
     XCTAssertNil(userData);
 }
 
 - (void)testMigrationFromV1
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v1"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -84,7 +84,7 @@
 - (void)testMigrationFromV2
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v2"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
