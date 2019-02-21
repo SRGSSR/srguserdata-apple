@@ -403,7 +403,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         
         NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
         if (historyEntry.inserted) {
-            [uids addObject:historyEntry.uid];
+            [uids addObject:uid];
         }
         currentUids = [uids copy];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
