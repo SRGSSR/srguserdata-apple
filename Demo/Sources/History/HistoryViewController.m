@@ -104,9 +104,7 @@
 
 - (void)refresh
 {
-    if (self.request) {
-        return;
-    }
+    [self.request cancel];
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
