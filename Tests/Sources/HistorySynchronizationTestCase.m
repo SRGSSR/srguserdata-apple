@@ -16,7 +16,7 @@
 
 - (void)testEmptyHistoryInitialSynchronization
 {
-    
+    // TODO: Check that sync date is not nil afterwards
 }
 
 - (void)testHistoryInitialSynchronization
