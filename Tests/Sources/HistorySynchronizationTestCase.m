@@ -66,8 +66,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     XCTAssertTrue(hasHandledCallbackURL);
     XCTAssertNotNil(self.identityService.sessionToken);
     
-    [self expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 0);
+    [self expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         return YES;
     }];
     
@@ -81,9 +80,21 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 #pragma mark Tests
 
-- (void)testEmptyHistoryInitialSynchronization
+- (void)testEmptyHistorySynchronization
 {
+    [self expectationForNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
     
+    [self expectationForElapsedTimeInterval:5. withHandler:nil];
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.identityService queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        XCTFail(@"No change notification is expected. The history was empty and still is");
+    }];
+    
+    [self.userData.history synchronize];
+    
+    [self waitForExpectationsWithTimeout:5. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
 }
 
 - (void)testHistoryInitialSynchronization
