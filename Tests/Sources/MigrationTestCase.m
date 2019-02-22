@@ -22,14 +22,14 @@
 - (void)testFailingMigration
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_invalid"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:nil];
     XCTAssertNil(userData);
 }
 
 - (void)testMigrationFromV1
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v1"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -65,7 +65,7 @@
     NSString *uid2 = @"urn:rts:video:1234567890";
     [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
+        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
         return [uids containsObject:uid2];
     }];
     
@@ -84,7 +84,7 @@
 - (void)testMigrationFromV2
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v2"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -120,7 +120,7 @@
     NSString *uid2 = @"urn:rts:video:1234567890";
     [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
+        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
         return [uids containsObject:uid2];
     }];
     

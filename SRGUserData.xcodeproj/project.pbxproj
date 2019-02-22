@@ -44,6 +44,9 @@
 		6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54220FC7FF4009C02CF /* SRGUserData.m */; };
 		6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */; };
 		6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */; };
+		6F19DA8B221ED8A300085C7D /* Masonry.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F19DAA6221FF61800085C7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAA3221FF61800085C7D /* main.m */; };
+		6F19DAA7221FF61800085C7D /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F19DAA4221FF61800085C7D /* Launch Screen.storyboard */; };
 		6F308A682212CE7E003D3385 /* UserData_DB_invalid in Resources */ = {isa = PBXBuildFile; fileRef = 6FFEB7442212CBE60098F131 /* UserData_DB_invalid */; };
 		6F32342D2212E9B90046E265 /* TestData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6F32342A2212E9890046E265 /* TestData.xcdatamodeld */; };
 		6F3234322212ED240046E265 /* UserDataBaseTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F3234312212ED230046E265 /* UserDataBaseTestCase.m */; };
@@ -139,6 +142,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		08EF58B5221FFC2B000E7446 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6F0EB52820FC7F58009C02CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6F19DA8F221FF5F800085C7D;
+			remoteInfo = "SRGUserData-testapp";
+		};
 		6F0C98EF2121E26400073AB6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6F0EB52820FC7F58009C02CF /* Project object */;
@@ -202,6 +212,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				6F19DA8B221ED8A300085C7D /* Masonry.framework in Copy Files */,
 				6FA62D70220439CF008569DC /* Mantle.framework in Copy Files */,
 				6FA62D71220439CF008569DC /* FXReachability.framework in Copy Files */,
 				6FA62D72220439CF008569DC /* SRGIdentity.framework in Copy Files */,
@@ -246,6 +257,10 @@
 		6F0EB54220FC7FF4009C02CF /* SRGUserData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGUserData.m; sourceTree = "<group>"; };
 		6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+SRGUserData.m"; sourceTree = "<group>"; };
 		6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+SRGUserData.h"; sourceTree = "<group>"; };
+		6F19DA90221FF5F800085C7D /* SRGUserData-testapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-testapp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F19DAA3221FF61800085C7D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6F19DAA4221FF61800085C7D /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		6F19DAA5221FF61800085C7D /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6F32342B2212E9890046E265 /* TestData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestData.xcdatamodel; sourceTree = "<group>"; };
 		6F3234312212ED230046E265 /* UserDataBaseTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDataBaseTestCase.m; sourceTree = "<group>"; };
 		6F3234332212ED370046E265 /* UserDataBaseTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDataBaseTestCase.h; sourceTree = "<group>"; };
@@ -338,6 +353,13 @@
 				6F0432BD21006E7A002B090A /* SRGNetwork.framework in Frameworks */,
 				0858B69B22010C9E000F00CF /* libextobjc.framework in Frameworks */,
 				0858B69822010C9E000F00CF /* SRGLogger.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6F19DA8D221FF5F800085C7D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -448,6 +470,7 @@
 				6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */,
 				6FB74D672101D4D200E2D365 /* SRGUserData-tests.xctest */,
 				6F0C98E62121E1C200073AB6 /* SRGUserData.bundle */,
+				6F19DA90221FF5F800085C7D /* SRGUserData-testapp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -491,6 +514,16 @@
 				6F0178C92208192B00B4BCD9 /* NSTimer+SRGUserData.m */,
 			);
 			path = Categories;
+			sourceTree = "<group>";
+		};
+		6F19DAA2221FF61800085C7D /* TestApp */ = {
+			isa = PBXGroup;
+			children = (
+				6F19DAA3221FF61800085C7D /* main.m */,
+				6F19DAA4221FF61800085C7D /* Launch Screen.storyboard */,
+				6F19DAA5221FF61800085C7D /* Info.plist */,
+			);
+			path = TestApp;
 			sourceTree = "<group>";
 		};
 		6F3234302212ED230046E265 /* Helpers */ = {
@@ -623,8 +656,9 @@
 		6FB74D722101D5D600E2D365 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				6FB74D732101D5D600E2D365 /* Sources */,
 				082442AC220CB0B900F39785 /* Resources */,
+				6FB74D732101D5D600E2D365 /* Sources */,
+				6F19DAA2221FF61800085C7D /* TestApp */,
 				6FB74D762101D5D600E2D365 /* Info.plist */,
 			);
 			path = Tests;
@@ -740,6 +774,23 @@
 			productReference = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		6F19DA8F221FF5F800085C7D /* SRGUserData-testapp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6F19DAA1221FF5FA00085C7D /* Build configuration list for PBXNativeTarget "SRGUserData-testapp" */;
+			buildPhases = (
+				6F19DA8C221FF5F800085C7D /* Sources */,
+				6F19DA8D221FF5F800085C7D /* Frameworks */,
+				6F19DA8E221FF5F800085C7D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SRGUserData-testapp";
+			productName = "SRGUserData-testapp";
+			productReference = 6F19DA90221FF5F800085C7D /* SRGUserData-testapp.app */;
+			productType = "com.apple.product-type.application";
+		};
 		6F8A93D720FDCA0800AA6434 /* SRGUserData-demo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6F8A93EB20FDCA0900AA6434 /* Build configuration list for PBXNativeTarget "SRGUserData-demo" */;
@@ -772,6 +823,7 @@
 			);
 			dependencies = (
 				6FB74D6E2101D4D200E2D365 /* PBXTargetDependency */,
+				08EF58B6221FFC2B000E7446 /* PBXTargetDependency */,
 			);
 			name = "SRGUserData-tests";
 			productName = "SRGUserData-tests";
@@ -792,6 +844,9 @@
 					};
 					6F0EB53020FC7F58009C02CF = {
 						CreatedOnToolsVersion = 9.4;
+					};
+					6F19DA8F221FF5F800085C7D = {
+						CreatedOnToolsVersion = 10.1;
 					};
 					6F8A93D720FDCA0800AA6434 = {
 						CreatedOnToolsVersion = 9.4;
@@ -822,6 +877,7 @@
 				6F0C98E52121E1C200073AB6 /* SRGUserData-resources */,
 				6F8A93D720FDCA0800AA6434 /* SRGUserData-demo */,
 				6FB74D662101D4D200E2D365 /* SRGUserData-tests */,
+				6F19DA8F221FF5F800085C7D /* SRGUserData-testapp */,
 			);
 		};
 /* End PBXProject section */
@@ -840,6 +896,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F0C98F12121E26A00073AB6 /* SRGUserData.bundle in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6F19DA8E221FF5F800085C7D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6F19DAA7221FF61800085C7D /* Launch Screen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -899,6 +963,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6F19DA8C221FF5F800085C7D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6F19DAA6221FF61800085C7D /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6F8A93D420FDCA0800AA6434 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -929,6 +1001,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		08EF58B6221FFC2B000E7446 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6F19DA8F221FF5F800085C7D /* SRGUserData-testapp */;
+			targetProxy = 08EF58B5221FFC2B000E7446 /* PBXContainerItemProxy */;
+		};
 		6F0C98F02121E26400073AB6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6F0C98E52121E1C200073AB6 /* SRGUserData-resources */;
@@ -1090,6 +1167,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SRGUserData-testapp.app/SRGUserData-testapp";
 			};
 			name = "Debug-static";
 		};
@@ -1215,6 +1293,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SRGUserData-testapp.app/SRGUserData-testapp";
 			};
 			name = "Release-static";
 		};
@@ -1446,6 +1525,84 @@
 			};
 			name = Release;
 		};
+		6F19DA9D221FF5FA00085C7D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Tests/TestApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-testapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6F19DA9E221FF5FA00085C7D /* Debug-static */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Tests/TestApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-testapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-static";
+		};
+		6F19DA9F221FF5FA00085C7D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Tests/TestApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-testapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6F19DAA0221FF5FA00085C7D /* Release-static */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Tests/TestApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-testapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Release-static";
+		};
 		6F8A93EC20FDCA0900AA6434 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1502,6 +1659,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SRGUserData-testapp.app/SRGUserData-testapp";
 			};
 			name = Debug;
 		};
@@ -1521,6 +1679,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SRGUserData-testapp.app/SRGUserData-testapp";
 			};
 			name = Release;
 		};
@@ -1556,6 +1715,17 @@
 				6F0C98DB2121E14000073AB6 /* Debug-static */,
 				6F0EB53B20FC7F58009C02CF /* Release */,
 				6F0C98DF2121E14600073AB6 /* Release-static */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6F19DAA1221FF5FA00085C7D /* Build configuration list for PBXNativeTarget "SRGUserData-testapp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6F19DA9D221FF5FA00085C7D /* Debug */,
+				6F19DA9E221FF5FA00085C7D /* Debug-static */,
+				6F19DA9F221FF5FA00085C7D /* Release */,
+				6F19DAA0221FF5FA00085C7D /* Release-static */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

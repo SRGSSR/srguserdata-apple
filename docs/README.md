@@ -88,6 +88,10 @@ Import the module where needed:
 import SRGUserData
 ```
 
+### Working with the library
+
+To learn about how the library can be used, have a look at the [getting started guide](GETTING_STARTED.md).
+
 ## License
 
 See the [LICENSE](../LICENSE) file for more information.

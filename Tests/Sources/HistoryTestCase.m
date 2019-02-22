@@ -18,13 +18,13 @@
 
 #pragma mark Helpers
 
-- (void)saveUids:(NSArray<NSString *> *)uids withDeviceUid:(NSString *)deviceUid
+- (void)saveUids:(NSArray<NSString *> *)uids
 {
     NSMutableArray<NSString *> *expectedSavedNotifications = uids.mutableCopy;
     
     [self expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
+        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
         [expectedSavedNotifications removeObjectsInArray:uids];
         return (expectedSavedNotifications.count == 0);
     }];
@@ -33,7 +33,7 @@
         CMTime time = CMTimeMakeWithSeconds(uid.integerValue, NSEC_PER_SEC);
         XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
         
-        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
+        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:time deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
@@ -47,7 +47,7 @@
 - (void)setUp
 {
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
-    self.userData = [[SRGUserData alloc] initWithIdentityService:nil historyServiceURL:nil storeFileURL:fileURL];
+    self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:nil];
 }
 
 - (void)tearDown
@@ -70,13 +70,15 @@
 {
     NSString *uid = @"1234";
     CMTime time = CMTimeMakeWithSeconds(10, NSEC_PER_SEC);
-    ;
+    
     NSString *deviceUid = @"Test device";
     
     [self expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
-        return [uids containsObject:uid];
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryChangedUidsKey], @[uid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryPreviousUidsKey], @[]);
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryUidsKey], @[uid]);
+        return YES;
     }];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
@@ -98,7 +100,7 @@
     
     [self expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
+        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
         [expectedSavedNotifications removeObjectsInArray:uids];
         return (expectedSavedNotifications.count == 0);
     }];
@@ -115,7 +117,6 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    // No more history did change notifications must be received
     id historyDidChangeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"History must not send more did change notifications.");
     }];
@@ -132,21 +133,20 @@
     NSString *uid = @"1234";
     NSString *deviceUid = @"Test device";
     
-    NSUInteger saveInterations = 5;
-    __block NSUInteger expectedSavedNotifications = saveInterations;
+    NSUInteger numberOfSaves = 5;
+    __block NSUInteger expectedSavedNotifications = numberOfSaves;
     
     [self expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
+        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
         expectedSavedNotifications -= uids.count;
         return (expectedSavedNotifications == 0);
     }];
     
-    for (NSUInteger i = 0; i < saveInterations; i++) {
-        CMTime time = CMTimeMakeWithSeconds(i, NSEC_PER_SEC);
+    for (NSUInteger i = 0; i < numberOfSaves; i++) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
         
-        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
+        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
@@ -154,7 +154,6 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    // No more history did change notifications must be received
     id historyDidChangeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"History must not send more did change notifications.");
     }];
@@ -170,7 +169,7 @@
 {
     NSString *uid = @"1234";
     CMTime time = CMTimeMakeWithSeconds(10, NSEC_PER_SEC);
-    ;
+    
     NSString *deviceUid = @"Test device";
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
@@ -187,7 +186,7 @@
     XCTAssertEqualObjects(historyEntry1.uid, uid);
     XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry1.lastPlaybackTime, ==, time));
     XCTAssertEqualObjects(historyEntry1.deviceUid, deviceUid);
-    XCTAssertEqual(historyEntry1.discarded, NO);
+    XCTAssertFalse(historyEntry1.discarded);
     
     SRGHistoryEntry *historyEntry2 = [self.userData.history historyEntryWithUid:@"notFound"];
     
@@ -198,7 +197,7 @@
 {
     NSString *uid = @"1234";
     CMTime time = CMTimeMakeWithSeconds(10, NSEC_PER_SEC);
-    ;
+    
     NSString *deviceUid = @"Test device";
     
     XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entry saved"];
@@ -217,7 +216,7 @@
         XCTAssertEqualObjects(historyEntry.uid, uid);
         XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, time));
         XCTAssertEqualObjects(historyEntry.deviceUid, deviceUid);
-        XCTAssertEqual(historyEntry.discarded, NO);
+        XCTAssertFalse(historyEntry.discarded);
         [expectation2 fulfill];
     }];
     
@@ -233,7 +232,7 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
-- (void)testHistoryEntriesMatchingEmptyPredicateEmptySortedhDescriptor
+- (void)testHistoryEntriesMatchingEmptyPredicateEmptySortDescriptor
 {
     NSArray<SRGHistoryEntry *> *historyEntries1 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
     
@@ -241,8 +240,7 @@
     XCTAssertEqual(historyEntries1.count, 0);
     
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     NSArray<SRGHistoryEntry *> *historyEntries2 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
     
@@ -252,7 +250,7 @@
     XCTAssertEqualObjects(queryUids2, [[uids reverseObjectEnumerator] allObjects]);
 }
 
-- (void)testHistoryEntriesMatchingEmptyPredicateEmptySortedhDescriptorAsynchronously
+- (void)testHistoryEntriesMatchingEmptyPredicateEmptySortDescriptorAsynchronously
 {
     XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entries fetched"];
     
@@ -266,8 +264,7 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entries fetched"];
     
@@ -283,11 +280,10 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
-- (void)testHistoryEntriesMatchingPredicatesOrSortedDescriptors
+- (void)testHistoryEntriesMatchingPredicatesOrSortDescriptors
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:YES];
     NSArray<SRGHistoryEntry *> *historyEntries1 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor1]];
@@ -310,7 +306,7 @@
     NSArray<NSString *> *queryUids3 = [historyEntries3 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
     XCTAssertEqualObjects(queryUids3, [[uids reverseObjectEnumerator] allObjects]);
     
-    NSPredicate *predicate4 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, deviceUid), deviceUid];
+    NSPredicate *predicate4 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, deviceUid), @"Test device"];
     NSArray<SRGHistoryEntry *> *historyEntries4 = [self.userData.history historyEntriesMatchingPredicate:predicate4 sortedWithDescriptors:nil];
     
     XCTAssertEqual(historyEntries4.count, uids.count);
@@ -325,8 +321,8 @@
     SRGHistoryEntry *historyEntry = historyEntries5.firstObject;
     XCTAssertEqualObjects(historyEntry.uid, queryUid);
     XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, CMTimeMakeWithSeconds(queryUid.integerValue, NSEC_PER_SEC)));
-    XCTAssertEqualObjects(historyEntry.deviceUid, deviceUid);
-    XCTAssertEqual(historyEntry.discarded, NO);
+    XCTAssertEqualObjects(historyEntry.deviceUid, @"Test device");
+    XCTAssertFalse(historyEntry.discarded);
     
     NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ || %K CONTAINS[cd] %@", @keypath(SRGHistoryEntry.new, uid), @"1", @keypath(SRGHistoryEntry.new, uid), @"9"];
     NSSortDescriptor *sortDescriptor6 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:YES];
@@ -347,11 +343,10 @@
     XCTAssertEqualObjects(queryUids7, expectedQueryUids7);
 }
 
-- (void)testHistoryEntriesMatchingPredicatesOrSortedDescriptorsAsynchronously
+- (void)testHistoryEntriesMatchingPredicatesOrSortDescriptorsAsynchronously
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entries fetched"];
     
@@ -394,7 +389,7 @@
     
     XCTestExpectation *expectation4 = [self expectationWithDescription:@"History entries fetched"];
     
-    NSPredicate *predicate4 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, deviceUid), deviceUid];
+    NSPredicate *predicate4 = [NSPredicate predicateWithFormat:@"%K == 'Test device'", @keypath(SRGHistoryEntry.new, deviceUid)];
     [self.userData.history historyEntriesMatchingPredicate:predicate4 sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries4) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertEqual(historyEntries4.count, uids.count);
@@ -415,8 +410,8 @@
         SRGHistoryEntry *historyEntry = historyEntries5.firstObject;
         XCTAssertEqualObjects(historyEntry.uid, queryUid);
         XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, CMTimeMakeWithSeconds(queryUid.integerValue, NSEC_PER_SEC)));
-        XCTAssertEqualObjects(historyEntry.deviceUid, deviceUid);
-        XCTAssertEqual(historyEntry.discarded, NO);
+        XCTAssertEqualObjects(historyEntry.deviceUid, @"Test device");
+        XCTAssertFalse(historyEntry.discarded);
         [expectation5 fulfill];
     }];
     
@@ -456,24 +451,22 @@
 - (void)testDiscardHistoryEntries
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
-    NSArray<NSString *> *discaredUids = @[@"12", @"90"];
+    NSArray<NSString *> *discardedUids = @[@"12", @"90"];
+    NSArray<NSString *> *remainingUids = @[@"34", @"56", @"78"];
     
     [self expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *notifiedUids = notification.userInfo[SRGHistoryUidsKey];
-        XCTAssertEqual(notifiedUids.count, discaredUids.count);
-        [notifiedUids enumerateObjectsUsingBlock:^(NSString * _Nonnull uid, NSUInteger idx, BOOL * _Nonnull stop) {
-            XCTAssertTrue([discaredUids containsObject:uid]);
-        }];
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryChangedUidsKey]], [NSSet setWithArray:discardedUids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryPreviousUidsKey]], [NSSet setWithArray:uids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryUidsKey]], [NSSet setWithArray:remainingUids]);
         return YES;
     }];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History discarded"];
     
-    [self.userData.history discardHistoryEntriesWithUids:discaredUids completionBlock:^(NSError * _Nonnull error) {
+    [self.userData.history discardHistoryEntriesWithUids:discardedUids completionBlock:^(NSError * _Nonnull error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertNil(error);
         [expectation fulfill];
@@ -484,7 +477,6 @@
     NSArray<SRGHistoryEntry *> *historyEntries = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
     XCTAssertEqual(historyEntries.count, 3);
     
-    // No more history did change notifications must be received
     id historyDidChangeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"History must not send more did change notifications.");
     }];
@@ -499,16 +491,13 @@
 - (void)testDiscardAllHistoryEntries
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    NSString *deviceUid = @"Test device";
-    [self saveUids:uids withDeviceUid:deviceUid];
+    [self saveUids:uids];
     
     [self expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *notifiedUids = notification.userInfo[SRGHistoryUidsKey];
-        XCTAssertEqual(notifiedUids.count, uids.count);
-        [notifiedUids enumerateObjectsUsingBlock:^(NSString * _Nonnull uid, NSUInteger idx, BOOL * _Nonnull stop) {
-            XCTAssertTrue([uids containsObject:uid]);
-        }];
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryChangedUidsKey]], [NSSet setWithArray:uids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryPreviousUidsKey]], [NSSet setWithArray:uids]);
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryUidsKey], @[]);
         return YES;
     }];
     
@@ -525,7 +514,6 @@
     NSArray<SRGHistoryEntry *> *historyEntries = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
     XCTAssertEqual(historyEntries.count, 0);
     
-    // No more history did change notifications must be received
     id historyDidChangeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"History must not send more did change notifications.");
     }];

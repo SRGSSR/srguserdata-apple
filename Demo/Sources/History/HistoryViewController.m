@@ -56,12 +56,8 @@
                                                name:SRGIdentityServiceDidUpdateAccountNotification
                                              object:SRGIdentityService.currentIdentityService];
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(historyDidStartSynchronization:)
-                                               name:SRGHistoryDidStartSynchronizationNotification
-                                             object:SRGUserData.currentUserData.history];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(historyDidClear:)
-                                               name:SRGHistoryDidClearNotification
+                                           selector:@selector(historyDidChange:)
+                                               name:SRGHistoryDidChangeNotification
                                              object:SRGUserData.currentUserData.history];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
@@ -96,10 +92,10 @@
                                                                                  action:@selector(login:)];
     }
     else {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Logout", nil)
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
                                                                                   style:UIBarButtonItemStylePlain
                                                                                  target:self
-                                                                                 action:@selector(logout:)];
+                                                                                 action:@selector(showAccount:)];
     }
 }
 
@@ -108,9 +104,7 @@
 
 - (void)refresh
 {
-    if (self.request) {
-        return;
-    }
+    [self.request cancel];
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -191,9 +185,9 @@
     [SRGIdentityService.currentIdentityService loginWithEmailAddress:nil];
 }
 
-- (void)logout:(id)sender
+- (void)showAccount:(id)sender
 {
-    [SRGIdentityService.currentIdentityService logout];
+    [SRGIdentityService.currentIdentityService showAccountView];
 }
 
 - (void)refresh:(id)sender
@@ -213,14 +207,13 @@
     [self updateNavigationBar];
 }
 
-- (void)historyDidStartSynchronization:(NSNotification *)notification
+- (void)historyDidChange:(NSNotification *)notification
 {
-    [self refresh];
-}
-
-- (void)historyDidClear:(NSNotification *)notification
-{
-    [self refresh];
+    NSArray<NSString *> *previousURNs = notification.userInfo[SRGHistoryPreviousUidsKey];
+    NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
+    if (URNs.count == 0 || previousURNs.count == 0) {
+        [self refresh];
+    }
 }
 
 @end

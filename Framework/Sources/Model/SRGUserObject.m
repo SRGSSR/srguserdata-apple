@@ -67,7 +67,7 @@
     return object;
 }
 
-+ (NSString *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
     NSString *uid = dictionary[@"item_id"];
     if (! uid) {
@@ -83,7 +83,7 @@
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.];
     SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
     if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
-        return uid;
+        return object;
     }
     
     BOOL isDeleted = [dictionary[@"deleted"] boolValue];
@@ -91,7 +91,7 @@
         if (object) {
             [managedObjectContext deleteObject:object];
         }
-        return uid;
+        return object;
     }
     
     if (! object) {
@@ -100,7 +100,7 @@
     
     [object updateWithDictionary:dictionary];
     object.dirty = NO;
-    return uid;
+    return object;
 }
 
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;

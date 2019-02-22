@@ -53,9 +53,9 @@ NSString *SRGUserDataMarketingVersion(void)
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithIdentityService:(SRGIdentityService *)identityService
-                      historyServiceURL:(NSURL *)historyServiceURL
-                           storeFileURL:(NSURL *)storeFileURL
+- (instancetype)initWithStoreFileURL:(NSURL *)storeFileURL
+                   historyServiceURL:(NSURL *)historyServiceURL
+                     identityService:(SRGIdentityService *)identityService
 {
     if (self = [super init]) {
         self.identityService = identityService;
