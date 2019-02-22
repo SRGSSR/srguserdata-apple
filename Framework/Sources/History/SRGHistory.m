@@ -8,6 +8,7 @@
 
 #import "SRGDataStore.h"
 #import "SRGHistoryEntry+Private.h"
+#import "SRGHistoryRequest.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserObject+Private.h"
@@ -18,8 +19,8 @@
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGNetwork/SRGNetwork.h>
 
-typedef void (^SRGHistoryUpdatesCompletionBlock)(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
 typedef void (^SRGHistoryPullCompletionBlock)(NSDate * _Nullable serverDate, NSError * _Nullable error);
+typedef void (^SRGHistoryPushCompletionBlock)(NSError * _Nullable error);
 
 NSString * const SRGHistoryDidChangeNotification = @"SRGHistoryDidChangeNotification";
 
@@ -71,58 +72,6 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 #pragma mark Requests
 
-- (SRGFirstPageRequest *)historyUpdatesForSessionToken:(NSString *)sessionToken
-                                             afterDate:(NSDate *)date
-                                   withCompletionBlock:(SRGHistoryUpdatesCompletionBlock)completionBlock
-{
-    NSParameterAssert(sessionToken);
-    NSParameterAssert(completionBlock);
-    
-    NSURL *URL = [self.serviceURL URLByAppendingPathComponent:@"v2"];
-    NSURLComponents *URLComponents = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:NO];
-    
-    NSMutableArray<NSURLQueryItem *> *queryItems = [NSMutableArray array];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"with_deleted" value:@"true"]];
-    if (date) {
-        NSTimeInterval timestamp = round(date.timeIntervalSince1970 * 1000.);
-        [queryItems addObject:[NSURLQueryItem queryItemWithName:@"after" value:@(timestamp).stringValue]];
-    }
-    URLComponents.queryItems = [queryItems copy];
-    NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URLComponents.URL];
-    [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", sessionToken] forHTTPHeaderField:@"Authorization"];
-    
-    return [SRGFirstPageRequest JSONDictionaryRequestWithURLRequest:URLRequest session:self.session sizer:^NSURLRequest *(NSURLRequest * _Nonnull URLRequest, NSUInteger size) {
-        NSURLComponents *URLComponents = [NSURLComponents componentsWithURL:URLRequest.URL resolvingAgainstBaseURL:NO];
-        NSMutableArray<NSURLQueryItem *> *queryItems = URLComponents.queryItems ? [NSMutableArray arrayWithArray:URLComponents.queryItems]: [NSMutableArray array];
-        
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K != %@", @keypath(NSURLQueryItem.new, name), @"limit"];
-        [queryItems filterUsingPredicate:predicate];
-        [queryItems addObject:[NSURLQueryItem queryItemWithName:@"limit" value:@(size).stringValue]];
-        URLComponents.queryItems = [queryItems copy];
-        
-        NSMutableURLRequest *request = [URLRequest mutableCopy];
-        request.URL = URLComponents.URL;
-        return [request copy];
-    } paginator:^NSURLRequest * _Nullable(NSURLRequest * _Nonnull URLRequest, NSDictionary * _Nullable JSONDictionary, NSURLResponse * _Nullable response, NSUInteger size, NSUInteger number) {
-        NSString *nextURLComponent = JSONDictionary[@"next"];
-        NSString *nextURLString = nextURLComponent ? [URL.absoluteString stringByAppendingString:nextURLComponent] : nil;
-        NSURL *nextURL = nextURLString ? [NSURL URLWithString:nextURLString] : nil;
-        if (nextURL) {
-            NSMutableURLRequest *request = [URLRequest mutableCopy];
-            request.URL = nextURL;
-            return [request copy];
-        }
-        else {
-            return nil;
-        };
-    } completionBlock:^(NSDictionary * _Nullable JSONDictionary, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        NSHTTPURLResponse *HTTPResponse = [response isKindOfClass:NSHTTPURLResponse.class] ? (NSHTTPURLResponse *)response : nil;
-        NSNumber *serverTimestamp = JSONDictionary[@"last_update"];
-        NSDate *serverDate = serverTimestamp ? [NSDate dateWithTimeIntervalSince1970:serverTimestamp.doubleValue / 1000.] : nil;
-        completionBlock(JSONDictionary[@"data"], serverDate, page, nextPage, HTTPResponse, error);
-    }];
-}
-
 - (void)pullHistoryEntriesForSessionToken:(NSString *)sessionToken
                                 afterDate:(NSDate *)date
                           completionBlock:(SRGHistoryPullCompletionBlock)completionBlock
@@ -131,7 +80,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     NSParameterAssert(completionBlock);
     
     @weakify(self)
-    __block SRGFirstPageRequest *firstRequest = [[[self historyUpdatesForSessionToken:sessionToken afterDate:date withCompletionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    __block SRGFirstPageRequest *firstRequest = [[[SRGHistoryRequest historyUpdatesFromServiceURL:self.serviceURL forSessionToken:sessionToken afterDate:date withSession:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         @strongify(self)
         
         if (error) {
@@ -205,22 +154,15 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 - (SRGRequest *)pushHistoryEntry:(SRGHistoryEntry *)historyEntry
                  forSessionToken:(NSString *)sessionToken
-             withCompletionBlock:(void (^)(NSHTTPURLResponse * _Nonnull HTTPResponse, NSError * _Nullable error))completionBlock
+             withCompletionBlock:(SRGHistoryPostCompletionBlock)completionBlock
 {
     NSParameterAssert(historyEntry);
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-    NSURL *URL = [self.serviceURL URLByAppendingPathComponent:@"v2"];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
-    request.HTTPMethod = @"POST";
-    [request setValue:[NSString stringWithFormat:@"sessionToken %@", sessionToken] forHTTPHeaderField:@"Authorization"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    request.HTTPBody = [NSJSONSerialization dataWithJSONObject:historyEntry.dictionary options:0 error:NULL];
-    
+    NSDictionary *JSONDictionary = historyEntry.dictionary;
     NSManagedObjectID *historyEntryID = historyEntry.objectID;
-    return [SRGRequest JSONDictionaryRequestWithURLRequest:request session:self.session completionBlock:^(NSDictionary * _Nullable JSONDictionary, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        NSHTTPURLResponse *HTTPResponse = [response isKindOfClass:NSHTTPURLResponse.class] ? (NSHTTPURLResponse *)response : nil;
+    return [SRGHistoryRequest postHistoryEntryDictionary:JSONDictionary toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         if (! error) {
             [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull mangedObjectContext) {
                 SRGHistoryEntry *historyEntry = [mangedObjectContext existingObjectWithID:historyEntryID error:NULL];
@@ -236,7 +178,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 - (void)pushHistoryEntries:(NSArray<SRGHistoryEntry *> *)historyEntries
            forSessionToken:(NSString *)sessionToken
-       withCompletionBlock:(void (^)(NSError * _Nullable error))completionBlock
+       withCompletionBlock:(SRGHistoryPushCompletionBlock)completionBlock
 {
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
