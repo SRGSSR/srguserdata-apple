@@ -142,6 +142,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		08EF58B5221FFC2B000E7446 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6F0EB52820FC7F58009C02CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6F19DA8F221FF5F800085C7D;
+			remoteInfo = "SRGUserData-testapp";
+		};
 		6F0C98EF2121E26400073AB6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6F0EB52820FC7F58009C02CF /* Project object */;
@@ -816,6 +823,7 @@
 			);
 			dependencies = (
 				6FB74D6E2101D4D200E2D365 /* PBXTargetDependency */,
+				08EF58B6221FFC2B000E7446 /* PBXTargetDependency */,
 			);
 			name = "SRGUserData-tests";
 			productName = "SRGUserData-tests";
@@ -993,6 +1001,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		08EF58B6221FFC2B000E7446 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6F19DA8F221FF5F800085C7D /* SRGUserData-testapp */;
+			targetProxy = 08EF58B5221FFC2B000E7446 /* PBXContainerItemProxy */;
+		};
 		6F0C98F02121E26400073AB6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6F0C98E52121E1C200073AB6 /* SRGUserData-resources */;
