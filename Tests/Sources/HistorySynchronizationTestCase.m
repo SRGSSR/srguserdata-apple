@@ -50,15 +50,10 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
     self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:self.identityService];
     
-    [self expectationForNotification:SRGIdentityServiceUserDidLoginNotification object:self.identityService handler:^BOOL(NSNotification * _Nonnull notification) {
-        return YES;
-    }];
-    
     // playsrgtests+userdata1@gmail.com
     BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, @"s%3AywJ2a0JqEvMOe-rzgZbYqvSeBSg0bb9P.2qChe6iS9BEEf%2FXPTjJ8Nosw2r1JACPRgxyFaXSrz6U")];
     XCTAssertTrue(hasHandledCallbackURL);
-    
-    [self waitForExpectationsWithTimeout:5. handler:nil];
+    XCTAssertNotNil(self.identityService.sessionToken);
 }
 
 #pragma mark Tests
