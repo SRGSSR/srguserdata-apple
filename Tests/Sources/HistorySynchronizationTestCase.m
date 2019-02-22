@@ -80,22 +80,11 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 #pragma mark Helpers
 
-- (void)insertRemoteTestHistoryEntries
+- (void)insertRemoteTestHistoryEntriesWithCount:(NSInteger)count
 {
-    for (NSInteger i = 1; i <= 10; ++i) {
-        XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
-        [self.userData.history saveHistoryEntryForUid:[NSString stringWithFormat:@"existing_%@", @(i)] withLastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:@"UT" completionBlock:^(NSError * _Nonnull error) {
-            [expectation fulfill];
-        }];
-    }
+    XCTFail(@"Not implemented yet");
     
-    [self expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        return YES;
-    }];
-    
-    [self.userData.history synchronize];
-    
-    [self waitForExpectationsWithTimeout:5. handler:nil];
+    // TODO: Must push to the server directly without going through the store
 }
 
 #pragma mark Tests
@@ -106,7 +95,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     [self expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
     
     [self expectationForElapsedTimeInterval:5. withHandler:nil];
-    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.identityService queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.identityService queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"No change notification is expected. The history was empty and still is");
     }];
     
@@ -119,9 +108,20 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 - (void)testHistoryInitialSynchronizationWithExistingRemoteEntries
 {
-    [self insertRemoteTestHistoryEntries];
+    [self insertRemoteTestHistoryEntriesWithCount:2];
     
-    // TODO:
+    [self expectationForNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    
+    [self expectationForNotification:SRGHistoryDidChangeNotification object:self.identityService handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 0);
+        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 2);
+        return YES;
+    }];
+    
+    [self.userData.history synchronize];
+    
+    [self waitForExpectationsWithTimeout:5. handler:nil];
 }
 
 - (void)testHistoryInitialSynchronizationWithExistingLocalEntries
