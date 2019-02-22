@@ -78,6 +78,26 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     [self waitForExpectationsWithTimeout:5. handler:nil];
 }
 
+#pragma mark Helpers
+
+- (void)insertRemoteTestHistoryEntries
+{
+    for (NSInteger i = 1; i <= 10; ++i) {
+        XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
+        [self.userData.history saveHistoryEntryForUid:[NSString stringWithFormat:@"existing_%@", @(i)] withLastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:@"UT" completionBlock:^(NSError * _Nonnull error) {
+            [expectation fulfill];
+        }];
+    }
+    
+    [self expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        return YES;
+    }];
+    
+    [self.userData.history synchronize];
+    
+    [self waitForExpectationsWithTimeout:5. handler:nil];
+}
+
 #pragma mark Tests
 
 - (void)testEmptyHistorySynchronization
@@ -97,9 +117,11 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     }];
 }
 
-- (void)testHistoryInitialSynchronization
+- (void)testHistoryInitialSynchronizationWithExistingRemoteEntries
 {
+    [self insertRemoteTestHistoryEntries];
     
+    // TODO:
 }
 
 - (void)testHistoryInitialSynchronizationWithExistingLocalEntries
