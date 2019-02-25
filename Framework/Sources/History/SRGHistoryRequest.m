@@ -13,14 +13,15 @@
 + (SRGFirstPageRequest *)historyUpdatesFromServiceURL:(NSURL *)serviceURL
                                       forSessionToken:(NSString *)sessionToken
                                             afterDate:(NSDate *)date
-                                          withSession:(NSURLSession *)session
+                                   withDeletedEntries:(BOOL)deletedEntries
+                                              session:(NSURLSession *)session
                                       completionBlock:(SRGHistoryUpdatesCompletionBlock)completionBlock
 {
     NSURL *URL = [serviceURL URLByAppendingPathComponent:@"v2"];
     NSURLComponents *URLComponents = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:NO];
     
     NSMutableArray<NSURLQueryItem *> *queryItems = [NSMutableArray array];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"with_deleted" value:@"true"]];
+    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"with_deleted" value:deletedEntries ? @"true" : @"false"]];
     if (date) {
         NSTimeInterval timestamp = round(date.timeIntervalSince1970 * 1000.);
         [queryItems addObject:[NSURLQueryItem queryItemWithName:@"after" value:@(timestamp).stringValue]];

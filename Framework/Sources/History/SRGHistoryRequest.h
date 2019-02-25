@@ -22,8 +22,9 @@ typedef void (^SRGHistoryPostCompletionBlock)(NSHTTPURLResponse * _Nullable HTTP
  */
 + (SRGFirstPageRequest *)historyUpdatesFromServiceURL:(NSURL *)serviceURL
                                       forSessionToken:(NSString *)sessionToken
-                                            afterDate:(NSDate *)date
-                                          withSession:(NSURLSession *)session
+                                            afterDate:(nullable NSDate *)date
+                                   withDeletedEntries:(BOOL)deletedEntries
+                                              session:(NSURLSession *)session
                                       completionBlock:(SRGHistoryUpdatesCompletionBlock)completionBlock;
 
 /**

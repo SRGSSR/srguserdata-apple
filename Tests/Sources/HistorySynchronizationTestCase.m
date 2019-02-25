@@ -157,6 +157,16 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
         [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
     }];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
+    
+    [[SRGHistoryRequest historyUpdatesFromServiceURL:HistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(historyEntryDictionaries.count, 0);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 - (void)testHistoryInitialSynchronizationWithExistingRemoteEntries
@@ -173,6 +183,16 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     }];
     
     [self.userData.history synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
+    
+    [[SRGHistoryRequest historyUpdatesFromServiceURL:HistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(historyEntryDictionaries.count, 2);
+        [expectation fulfill];
+    }] resume];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
@@ -194,6 +214,21 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     [self.userData.history synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
+    
+    [[SRGHistoryRequest historyUpdatesFromServiceURL:HistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(historyEntryDictionaries.count, 5);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)testLargeHistory
+{
+    
 }
 
 - (void)testSynchronizationWithNewRemoteEntries
