@@ -24,9 +24,9 @@ typedef void (^SRGHistoryPushCompletionBlock)(NSError * _Nullable error);
 
 NSString * const SRGHistoryDidChangeNotification = @"SRGHistoryDidChangeNotification";
 
-NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUidsKey";
-NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUidsKey";
-NSString * const SRGHistoryUidsKey = @"SRGHistoryUidsKey";
+NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
+NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
+NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
 
 NSString * const SRGHistoryDidStartSynchronizationNotification = @"SRGHistoryDidStartSynchronizationNotification";
 NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDidFinishSynchronizationNotification";
