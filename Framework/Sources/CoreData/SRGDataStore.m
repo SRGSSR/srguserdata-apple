@@ -6,8 +6,6 @@
 
 #import "SRGDataStore.h"
 
-#import <libextobjc/libextobjc.h>
-
 @interface SRGDataStore ()
 
 @property (nonatomic) id<SRGPersistentContainer> persistentContainer;
@@ -65,11 +63,7 @@
 {
     NSString *handle = NSUUID.UUID.UUIDString;
     
-    __block NSOperation *operation = nil;
-    @weakify(operation);
-    operation = [NSBlockOperation blockOperationWithBlock:^{
-        @strongify(operation)
-        
+    __block NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
         NSManagedObjectContext *managedObjectContext = self.persistentContainer.newBackgroundContext;
         managedObjectContext.undoManager = nil;
         
@@ -86,6 +80,9 @@
         if (! operation.cancelled) {
             completionBlock ? completionBlock(result) : nil;
         }
+        
+        // Avoid retain cycle
+        operation = nil;
     }];
     operation.queuePriority = priority;
     
@@ -103,11 +100,7 @@
 {
     NSString *handle = NSUUID.UUID.UUIDString;
     
-    __block NSOperation *operation = nil;
-    @weakify(operation);
-    operation = [NSBlockOperation blockOperationWithBlock:^{
-        @strongify(operation)
-        
+    __block NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
         // If clients use the API as expected (i.e. do not perform changes in `-performMainThreadReadTask:`, which should
         // be enforced during development), merging behavior setup is not really required for background contexts, as
         // transactions can never be made in parallel. But if this happens for some reason, ignore those changes and keep
@@ -140,6 +133,9 @@
         if (! operation.cancelled) {
             completionBlock ? completionBlock(error) : nil;
         }
+        
+        // Avoid retain cycle
+        operation = nil;
     }];
     operation.queuePriority = priority;
     
