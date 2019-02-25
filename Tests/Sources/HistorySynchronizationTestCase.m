@@ -29,7 +29,7 @@ static NSString * const TestSessionToken = @"s%3AO38TTzK5Mo9DK3LON2U4J0XF8u06MEm
 
 static NSURL *TestWebserviceURL(void)
 {
-    return [NSURL URLWithString:@"https://api.srgssr.local"];
+    return [NSURL URLWithString:@"https://hummingbird.rts.ch/api/profile"];
 }
 
 static NSURL *TestWebsiteURL(void)
@@ -44,7 +44,7 @@ static NSURL *HistoryServiceURL(void)
 
 static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString *token)
 {
-    NSString *URLString = [NSString stringWithFormat:@"srguserdata-tests://%@?identity_service=%@&token=%@", TestWebserviceURL().host, identityService.identifier, token];
+    NSString *URLString = [NSString stringWithFormat:@"srguserdata-tests://%@?identity_service=%@&token=%@", @"hummingbird.rts.ch/api/profile", identityService.identifier, token];
     return [NSURL URLWithString:URLString];
 }
 
@@ -77,6 +77,10 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
     // Wait until the 1st synchronization has been performed (automatic after login)
     [self expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    
+    [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(SRGUserData * _Nullable userData, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return userData.user != nil;
+    }] evaluatedWithObject:self.userData handler:nil];
     
     BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, TestSessionToken)];
     XCTAssertTrue(hasHandledCallbackURL);
