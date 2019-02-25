@@ -25,7 +25,7 @@
 @end
 
 // Logout with playsrgtests+userdata1@gmail.com
-static NSString * const TestSessionToken = @"s%3AMt0hV7u9zEA_hSD6rXOp4iwhFf8RJFBW.S%2F8b5nyKbRt1Rf6G6GQzeYiYljbP1jMDjkj26dN70Ic";
+static NSString * const TestSessionToken = @"s%3AO38TTzK5Mo9DK3LON2U4J0XF8u06MEme.JG0EAm1fsSNS8sDVmvtYRiCKqXqZE0Tdm7Q2NWlDy0U";
 
 static NSURL *TestWebserviceURL(void)
 {
@@ -39,7 +39,7 @@ static NSURL *TestWebsiteURL(void)
 
 static NSURL *HistoryServiceURL(void)
 {
-    return [NSURL URLWithString:@"https://stage-profil.rts.ch/api/history"];
+    return [NSURL URLWithString:@"https://profil.rts.ch/api/history"];
 }
 
 static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString *token)
