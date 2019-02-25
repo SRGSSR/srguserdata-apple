@@ -63,6 +63,8 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 - (void)setUp
 {
+    [self eraseRemoteHistory];
+    
     self.identityService = [[SRGIdentityService alloc] initWithWebserviceURL:TestWebserviceURL() websiteURL:TestWebsiteURL()];
  
     // We could mock history services to implement true unit tests, but to be able to catch their possible issues (!),
@@ -81,8 +83,6 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     XCTAssertNotNil(self.identityService.sessionToken);
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
-    
-    [self eraseRemoteHistory];
 }
 
 #pragma mark Helpers
@@ -102,7 +102,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)insertRemoteTestHistoryEntriesWithCount:(NSInteger)count
+- (void)insertRemoteTestHistoryEntriesWithCount:(NSUInteger)count
 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Remote entry creation finished"];
     
@@ -113,7 +113,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
         }
     }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
     
-    for (NSInteger i = 0; i < count; ++i) {
+    for (NSUInteger i = 0; i < count; ++i) {
         NSDictionary *JSONDictionary = @{ @"item_id" : [NSString stringWithFormat:@"remote_test_%@", @(i)],
                                           @"device_id" : @"test suite",
                                           @"lastPlaybackPosition" : @(i * 1000.) };
@@ -121,6 +121,20 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
             [self.requestQueue reportError:error];
         }];
         [self.requestQueue addRequest:request resume:YES];
+    }
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)insertLocalTestHistoryEntriesWithCount:(NSUInteger)count
+{
+    for (NSUInteger i = 0; i < count; ++i) {
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Insertion"];
+        
+        NSString *uid = [NSString stringWithFormat:@"local_test_%@", @(i)];
+        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
+            [expectation fulfill];
+        }];
     }
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
@@ -135,7 +149,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     
     [self expectationForElapsedTimeInterval:5. withHandler:nil];
     id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.identityService queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
-        XCTFail(@"No change notification is expected. The history was empty and still is");
+        XCTFail(@"No change notification is expected. The history was empty and still must be");
     }];
     
     [self.userData.history synchronize];
@@ -165,7 +179,21 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 - (void)testHistoryInitialSynchronizationWithExistingLocalEntries
 {
+    [self insertRemoteTestHistoryEntriesWithCount:2];
+    [self insertLocalTestHistoryEntriesWithCount:3];
     
+    [self expectationForNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    
+    [self expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 3);
+        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 5);
+        return YES;
+    }];
+    
+    [self.userData.history synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 - (void)testSynchronizationWithNewRemoteEntries
@@ -213,6 +241,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     
 }
 
+// Test merge with common entries
 // etc.
 
 @end
