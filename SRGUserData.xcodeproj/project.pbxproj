@@ -87,6 +87,7 @@
 		6F41C9AB2216C3CC003F434A /* PlayerViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F41C9A82216C3CB003F434A /* PlayerViewController.storyboard */; };
 		6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F41C9AA2216C3CB003F434A /* PlayerViewController.m */; };
 		6F46DD76221429110013C10A /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F46DD75221429100013C10A /* Person.m */; };
+		6F6EB98D22245D0200CE2E00 /* XCTestCase+UserDataTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6EB98B22245D0000CE2E00 /* XCTestCase+UserDataTests.m */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
 		6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F120FDCAA800AA6434 /* Images.xcassets */; };
 		6F8A93FD20FDCAA800AA6434 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8A93F520FDCAA800AA6434 /* main.m */; };
@@ -290,6 +291,8 @@
 		6F41C9AA2216C3CB003F434A /* PlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerViewController.m; sourceTree = "<group>"; };
 		6F46DD74221429100013C10A /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 		6F46DD75221429100013C10A /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+		6F6EB98B22245D0000CE2E00 /* XCTestCase+UserDataTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "XCTestCase+UserDataTests.m"; sourceTree = "<group>"; };
+		6F6EB98C22245D0000CE2E00 /* XCTestCase+UserDataTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "XCTestCase+UserDataTests.h"; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6F8A93F120FDCAA800AA6434 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -451,11 +454,11 @@
 		6F0EB52720FC7F58009C02CF = {
 			isa = PBXGroup;
 			children = (
-				6F0EB53C20FC7FA9009C02CF /* Framework */,
-				6FB74D722101D5D600E2D365 /* Tests */,
 				6F8A93EE20FDCAA800AA6434 /* Demo */,
+				6F0EB53C20FC7FA9009C02CF /* Framework */,
 				6F8A945521006A9E00AA6434 /* Frameworks */,
 				6F0EB53220FC7F58009C02CF /* Products */,
+				6FB74D722101D5D600E2D365 /* Tests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -524,6 +527,8 @@
 		6F3234302212ED230046E265 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				6F6EB98C22245D0000CE2E00 /* XCTestCase+UserDataTests.h */,
+				6F6EB98B22245D0000CE2E00 /* XCTestCase+UserDataTests.m */,
 				6F3234332212ED370046E265 /* UserDataBaseTestCase.h */,
 				6F3234312212ED230046E265 /* UserDataBaseTestCase.m */,
 			);
@@ -989,6 +994,7 @@
 				08B327A7221324810051DDA6 /* HistoryTestCase.m in Sources */,
 				6F0178A522048B2800B4BCD9 /* DataStoreTestCase.m in Sources */,
 				6F3234322212ED240046E265 /* UserDataBaseTestCase.m in Sources */,
+				6F6EB98D22245D0200CE2E00 /* XCTestCase+UserDataTests.m in Sources */,
 				6FB19597221442BF00D3BF88 /* UserObjectTestCase.m in Sources */,
 				6F32342D2212E9B90046E265 /* TestData.xcdatamodeld in Sources */,
 			);
