@@ -62,8 +62,7 @@
                         completionBlock:(void (^)(id result))completionBlock
 {
     NSString *handle = NSUUID.UUID.UUIDString;
-    
-    __block NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
+    NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
         NSManagedObjectContext *managedObjectContext = self.persistentContainer.newBackgroundContext;
         managedObjectContext.undoManager = nil;
         
@@ -74,15 +73,21 @@
         // complexity and not make sense anyway, as tasks should be individually small.
         [managedObjectContext performBlockAndWait:^{
             result = task(managedObjectContext);
-            [self.operations removeObjectForKey:handle];
         }];
         
-        if (! operation.cancelled) {
+        __block BOOL cancelled = NO;
+        dispatch_sync(self.concurrentQueue, ^{
+            NSOperation *operation = [self.operations objectForKey:handle];
+            cancelled = operation.cancelled;
+        });
+        
+        if (! cancelled) {
             completionBlock ? completionBlock(result) : nil;
         }
         
-        // Avoid retain cycle
-        operation = nil;
+        dispatch_barrier_async(self.concurrentQueue, ^{
+            [self.operations removeObjectForKey:handle];
+        });
     }];
     operation.queuePriority = priority;
     
@@ -99,8 +104,7 @@
                          completionBlock:(void (^)(NSError *error))completionBlock;
 {
     NSString *handle = NSUUID.UUID.UUIDString;
-    
-    __block NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
+    NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
         // If clients use the API as expected (i.e. do not perform changes in `-performMainThreadReadTask:`, which should
         // be enforced during development), merging behavior setup is not really required for background contexts, as
         // transactions can never be made in parallel. But if this happens for some reason, ignore those changes and keep
@@ -113,29 +117,33 @@
         managedObjectContext.undoManager = nil;
         
         __block NSError *error = nil;
+        __block BOOL cancelled = NO;
         
         [managedObjectContext performBlockAndWait:^{
             task(managedObjectContext);
             
+            dispatch_sync(self.concurrentQueue, ^{
+                NSOperation *operation = [self.operations objectForKey:handle];
+                cancelled = operation.cancelled;
+            });
+            
             if (managedObjectContext.hasChanges) {
-                if (operation.cancelled) {
+                if (cancelled) {
                     [managedObjectContext rollback];
                 }
                 else if (! [managedObjectContext save:&error]) {
                     [managedObjectContext rollback];
                 }
             }
-            dispatch_barrier_async(self.concurrentQueue, ^{
-                [self.operations removeObjectForKey:handle];
-            });
         }];
         
-        if (! operation.cancelled) {
+        if (! cancelled) {
             completionBlock ? completionBlock(error) : nil;
         }
         
-        // Avoid retain cycle
-        operation = nil;
+        dispatch_barrier_async(self.concurrentQueue, ^{
+            [self.operations removeObjectForKey:handle];
+        });
     }];
     operation.queuePriority = priority;
     
@@ -149,24 +157,31 @@
 
 - (void)cancelBackgroundTaskWithHandle:(NSString *)handle
 {
-    dispatch_sync(self.concurrentQueue, ^{
+    dispatch_barrier_async(self.concurrentQueue, ^{
         NSOperation *operation = [self.operations objectForKey:handle];
         [operation cancel];
-    });
-    
-    dispatch_barrier_async(self.concurrentQueue, ^{
+        
         // Removal at the end of task execution does not take place for pending tasks. Must remove the entry manually.
-        [self.operations removeObjectForKey:handle];
+        // Tasks being executed will be cleaned up at the end of their execution
+        if (! operation.executing) {
+            [self.operations removeObjectForKey:handle];
+        }
     });
 }
 
 - (void)cancelAllBackgroundTasks
 {
     dispatch_barrier_async(self.concurrentQueue, ^{
-        [self.serialOperationQueue cancelAllOperations];
-    
-        // Removal at the end of task execution does not take place for pending tasks. Must remove entries manually.
-        [self.operations removeAllObjects];
+        for (NSString *handle in [[self.operations copy] keyEnumerator]) {
+            NSOperation *operation = [self.operations objectForKey:handle];
+            [operation cancel];
+            
+            // Removal at the end of task execution does not take place for pending tasks. Must remove the entry manually.
+            // Tasks being executed will be cleaned up at the end of their execution
+            if (! operation.executing) {
+                [self.operations removeObjectForKey:handle];
+            }
+        }
     });
 }
 
