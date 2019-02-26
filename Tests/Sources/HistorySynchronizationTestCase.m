@@ -83,10 +83,6 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
         return userData.user.accountUid != nil;
     }] evaluatedWithObject:self.userData handler:nil];
     
-    [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(SRGUserData * _Nullable userData, NSDictionary<NSString *,id> * _Nullable bindings) {
-        return userData.user != nil;
-    }] evaluatedWithObject:self.userData handler:nil];
-    
     BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, TestValidToken)];
     XCTAssertTrue(hasHandledCallbackURL);
     XCTAssertNotNil(self.identityService.sessionToken);
