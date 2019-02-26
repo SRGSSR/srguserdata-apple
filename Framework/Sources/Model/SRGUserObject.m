@@ -109,11 +109,14 @@
     NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
     
-    for (SRGUserObject *object in objects) {
-        if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
-            [managedObjectContext deleteObject:object];
-        }
-        else {
+    if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
+        NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
+        fetchRequest.predicate = predicate;
+        NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
+        [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
+    }
+    else {
+        for (SRGUserObject *object in objects) {
             object.discarded = YES;
             object.dirty = YES;
             object.date = NSDate.date;
