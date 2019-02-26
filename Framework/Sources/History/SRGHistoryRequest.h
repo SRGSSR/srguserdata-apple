@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Block signatures.
 typedef void (^SRGHistoryUpdatesCompletionBlock)(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
-typedef void (^SRGHistoryPostCompletionBlock)(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
+typedef void (^SRGHistoryBatchPostCompletionBlock)(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
 
 /**
  *  Low-level requests of the history service.
@@ -28,13 +28,13 @@ typedef void (^SRGHistoryPostCompletionBlock)(NSHTTPURLResponse * _Nullable HTTP
                                       completionBlock:(SRGHistoryUpdatesCompletionBlock)completionBlock;
 
 /**
- *  Submit a new history entry.
+ *  Submit a batch of history entries.
  */
-+ (SRGRequest *)postHistoryEntryDictionary:(NSDictionary *)dictionary
-                              toServiceURL:(NSURL *)serviceURL
-                           forSessionToken:(NSString *)sessionToken
-                               withSession:(NSURLSession *)session
-                           completionBlock:(SRGHistoryPostCompletionBlock)completionBlock;
++ (SRGRequest *)postBatchOfHistoryEntryDictionaries:(NSArray<NSDictionary *> *)dictionaries
+                                       toServiceURL:(NSURL *)serviceURL
+                                    forSessionToken:(NSString *)sessionToken
+                                        withSession:(NSURLSession *)session
+                                    completionBlock:(SRGHistoryBatchPostCompletionBlock)completionBlock;
 
 @end
 

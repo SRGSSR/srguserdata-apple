@@ -152,24 +152,27 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     self.pullRequest = firstRequest;
 }
 
-- (SRGRequest *)pushHistoryEntry:(SRGHistoryEntry *)historyEntry
-                 forSessionToken:(NSString *)sessionToken
-             withCompletionBlock:(SRGHistoryPostCompletionBlock)completionBlock
+- (SRGRequest *)pushBatchHistoryEntries:(NSArray<SRGHistoryEntry *> *)historyEntries
+                        forSessionToken:(NSString *)sessionToken
+                    withCompletionBlock:(SRGHistoryBatchPostCompletionBlock)completionBlock
 {
-    NSParameterAssert(historyEntry);
+    NSParameterAssert(historyEntries);
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-    NSDictionary *JSONDictionary = historyEntry.dictionary;
-    NSManagedObjectID *historyEntryID = historyEntry.objectID;
-    return [SRGHistoryRequest postHistoryEntryDictionary:JSONDictionary toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    NSMutableDictionary<NSManagedObjectID *, NSDictionary *> *historyEntriesMap = [NSMutableDictionary dictionary];
+    for (SRGHistoryEntry *historyEntry in historyEntries) {
+        historyEntriesMap[historyEntry.objectID] = historyEntry.dictionary;
+    }
+    
+    return [SRGHistoryRequest postBatchOfHistoryEntryDictionaries:historyEntriesMap.allValues toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         if (! error) {
             [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull mangedObjectContext) {
-                SRGHistoryEntry *historyEntry = [mangedObjectContext existingObjectWithID:historyEntryID error:NULL];
-                if (JSONDictionary) {
-                    [historyEntry updateWithDictionary:JSONDictionary];
+                for (NSManagedObjectID *historyEntryID in historyEntriesMap.allKeys) {
+                    SRGHistoryEntry *historyEntry = [mangedObjectContext existingObjectWithID:historyEntryID error:NULL];
+                    [historyEntry updateWithDictionary:historyEntriesMap[historyEntryID]];
+                    historyEntry.dirty = NO;
                 }
-                historyEntry.dirty = NO;
             } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
         }
         completionBlock(HTTPResponse, error);
@@ -193,8 +196,14 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         }
     }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
     
-    for (SRGHistoryEntry *historyEntry in historyEntries) {
-        SRGRequest *request = [[self pushHistoryEntry:historyEntry forSessionToken:sessionToken withCompletionBlock:^(NSHTTPURLResponse * _Nonnull HTTPResponse, NSError * _Nullable error) {
+    static const NSUInteger kPageSize = 50;
+    
+    NSUInteger location = 0;
+    while (location < historyEntries.count) {
+        NSArray<SRGHistoryEntry *> *pageHistoryEntries = [historyEntries subarrayWithRange:NSMakeRange(location, MIN(historyEntries.count - location, kPageSize))];
+        location += kPageSize;
+        
+        SRGRequest *request = [[self pushBatchHistoryEntries:pageHistoryEntries forSessionToken:sessionToken withCompletionBlock:^(NSHTTPURLResponse * _Nonnull HTTPResponse, NSError * _Nullable error) {
             [self.pushRequestQueue reportError:error];
         }] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
         [self.pushRequestQueue addRequest:request resume:NO /* see below */];
