@@ -54,12 +54,15 @@ OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
  *  descriptors are provided, entries are still returned in a stable order. The read occurs asynchronously, calling
  *  the provided block on completion.
  *
+ *  @return `NSString` An opaque task handle which can be used to cancel it. Cancelled started tasks are executed until
+ *                     the end without their completion block being called. Cancelled pending tasks are discarded
+ *
  *  @discussion The completion block is called on a background thread. You can only use the returned object on this
  *              thread.
  */
-- (void)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
-                  sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
-                        completionBlock:(void (^)(NSArray<SRGHistoryEntry *> *historyEntries))completionBlock;
+- (NSString *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                        sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
+                              completionBlock:(void (^)(NSArray<SRGHistoryEntry *> *historyEntries))completionBlock;
 
 /**
  *  Return the history entry matching the specified identifier, if any.
@@ -72,29 +75,44 @@ OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
  *  Return the history entry matching the specified identifier, if any. The read occurs asynchronously, calling the
  *  provided block on completion.
  *
+ *  @return `NSString` An opaque task handle which can be used to cancel it. Cancelled started tasks are executed until
+ *                     the end without their completion block being called. Cancelled pending tasks are discarded
+ *
  *  @discussion The completion block is called on a background thread. You can only use the returned object on this
  *              thread.
  */
-- (void)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable historyEntry))completionBlock;
+- (NSString *)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable historyEntry))completionBlock;
 
 /**
  *  Asynchronously save a history entry for a given identifier, calling the specified block on completion.
  *
+ *  @return `NSString` An opaque task handle which can be used to cancel it. Cancelled started tasks are executed until
+ *                     the end without their completion block being called. Cancelled pending tasks are discarded
+ *
  *  @discussion The completion block is called on a background thread.
  */
-- (void)saveHistoryEntryForUid:(NSString *)Uid
-          withLastPlaybackTime:(CMTime)lastPlaybackTime
-                     deviceUid:(nullable NSString *)deviceUid
-               completionBlock:(nullable void (^)(NSError *error))completionBlock;
+- (NSString *)saveHistoryEntryForUid:(NSString *)Uid
+                withLastPlaybackTime:(CMTime)lastPlaybackTime
+                           deviceUid:(nullable NSString *)deviceUid
+                     completionBlock:(nullable void (^)(NSError *error))completionBlock;
 
 /**
  *  Asynchronously discard history entries matching an identifier list, calling the provided block on completion. If no
  *  list is provided, all entries are discarded.
  *
+ *  @return `NSString` An opaque task handle which can be used to cancel it. Cancelled started tasks are executed until
+ *                     the end without their completion block being called. Cancelled pending tasks are discarded
+ *
  *  @discussion The completion block is called on a background thread.
  */
-- (void)discardHistoryEntriesWithUids:(nullable NSArray<NSString *> *)uids
-                      completionBlock:(nullable void (^)(NSError *error))completionBlock;
+- (NSString *)discardHistoryEntriesWithUids:(nullable NSArray<NSString *> *)uids
+                            completionBlock:(nullable void (^)(NSError *error))completionBlock;
+
+
+/**
+ *  Cancel the task having the specified handle.
+ */
+- (void)cancelTaskWithHandle:(NSString *)handle;
 
 @end
 
