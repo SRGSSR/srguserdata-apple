@@ -112,15 +112,17 @@
     if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
         NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
         fetchRequest.predicate = predicate;
+        
         NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
         [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
     }
     else {
-        for (SRGUserObject *object in objects) {
-            object.discarded = YES;
-            object.dirty = YES;
-            object.date = NSDate.date;
-        }
+        NSBatchUpdateRequest *batchUpdateRequest = [[NSBatchUpdateRequest alloc] initWithEntityName:NSStringFromClass(self)];
+        batchUpdateRequest.predicate = predicate;
+        batchUpdateRequest.propertiesToUpdate = @{ @keypath(SRGUserObject.new, discarded) : @YES,
+                                                   @keypath(SRGUserObject.new, dirty) : @YES,
+                                                   @keypath(SRGUserObject.new, date) : NSDate.date };
+        [managedObjectContext executeRequest:batchUpdateRequest error:NULL];
     }
     
     return discardedUids;
