@@ -68,8 +68,6 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     return self;
 }
 
-#pragma clang diagnostic pop
-
 #pragma mark Requests
 
 - (void)pullHistoryEntriesForSessionToken:(NSString *)sessionToken
