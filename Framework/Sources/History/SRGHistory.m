@@ -206,14 +206,8 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         SRGRequest *request = [[self pushBatchHistoryEntries:pageHistoryEntries forSessionToken:sessionToken withCompletionBlock:^(NSHTTPURLResponse * _Nonnull HTTPResponse, NSError * _Nullable error) {
             [self.pushRequestQueue reportError:error];
         }] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
-        [self.pushRequestQueue addRequest:request resume:NO /* see below */];
+        [self.pushRequestQueue addRequest:request resume:YES];
     }
-    
-    // TODO: Temporary workaround to SRG Network not being thread safe. Attempting to add & start requests leads
-    //       to an concurrent resource in SRG Network, which we can avoid by starting all requests at once.
-    // FIXME: We should fix the issue by copying the list which gets enumerated instead. This is not perfect thread-safety,
-    //        but will be better until we properly implement it.
-    [self.pushRequestQueue resume];
 }
 
 #pragma mark Subclassing hooks
