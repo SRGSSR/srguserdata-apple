@@ -63,7 +63,7 @@
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
-    [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
         NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
         return [uids containsObject:uid2];
@@ -118,7 +118,7 @@
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
-    [self expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
         NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
         return [uids containsObject:uid2];

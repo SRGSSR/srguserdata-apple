@@ -38,7 +38,6 @@
 		6F0432BD21006E7A002B090A /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6F0432BE21007340002B090A /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6F0432BF21007340002B090A /* SRGNetwork.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		6F0C98EE2121E1D600073AB6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6FCBFEF7210B578B006BC355 /* Localizable.strings */; };
 		6F0C98F12121E26A00073AB6 /* SRGUserData.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6F0C98E62121E1C200073AB6 /* SRGUserData.bundle */; };
 		6F0EB54020FC7FA9009C02CF /* SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0EB53E20FC7FA9009C02CF /* SRGUserData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54220FC7FF4009C02CF /* SRGUserData.m */; };
@@ -46,6 +45,8 @@
 		6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */; };
 		6F19DA8B221ED8A300085C7D /* Masonry.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F19DAA6221FF61800085C7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAA3221FF61800085C7D /* main.m */; };
+		6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F19DAA9222005A800085C7D /* SRGHistoryRequest.h */; };
+		6F19DAAC222005A800085C7D /* SRGHistoryRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAAA222005A800085C7D /* SRGHistoryRequest.m */; };
 		6F308A682212CE7E003D3385 /* UserData_DB_invalid in Resources */ = {isa = PBXBuildFile; fileRef = 6FFEB7442212CBE60098F131 /* UserData_DB_invalid */; };
 		6F32342D2212E9B90046E265 /* TestData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6F32342A2212E9890046E265 /* TestData.xcdatamodeld */; };
 		6F3234322212ED240046E265 /* UserDataBaseTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F3234312212ED230046E265 /* UserDataBaseTestCase.m */; };
@@ -259,6 +260,8 @@
 		6F19DA90221FF5F800085C7D /* SRGUserData-testapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-testapp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F19DAA3221FF61800085C7D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6F19DAA5221FF61800085C7D /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6F19DAA9222005A800085C7D /* SRGHistoryRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGHistoryRequest.h; sourceTree = "<group>"; };
+		6F19DAAA222005A800085C7D /* SRGHistoryRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGHistoryRequest.m; sourceTree = "<group>"; };
 		6F32342B2212E9890046E265 /* TestData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestData.xcdatamodel; sourceTree = "<group>"; };
 		6F3234312212ED230046E265 /* UserDataBaseTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDataBaseTestCase.m; sourceTree = "<group>"; };
 		6F3234332212ED370046E265 /* UserDataBaseTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDataBaseTestCase.h; sourceTree = "<group>"; };
@@ -307,11 +310,6 @@
 		6FB74D672101D4D200E2D365 /* SRGUserData-tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SRGUserData-tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistorySynchronizationTestCase.m; sourceTree = "<group>"; };
 		6FB74D762101D5D600E2D365 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6FCBFEF8210B578B006BC355 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		6FCBFEFA210B57BD006BC355 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
-		6FCBFEFB210B57BD006BC355 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		6FCBFEFC210B57BE006BC355 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
-		6FCBFEFD210B57BE006BC355 /* rm */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = rm; path = rm.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCCE4802212BFD600423EFF /* MigrationTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MigrationTestCase.m; sourceTree = "<group>"; };
 		6FE6E5E32148DC1D00228573 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6FFB346422088BA200E76E6D /* SRGDataProvider.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGDataProvider.framework; path = Carthage/Build/iOS/SRGDataProvider.framework; sourceTree = "<group>"; };
@@ -453,11 +451,11 @@
 		6F0EB52720FC7F58009C02CF = {
 			isa = PBXGroup;
 			children = (
-				6F0EB53C20FC7FA9009C02CF /* Framework */,
-				6FB74D722101D5D600E2D365 /* Tests */,
 				6F8A93EE20FDCAA800AA6434 /* Demo */,
+				6F0EB53C20FC7FA9009C02CF /* Framework */,
 				6F8A945521006A9E00AA6434 /* Frameworks */,
 				6F0EB53220FC7F58009C02CF /* Products */,
+				6FB74D722101D5D600E2D365 /* Tests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -678,7 +676,6 @@
 		6FCBFEF6210B571C006BC355 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				6FCBFEF7210B578B006BC355 /* Localizable.strings */,
 				6FE6E5E32148DC1D00228573 /* Info.plist */,
 			);
 			path = Resources;
@@ -689,6 +686,8 @@
 			children = (
 				6FFB346922089A5E00E76E6D /* SRGHistory.h */,
 				6FFB346A22089A5E00E76E6D /* SRGHistory.m */,
+				6F19DAA9222005A800085C7D /* SRGHistoryRequest.h */,
+				6F19DAAA222005A800085C7D /* SRGHistoryRequest.m */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -718,6 +717,7 @@
 				6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */,
 				6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */,
 				6FFB347322089A5E00E76E6D /* SRGDataStore.h in Headers */,
+				6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */,
 				6F0178D02208199800B4BCD9 /* SRGUserDataTimerTarget.h in Headers */,
 				6F0178CC2208192B00B4BCD9 /* NSTimer+SRGUserData.h in Headers */,
 				6FFB34812209B0DC00E76E6D /* SRGUserObject.h in Headers */,
@@ -884,7 +884,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6F0C98EE2121E1D600073AB6 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -946,6 +945,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6FFB34822209B0DC00E76E6D /* SRGUserObject.m in Sources */,
+				6F19DAAC222005A800085C7D /* SRGHistoryRequest.m in Sources */,
 				6F0178D12208199800B4BCD9 /* SRGUserDataTimerTarget.m in Sources */,
 				6FFB347E2209773F00E76E6D /* SRGUserDataService.m in Sources */,
 				6FFB347622089A5E00E76E6D /* SRGPersistentContainer.m in Sources */,
@@ -1018,21 +1018,6 @@
 			targetProxy = 6FB74D6D2101D4D200E2D365 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		6FCBFEF7210B578B006BC355 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6FCBFEF8210B578B006BC355 /* en */,
-				6FCBFEFA210B57BD006BC355 /* it */,
-				6FCBFEFB210B57BD006BC355 /* de */,
-				6FCBFEFC210B57BE006BC355 /* fr */,
-				6FCBFEFD210B57BE006BC355 /* rm */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		6F0C98DA2121E14000073AB6 /* Debug-static */ = {

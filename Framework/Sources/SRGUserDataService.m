@@ -137,6 +137,8 @@
 - (void)userDidLogout:(NSNotification *)notification
 {
     [self userDidLogout];
+    
+    self.synchronizing = NO;
 }
 
 @end

@@ -109,15 +109,20 @@
     NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
     
-    for (SRGUserObject *object in objects) {
-        if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
-            [managedObjectContext deleteObject:object];
-        }
-        else {
-            object.discarded = YES;
-            object.dirty = YES;
-            object.date = NSDate.date;
-        }
+    if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
+        NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
+        fetchRequest.predicate = predicate;
+        
+        NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
+        [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
+    }
+    else {
+        NSBatchUpdateRequest *batchUpdateRequest = [[NSBatchUpdateRequest alloc] initWithEntityName:NSStringFromClass(self)];
+        batchUpdateRequest.predicate = predicate;
+        batchUpdateRequest.propertiesToUpdate = @{ @keypath(SRGUserObject.new, discarded) : @YES,
+                                                   @keypath(SRGUserObject.new, dirty) : @YES,
+                                                   @keypath(SRGUserObject.new, date) : NSDate.date };
+        [managedObjectContext executeRequest:batchUpdateRequest error:NULL];
     }
     
     return discardedUids;
