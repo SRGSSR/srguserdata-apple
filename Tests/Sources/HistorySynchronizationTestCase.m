@@ -50,6 +50,12 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     return [NSURL URLWithString:URLString];
 }
 
+static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSString *token)
+{
+    NSString *URLString = [NSString stringWithFormat:@"srguserdata-tests://%@?identity_service=%@&action=log_out", @"hummingbird.rts.ch/api/profile", identityService.identifier];
+    return [NSURL URLWithString:URLString];
+}
+
 @interface SRGHistorySynchronizationTestCase : UserDataBaseTestCase
 
 @property (nonatomic) SRGRequestQueue *requestQueue;
@@ -77,6 +83,13 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
                                             historyServiceURL:HistoryServiceURL()
                                               identityService:self.identityService];
 
+    [self loginAndPerformInitialSynchronization];
+}
+
+#pragma mark Helpers
+
+- (void)loginAndPerformInitialSynchronization
+{
     // Wait until the 1st synchronization has been performed (automatic after login)
     [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
     [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(SRGUserData * _Nullable userData, NSDictionary<NSString *,id> * _Nullable bindings) {
@@ -89,8 +102,6 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
-
-#pragma mark Helpers
 
 - (void)deleteRemoteHistory
 {
@@ -365,7 +376,32 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 - (void)testSynchronizationAfterLogoutDuringSynchronization
 {
-    // TODO: Mock logout to avoid clearing the token server-side
+    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
+    [self insertLocalTestHistoryEntriesWithName:@"local" count:3];
+    
+    [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
+    
+    [self expectationForElapsedTimeInterval:8. withHandler:nil];
+    id synchronizationObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.identityService queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No synchronization end notification expected");
+    }];
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.identityService queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No history change notification expected");
+    }];
+    
+    [self.userData.history synchronize];
+    
+    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLogoutCallbackURL(self.identityService, TestValidToken)];
+    XCTAssertTrue(hasHandledCallbackURL);
+    XCTAssertNil(self.identityService.sessionToken);
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:synchronizationObserver];
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+    
+    // Login again and check that synchronization is still possible
+    [self loginAndPerformInitialSynchronization];
 }
 
 @end
