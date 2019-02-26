@@ -63,7 +63,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 - (void)setUp
 {
-    [self eraseRemoteHistory];
+    [self deleteRemoteHistory];
     
     self.identityService = [[SRGIdentityService alloc] initWithWebserviceURL:TestWebserviceURL() websiteURL:TestWebsiteURL()];
  
@@ -94,7 +94,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 #pragma mark Helpers
 
-- (void)eraseRemoteHistory
+- (void)deleteRemoteHistory
 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"History cleared"];
     
@@ -102,6 +102,21 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     URLRequest.HTTPMethod = @"DELETE";
     [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", TestValidToken] forHTTPHeaderField:@"Authorization"];
     [[SRGRequest dataRequestWithURLRequest:URLRequest session:NSURLSession.sharedSession completionBlock:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)deleteRemoteHistoryEntryWithUid:(NSString *)uid
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History cleared"];
+    
+    NSDictionary *JSONDictionary = @{ @"item_id" : uid,
+                                      @"device_id" : @"test suite",
+                                      @"deleted": @YES };
+    [[SRGHistoryRequest postHistoryEntryDictionary:JSONDictionary toServiceURL:HistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];
@@ -294,7 +309,20 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
-    // TODO:
+    [self deleteRemoteHistoryEntryWithUid:@"remote_2"];
+    
+    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 3);
+        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 2);
+        return YES;
+    }];
+    
+    [self.userData.history synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 - (void)testLargeHistory

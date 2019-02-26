@@ -201,7 +201,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     }
     
     // TODO: Temporary workaround to SRG Network not being thread safe. Attempting to add & start requests leads
-    //       to an concurrent resource in SRG Network, which we can avoided by starting all requests at once.
+    //       to an concurrent resource in SRG Network, which we can avoid by starting all requests at once.
     // FIXME: We should fix the issue by copying the list which gets enumerated instead. This is not perfect thread-safety,
     //        but will be better until we properly implement it.
     [self.pushRequestQueue resume];
