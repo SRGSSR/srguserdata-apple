@@ -145,7 +145,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         else {
             completionBlock(serverDate, nil);
         }
-    }] requestWithPageSize:100] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
+    }] requestWithPageSize:100] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
     [firstRequest resume];
     self.pullRequest = firstRequest;
 }
@@ -203,7 +203,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         
         SRGRequest *request = [[self pushBatchHistoryEntries:pageHistoryEntries forSessionToken:sessionToken withCompletionBlock:^(NSHTTPURLResponse * _Nonnull HTTPResponse, NSError * _Nullable error) {
             [self.pushRequestQueue reportError:error];
-        }] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
+        }] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
         [self.pushRequestQueue addRequest:request resume:YES];
     }
 }

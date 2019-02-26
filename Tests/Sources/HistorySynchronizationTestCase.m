@@ -367,4 +367,9 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
+- (void)testSynchronizationAfterLogoutDuringSynchronization
+{
+    // TODO: Mock logout to avoid clearing the token server-side
+}
+
 @end
