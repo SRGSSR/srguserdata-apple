@@ -6,8 +6,6 @@
 
 #import "UserDataBaseTestCase.h"
 
-#import "XCTestCase+UserDataTests.h"
-
 // Private headers
 #import "SRGUser+Private.h"
 
@@ -65,7 +63,7 @@
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
-    [self udt_expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
         NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
         return [uids containsObject:uid2];
@@ -120,7 +118,7 @@
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
-    [self udt_expectationForNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
         NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
         return [uids containsObject:uid2];

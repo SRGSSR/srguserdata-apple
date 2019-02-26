@@ -7,7 +7,6 @@
 #import "UserDataBaseTestCase.h"
 
 #import "SRGHistoryRequest.h"
-#import "XCTestCase+UserDataTests.h"
 
 #import <SRGIdentity/SRGIdentity.h>
 
@@ -77,7 +76,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
                                               identityService:self.identityService];
 
     // Wait until the 1st synchronization has been performed (automatic after login)
-    [self udt_expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
     [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(SRGUserData * _Nullable userData, NSDictionary<NSString *,id> * _Nullable bindings) {
         return userData.user.accountUid != nil;
     }] evaluatedWithObject:self.userData handler:nil];
@@ -152,8 +151,8 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 - (void)testEmptyHistorySynchronization
 {
-    [self udt_expectationForNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
-    [self udt_expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
     
     [self expectationForElapsedTimeInterval:5. withHandler:nil];
     id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.identityService queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
@@ -181,10 +180,10 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 {
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
     
-    [self udt_expectationForNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
-    [self udt_expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
     
-    [self udt_expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 0);
         XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 2);
         return YES;
@@ -210,10 +209,10 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
     [self insertLocalTestHistoryEntriesWithName:@"local" count:3];
     
-    [self udt_expectationForNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
-    [self udt_expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
     
-    [self udt_expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 3);
         XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 5);
         return YES;
@@ -238,10 +237,10 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 {
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:3];
     
-    [self udt_expectationForNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
-    [self udt_expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
     
-    [self udt_expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 0);
         XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 3);
         return YES;
@@ -251,10 +250,10 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
-    [self udt_expectationForNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
-    [self udt_expectationForNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
     
-    [self udt_expectationForNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 3);
         XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 2);
         return YES;
@@ -280,7 +279,22 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 - (void)testSynchronizationWithDeletedRemoteEntries
 {
+    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:3];
     
+    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 0);
+        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 3);
+        return YES;
+    }];
+    
+    [self.userData.history synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    // TODO:
 }
 
 - (void)testLargeHistory
