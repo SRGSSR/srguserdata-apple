@@ -9,12 +9,14 @@
 #import "SRGHistoryRequest.h"
 
 #import <SRGIdentity/SRGIdentity.h>
+#import <SRGNetwork/SRGNetwork.h>
 
 @interface SRGIdentityService (Private)
 
 - (BOOL)handleCallbackURL:(NSURL *)callbackURL;
 
 @property (nonatomic, readonly, copy) NSString *identifier;
+@property (nonatomic) SRGRequestQueue *requestQueue;
 
 @end
 
@@ -116,7 +118,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     NSDictionary *JSONDictionary = @{ @"item_id" : uid,
                                       @"device_id" : @"test suite",
                                       @"deleted": @YES };
-    [[SRGHistoryRequest postHistoryEntryDictionary:JSONDictionary toServiceURL:HistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:@[JSONDictionary] toServiceURL:HistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];
@@ -128,21 +130,31 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Remote entry creation finished"];
     
-    self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
+    self.requestQueue = [[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
         if (finished) {
             XCTAssertNil(error);
             [expectation fulfill];
         }
-    }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
+    }];
     
-    for (NSUInteger i = 0; i < count; ++i) {
-        NSDictionary *JSONDictionary = @{ @"item_id" : [NSString stringWithFormat:@"%@_%@", name, @(i)],
-                                          @"device_id" : @"test suite",
-                                          @"lastPlaybackPosition" : @(i * 1000.) };
-        SRGRequest *request = [SRGHistoryRequest postHistoryEntryDictionary:JSONDictionary toServiceURL:HistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    static const NSUInteger kPageSize = 50;
+    
+    NSUInteger location = 0;
+    while (location < count) {
+        NSMutableArray<NSDictionary *> *JSONDictionaries = [NSMutableArray array];
+        for (NSUInteger i = 0; i < MIN(count - location, kPageSize); ++i) {
+            NSDictionary *JSONDictionary = @{ @"item_id" : [NSString stringWithFormat:@"%@_%@", name, @(location + i)],
+                                              @"device_id" : @"test suite",
+                                              @"lastPlaybackPosition" : @(i * 1000.) };
+            [JSONDictionaries addObject:JSONDictionary];
+        }
+        
+        SRGRequest *request = [SRGHistoryRequest postBatchOfHistoryEntryDictionaries:JSONDictionaries toServiceURL:HistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
             [self.requestQueue reportError:error];
         }];
         [self.requestQueue addRequest:request resume:YES];
+        
+        location += kPageSize;
     }
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
@@ -184,6 +196,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     
     [[SRGHistoryRequest historyUpdatesFromServiceURL:HistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
+        XCTAssertNil(nextPage);
         XCTAssertEqual(historyEntryDictionaries.count, 0);
         [expectation fulfill];
     }] resume];
@@ -212,6 +225,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     
     [[SRGHistoryRequest historyUpdatesFromServiceURL:HistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
+        XCTAssertNil(nextPage);
         XCTAssertEqual(historyEntryDictionaries.count, 2);
         [expectation fulfill];
     }] resume];
@@ -241,6 +255,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     
     [[SRGHistoryRequest historyUpdatesFromServiceURL:HistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
+        XCTAssertNil(nextPage);
         XCTAssertEqual(historyEntryDictionaries.count, 5);
         [expectation fulfill];
     }] resume];
@@ -285,6 +300,7 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     
     [[SRGHistoryRequest historyUpdatesFromServiceURL:HistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
+        XCTAssertNil(nextPage);
         XCTAssertEqual(historyEntryDictionaries.count, 2);
         [expectation fulfill];
     }] resume];
@@ -327,7 +343,29 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
 
 - (void)testLargeHistory
 {
- 
+    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:100];
+    [self insertLocalTestHistoryEntriesWithName:@"local" count:200];
+    
+    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        return [notification.userInfo[SRGHistoryUidsKey] count] == 300;
+    }];
+    
+    [self.userData.history synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
+    
+    [[SRGHistoryRequest historyUpdatesFromServiceURL:HistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(historyEntryDictionaries.count, 300);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 - (void)testLogout
