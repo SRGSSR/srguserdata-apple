@@ -338,7 +338,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         // The history emits an update after each page insertion. Check that the page size increases with each change
         // before reaching the maximum value.
-        static NSUInteger kPullPageSize = 100;
+        static NSUInteger kPullPageSize = 500;
         
         if ([notification.userInfo[SRGHistoryUidsKey] count] == 3000) {
             XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 3000 - kPullPageSize);

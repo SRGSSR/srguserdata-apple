@@ -145,7 +145,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         else {
             completionBlock(serverDate, nil);
         }
-    }] requestWithPageSize:100] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
+    }] requestWithPageSize:500] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
     [firstRequest resume];
     self.pullRequest = firstRequest;
 }
