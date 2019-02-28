@@ -68,8 +68,6 @@
                                         withSession:(NSURLSession *)session
                                     completionBlock:(SRGHistoryBatchPostCompletionBlock)completionBlock
 {
-    NSAssert(dictionaries.count <= 50, @"At most 50 items can be POSTed at once");
-    
     NSURL *URL = [serviceURL URLByAppendingPathComponent:@"v2/batch"];
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URL];
     URLRequest.HTTPMethod = @"POST";

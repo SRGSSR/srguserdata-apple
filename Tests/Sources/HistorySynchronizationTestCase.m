@@ -16,7 +16,6 @@
 - (BOOL)handleCallbackURL:(NSURL *)callbackURL;
 
 @property (nonatomic, readonly, copy) NSString *identifier;
-@property (nonatomic) SRGRequestQueue *requestQueue;
 
 @end
 
@@ -57,8 +56,6 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 }
 
 @interface SRGHistorySynchronizationTestCase : UserDataBaseTestCase
-
-@property (nonatomic) SRGRequestQueue *requestQueue;
 
 @property (nonatomic) SRGIdentityService *identityService;
 @property (nonatomic) SRGUserData *userData;
@@ -137,32 +134,18 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Remote entry creation finished"];
     
-    self.requestQueue = [[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
-        if (finished) {
-            XCTAssertNil(error);
-            [expectation fulfill];
-        }
-    }];
-    
-    static const NSUInteger kPageSize = 50;
-    
-    NSUInteger location = 0;
-    while (location < count) {
-        NSMutableArray<NSDictionary *> *JSONDictionaries = [NSMutableArray array];
-        for (NSUInteger i = 0; i < MIN(count - location, kPageSize); ++i) {
-            NSDictionary *JSONDictionary = @{ @"item_id" : [NSString stringWithFormat:@"%@_%@", name, @(location + i)],
-                                              @"device_id" : @"test suite",
-                                              @"lastPlaybackPosition" : @(i * 1000.) };
-            [JSONDictionaries addObject:JSONDictionary];
-        }
-        
-        SRGRequest *request = [SRGHistoryRequest postBatchOfHistoryEntryDictionaries:JSONDictionaries toServiceURL:HistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-            [self.requestQueue reportError:error];
-        }];
-        [self.requestQueue addRequest:request resume:YES];
-        
-        location += kPageSize;
+    NSMutableArray<NSDictionary *> *JSONDictionaries = [NSMutableArray array];
+    for (NSUInteger i = 0; i < count; ++i) {
+        NSDictionary *JSONDictionary = @{ @"item_id" : [NSString stringWithFormat:@"%@_%@", name, @(i + 1)],
+                                          @"device_id" : @"test suite",
+                                          @"lastPlaybackPosition" : @(i * 1000.) };
+        [JSONDictionaries addObject:JSONDictionary];
     }
+    
+    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:JSONDictionaries toServiceURL:HistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }] resume];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
@@ -344,7 +327,6 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-// FIXME: This test should work, but apparently there is an issue with the service. For this reason this test is flaky at the moment.
 - (void)testLargeHistory
 {
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:100];
@@ -355,7 +337,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 200);
-        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 100);
+        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 300);
         return YES;
     }];
     
