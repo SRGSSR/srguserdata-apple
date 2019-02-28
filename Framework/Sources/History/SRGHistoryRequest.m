@@ -75,7 +75,7 @@
     [URLRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     URLRequest.HTTPBody = [NSJSONSerialization dataWithJSONObject:@{ @"data" : dictionaries } options:0 error:NULL];
     
-    return [SRGRequest JSONDictionaryRequestWithURLRequest:URLRequest session:session completionBlock:^(NSDictionary * _Nullable JSONDictionary, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    return [SRGRequest dataRequestWithURLRequest:URLRequest session:session completionBlock:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         NSHTTPURLResponse *HTTPResponse = [response isKindOfClass:NSHTTPURLResponse.class] ? (NSHTTPURLResponse *)response : nil;
         completionBlock(HTTPResponse, error);
     }];
