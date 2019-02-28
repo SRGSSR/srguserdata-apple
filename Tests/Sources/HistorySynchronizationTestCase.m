@@ -153,7 +153,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 - (void)insertLocalTestHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count
 {
     for (NSUInteger i = 0; i < count; ++i) {
-        XCTestExpectation *expectation = [self expectationWithDescription:@"Insertion"];
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
         
         NSString *uid = [NSString stringWithFormat:@"%@_%@", name, @(i)];
         [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
@@ -161,7 +161,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
         }];
     }
     
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self waitForExpectationsWithTimeout:100. handler:nil];
 }
 
 #pragma mark Tests
@@ -329,31 +329,40 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testLargeHistory
 {
-    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:100];
-    [self insertLocalTestHistoryEntriesWithName:@"local" count:200];
+    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:1000];
+    [self insertLocalTestHistoryEntriesWithName:@"local" count:2000];
     
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
     [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
     
     [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 200);
-        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 300);
-        return YES;
+        // The history emits an update after each page insertion. Check that the page size increases with each change
+        // before reaching the maximum value.
+        static NSUInteger kPullPageSize = 100;
+        
+        if ([notification.userInfo[SRGHistoryUidsKey] count] == 3000) {
+            XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 3000 - kPullPageSize);
+            return YES;
+        }
+        else {
+            XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], [notification.userInfo[SRGHistoryPreviousUidsKey] count] + kPullPageSize);
+            return NO;
+        }
     }];
     
     [self.userData.history synchronize];
     
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self waitForExpectationsWithTimeout:100. handler:nil];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
     
     [[SRGHistoryRequest historyUpdatesFromServiceURL:HistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
-        XCTAssertEqual(historyEntryDictionaries.count, 300);
+        XCTAssertEqual(historyEntryDictionaries.count, 3000);
         [expectation fulfill];
     }] resume];
     
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self waitForExpectationsWithTimeout:100. handler:nil];
 }
 
 - (void)testSynchronizationAfterLogoutDuringSynchronization
