@@ -68,8 +68,6 @@
                                         withSession:(NSURLSession *)session
                                     completionBlock:(SRGHistoryBatchPostCompletionBlock)completionBlock
 {
-    NSAssert(dictionaries.count <= 50, @"At most 50 items can be POSTed at once");
-    
     NSURL *URL = [serviceURL URLByAppendingPathComponent:@"v2/batch"];
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URL];
     URLRequest.HTTPMethod = @"POST";
@@ -77,7 +75,7 @@
     [URLRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     URLRequest.HTTPBody = [NSJSONSerialization dataWithJSONObject:@{ @"data" : dictionaries } options:0 error:NULL];
     
-    return [SRGRequest JSONDictionaryRequestWithURLRequest:URLRequest session:session completionBlock:^(NSDictionary * _Nullable JSONDictionary, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    return [SRGRequest dataRequestWithURLRequest:URLRequest session:session completionBlock:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         NSHTTPURLResponse *HTTPResponse = [response isKindOfClass:NSHTTPURLResponse.class] ? (NSHTTPURLResponse *)response : nil;
         completionBlock(HTTPResponse, error);
     }];

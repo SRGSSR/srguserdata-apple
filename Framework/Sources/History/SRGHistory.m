@@ -50,7 +50,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 @interface SRGHistory ()
 
 @property (nonatomic, weak) SRGPageRequest *pullRequest;
-@property (nonatomic) SRGRequestQueue *pushRequestQueue;
+@property (nonatomic, weak) SRGRequest *pushRequest;
 
 @property (nonatomic) NSURLSession *session;
 
@@ -143,27 +143,33 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             self.pullRequest = nextRequest;
         }
         else {
+            firstRequest = nil;
             completionBlock(serverDate, nil);
         }
-    }] requestWithPageSize:100] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
+    }] requestWithPageSize:500] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
     [firstRequest resume];
     self.pullRequest = firstRequest;
 }
 
-- (SRGRequest *)pushBatchHistoryEntries:(NSArray<SRGHistoryEntry *> *)historyEntries
-                        forSessionToken:(NSString *)sessionToken
-                    withCompletionBlock:(SRGHistoryBatchPostCompletionBlock)completionBlock
+- (void)pushHistoryEntries:(NSArray<SRGHistoryEntry *> *)historyEntries
+           forSessionToken:(NSString *)sessionToken
+       withCompletionBlock:(SRGHistoryPushCompletionBlock)completionBlock
 {
     NSParameterAssert(historyEntries);
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
+    
+    if (historyEntries.count == 0) {
+        completionBlock(nil);
+        return;
+    }
     
     NSMutableDictionary<NSManagedObjectID *, NSDictionary *> *historyEntriesMap = [NSMutableDictionary dictionary];
     for (SRGHistoryEntry *historyEntry in historyEntries) {
         historyEntriesMap[historyEntry.objectID] = historyEntry.dictionary;
     }
     
-    return [SRGHistoryRequest postBatchOfHistoryEntryDictionaries:historyEntriesMap.allValues toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    SRGRequest *pushRequest = [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:historyEntriesMap.allValues toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         if (! error) {
             [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull mangedObjectContext) {
                 for (NSManagedObjectID *historyEntryID in historyEntriesMap.allKeys) {
@@ -172,40 +178,11 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                     historyEntry.dirty = NO;
                 }
             } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
-        }
-        completionBlock(HTTPResponse, error);
-    }];
-}
-
-- (void)pushHistoryEntries:(NSArray<SRGHistoryEntry *> *)historyEntries
-           forSessionToken:(NSString *)sessionToken
-       withCompletionBlock:(SRGHistoryPushCompletionBlock)completionBlock
-{
-    NSParameterAssert(sessionToken);
-    NSParameterAssert(completionBlock);
-    
-    if (historyEntries.count == 0) {
-        completionBlock(nil);
-    }
-    
-    self.pushRequestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
-        if (finished) {
-            completionBlock(error);
-        }
-    }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
-    
-    static const NSUInteger kPageSize = 50;
-    
-    NSUInteger location = 0;
-    while (location < historyEntries.count) {
-        NSArray<SRGHistoryEntry *> *pageHistoryEntries = [historyEntries subarrayWithRange:NSMakeRange(location, MIN(historyEntries.count - location, kPageSize))];
-        location += kPageSize;
-        
-        SRGRequest *request = [[self pushBatchHistoryEntries:pageHistoryEntries forSessionToken:sessionToken withCompletionBlock:^(NSHTTPURLResponse * _Nonnull HTTPResponse, NSError * _Nullable error) {
-            [self.pushRequestQueue reportError:error];
-        }] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
-        [self.pushRequestQueue addRequest:request resume:YES];
-    }
+        } 
+        completionBlock(error);
+    }] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
+    [pushRequest resume];
+    self.pushRequest = pushRequest;
 }
 
 #pragma mark Subclassing hooks
@@ -277,7 +254,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 - (void)userDidLogout
 {
     [self.pullRequest cancel];
-    [self.pushRequestQueue cancel];
+    [self.pushRequest cancel];
 }
 
 - (void)clearData
