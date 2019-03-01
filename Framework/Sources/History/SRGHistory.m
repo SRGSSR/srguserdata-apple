@@ -102,7 +102,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         }
         currentUids = [uids copy];
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-        if (! error && currentUids.count > 0) {
+        if (! error && changedUids.count > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
