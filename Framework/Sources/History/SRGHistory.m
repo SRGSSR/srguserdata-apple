@@ -119,11 +119,9 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 - (void)pullHistoryEntriesForSessionToken:(NSString *)sessionToken
                                 afterDate:(NSDate *)date
-                           withStartBlock:(void (^)(void))startBlock
-                          completionBlock:(SRGHistoryPullCompletionBlock)completionBlock
+                      withCompletionBlock:(SRGHistoryPullCompletionBlock)completionBlock
 {
     NSParameterAssert(sessionToken);
-    NSParameterAssert(startBlock);
     NSParameterAssert(completionBlock);
     
     @weakify(self)
@@ -146,10 +144,6 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                 return;
             }
             
-            if (page.number == 0) {
-                startBlock();
-            }
-            
             if (nextPage) {
                 SRGPageRequest *nextRequest = [firstRequest requestWithPage:nextPage];
                 [nextRequest resume];
@@ -159,7 +153,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                 pullCompletionBlock(serverDate, nil);
             }
         }];
-    }] requestWithPageSize:500] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
+    }] requestWithPageSize:500] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
     [firstRequest resume];
     self.pullRequest = firstRequest;
 }
@@ -193,7 +187,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
         } 
         completionBlock(error);
-    }] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
+    }] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
     [pushRequest resume];
     self.pushRequest = pushRequest;
 }
@@ -211,16 +205,14 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         completionBlock();
     };
     
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
+    });
+    
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user) {
-        [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historyServerSynchronizationDate withStartBlock:^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
-            });
-        } completionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable pullError) {
-            // Remark: We want to save local history even if a pull failed for some reason. A push is threfore attempted
-            //         even if the pull failed with an error (only exception: unauthorization received).
+        [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historyServerSynchronizationDate withCompletionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable pullError) {
             if (! pullError) {
                 NSManagedObjectID *userID = user.objectID;
                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {

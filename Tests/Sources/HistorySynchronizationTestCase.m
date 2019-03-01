@@ -492,14 +492,17 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     [self setupUserDataWithHistoryServiceURL:[NSURL URLWithString:@"https://missing.service"]];
     [self login];
     
-    id startObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidStartSynchronizationNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
-        XCTFail(@"No start notification is expected");
+    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
     }];
+    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
+    }];
+    
     id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"No change notification is expected");
-    }];
-    id finishObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
-        XCTFail(@"No finish notification is expected");
     }];
     
     [self expectationForElapsedTimeInterval:5. withHandler:nil];
@@ -507,9 +510,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     [self.userData.history synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
-        [NSNotificationCenter.defaultCenter removeObserver:startObserver];
         [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
-        [NSNotificationCenter.defaultCenter removeObserver:finishObserver];
     }];
 }
 
