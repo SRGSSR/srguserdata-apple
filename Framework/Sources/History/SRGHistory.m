@@ -198,7 +198,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 {
     NSString *sessionToken = self.identityService.sessionToken;
     
-    void (^synchronizationCompletionBlock)(void) = ^{
+    void (^finishSynchronization)(void) = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidFinishSynchronizationNotification object:self];
         });
@@ -211,7 +211,12 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
+        if (error) {
+            finishSynchronization();
+            return;
+        }
+        
         [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historyServerSynchronizationDate withCompletionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable pullError) {
             if (! pullError) {
                 NSManagedObjectID *userID = user.objectID;
@@ -222,14 +227,19 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             }
             else if (SRGHistoryIsUnauthorizationError(pullError)) {
                 [self.identityService reportUnauthorization];
-                synchronizationCompletionBlock();
+                finishSynchronization();
                 return;
             }
             
             [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
                 NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGHistoryEntry.new, dirty)];
                 return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-            } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries) {
+            } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+                if (error) {
+                    finishSynchronization();
+                    return;
+                }
+                
                 [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pushError) {
                     if (! pushError && ! pullError) {
                         NSManagedObjectID *userID = user.objectID;
@@ -237,15 +247,15 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                             SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
                             user.historyLocalSynchronizationDate = NSDate.date;
                         } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-                            synchronizationCompletionBlock();
+                            finishSynchronization();
                         }];
                     }
                     else if (SRGHistoryIsUnauthorizationError(pushError)) {
                         [self.identityService reportUnauthorization];
-                        synchronizationCompletionBlock();
+                        finishSynchronization();
                     }
                     else {
-                        synchronizationCompletionBlock();
+                        finishSynchronization();
                     }
                 }];
             }];
@@ -303,7 +313,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     }];
 }
 
-- (NSString *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGHistoryEntry *> * _Nonnull))completionBlock
+- (NSString *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGHistoryEntry *> * _Nullable, NSError * _Nullable))completionBlock
 {
     return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
@@ -317,7 +327,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     }];
 }
 
-- (NSString *)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable))completionBlock
+- (NSString *)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable, NSError * _Nullable))completionBlock
 {
     return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:managedObjectContext];

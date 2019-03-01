@@ -75,9 +75,10 @@
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         XCTAssertFalse(NSThread.isMainThread);
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id  _Nullable result, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertTrue([result isKindOfClass:Person.class]);
+        XCTAssertNil(error);
         
         Person *person = result;
         XCTAssertEqualObjects(person.name, @"Boris");
@@ -123,8 +124,9 @@
     SRGDataStore *dataStore = [self testDataStoreFromPackage:nil];
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons, NSError * _Nullable error) {
         XCTAssertEqual(persons.count, 0);
+        XCTAssertNil(error);
     }];
     
     [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -134,8 +136,9 @@
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons, NSError * _Nullable error) {
         XCTAssertEqual(persons.count, 1);
+        XCTAssertNil(error);
     }];
     
     [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -145,8 +148,9 @@
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons, NSError * _Nullable error) {
         XCTAssertEqual(persons.count, 2);
+        XCTAssertNil(error);
         [expectation fulfill];
     }];
     
@@ -161,8 +165,9 @@
     SRGDataStore *dataStore = [self testDataStoreFromPackage:nil];
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons, NSError * _Nullable error) {
         XCTAssertEqual(persons.count, 0);
+        XCTAssertNil(error);
     }];
     
     [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -172,8 +177,9 @@
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons, NSError * _Nullable error) {
         XCTAssertEqual(persons.count, 2);
+        XCTAssertNil(error);
     }];
     
     [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -183,8 +189,9 @@
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons, NSError * _Nullable error) {
         XCTAssertEqual(persons.count, 2);
+        XCTAssertNil(error);
         [expectation fulfill];
     }];
     
@@ -193,31 +200,38 @@
 
 - (void)testBackgroundReadTaskCancellation
 {
-    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Task 1 finished"];
     
     SRGDataStore *dataStore = [self testDataStoreFromPackage:@"TestData_1"];
     
     NSString *readTask1 = [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         XCTAssertFalse(NSThread.isMainThread);
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result) {
-        XCTFail(@"Must not be called when a task has been cancelled");
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result, NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        [expectation1 fulfill];
     }];
     [dataStore cancelBackgroundTaskWithHandle:readTask1];
+    
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Task 2 finished"];
     
     NSString *readTask2 = [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         XCTAssertFalse(NSThread.isMainThread);
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result) {
-        XCTFail(@"Must not be called when a task has been cancelled");
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result, NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        [expectation2 fulfill];
     }];
     [dataStore cancelBackgroundTaskWithHandle:readTask2];
+    
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Task 3 finished"];
     
     NSString *readTask3 = [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         XCTAssertFalse(NSThread.isMainThread);
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result) {
-        XCTFail(@"Must not be called when a task has been cancelled");
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result, NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        [expectation3 fulfill];
     }];
     [dataStore cancelBackgroundTaskWithHandle:readTask3];
     
@@ -226,7 +240,7 @@
 
 - (void)testBackgroundWriteTaskCancellation
 {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"All operations finished"];
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Task 1 finished"];
     
     SRGDataStore *dataStore = [self testDataStoreFromPackage:nil];
     
@@ -234,31 +248,41 @@
         Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
         person.name = @"Eva";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        XCTFail(@"Must not be called when a task has been cancelled");
+        XCTAssertNotNil(error);
+        [expectation1 fulfill];
     }];
     [dataStore cancelBackgroundTaskWithHandle:writeTask1];
+    
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Task 2 finished"];
     
     NSString *writeTask2 = [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
         person.name = @"Jim";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        XCTFail(@"Must not be called when a task has been cancelled");
+        XCTAssertNotNil(error);
+        [expectation2 fulfill];
     }];
     [dataStore cancelBackgroundTaskWithHandle:writeTask2];
+    
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Task 3 finished"];
     
     NSString *writeTask3 = [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
         person.name = @"Clara";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        XCTFail(@"Must not be called when a task has been cancelled");
+        XCTAssertNotNil(error);
+        [expectation3 fulfill];
     }];
     [dataStore cancelBackgroundTaskWithHandle:writeTask3];
     
+    XCTestExpectation *expectation4 = [self expectationWithDescription:@"Task 4 finished"];
+    
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons, NSError * _Nullable error) {
         XCTAssertEqual(persons.count, 0);
-        [expectation fulfill];
+        XCTAssertNil(error);
+        [expectation4 fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
@@ -288,25 +312,34 @@
     
     SRGDataStore *dataStore = [self testDataStoreFromPackage:@"TestData_1"];
     
-    [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        XCTAssertFalse(NSThread.isMainThread);
-        return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result) {
-        XCTFail(@"Must not be called when a task has been cancelled");
-    }];
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Task 1 finished"];
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         XCTAssertFalse(NSThread.isMainThread);
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result) {
-        XCTFail(@"Must not be called when a task has been cancelled");
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result, NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        [expectation1 fulfill];
     }];
+    
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Task 2 finished"];
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         XCTAssertFalse(NSThread.isMainThread);
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result) {
-        XCTFail(@"Must not be called when a task has been cancelled");
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result, NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        [expectation2 fulfill];
+    }];
+    
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Task 3 finished"];
+    
+    [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        XCTAssertFalse(NSThread.isMainThread);
+        return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL].firstObject;
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(id _Nullable result, NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        [expectation3 fulfill];
     }];
     
     [dataStore cancelAllBackgroundTasks];
@@ -329,8 +362,9 @@
     
     [dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [managedObjectContext executeFetchRequest:[Person fetchRequest] error:NULL];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons) {
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSArray<Person *> * _Nullable persons, NSError * _Nullable error) {
         XCTAssertEqual(persons.count, 1000);
+        XCTAssertNil(error);
         [expectation fulfill];
     }];
     
