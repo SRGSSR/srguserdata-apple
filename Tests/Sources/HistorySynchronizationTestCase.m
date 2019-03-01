@@ -81,6 +81,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     [self eraseRemoteHistory];
     
     self.identityService = [[SRGIdentityService alloc] initWithWebserviceURL:TestWebserviceURL() websiteURL:TestWebsiteURL()];
+    [self logout];
     
     // We could mock history services to implement true unit tests, but to be able to catch their possible issues (!),
     // we rather want integration tests. We therefore need to use a test user, simulating login by injecting its
@@ -91,7 +92,14 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
                                               identityService:self.identityService];
 }
 
-- (void)loginAndPerformInitialSynchronization
+- (void)login
+{
+    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, TestValidToken)];
+    XCTAssertTrue(hasHandledCallbackURL);
+    XCTAssertNotNil(self.identityService.sessionToken);
+}
+
+- (void)loginAndWaitForSynchronization
 {
     // Wait until the 1st synchronization has been performed (automatic after login)
     [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
@@ -99,11 +107,16 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
         return userData.user.accountUid != nil;
     }] evaluatedWithObject:self.userData handler:nil];
     
-    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, TestValidToken)];
-    XCTAssertTrue(hasHandledCallbackURL);
-    XCTAssertNotNil(self.identityService.sessionToken);
+    [self login];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)logout
+{
+    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLogoutCallbackURL(self.identityService, TestValidToken)];
+    XCTAssertTrue(hasHandledCallbackURL);
+    XCTAssertNil(self.identityService.sessionToken);
 }
 
 - (void)deleteRemoteHistoryEntryWithUid:(NSString *)uid
@@ -177,7 +190,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 - (void)testEmptyHistorySynchronization
 {
     [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndPerformInitialSynchronization];
+    [self loginAndWaitForSynchronization];
     
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
@@ -189,7 +202,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     }];
     
     [self expectationForElapsedTimeInterval:5. withHandler:nil];
-    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.identityService queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"No change notification is expected. The history was empty and still must be");
     }];
     
@@ -213,7 +226,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 - (void)testHistoryInitialSynchronizationWithExistingRemoteEntries
 {
     [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndPerformInitialSynchronization];
+    [self loginAndWaitForSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
     
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
@@ -250,7 +263,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 - (void)testHistoryInitialSynchronizationWithExistingLocalEntries
 {
     [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndPerformInitialSynchronization];
+    [self loginAndWaitForSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
     [self insertLocalTestHistoryEntriesWithName:@"local" count:3];
     
@@ -288,7 +301,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 - (void)testSynchronizationWithDeletedLocalEntries
 {
     [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndPerformInitialSynchronization];
+    [self loginAndWaitForSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:3];
     
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
@@ -342,7 +355,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 - (void)testSynchronizationWithDeletedRemoteEntries
 {
     [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndPerformInitialSynchronization];
+    [self loginAndWaitForSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:3];
     
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
@@ -385,7 +398,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 - (void)testLargeHistory
 {
     [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndPerformInitialSynchronization];
+    [self loginAndWaitForSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:1000];
     [self insertLocalTestHistoryEntriesWithName:@"local" count:2000];
     
@@ -433,43 +446,71 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 - (void)testSynchronizationAfterLogoutDuringSynchronization
 {
     [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndPerformInitialSynchronization];
+    [self loginAndWaitForSynchronization];
+    
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
     [self insertLocalTestHistoryEntriesWithName:@"local" count:3];
     
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
     
-    [self expectationForElapsedTimeInterval:8. withHandler:nil];
-    id synchronizationObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.identityService queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
-        XCTFail(@"No synchronization end notification expected");
-    }];
-    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.identityService queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
-        XCTFail(@"No history change notification expected");
-    }];
-    
     [self.userData.history synchronize];
+    [self logout];
     
-    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLogoutCallbackURL(self.identityService, TestValidToken)];
-    XCTAssertTrue(hasHandledCallbackURL);
-    XCTAssertNil(self.identityService.sessionToken);
-    
-    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
-        [NSNotificationCenter.defaultCenter removeObserver:synchronizationObserver];
-        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
-    }];
+    [self waitForExpectationsWithTimeout:10. handler:nil];
     
     // Login again and check that synchronization is still possible
-    [self loginAndPerformInitialSynchronization];
+    [self loginAndWaitForSynchronization];
 }
 
 - (void)testSynchronizationWithoutLoggedInUser
 {
+    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
     
+    id startObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidStartSynchronizationNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No start notification is expected");
+    }];
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No change notification is expected");
+    }];
+    id finishObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No finish notification is expected");
+    }];
+    
+    [self expectationForElapsedTimeInterval:5. withHandler:nil];
+    
+    [self.userData.history synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:startObserver];
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+        [NSNotificationCenter.defaultCenter removeObserver:finishObserver];
+    }];
 }
 
 - (void)testSynchronizationWithUnavailableService
 {
+    [self setupUserDataWithHistoryServiceURL:[NSURL URLWithString:@"https://missing.service"]];
+    [self login];
     
+    id startObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidStartSynchronizationNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No start notification is expected");
+    }];
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No change notification is expected");
+    }];
+    id finishObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No finish notification is expected");
+    }];
+    
+    [self expectationForElapsedTimeInterval:5. withHandler:nil];
+    
+    [self.userData.history synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:startObserver];
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+        [NSNotificationCenter.defaultCenter removeObserver:finishObserver];
+    }];
 }
 
 @end
