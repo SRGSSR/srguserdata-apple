@@ -74,26 +74,22 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 @implementation SRGHistorySynchronizationTestCase
 
-#pragma mark Setup and teardown
+#pragma mark Helpers
 
-- (void)setUp
+- (void)setupUserDataWithHistoryServiceURL:(NSURL *)historyServiceURL
 {
     [self eraseRemoteHistory];
     
     self.identityService = [[SRGIdentityService alloc] initWithWebserviceURL:TestWebserviceURL() websiteURL:TestWebsiteURL()];
- 
+    
     // We could mock history services to implement true unit tests, but to be able to catch their possible issues (!),
     // we rather want integration tests. We therefore need to use a test user, simulating login by injecting its
     // session token into the identity service.
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
     self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
-                                            historyServiceURL:TestHistoryServiceURL()
+                                            historyServiceURL:historyServiceURL
                                               identityService:self.identityService];
-
-    [self loginAndPerformInitialSynchronization];
 }
-
-#pragma mark Helpers
 
 - (void)loginAndPerformInitialSynchronization
 {
@@ -106,22 +102,6 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, TestValidToken)];
     XCTAssertTrue(hasHandledCallbackURL);
     XCTAssertNotNil(self.identityService.sessionToken);
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-}
-
-// Use GDPR special endpoint which erases the entire change history, returning the account to a pristine state
-- (void)eraseRemoteHistory
-{
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History cleared"];
-    
-    NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:TestDataServiceURL()];
-    URLRequest.HTTPMethod = @"DELETE";
-    [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", TestValidToken] forHTTPHeaderField:@"Authorization"];
-    [[SRGRequest dataRequestWithURLRequest:URLRequest session:NSURLSession.sharedSession completionBlock:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        [expectation fulfill];
-    }] resume];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
@@ -175,10 +155,30 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     [self waitForExpectationsWithTimeout:100. handler:nil];
 }
 
+// GDPR special endpoint which erases the entire change history, returning the account to a pristine state. This endpoint
+// is undocumented but publicly available.
+- (void)eraseRemoteHistory
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History cleared"];
+    
+    NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:TestDataServiceURL()];
+    URLRequest.HTTPMethod = @"DELETE";
+    [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", TestValidToken] forHTTPHeaderField:@"Authorization"];
+    [[SRGRequest dataRequestWithURLRequest:URLRequest session:NSURLSession.sharedSession completionBlock:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
 #pragma mark Tests
 
 - (void)testEmptyHistorySynchronization
 {
+    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self loginAndPerformInitialSynchronization];
+    
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
         return YES;
@@ -212,6 +212,8 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testHistoryInitialSynchronizationWithExistingRemoteEntries
 {
+    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self loginAndPerformInitialSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
     
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
@@ -247,6 +249,8 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testHistoryInitialSynchronizationWithExistingLocalEntries
 {
+    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self loginAndPerformInitialSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
     [self insertLocalTestHistoryEntriesWithName:@"local" count:3];
     
@@ -283,6 +287,8 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testSynchronizationWithDeletedLocalEntries
 {
+    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self loginAndPerformInitialSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:3];
     
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
@@ -335,6 +341,8 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testSynchronizationWithDeletedRemoteEntries
 {
+    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self loginAndPerformInitialSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:3];
     
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
@@ -376,6 +384,8 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testLargeHistory
 {
+    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self loginAndPerformInitialSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:1000];
     [self insertLocalTestHistoryEntriesWithName:@"local" count:2000];
     
@@ -422,6 +432,8 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testSynchronizationAfterLogoutDuringSynchronization
 {
+    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self loginAndPerformInitialSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
     [self insertLocalTestHistoryEntriesWithName:@"local" count:3];
     
@@ -448,6 +460,16 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     // Login again and check that synchronization is still possible
     [self loginAndPerformInitialSynchronization];
+}
+
+- (void)testSynchronizationWithoutLoggedInUser
+{
+    
+}
+
+- (void)testSynchronizationWithUnavailableService
+{
+    
 }
 
 @end
