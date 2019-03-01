@@ -204,6 +204,13 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 {
     NSString *sessionToken = self.identityService.sessionToken;
     
+    void (^synchronizationCompletionBlock)(void) = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidFinishSynchronizationNotification object:self];
+        });
+        completionBlock();
+    };
+    
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user) {
@@ -212,6 +219,8 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
             });
         } completionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable pullError) {
+            // Remark: We want to save local history even if a pull failed for some reason. A push is threfore attempted
+            //         even if the pull failed with an error (only exception: unauthorization received).
             if (! pullError) {
                 NSManagedObjectID *userID = user.objectID;
                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -221,7 +230,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             }
             else if (SRGHistoryIsUnauthorizationError(pullError)) {
                 [self.identityService reportUnauthorization];
-                completionBlock();
+                synchronizationCompletionBlock();
                 return;
             }
             
@@ -230,23 +239,21 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                 return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
             } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries) {
                 [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pushError) {
-                    completionBlock();
-                    
-                    if (SRGHistoryIsUnauthorizationError(pushError)) {
-                        [self.identityService reportUnauthorization];
-                    }
-                    else if (! pushError && ! pullError) {
+                    if (! pushError && ! pullError) {
                         NSManagedObjectID *userID = user.objectID;
                         [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                             SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
                             user.historyLocalSynchronizationDate = NSDate.date;
                         } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-                            if (! error) {
-                                dispatch_async(dispatch_get_main_queue(), ^{
-                                    [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidFinishSynchronizationNotification object:self];
-                                });
-                            }
+                            synchronizationCompletionBlock();
                         }];
+                    }
+                    else if (SRGHistoryIsUnauthorizationError(pushError)) {
+                        [self.identityService reportUnauthorization];
+                        completionBlock();
+                    }
+                    else {
+                        completionBlock();
                     }
                 }];
             }];
