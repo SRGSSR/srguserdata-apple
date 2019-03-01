@@ -250,10 +250,10 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                     }
                     else if (SRGHistoryIsUnauthorizationError(pushError)) {
                         [self.identityService reportUnauthorization];
-                        completionBlock();
+                        synchronizationCompletionBlock();
                     }
                     else {
-                        completionBlock();
+                        synchronizationCompletionBlock();
                     }
                 }];
             }];
