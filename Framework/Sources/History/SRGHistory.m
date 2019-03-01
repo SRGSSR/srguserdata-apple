@@ -68,85 +68,97 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     return self;
 }
 
+#pragma mark Data
+
+- (void)saveHistoryEntryDictionaries:(NSArray<NSDictionary *> *)historyEntryDictionaries withCompletionBlock:(void (^)(NSError *error))completionBlock
+{
+    if (historyEntryDictionaries.count == 0) {
+        completionBlock(nil);
+        return;
+    }
+    
+    NSMutableArray<NSString *> *changedUids = [NSMutableArray array];
+    
+    __block NSArray<NSString *> *previousUids = nil;
+    __block NSArray<NSString *> *currentUids = nil;
+    
+    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        NSArray<SRGHistoryEntry *> *previousHistoryEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        previousUids = [previousHistoryEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)]];
+        
+        NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
+        for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
+            SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
+            if (historyEntry) {
+                [changedUids addObject:historyEntry.uid];
+                
+                if (historyEntry.inserted) {
+                    [uids addObject:historyEntry.uid];
+                }
+                else if (historyEntry.deleted) {
+                    [uids removeObject:historyEntry.uid];
+                }
+            }
+        }
+        currentUids = [uids copy];
+    } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
+        if (! error && currentUids.count > 0) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGHistoryChangedUidsKey : [changedUids copy],
+                                                                            SRGHistoryPreviousUidsKey : previousUids,
+                                                                            SRGHistoryUidsKey : currentUids }];
+            });
+        }
+        completionBlock(error);
+    }];
+}
+
 #pragma mark Requests
 
 - (void)pullHistoryEntriesForSessionToken:(NSString *)sessionToken
                                 afterDate:(NSDate *)date
+                           withStartBlock:(void (^)(void))startBlock
                           completionBlock:(SRGHistoryPullCompletionBlock)completionBlock
 {
     NSParameterAssert(sessionToken);
+    NSParameterAssert(startBlock);
     NSParameterAssert(completionBlock);
     
     @weakify(self)
     __block SRGFirstPageRequest *firstRequest = [[[SRGHistoryRequest historyUpdatesFromServiceURL:self.serviceURL forSessionToken:sessionToken afterDate:date withDeletedEntries:YES session:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         @strongify(self)
         
-        if (error) {
-            completionBlock(nil, error);
+        SRGHistoryPullCompletionBlock pullCompletionBlock = ^(NSDate *serverDate, NSError *error) {
+            completionBlock(serverDate, error);
             firstRequest = nil;
+        };
+        
+        if (error) {
+            pullCompletionBlock(nil, error);
             return;
         }
         
-        if (historyEntryDictionaries.count != 0) {
-            NSMutableArray<NSString *> *changedUids = [NSMutableArray array];
+        [self saveHistoryEntryDictionaries:historyEntryDictionaries withCompletionBlock:^(NSError *error) {
+            if (error) {
+                pullCompletionBlock(nil, error);
+                return;
+            }
             
-            __block NSArray<NSString *> *previousUids = nil;
-            __block NSArray<NSString *> *currentUids = nil;
+            if (page.number == 0) {
+                startBlock();
+            }
             
-            [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                NSArray<SRGHistoryEntry *> *previousHistoryEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-                previousUids = [previousHistoryEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)]];
-                
-                NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
-                for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
-                    SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
-                    if (historyEntry) {
-                        [changedUids addObject:historyEntry.uid];
-                        
-                        if (historyEntry.inserted) {
-                            [uids addObject:historyEntry.uid];
-                        }
-                        else if (historyEntry.deleted) {
-                            [uids removeObject:historyEntry.uid];
-                        }
-                    }
-                }
-                currentUids = [uids copy];
-            } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (error) {
-                        return;
-                    }
-                    
-                    if (page.number == 0) {
-                        [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
-                    }
-                    
-                    if (currentUids.count > 0) {
-                        [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
-                                                                          object:self
-                                                                        userInfo:@{ SRGHistoryChangedUidsKey : [changedUids copy],
-                                                                                    SRGHistoryPreviousUidsKey : previousUids,
-                                                                                    SRGHistoryUidsKey : currentUids }];
-                    }
-                });
-            }];
-        }
-        else if (page.number == 0) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
-            });
-        }
-        
-        if (nextPage) {
-            SRGPageRequest *nextRequest = [firstRequest requestWithPage:nextPage];
-            [nextRequest resume];
-            self.pullRequest = nextRequest;
-        }
-        else {
-            completionBlock(serverDate, nil);
-            firstRequest = nil;
-        }
+            if (nextPage) {
+                SRGPageRequest *nextRequest = [firstRequest requestWithPage:nextPage];
+                [nextRequest resume];
+                self.pullRequest = nextRequest;
+            }
+            else {
+                pullCompletionBlock(serverDate, nil);
+            }
+        }];
     }] requestWithPageSize:500] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled];
     [firstRequest resume];
     self.pullRequest = firstRequest;
@@ -195,7 +207,11 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user) {
-        [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historyServerSynchronizationDate completionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable pullError) {
+        [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historyServerSynchronizationDate withStartBlock:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
+            });
+        } completionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable pullError) {
             if (! pullError) {
                 NSManagedObjectID *userID = user.objectID;
                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
