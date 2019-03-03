@@ -8,6 +8,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ *  Convenience macro for localized strings associated with the framework.
+ */
+#define SRGUserDataLocalizedString(key, comment) [NSBundle.srg_userDataBundle localizedStringForKey:(key) value:@"" table:nil]
+
+/**
+ *  Use to avoid user-facing text analyzer warnings.
+ *
+ *  See https://clang-analyzer.llvm.org/faq.html.
+ */
+__attribute__((annotate("returns_localized_nsstring")))
+OBJC_EXPORT NSString *SRGUserDataNonLocalizedString(NSString *string);
+
 @interface NSBundle (SRGUserData)
 
 /**
