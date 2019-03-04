@@ -96,7 +96,7 @@
         else {
             NSError *error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                                  code:SRGUserDataErrorCancelled
-                                             userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"The operation has been cancelled", @"Error message returned when an operation has been cancelled") }];
+                                             userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The operation has been cancelled", @"Error message returned when an operation has been cancelled") }];
             completionBlock ? completionBlock(nil, error) : nil;
         }
         
@@ -160,7 +160,7 @@
         else {
             NSError *error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                                  code:SRGUserDataErrorCancelled
-                                             userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"The operation has been cancelled", @"Error message returned when an operation has been cancelled") }];
+                                             userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The operation has been cancelled", @"Error message returned when an operation has been cancelled") }];
             completionBlock ? completionBlock(error) : nil;
         }
         
@@ -191,7 +191,7 @@
         if (! operation.executing) {
             NSError *error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                                  code:SRGUserDataErrorCancelled
-                                             userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"The operation has been cancelled", @"Error message returned when an operation has been cancelled") }];
+                                             userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The operation has been cancelled", @"Error message returned when an operation has been cancelled") }];
             SRGDataStoreReadCompletionBlock readCompletionBlock = [self.readCompletionBlocks objectForKey:handle];
             if (readCompletionBlock) {
                 readCompletionBlock(nil, error);
