@@ -319,7 +319,7 @@
     
     XCTestExpectation *expectation3 = [self expectationWithDescription:@"Task 3 finished"];
     
-    NSString *writeTask3 = [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         Person *person = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(Person.class) inManagedObjectContext:managedObjectContext];
         person.name = @"Clara";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
