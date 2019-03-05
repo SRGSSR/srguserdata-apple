@@ -111,6 +111,7 @@
     
     self.synchronizing = YES;
     [self synchronizeWithCompletionBlock:^{
+        NSCAssert(self.synchronizing, @"Must be synchronizing: The completion block must be called only once per sync attempt");
         self.synchronizing = NO;
     }];
 }
@@ -137,8 +138,6 @@
 - (void)userDidLogout:(NSNotification *)notification
 {
     [self userDidLogout];
-    
-    self.synchronizing = NO;
 }
 
 @end

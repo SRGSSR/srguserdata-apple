@@ -8,6 +8,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// Block signatures
+typedef void (^SRGDataStoreReadCompletionBlock)(id _Nullable result, NSError * _Nullable error);
+typedef void (^SRGDataStoreWriteCompletionBlock)(NSError * _Nullable error);
+
 /**
  *  An SQLite data store which ensures safe accesses to the application Core Data layer. In particular, work can be
  *  performed on or off the main thread, without context merging issues. This is achieved by having a single serialized
@@ -60,14 +64,14 @@ NS_ASSUME_NONNULL_BEGIN
  *                              thread). Beware that if managed objects are returned, they can only be used from within
  *                              the block associated thread, not on another thread you would dispatch work onto.
  *
- *  @return `NSString` An opaque task handle which can be used to cancel it. Cancelled started tasks are executed until
- *                     the end without their completion block being called. Cancelled pending tasks are discarded.
+ *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
+ *                     will be called with an error.
  *
  *  @discussion This method can be called from any thread.
  */
 - (NSString *)performBackgroundReadTask:(id _Nullable (^)(NSManagedObjectContext *managedObjectContext))task
                            withPriority:(NSOperationQueuePriority)priority
-                        completionBlock:(void (^)(id _Nullable result))completionBlock;
+                        completionBlock:(SRGDataStoreReadCompletionBlock)completionBlock;
 
 /**
  *  Enqueue a write operation on the serial queue, with a priority level. Pending tasks with higher priority will be
@@ -81,9 +85,8 @@ NS_ASSUME_NONNULL_BEGIN
  *                              therefore be lightweight, otherwise use GCD to send time-consuming operations on another
  *                              thread.
  *
- *  @return `NSString` An opaque task handle which can be used to cancel it. Started write tasks can be cancelled, in
- *                     which case the completion block will not be called and the transaction rollbacked. Cancelled
- *                     pending tasks are discarded.
+ *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
+ *                     will be called with an error and the corresponding transaction rollbacked.
  *
  *  @discussion Once the task successfully completes, a save is automaticaly performed. If the save operation fails (e.g.
  *              because of model validation errors), the work is rollbacked automatically and the completion block is
@@ -93,7 +96,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSString *)performBackgroundWriteTask:(void (^)(NSManagedObjectContext *managedObjectContext))task
                             withPriority:(NSOperationQueuePriority)priority
-                         completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
+                         completionBlock:(nullable SRGDataStoreWriteCompletionBlock)completionBlock;
 
 /**
  *  Cancel the task with the provided handle, whether it is being executed or pending. A task being executed will not

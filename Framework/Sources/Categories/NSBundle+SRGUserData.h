@@ -8,6 +8,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ *  Convenience macro for localized strings associated with the framework.
+ */
+#define SRGUserDataLocalizedString(key, comment) [NSBundle.srg_userDataBundle localizedStringForKey:(key) value:@"" table:nil]
+
 @interface NSBundle (SRGUserData)
 
 /**

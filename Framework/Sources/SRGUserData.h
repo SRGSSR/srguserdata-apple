@@ -10,6 +10,7 @@
 #import "SRGHistory.h"
 #import "SRGHistoryEntry.h"
 #import "SRGUser.h"
+#import "SRGUserDataError.h"
 #import "SRGUserDataService.h"
 #import "SRGUserObject.h"
 

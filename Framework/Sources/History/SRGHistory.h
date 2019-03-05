@@ -54,15 +54,15 @@ OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
  *  descriptors are provided, entries are still returned in a stable order. The read occurs asynchronously, calling
  *  the provided block on completion.
  *
- *  @return `NSString` An opaque task handle which can be used to cancel it. Cancelled started tasks are executed until
- *                     the end without their completion block being called. Cancelled pending tasks are discarded
+ *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
+ *                     will be called with an error.
  *
  *  @discussion The completion block is called on a background thread. You can only use the returned object on this
  *              thread.
  */
 - (NSString *)historyEntriesMatchingPredicate:(nullable NSPredicate *)predicate
                         sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
-                              completionBlock:(void (^)(NSArray<SRGHistoryEntry *> *historyEntries))completionBlock;
+                              completionBlock:(void (^)(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error))completionBlock;
 
 /**
  *  Return the history entry matching the specified identifier, if any.
@@ -75,38 +75,38 @@ OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
  *  Return the history entry matching the specified identifier, if any. The read occurs asynchronously, calling the
  *  provided block on completion.
  *
- *  @return `NSString` An opaque task handle which can be used to cancel it. Cancelled started tasks are executed until
- *                     the end without their completion block being called. Cancelled pending tasks are discarded
+ *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
+ *                     will be called with an error.
  *
  *  @discussion The completion block is called on a background thread. You can only use the returned object on this
  *              thread.
  */
-- (NSString *)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable historyEntry))completionBlock;
+- (NSString *)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error))completionBlock;
 
 /**
  *  Asynchronously save a history entry for a given identifier, calling the specified block on completion.
  *
- *  @return `NSString` An opaque task handle which can be used to cancel it. Cancelled started tasks are executed until
- *                     the end without their completion block being called. Cancelled pending tasks are discarded
+ *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
+ *                     will be called with an error and the corresponding transaction rollbacked.
  *
  *  @discussion The completion block is called on a background thread.
  */
 - (NSString *)saveHistoryEntryForUid:(NSString *)Uid
                 withLastPlaybackTime:(CMTime)lastPlaybackTime
                            deviceUid:(nullable NSString *)deviceUid
-                     completionBlock:(nullable void (^)(NSError *error))completionBlock;
+                     completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
  *  Asynchronously discard history entries matching an identifier list, calling the provided block on completion. If no
  *  list is provided, all entries are discarded.
  *
- *  @return `NSString` An opaque task handle which can be used to cancel it. Cancelled started tasks are executed until
- *                     the end without their completion block being called. Cancelled pending tasks are discarded
+ *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
+ *                     will be called with an error and the corresponding transaction rollbacked.
  *
  *  @discussion The completion block is called on a background thread.
  */
 - (NSString *)discardHistoryEntriesWithUids:(nullable NSArray<NSString *> *)uids
-                            completionBlock:(nullable void (^)(NSError *error))completionBlock;
+                            completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 
 /**

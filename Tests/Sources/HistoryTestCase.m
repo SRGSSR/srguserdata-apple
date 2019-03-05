@@ -211,7 +211,7 @@
     
     XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entry fetched"];
     
-    [self.userData.history historyEntryWithUid:uid completionBlock:^(SRGHistoryEntry * _Nullable historyEntry) {
+    [self.userData.history historyEntryWithUid:uid completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertEqualObjects(historyEntry.uid, uid);
         XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, time));
@@ -224,7 +224,7 @@
     
     XCTestExpectation *expectation3 = [self expectationWithDescription:@"History entry fetched"];
     
-    [self.userData.history historyEntryWithUid:@"notFound" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry) {
+    [self.userData.history historyEntryWithUid:@"notFound" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
         XCTAssertNil(historyEntry);
         [expectation3 fulfill];
     }];
@@ -254,7 +254,7 @@
 {
     XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entries fetched"];
     
-    [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries1) {
+    [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries1, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertNotNil(historyEntries1);
         XCTAssertEqual(historyEntries1.count, 0);
@@ -268,7 +268,7 @@
     
     XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entries fetched"];
     
-    [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries2) {
+    [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries2, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertEqual(historyEntries2.count, uids.count);
         
@@ -351,7 +351,7 @@
     XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entries fetched"];
     
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:YES];
-    [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor1] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries1) {
+    [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor1] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries1, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertEqual(historyEntries1.count, uids.count);
         NSArray<NSString *> *queryUids1 = [historyEntries1 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
@@ -364,7 +364,7 @@
     XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entries fetched"];
     
     NSSortDescriptor *sortDescriptor2 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, uid) ascending:YES];
-    [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor2] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries2) {
+    [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor2] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries2, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertEqual(historyEntries2.count, uids.count);
         NSArray<NSString *> *queryUids2 = [historyEntries2 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
@@ -377,7 +377,7 @@
     XCTestExpectation *expectation3 = [self expectationWithDescription:@"History entries fetched"];
     
     NSPredicate *predicate3 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
-    [self.userData.history historyEntriesMatchingPredicate:predicate3 sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries3) {
+    [self.userData.history historyEntriesMatchingPredicate:predicate3 sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries3, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertEqual(historyEntries3.count, uids.count);
         NSArray<NSString *> *queryUids3 = [historyEntries3 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
@@ -390,7 +390,7 @@
     XCTestExpectation *expectation4 = [self expectationWithDescription:@"History entries fetched"];
     
     NSPredicate *predicate4 = [NSPredicate predicateWithFormat:@"%K == 'Test device'", @keypath(SRGHistoryEntry.new, deviceUid)];
-    [self.userData.history historyEntriesMatchingPredicate:predicate4 sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries4) {
+    [self.userData.history historyEntriesMatchingPredicate:predicate4 sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries4, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertEqual(historyEntries4.count, uids.count);
         NSArray<NSString *> *queryUids4 = [historyEntries4 valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
@@ -404,7 +404,7 @@
     
     NSString *queryUid = @"34";
     NSPredicate *predicate5 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), queryUid];
-    [self.userData.history historyEntriesMatchingPredicate:predicate5 sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries5) {
+    [self.userData.history historyEntriesMatchingPredicate:predicate5 sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries5, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertEqual(historyEntries5.count, 1);
         SRGHistoryEntry *historyEntry = historyEntries5.firstObject;
@@ -421,7 +421,7 @@
     
     NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ || %K CONTAINS[cd] %@", @keypath(SRGHistoryEntry.new, uid), @"1", @keypath(SRGHistoryEntry.new, uid), @"9"];
     NSSortDescriptor *sortDescriptor6 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:YES];
-    [self.userData.history historyEntriesMatchingPredicate:predicate6 sortedWithDescriptors:@[sortDescriptor6] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries6) {
+    [self.userData.history historyEntriesMatchingPredicate:predicate6 sortedWithDescriptors:@[sortDescriptor6] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries6, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         NSArray<NSString *> *expectedQueryUids6 = @[@"12", @"90"];
         XCTAssertEqual(historyEntries6.count, expectedQueryUids6.count);
@@ -436,7 +436,7 @@
     
     NSPredicate *predicate7 = [NSPredicate predicateWithFormat:@"%K < 60", @keypath(SRGHistoryEntry.new, lastPlaybackPosition)];
     NSSortDescriptor *sortDescriptor7 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
-    [self.userData.history historyEntriesMatchingPredicate:predicate7 sortedWithDescriptors:@[sortDescriptor7] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries7) {
+    [self.userData.history historyEntriesMatchingPredicate:predicate7 sortedWithDescriptors:@[sortDescriptor7] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries7, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         NSArray<NSString *> *expectedQueryUids7 = @[@"56", @"34", @"12"];
         XCTAssertEqual(historyEntries7.count, expectedQueryUids7.count);

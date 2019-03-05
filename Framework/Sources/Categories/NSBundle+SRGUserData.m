@@ -8,11 +8,6 @@
 
 #import "SRGUserData.h"
 
-NSString *SRGUserDataNonLocalizedString(NSString *string)
-{
-    return string;
-}
-
 @implementation NSBundle (SRGUserData)
 
 #pragma mark Class methods

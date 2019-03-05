@@ -6,12 +6,18 @@
 
 #import "SRGDataStore.h"
 
+#import "NSBundle+SRGUserData.h"
+#import "SRGUserDataError.h"
+
 @interface SRGDataStore ()
 
 @property (nonatomic) id<SRGPersistentContainer> persistentContainer;
 
 @property (nonatomic) NSOperationQueue *serialOperationQueue;
 @property (nonatomic) NSMapTable<NSString *, NSOperation *> *operations;
+
+@property (nonatomic) NSMapTable<NSString *, SRGDataStoreReadCompletionBlock> *readCompletionBlocks;
+@property (nonatomic) NSMapTable<NSString *, SRGDataStoreWriteCompletionBlock> *writeCompletionBlocks;
 
 @property (nonatomic) dispatch_queue_t concurrentQueue;
 
@@ -40,6 +46,9 @@
         
         self.operations = [NSMapTable strongToWeakObjectsMapTable];
         
+        self.readCompletionBlocks = [NSMapTable strongToStrongObjectsMapTable];
+        self.writeCompletionBlocks = [NSMapTable strongToStrongObjectsMapTable];
+        
         self.concurrentQueue = dispatch_queue_create("ch.srgssr.playsrg.SRGDataStore.concurrent", DISPATCH_QUEUE_CONCURRENT);
     }
     return self;
@@ -59,7 +68,7 @@
 
 - (NSString *)performBackgroundReadTask:(id (^)(NSManagedObjectContext *managedObjectContext))task
                            withPriority:(NSOperationQueuePriority)priority
-                        completionBlock:(void (^)(id result))completionBlock
+                        completionBlock:(SRGDataStoreReadCompletionBlock)completionBlock
 {
     NSString *handle = NSUUID.UUID.UUIDString;
     NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
@@ -82,16 +91,24 @@
         });
         
         if (! cancelled) {
-            completionBlock ? completionBlock(result) : nil;
+            completionBlock ? completionBlock(result, nil) : nil;
+        }
+        else {
+            NSError *error = [NSError errorWithDomain:SRGUserDataErrorDomain
+                                                 code:SRGUserDataErrorCancelled
+                                             userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The operation has been cancelled", @"Error message returned when an operation has been cancelled") }];
+            completionBlock ? completionBlock(nil, error) : nil;
         }
         
         dispatch_barrier_async(self.concurrentQueue, ^{
             [self.operations removeObjectForKey:handle];
+            [self.readCompletionBlocks removeObjectForKey:handle];
         });
     }];
     operation.queuePriority = priority;
     
     dispatch_barrier_async(self.concurrentQueue, ^{
+        [self.readCompletionBlocks setObject:completionBlock forKey:handle];
         [self.operations setObject:operation forKey:handle];
         [self.serialOperationQueue addOperation:operation];
     });
@@ -101,7 +118,7 @@
 
 - (NSString *)performBackgroundWriteTask:(void (^)(NSManagedObjectContext *managedObjectContext))task
                             withPriority:(NSOperationQueuePriority)priority
-                         completionBlock:(void (^)(NSError *error))completionBlock;
+                         completionBlock:(SRGDataStoreWriteCompletionBlock)completionBlock;
 {
     NSString *handle = NSUUID.UUID.UUIDString;
     NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
@@ -119,13 +136,13 @@
         __block NSError *error = nil;
         __block BOOL cancelled = NO;
         
+        dispatch_sync(self.concurrentQueue, ^{
+            NSOperation *operation = [self.operations objectForKey:handle];
+            cancelled = operation.cancelled;
+        });
+        
         [managedObjectContext performBlockAndWait:^{
             task(managedObjectContext);
-            
-            dispatch_sync(self.concurrentQueue, ^{
-                NSOperation *operation = [self.operations objectForKey:handle];
-                cancelled = operation.cancelled;
-            });
             
             if (managedObjectContext.hasChanges) {
                 if (cancelled) {
@@ -140,14 +157,22 @@
         if (! cancelled) {
             completionBlock ? completionBlock(error) : nil;
         }
+        else {
+            NSError *error = [NSError errorWithDomain:SRGUserDataErrorDomain
+                                                 code:SRGUserDataErrorCancelled
+                                             userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The operation has been cancelled", @"Error message returned when an operation has been cancelled") }];
+            completionBlock ? completionBlock(error) : nil;
+        }
         
         dispatch_barrier_async(self.concurrentQueue, ^{
             [self.operations removeObjectForKey:handle];
+            [self.writeCompletionBlocks removeObjectForKey:handle];
         });
     }];
     operation.queuePriority = priority;
     
     dispatch_barrier_async(self.concurrentQueue, ^{
+        [self.writeCompletionBlocks setObject:completionBlock forKey:handle];
         [self.operations setObject:operation forKey:handle];
         [self.serialOperationQueue addOperation:operation];
     });
@@ -158,12 +183,28 @@
 - (void)cancelBackgroundTaskWithHandle:(NSString *)handle
 {
     dispatch_barrier_async(self.concurrentQueue, ^{
+        // Removal at the end of task execution does not take place for pending tasks. Must remove the entry manually.
+        // Tasks being executed will be cleaned up at the end of their execution
         NSOperation *operation = [self.operations objectForKey:handle];
         [operation cancel];
         
-        // Removal at the end of task execution does not take place for pending tasks. Must remove the entry manually.
-        // Tasks being executed will be cleaned up at the end of their execution
         if (! operation.executing) {
+            NSError *error = [NSError errorWithDomain:SRGUserDataErrorDomain
+                                                 code:SRGUserDataErrorCancelled
+                                             userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The operation has been cancelled", @"Error message returned when an operation has been cancelled") }];
+            SRGDataStoreReadCompletionBlock readCompletionBlock = [self.readCompletionBlocks objectForKey:handle];
+            if (readCompletionBlock) {
+                readCompletionBlock(nil, error);
+                [self.readCompletionBlocks removeObjectForKey:handle];
+            }
+            else {
+                SRGDataStoreWriteCompletionBlock writeCompletionBlock = [self.writeCompletionBlocks objectForKey:handle];
+                if (writeCompletionBlock) {
+                    writeCompletionBlock(error);
+                    [self.writeCompletionBlocks removeObjectForKey:handle];
+                }
+            }
+            
             [self.operations removeObjectForKey:handle];
         }
     });
@@ -171,18 +212,9 @@
 
 - (void)cancelAllBackgroundTasks
 {
-    dispatch_barrier_async(self.concurrentQueue, ^{
-        for (NSString *handle in [[self.operations copy] keyEnumerator]) {
-            NSOperation *operation = [self.operations objectForKey:handle];
-            [operation cancel];
-            
-            // Removal at the end of task execution does not take place for pending tasks. Must remove the entry manually.
-            // Tasks being executed will be cleaned up at the end of their execution
-            if (! operation.executing) {
-                [self.operations removeObjectForKey:handle];
-            }
-        }
-    });
+    for (NSString *handle in [[self.operations copy] keyEnumerator]) {
+        [self cancelBackgroundTaskWithHandle:handle];
+    }
 }
 
 @end
