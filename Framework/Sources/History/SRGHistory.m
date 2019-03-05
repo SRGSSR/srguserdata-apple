@@ -153,7 +153,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                 pullCompletionBlock(serverDate, nil);
             }
         }];
-    }] requestWithPageSize:500] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
+    }] requestWithPageSize:500] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
     [firstRequest resume];
     self.pullRequest = firstRequest;
 }
@@ -187,7 +187,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
             } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
         } 
         completionBlock(error);
-    }] requestWithOptions:SRGNetworkRequestBackgroundThreadCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
+    }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
     [pushRequest resume];
     self.pushRequest = pushRequest;
 }
