@@ -27,6 +27,7 @@
     XCTAssertNil(userData);
 }
 
+// Version v1 was in Play 2.8.4 (prod 278), Play 2.8.5 (prod 280), Play 2.8.6 (prod 283), Play 2.8.7 (prod 284)
 - (void)testMigrationFromV1
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v1"];
@@ -89,6 +90,7 @@
     XCTAssertEqual(itemUids4.count, 104);
 }
 
+// Version v2 was in Play 2.8.8 (beta 285)
 - (void)testMigrationFromV2
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v2"];
@@ -144,6 +146,7 @@
     XCTAssertEqual(itemUids3.count, 104);
 }
 
+// Version v3 was in Play 2.8.8 (prod 289), Play 2.8.9 (prod 292)
 - (void)testMigrationFromV3
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v3"];
@@ -199,6 +202,7 @@
     XCTAssertEqual(itemUids3.count, 104);
 }
 
+// Version v4 was in Play 2.8.10 (beta 293)
 - (void)testMigrationFromV4
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v4"];
