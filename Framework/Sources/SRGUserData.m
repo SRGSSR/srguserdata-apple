@@ -17,7 +17,7 @@
 
 #import <libextobjc/libextobjc.h>
 
-static NSUInteger s_currentPersistentStoreVersion = 3;
+static NSUInteger s_currentPersistentStoreVersion = 4;
 
 typedef NSString * SRGUserDataServiceType NS_TYPED_ENUM;
 static SRGUserDataServiceType const SRGUserDataServiceTypeHistory = @"History";

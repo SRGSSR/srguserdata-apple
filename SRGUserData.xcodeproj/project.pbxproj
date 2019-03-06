@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		082442A8220CA16300F39785 /* SRGUserData_v2_v3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 082442A7220CA16300F39785 /* SRGUserData_v2_v3.xcmappingmodel */; };
-		082442AA220CA21600F39785 /* SRGUserData_v1_v2.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 082442A9220CA21600F39785 /* SRGUserData_v1_v2.xcmappingmodel */; };
-		082442AF220CB0DD00F39785 /* UserData_DB_v2 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AD220CB0DD00F39785 /* UserData_DB_v2 */; };
-		082442B0220CB0DD00F39785 /* UserData_DB_v1 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AE220CB0DD00F39785 /* UserData_DB_v1 */; };
+		082442A8220CA16300F39785 /* SRGUserData_v3_v4.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 082442A7220CA16300F39785 /* SRGUserData_v3_v4.xcmappingmodel */; };
+		082442AA220CA21600F39785 /* SRGUserData_v2_v3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 082442A9220CA21600F39785 /* SRGUserData_v2_v3.xcmappingmodel */; };
+		082442AF220CB0DD00F39785 /* UserData_DB_v3 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AD220CB0DD00F39785 /* UserData_DB_v3 */; };
+		082442B0220CB0DD00F39785 /* UserData_DB_v2 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AE220CB0DD00F39785 /* UserData_DB_v2 */; };
+		0850E2C122304201003BDCB8 /* SRGUserData_v1_v2.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0850E2C022304201003BDCB8 /* SRGUserData_v1_v2.xcmappingmodel */; };
+		0850E2C5223043C4003BDCB8 /* UserData_DB_v1 in Resources */ = {isa = PBXBuildFile; fileRef = 0850E2C4223043C4003BDCB8 /* UserData_DB_v1 */; };
 		0858B69822010C9E000F00CF /* SRGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; };
 		0858B69A22010C9E000F00CF /* SRGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; };
 		0858B69B22010C9E000F00CF /* libextobjc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69622010C9E000F00CF /* libextobjc.framework */; };
@@ -233,10 +235,13 @@
 /* Begin PBXFileReference section */
 		082442A5220C8A8800F39785 /* SRGUserData_v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v2.xcdatamodel; sourceTree = "<group>"; };
 		082442A6220C8BA000F39785 /* SRGUserData_v3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v3.xcdatamodel; sourceTree = "<group>"; };
-		082442A7220CA16300F39785 /* SRGUserData_v2_v3.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v2_v3.xcmappingmodel; sourceTree = "<group>"; };
-		082442A9220CA21600F39785 /* SRGUserData_v1_v2.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v1_v2.xcmappingmodel; sourceTree = "<group>"; };
-		082442AD220CB0DD00F39785 /* UserData_DB_v2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v2; sourceTree = "<group>"; };
-		082442AE220CB0DD00F39785 /* UserData_DB_v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v1; sourceTree = "<group>"; };
+		082442A7220CA16300F39785 /* SRGUserData_v3_v4.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v3_v4.xcmappingmodel; sourceTree = "<group>"; };
+		082442A9220CA21600F39785 /* SRGUserData_v2_v3.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v2_v3.xcmappingmodel; sourceTree = "<group>"; };
+		082442AD220CB0DD00F39785 /* UserData_DB_v3 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v3; sourceTree = "<group>"; };
+		082442AE220CB0DD00F39785 /* UserData_DB_v2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v2; sourceTree = "<group>"; };
+		0850E2BF22304169003BDCB8 /* SRGUserData_v4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v4.xcdatamodel; sourceTree = "<group>"; };
+		0850E2C022304201003BDCB8 /* SRGUserData_v1_v2.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v1_v2.xcmappingmodel; sourceTree = "<group>"; };
+		0850E2C4223043C4003BDCB8 /* UserData_DB_v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v1; sourceTree = "<group>"; };
 		0858B69522010C9E000F00CF /* SRGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGLogger.framework; path = Carthage/Build/iOS/SRGLogger.framework; sourceTree = "<group>"; };
 		0858B69622010C9E000F00CF /* libextobjc.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libextobjc.framework; path = Carthage/Build/iOS/libextobjc.framework; sourceTree = "<group>"; };
 		0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MAKVONotificationCenter.framework; path = Carthage/Build/iOS/MAKVONotificationCenter.framework; sourceTree = "<group>"; };
@@ -423,11 +428,12 @@
 			children = (
 				6F3234342212F61D0046E265 /* TestData_1 */,
 				6F32342A2212E9890046E265 /* TestData.xcdatamodeld */,
-				6FB1959A221467E900D3BF88 /* UserData_DB_loggedOut */,
-				6FB195982214474A00D3BF88 /* UserData_DB_loggedIn */,
 				6FFEB7442212CBE60098F131 /* UserData_DB_invalid */,
-				082442AE220CB0DD00F39785 /* UserData_DB_v1 */,
-				082442AD220CB0DD00F39785 /* UserData_DB_v2 */,
+				6FB195982214474A00D3BF88 /* UserData_DB_loggedIn */,
+				6FB1959A221467E900D3BF88 /* UserData_DB_loggedOut */,
+				0850E2C4223043C4003BDCB8 /* UserData_DB_v1 */,
+				082442AE220CB0DD00F39785 /* UserData_DB_v2 */,
+				082442AD220CB0DD00F39785 /* UserData_DB_v3 */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -653,8 +659,9 @@
 		6FB521BD2208838E0042FCC3 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				082442A9220CA21600F39785 /* SRGUserData_v1_v2.xcmappingmodel */,
-				082442A7220CA16300F39785 /* SRGUserData_v2_v3.xcmappingmodel */,
+				0850E2C022304201003BDCB8 /* SRGUserData_v1_v2.xcmappingmodel */,
+				082442A9220CA21600F39785 /* SRGUserData_v2_v3.xcmappingmodel */,
+				082442A7220CA16300F39785 /* SRGUserData_v3_v4.xcmappingmodel */,
 				6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */,
 			);
 			path = Data;
@@ -934,11 +941,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F3234352212F61D0046E265 /* TestData_1 in Resources */,
-				082442AF220CB0DD00F39785 /* UserData_DB_v2 in Resources */,
+				082442AF220CB0DD00F39785 /* UserData_DB_v3 in Resources */,
 				6FB1959B221467E900D3BF88 /* UserData_DB_loggedOut in Resources */,
 				6F308A682212CE7E003D3385 /* UserData_DB_invalid in Resources */,
 				6FB195992214474A00D3BF88 /* UserData_DB_loggedIn in Resources */,
-				082442B0220CB0DD00F39785 /* UserData_DB_v1 in Resources */,
+				0850E2C5223043C4003BDCB8 /* UserData_DB_v1 in Resources */,
+				082442B0220CB0DD00F39785 /* UserData_DB_v2 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -949,9 +957,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				082442A8220CA16300F39785 /* SRGUserData_v2_v3.xcmappingmodel in Sources */,
+				0850E2C122304201003BDCB8 /* SRGUserData_v1_v2.xcmappingmodel in Sources */,
+				082442A8220CA16300F39785 /* SRGUserData_v3_v4.xcmappingmodel in Sources */,
 				6FB521C02208838E0042FCC3 /* SRGUserData.xcdatamodeld in Sources */,
-				082442AA220CA21600F39785 /* SRGUserData_v1_v2.xcmappingmodel in Sources */,
+				082442AA220CA21600F39785 /* SRGUserData_v2_v3.xcmappingmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1780,11 +1789,12 @@
 		6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				0850E2BF22304169003BDCB8 /* SRGUserData_v4.xcdatamodel */,
 				082442A6220C8BA000F39785 /* SRGUserData_v3.xcdatamodel */,
 				082442A5220C8A8800F39785 /* SRGUserData_v2.xcdatamodel */,
 				6FB521BF2208838E0042FCC3 /* SRGUserData_v1.xcdatamodel */,
 			);
-			currentVersion = 082442A6220C8BA000F39785 /* SRGUserData_v3.xcdatamodel */;
+			currentVersion = 0850E2BF22304169003BDCB8 /* SRGUserData_v4.xcdatamodel */;
 			path = SRGUserData.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
