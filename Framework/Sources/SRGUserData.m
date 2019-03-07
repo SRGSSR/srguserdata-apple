@@ -17,7 +17,7 @@
 
 #import <libextobjc/libextobjc.h>
 
-static NSUInteger s_currentPersistentStoreVersion = 3;
+static NSUInteger s_currentPersistentStoreVersion = 5;
 
 typedef NSString * SRGUserDataServiceType NS_TYPED_ENUM;
 static SRGUserDataServiceType const SRGUserDataServiceTypeHistory = @"History";
@@ -115,9 +115,17 @@ NSString *SRGUserDataMarketingVersion(void)
         }
         
         self.dataStore = [[SRGDataStore alloc] initWithPersistentContainer:persistentContainer];
+        
+        dispatch_group_t group = dispatch_group_create();
+        
+        dispatch_group_enter(group);
         [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
             [SRGUser upsertInManagedObjectContext:managedObjectContext];
-        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:nil];
+        } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
+            dispatch_group_leave(group);
+        }];
+        
+        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
         
         NSMutableDictionary<SRGUserDataServiceType, SRGUserDataService *> *services = [NSMutableDictionary dictionary];
         services[SRGUserDataServiceTypeHistory] = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
