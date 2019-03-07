@@ -14,7 +14,7 @@
 
 #pragma mark Tests
 
-- (void)testFirstInstance
+- (void)testInstantiation
 {
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
     SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:nil];
@@ -23,30 +23,30 @@
     XCTAssertNotNil(userData.history);
 }
 
-- (void)testFirstInstanceWithHistoryServiceURL
+- (void)testInstantiationWithHistoryServiceURL
 {
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
-    NSURL *historyServiceURL = [NSURL URLWithString:@"https://missing.service"];
+    NSURL *historyServiceURL = [NSURL URLWithString:@"https://history.service"];
     SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:historyServiceURL identityService:nil];
     XCTAssertNotNil(userData);
     XCTAssertNotNil(userData.user);
     XCTAssertNotNil(userData.history);
 }
 
-- (void)testFirstInstanceWithIdentityService
+- (void)testInstantiationWithIdentityService
 {
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
-    SRGIdentityService *identityService = [[SRGIdentityService alloc] initWithWebserviceURL:[NSURL URLWithString:@"https://missing.webservice"] websiteURL:[NSURL URLWithString:@"https://missing.websiteurl"]];
+    SRGIdentityService *identityService = [[SRGIdentityService alloc] initWithWebserviceURL:[NSURL URLWithString:@"https://identity.webservice"] websiteURL:[NSURL URLWithString:@"https://identity.website"]];
     SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:identityService];
     XCTAssertNotNil(userData);
     XCTAssertNotNil(userData.user);
     XCTAssertNotNil(userData.history);
 }
 
-- (void)testFirstInstanceWithHistoryServiceURLAndIdentityService
+- (void)testInstantiationWithHistoryServiceURLAndIdentityService
 {
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
-    NSURL *historyServiceURL = [NSURL URLWithString:@"https://missing.service"];
+    NSURL *historyServiceURL = [NSURL URLWithString:@"https://history.service"];
     SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:historyServiceURL identityService:nil];
     XCTAssertNotNil(userData);
     XCTAssertNotNil(userData.user);
