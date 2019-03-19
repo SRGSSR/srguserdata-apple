@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.59" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="A6A-Ps-0a8">
+    <device id="ipad9_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.45"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Delegate-->
+        <scene sceneID="sIH-jk-ROp">
+            <objects>
+                <viewController id="A6A-Ps-0a8" customClass="PlayerViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Xul-ZD-b56">
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LJc-Y6-KTE" customClass="SRGLetterboxView">
+                                <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <outlet property="controller" destination="fsa-hY-eK6" id="9Xq-GL-cfz"/>
+                                    <outlet property="delegate" destination="A6A-Ps-0a8" id="7cG-Zu-kLu"/>
+                                </connections>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BM6-qQ-k06">
+                                <rect key="frame" x="10" y="30" width="48" height="48"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" image="close_48"/>
+                                <connections>
+                                    <action selector="close:" destination="A6A-Ps-0a8" eventType="touchUpInside" id="dLQ-FF-J0P"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="LJc-Y6-KTE" secondAttribute="bottom" id="73t-LL-4gD"/>
+                            <constraint firstItem="BM6-qQ-k06" firstAttribute="leading" secondItem="P37-7j-pII" secondAttribute="leading" constant="10" id="Bi3-Rn-NTM"/>
+                            <constraint firstAttribute="trailing" secondItem="LJc-Y6-KTE" secondAttribute="trailing" id="SbW-p2-gjh"/>
+                            <constraint firstItem="BM6-qQ-k06" firstAttribute="top" secondItem="P37-7j-pII" secondAttribute="top" constant="10" id="bUD-46-u0M"/>
+                            <constraint firstItem="LJc-Y6-KTE" firstAttribute="leading" secondItem="Xul-ZD-b56" secondAttribute="leading" id="fSX-ZH-AMq"/>
+                            <constraint firstItem="LJc-Y6-KTE" firstAttribute="top" secondItem="Xul-ZD-b56" secondAttribute="top" id="t2r-8H-YQE"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="P37-7j-pII"/>
+                    </view>
+                    <connections>
+                        <outlet property="closeButton" destination="BM6-qQ-k06" id="d6q-FX-7Fo"/>
+                        <outlet property="letterboxController" destination="fsa-hY-eK6" id="8XD-Wh-Z1m"/>
+                        <outlet property="letterboxView" destination="LJc-Y6-KTE" id="pdR-FX-gsA"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="9I3-9b-01C" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <customObject id="fsa-hY-eK6" customClass="SRGLetterboxController"/>
+            </objects>
+            <point key="canvasLocation" x="45.600000000000001" y="97.601199400299862"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="close_48" width="48" height="48"/>
+    </resources>
+</document>
