@@ -47,7 +47,7 @@
 - (void)setUp
 {
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
-    self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil identityService:nil];
+    self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil playlistServiceURL:nil identityService:nil];
 }
 
 - (void)tearDown

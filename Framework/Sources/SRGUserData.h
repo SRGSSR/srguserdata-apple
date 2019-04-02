@@ -9,6 +9,8 @@
 // Public headers.
 #import "SRGHistory.h"
 #import "SRGHistoryEntry.h"
+#import "SRGPlaylist.h"
+#import "SRGPlaylistEntry.h"
 #import "SRGUser.h"
 #import "SRGUserDataError.h"
 #import "SRGUserDataService.h"
@@ -38,14 +40,17 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
  *  Create a user data repository. The repository can be used to store data on device. Provided it is setup appropriately,
  *  logged in users can keep their data synchronized with their account.
  *
- *  @param storeFileURL      The file URL where the data is locally stored.
- *  @param identityService   The service which identities can be retrieved from. If none, no data synchronization will
- *                           occur.
- *  @param historyServiceURL The URL of the service with which local history information can be synchronized. If none
- *                           is provided, no history data synchronization will occur.
+ *  @param storeFileURL       The file URL where the data is locally stored.
+ *  @param identityService    The service which identities can be retrieved from. If none, no data synchronization will
+ *                            occur.
+ *  @param historyServiceURL  The URL of the service with which local history information can be synchronized. If none
+ *                            is provided, no history data synchronization will occur.
+ *  @param playlistServiceURL The URL of the service with which local playlists information can be synchronized. If none
+ *                            is provided, no playlist data synchronization will occur.
  */
 - (nullable instancetype)initWithStoreFileURL:(NSURL *)storeFileURL
                             historyServiceURL:(nullable NSURL *)historyServiceURL
+                           playlistServiceURL:(nullable NSURL *)playlistServiceURL
                               identityService:(nullable SRGIdentityService *)identityService;
 
 /**

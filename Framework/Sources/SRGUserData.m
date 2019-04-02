@@ -21,6 +21,7 @@ static NSUInteger s_currentPersistentStoreVersion = 6;
 
 typedef NSString * SRGUserDataServiceType NS_TYPED_ENUM;
 static SRGUserDataServiceType const SRGUserDataServiceTypeHistory = @"History";
+static SRGUserDataServiceType const SRGUserDataServiceTypePlaylist = @"Playlist";
 
 static SRGUserData *s_currentUserData = nil;
 
@@ -55,6 +56,7 @@ NSString *SRGUserDataMarketingVersion(void)
 
 - (instancetype)initWithStoreFileURL:(NSURL *)storeFileURL
                    historyServiceURL:(NSURL *)historyServiceURL
+                  playlistServiceURL:(nullable NSURL *)playlistServiceURL
                      identityService:(SRGIdentityService *)identityService
 {
     if (self = [super init]) {
@@ -129,6 +131,7 @@ NSString *SRGUserDataMarketingVersion(void)
         
         NSMutableDictionary<SRGUserDataServiceType, SRGUserDataService *> *services = [NSMutableDictionary dictionary];
         services[SRGUserDataServiceTypeHistory] = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
+        services[SRGUserDataServiceTypePlaylist] = [[SRGPlaylist alloc] initWithServiceURL:playlistServiceURL identityService:identityService dataStore:self.dataStore];
         self.services = [services copy];
         
         [NSNotificationCenter.defaultCenter addObserver:self
@@ -157,6 +160,13 @@ NSString *SRGUserDataMarketingVersion(void)
     SRGUserDataService *history = self.services[SRGUserDataServiceTypeHistory];
     NSAssert([history isKindOfClass:SRGHistory.class], @"History service expected");
     return (SRGHistory *)history;
+}
+
+- (SRGPlaylist *)playlist
+{
+    SRGUserDataService *playlist = self.services[SRGUserDataServiceTypePlaylist];
+    NSAssert([playlist isKindOfClass:SRGPlaylist.class], @"Playlist service expected");
+    return (SRGPlaylist *)playlist;
 }
 
 #pragma mark Migration

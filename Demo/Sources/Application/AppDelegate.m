@@ -29,6 +29,7 @@
     NSURL *fileURL = [[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:@"UserData-demo.sqlite"];
     SRGUserData.currentUserData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
                                                           historyServiceURL:[NSURL URLWithString:@"https://profil.rts.ch/api/history"]
+                                                         playlistServiceURL:nil
                                                             identityService:SRGIdentityService.currentIdentityService];
     
     SRGDataProvider.currentDataProvider = [[SRGDataProvider alloc] initWithServiceURL:SRGIntegrationLayerProductionServiceURL()];
