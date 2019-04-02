@@ -32,6 +32,7 @@
 		08624E65223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08624E64223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel */; };
 		08624E67223B114D007D919A /* UserData_DB_v5 in Resources */ = {isa = PBXBuildFile; fileRef = 08624E66223B114D007D919A /* UserData_DB_v5 */; };
 		08B327A7221324810051DDA6 /* HistoryTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 08B327A6221324810051DDA6 /* HistoryTestCase.m */; };
+		08C9919B22537833003E7816 /* SRGPlaylistEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 08C9919A22537833003E7816 /* SRGPlaylistEntry+Private.h */; };
 		08E9CC122230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08E9CC112230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel */; };
 		08E9CC142230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08E9CC132230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel */; };
 		08E9CC1622308CD70039A875 /* UserData_DB_v2 in Resources */ = {isa = PBXBuildFile; fileRef = 08E9CC1522308CD70039A875 /* UserData_DB_v2 */; };
@@ -264,6 +265,7 @@
 		08624E64223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v4_v5.xcmappingmodel; sourceTree = "<group>"; };
 		08624E66223B114D007D919A /* UserData_DB_v5 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v5; sourceTree = "<group>"; };
 		08B327A6221324810051DDA6 /* HistoryTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistoryTestCase.m; sourceTree = "<group>"; };
+		08C9919A22537833003E7816 /* SRGPlaylistEntry+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylistEntry+Private.h"; sourceTree = "<group>"; };
 		08E9CC112230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v1_v2.xcmappingmodel; sourceTree = "<group>"; };
 		08E9CC132230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v2_v3.xcmappingmodel; sourceTree = "<group>"; };
 		08E9CC1522308CD70039A875 /* UserData_DB_v2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v2; sourceTree = "<group>"; };
@@ -478,6 +480,7 @@
 				6FFB348C2209D57400E76E6D /* SRGHistoryEntry+Private.h */,
 				084ACC2C22535F48008ACBD0 /* SRGPlaylistEntry.h */,
 				084ACC2B22535F48008ACBD0 /* SRGPlaylistEntry.m */,
+				08C9919A22537833003E7816 /* SRGPlaylistEntry+Private.h */,
 				6F0178AD22080FEC00B4BCD9 /* SRGUser.h */,
 				6F0178AC22080FEC00B4BCD9 /* SRGUser.m */,
 				6F0178D722086F6D00B4BCD9 /* SRGUser+Private.h */,
@@ -778,6 +781,7 @@
 				6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */,
 				084ACC2E22535F48008ACBD0 /* SRGPlaylistEntry.h in Headers */,
 				6FFB347322089A5E00E76E6D /* SRGDataStore.h in Headers */,
+				08C9919B22537833003E7816 /* SRGPlaylistEntry+Private.h in Headers */,
 				6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */,
 				6F0178D02208199800B4BCD9 /* SRGUserDataTimerTarget.h in Headers */,
 				6F0178CC2208192B00B4BCD9 /* NSTimer+SRGUserData.h in Headers */,
