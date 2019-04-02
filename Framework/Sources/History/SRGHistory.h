@@ -91,7 +91,7 @@ OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
  *
  *  @discussion The completion block is called on a background thread.
  */
-- (NSString *)saveHistoryEntryForUid:(NSString *)Uid
+- (NSString *)saveHistoryEntryForUid:(NSString *)uid
                 withLastPlaybackTime:(CMTime)lastPlaybackTime
                            deviceUid:(nullable NSString *)deviceUid
                      completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
