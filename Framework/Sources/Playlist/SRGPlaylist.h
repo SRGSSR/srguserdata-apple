@@ -9,7 +9,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-OBJC_EXPORT NSString * const SRGSystemPlaylistWatchItLaterUid;                    // Watch it later unique id playlist
+/**
+ *  Return a suggested name for a system playlist, `nil` if none or unknown uid.
+ */
+OBJC_EXPORT NSString * _Nullable SRGPlaylistNameForPlaylistWithUid(NSString *uid);
+
+/**
+ *  Watch later system playlist uid
+ */
+OBJC_EXPORT NSString * const SRGPlaylistSystemWatchLaterUid;
 
 /**
  *  Notification sent when one or more playlists change. Use the keys below to retrieve detailed information from the notification

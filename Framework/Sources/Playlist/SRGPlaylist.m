@@ -22,7 +22,17 @@
 typedef void (^SRGPlaylistPullCompletionBlock)(NSDate * _Nullable serverDate, NSError * _Nullable error);
 typedef void (^SRGPlaylistPushCompletionBlock)(NSError * _Nullable error);
 
-NSString * const SRGSystemPlaylistWatchItLaterUid = @"watch_it_later";
+NSString *SRGPlaylistNameForPlaylistWithUid(NSString *uid)
+{
+    static dispatch_once_t s_onceToken;
+    static NSDictionary *s_names;
+    dispatch_once(&s_onceToken, ^{
+        s_names = @{ SRGPlaylistSystemWatchLaterUid : SRGUserDataLocalizedString(@"Watch it later", @"Default Watch it later playlist name") };
+    });
+    return s_names[uid];
+}
+
+NSString * const SRGPlaylistSystemWatchLaterUid = @"watch_later";
 
 NSString * const SRGPlaylistDidChangeNotification = @"SRGPlaylistDidChangeNotification";
 
@@ -52,15 +62,15 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
         
         // Check that system playlist exists.
-        SRGPlaylistEntry *watchItLaterPlaylistEntry = [self playlistEntryWithUid:SRGSystemPlaylistWatchItLaterUid];
+        SRGPlaylistEntry *watchItLaterPlaylistEntry = [self playlistEntryWithUid:SRGPlaylistSystemWatchLaterUid];
         if (! watchItLaterPlaylistEntry) {
             dispatch_group_t group = dispatch_group_create();
             
             dispatch_group_enter(group);
             [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                SRGPlaylistEntry *systemPlaylistEntry = [SRGPlaylistEntry upsertWithUid:SRGSystemPlaylistWatchItLaterUid inManagedObjectContext:managedObjectContext];
+                SRGPlaylistEntry *systemPlaylistEntry = [SRGPlaylistEntry upsertWithUid:SRGPlaylistSystemWatchLaterUid inManagedObjectContext:managedObjectContext];
                 systemPlaylistEntry.system = @YES;
-                systemPlaylistEntry.name = SRGUserDataLocalizedString(@"Watch it later", @"Default Watch it later playlist name");
+                systemPlaylistEntry.name = SRGPlaylistNameForPlaylistWithUid(SRGPlaylistSystemWatchLaterUid);
             } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
                 dispatch_group_leave(group);
             }];
