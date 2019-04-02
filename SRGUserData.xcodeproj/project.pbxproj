@@ -11,9 +11,9 @@
 		082442AF220CB0DD00F39785 /* UserData_DB_v4 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AD220CB0DD00F39785 /* UserData_DB_v4 */; };
 		082442B0220CB0DD00F39785 /* UserData_DB_v3 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AE220CB0DD00F39785 /* UserData_DB_v3 */; };
 		084ACC2822535ABD008ACBD0 /* SRGPlaylist.m in Sources */ = {isa = PBXBuildFile; fileRef = 084ACC2622535ABD008ACBD0 /* SRGPlaylist.m */; };
-		084ACC2922535ABD008ACBD0 /* SRGPlaylist.h in Headers */ = {isa = PBXBuildFile; fileRef = 084ACC2722535ABD008ACBD0 /* SRGPlaylist.h */; };
+		084ACC2922535ABD008ACBD0 /* SRGPlaylist.h in Headers */ = {isa = PBXBuildFile; fileRef = 084ACC2722535ABD008ACBD0 /* SRGPlaylist.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		084ACC2D22535F48008ACBD0 /* SRGPlaylistEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 084ACC2B22535F48008ACBD0 /* SRGPlaylistEntry.m */; };
-		084ACC2E22535F48008ACBD0 /* SRGPlaylistEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = 084ACC2C22535F48008ACBD0 /* SRGPlaylistEntry.h */; };
+		084ACC2E22535F48008ACBD0 /* SRGPlaylistEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = 084ACC2C22535F48008ACBD0 /* SRGPlaylistEntry.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0850E2C5223043C4003BDCB8 /* UserData_DB_v1 in Resources */ = {isa = PBXBuildFile; fileRef = 0850E2C4223043C4003BDCB8 /* UserData_DB_v1 */; };
 		0850E2C92230499A003BDCB8 /* UserDataTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0850E2C822304999003BDCB8 /* UserDataTestCase.m */; };
 		0858B69822010C9E000F00CF /* SRGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; };
