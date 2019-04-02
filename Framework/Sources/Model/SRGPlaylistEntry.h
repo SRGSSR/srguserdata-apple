@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  `YES` iff the playlist is a system mandatory one, otherwise, it's a user playlist.
  */
-@property (nonatomic, readonly, getter=isSystem) BOOL system;
+@property (nonatomic, readonly) BOOL system;
 
 @end
 
