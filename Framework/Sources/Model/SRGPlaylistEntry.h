@@ -1,0 +1,30 @@
+//
+//  Copyright (c) SRG SSR. All rights reserved.
+//
+//  License information is available from the LICENSE file.
+//
+
+#import "SRGUserObject.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+/**
+ *  Entry in the playlist service.
+ *
+ *  @discussion Instances must not be shared among threads.
+ */
+@interface SRGPlaylistEntry : SRGUserObject
+
+/**
+ *  A display name.
+ */
+@property (nonatomic, copy, nullable) NSString *name;
+
+/**
+ *  `YES` iff the playlist is a system mandatory one, otherwise, it's a user playlist.
+ */
+@property (nonatomic, readonly, getter=isSystem) BOOL system;
+
+@end
+
+NS_ASSUME_NONNULL_END

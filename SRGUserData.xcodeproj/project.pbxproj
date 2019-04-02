@@ -10,6 +10,10 @@
 		082442A8220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 082442A7220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel */; };
 		082442AF220CB0DD00F39785 /* UserData_DB_v4 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AD220CB0DD00F39785 /* UserData_DB_v4 */; };
 		082442B0220CB0DD00F39785 /* UserData_DB_v3 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AE220CB0DD00F39785 /* UserData_DB_v3 */; };
+		084ACC2822535ABD008ACBD0 /* SRGPlaylist.m in Sources */ = {isa = PBXBuildFile; fileRef = 084ACC2622535ABD008ACBD0 /* SRGPlaylist.m */; };
+		084ACC2922535ABD008ACBD0 /* SRGPlaylist.h in Headers */ = {isa = PBXBuildFile; fileRef = 084ACC2722535ABD008ACBD0 /* SRGPlaylist.h */; };
+		084ACC2D22535F48008ACBD0 /* SRGPlaylistEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 084ACC2B22535F48008ACBD0 /* SRGPlaylistEntry.m */; };
+		084ACC2E22535F48008ACBD0 /* SRGPlaylistEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = 084ACC2C22535F48008ACBD0 /* SRGPlaylistEntry.h */; };
 		0850E2C5223043C4003BDCB8 /* UserData_DB_v1 in Resources */ = {isa = PBXBuildFile; fileRef = 0850E2C4223043C4003BDCB8 /* UserData_DB_v1 */; };
 		0850E2C92230499A003BDCB8 /* UserDataTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0850E2C822304999003BDCB8 /* UserDataTestCase.m */; };
 		0858B69822010C9E000F00CF /* SRGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; };
@@ -243,6 +247,11 @@
 		082442A7220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v5_v6.xcmappingmodel; sourceTree = "<group>"; };
 		082442AD220CB0DD00F39785 /* UserData_DB_v4 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v4; sourceTree = "<group>"; };
 		082442AE220CB0DD00F39785 /* UserData_DB_v3 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v3; sourceTree = "<group>"; };
+		084ACC2622535ABD008ACBD0 /* SRGPlaylist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylist.m; sourceTree = "<group>"; };
+		084ACC2722535ABD008ACBD0 /* SRGPlaylist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPlaylist.h; sourceTree = "<group>"; };
+		084ACC2A22535CA6008ACBD0 /* SRGUserData_v7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v7.xcdatamodel; sourceTree = "<group>"; };
+		084ACC2B22535F48008ACBD0 /* SRGPlaylistEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylistEntry.m; sourceTree = "<group>"; };
+		084ACC2C22535F48008ACBD0 /* SRGPlaylistEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPlaylistEntry.h; sourceTree = "<group>"; };
 		0850E2BF22304169003BDCB8 /* SRGUserData_v4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v4.xcdatamodel; sourceTree = "<group>"; };
 		0850E2C4223043C4003BDCB8 /* UserData_DB_v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v1; sourceTree = "<group>"; };
 		0850E2C822304999003BDCB8 /* UserDataTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDataTestCase.m; sourceTree = "<group>"; };
@@ -452,12 +461,23 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		084ACC2522535ABD008ACBD0 /* Playlist */ = {
+			isa = PBXGroup;
+			children = (
+				084ACC2722535ABD008ACBD0 /* SRGPlaylist.h */,
+				084ACC2622535ABD008ACBD0 /* SRGPlaylist.m */,
+			);
+			path = Playlist;
+			sourceTree = "<group>";
+		};
 		6F0178AA22080FEC00B4BCD9 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				6F0178AB22080FEC00B4BCD9 /* SRGHistoryEntry.h */,
 				6F0178AE22080FEC00B4BCD9 /* SRGHistoryEntry.m */,
 				6FFB348C2209D57400E76E6D /* SRGHistoryEntry+Private.h */,
+				084ACC2C22535F48008ACBD0 /* SRGPlaylistEntry.h */,
+				084ACC2B22535F48008ACBD0 /* SRGPlaylistEntry.m */,
 				6F0178AD22080FEC00B4BCD9 /* SRGUser.h */,
 				6F0178AC22080FEC00B4BCD9 /* SRGUser.m */,
 				6F0178D722086F6D00B4BCD9 /* SRGUser+Private.h */,
@@ -520,6 +540,7 @@
 				6F0178CD2208199800B4BCD9 /* Helpers */,
 				6FFB346722089A5E00E76E6D /* History */,
 				6F0178AA22080FEC00B4BCD9 /* Model */,
+				084ACC2522535ABD008ACBD0 /* Playlist */,
 				6F0EB53E20FC7FA9009C02CF /* SRGUserData.h */,
 				6F0EB54220FC7FF4009C02CF /* SRGUserData.m */,
 				6FA9ADFD222C4944007446BD /* SRGUserDataError.h */,
@@ -527,8 +548,8 @@
 				6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */,
 				6FFB347B2209748900E76E6D /* SRGUserDataService.h */,
 				6FFB347D2209773F00E76E6D /* SRGUserDataService.m */,
-				6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */,
 				6FFB34872209C10800E76E6D /* SRGUserDataService+Private.h */,
+				6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -747,6 +768,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				084ACC2922535ABD008ACBD0 /* SRGPlaylist.h in Headers */,
 				6FFB347C2209759000E76E6D /* SRGUserDataService.h in Headers */,
 				6FFB347122089A5E00E76E6D /* SRGHistory.h in Headers */,
 				6F0178AF22080FEC00B4BCD9 /* SRGHistoryEntry.h in Headers */,
@@ -754,6 +776,7 @@
 				6F0178B122080FEC00B4BCD9 /* SRGUser.h in Headers */,
 				6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */,
 				6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */,
+				084ACC2E22535F48008ACBD0 /* SRGPlaylistEntry.h in Headers */,
 				6FFB347322089A5E00E76E6D /* SRGDataStore.h in Headers */,
 				6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */,
 				6F0178D02208199800B4BCD9 /* SRGUserDataTimerTarget.h in Headers */,
@@ -997,9 +1020,11 @@
 				6FFB347622089A5E00E76E6D /* SRGPersistentContainer.m in Sources */,
 				6F0178B022080FEC00B4BCD9 /* SRGUser.m in Sources */,
 				6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */,
+				084ACC2822535ABD008ACBD0 /* SRGPlaylist.m in Sources */,
 				6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */,
 				6F0178B222080FEC00B4BCD9 /* SRGHistoryEntry.m in Sources */,
 				6FFB347222089A5E00E76E6D /* SRGHistory.m in Sources */,
+				084ACC2D22535F48008ACBD0 /* SRGPlaylistEntry.m in Sources */,
 				6F0178CB2208192B00B4BCD9 /* NSTimer+SRGUserData.m in Sources */,
 				6FFB347522089A5E00E76E6D /* SRGDataStore.m in Sources */,
 			);
@@ -1811,6 +1836,7 @@
 		6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				084ACC2A22535CA6008ACBD0 /* SRGUserData_v7.xcdatamodel */,
 				08624E61223B0AE7007D919A /* SRGUserData_v6.xcdatamodel */,
 				0850E2CA22307E24003BDCB8 /* SRGUserData_v5.xcdatamodel */,
 				0850E2BF22304169003BDCB8 /* SRGUserData_v4.xcdatamodel */,
@@ -1818,7 +1844,7 @@
 				082442A5220C8A8800F39785 /* SRGUserData_v2.xcdatamodel */,
 				6FB521BF2208838E0042FCC3 /* SRGUserData_v1.xcdatamodel */,
 			);
-			currentVersion = 08624E61223B0AE7007D919A /* SRGUserData_v6.xcdatamodel */;
+			currentVersion = 084ACC2A22535CA6008ACBD0 /* SRGUserData_v7.xcdatamodel */;
 			path = SRGUserData.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
