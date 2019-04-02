@@ -270,7 +270,14 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
         NSArray<SRGPlaylistEntry *> *previousPlaylistEntries = [SRGPlaylistEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         previousUids = [previousPlaylistEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, uid)]];
         
-        changedUids = [SRGPlaylistEntry discardObjectsWithUids:uids inManagedObjectContext:managedObjectContext];
+        NSArray<NSString *> *discardUids = uids ?: previousUids;
+        if ([discardUids containsObject:SRGPlaylistSystemWatchLaterUid]) {
+            NSMutableArray<NSString *> *mutableUids = discardUids.mutableCopy;
+            [mutableUids removeObject:SRGPlaylistSystemWatchLaterUid];
+            discardUids = mutableUids.copy;
+        }
+        
+        changedUids = [SRGPlaylistEntry discardObjectsWithUids:discardUids inManagedObjectContext:managedObjectContext];
         
         NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
         [uids removeObjectsInArray:changedUids];
