@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  @see `SRGPlaylistEntry.h`
  */
+@property (nonatomic, copy) NSString *name;
 @property (nonatomic, getter=isSystem) BOOL system;
 
 @end

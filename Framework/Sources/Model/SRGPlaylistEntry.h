@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  A display name.
  */
-@property (nonatomic, copy, nullable) NSString *name;
+@property (nonatomic, readonly, copy) NSString *name;
 
 /**
  *  `YES` iff the playlist is a system mandatory one, otherwise, it's a user playlist.

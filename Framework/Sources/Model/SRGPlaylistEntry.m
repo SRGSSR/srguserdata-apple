@@ -13,6 +13,7 @@
 
 @interface SRGUserObject ()
 
+@property (nonatomic, copy) NSString *name;
 @property (nonatomic, getter=isSystem) BOOL system;
 
 @end
