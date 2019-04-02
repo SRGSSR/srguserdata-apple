@@ -63,6 +63,11 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
  */
 @property (nonatomic, readonly) SRGHistory *history;
 
+/**
+ *  Access to the user playlists.
+ */
+@property (nonatomic, readonly) SRGPlaylist *playlist;
+
 @end
 
 NS_ASSUME_NONNULL_END
