@@ -50,6 +50,23 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
 {
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
+        
+        // Check that system playlist exists.
+        SRGPlaylistEntry *watchItLaterPlaylistEntry = [self playlistEntryWithUid:SRGSystemPlaylistWatchItLaterUid];
+        if (! watchItLaterPlaylistEntry) {
+            dispatch_group_t group = dispatch_group_create();
+            
+            dispatch_group_enter(group);
+            [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                SRGPlaylistEntry *systemPlaylistEntry = [SRGPlaylistEntry upsertWithUid:SRGSystemPlaylistWatchItLaterUid inManagedObjectContext:managedObjectContext];
+                systemPlaylistEntry.system = @YES;
+                systemPlaylistEntry.name = SRGUserDataLocalizedString(@"Watch it later", @"Default Watch it later playlist name");
+            } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
+                dispatch_group_leave(group);
+            }];
+            
+            dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+        }
     }
     return self;
 }
@@ -181,40 +198,14 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
 - (SRGPlaylistEntry *)playlistEntryWithUid:(NSString *)uid
 {
     return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGPlaylistEntry *playlistEntry = [SRGPlaylistEntry objectWithUid:uid inManagedObjectContext:managedObjectContext];
-
-        if ([uid isEqualToString:SRGSystemPlaylistWatchItLaterUid] && !playlistEntry) {
-            dispatch_group_t group = dispatch_group_create();
-            
-            dispatch_group_enter(group);
-            [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                SRGPlaylistEntry *watchItLaterPlaylistEntry = [SRGPlaylistEntry upsertWithUid:uid inManagedObjectContext:managedObjectContext];
-                watchItLaterPlaylistEntry.system = @YES;
-                watchItLaterPlaylistEntry.name = SRGUserDataLocalizedString(@"Watch it later", @"Default Watch it later playlist name");
-            } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-                dispatch_group_leave(group);
-            }];
-            
-            dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-            playlistEntry = [SRGPlaylistEntry objectWithUid:uid inManagedObjectContext:managedObjectContext];
-        }
-        
-        return playlistEntry;
+        return [SRGPlaylistEntry objectWithUid:uid inManagedObjectContext:managedObjectContext];
     }];
 }
 
 - (NSString *)playlistEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGPlaylistEntry * _Nullable, NSError * _Nullable))completionBlock
 {
     return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        if ([uid isEqualToString:SRGSystemPlaylistWatchItLaterUid]) {
-            SRGPlaylistEntry *playlistEntry = [SRGPlaylistEntry upsertWithUid:uid inManagedObjectContext:managedObjectContext];
-            playlistEntry.system = @YES;
-            playlistEntry.name = SRGUserDataLocalizedString(@"Watch it later", @"Default Watch it later playlist name");
-            return playlistEntry;
-        }
-        else {
-            return [SRGPlaylistEntry objectWithUid:uid inManagedObjectContext:managedObjectContext];
-        }
+        return [SRGPlaylistEntry objectWithUid:uid inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
@@ -228,11 +219,7 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
         previousUids = [previousPlaylistEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, uid)]];
         
         SRGPlaylistEntry *playlistEntry = [SRGPlaylistEntry upsertWithUid:uid inManagedObjectContext:managedObjectContext];
-        if ([uid isEqualToString:SRGSystemPlaylistWatchItLaterUid]) {
-            playlistEntry.system = @YES;
-            playlistEntry.name = SRGUserDataLocalizedString(@"Watch it later", @"Default Watch it later playlist name");
-        }
-        else {
+        if (! playlistEntry.system) {
             playlistEntry.name = name;
         }
         
