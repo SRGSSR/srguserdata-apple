@@ -6,7 +6,6 @@
 
 #import "SRGPlaylistEntry.h"
 
-#import "SRGUser.h"
 #import "SRGUserObject+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
