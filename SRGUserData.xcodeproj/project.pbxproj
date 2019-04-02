@@ -33,6 +33,7 @@
 		08624E67223B114D007D919A /* UserData_DB_v5 in Resources */ = {isa = PBXBuildFile; fileRef = 08624E66223B114D007D919A /* UserData_DB_v5 */; };
 		08B327A7221324810051DDA6 /* HistoryTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 08B327A6221324810051DDA6 /* HistoryTestCase.m */; };
 		08C9919B22537833003E7816 /* SRGPlaylistEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 08C9919A22537833003E7816 /* SRGPlaylistEntry+Private.h */; };
+		08C9919D22538379003E7816 /* PlaylistTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 08C9919C22538379003E7816 /* PlaylistTestCase.m */; };
 		08E9CC122230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08E9CC112230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel */; };
 		08E9CC142230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08E9CC132230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel */; };
 		08E9CC1622308CD70039A875 /* UserData_DB_v2 in Resources */ = {isa = PBXBuildFile; fileRef = 08E9CC1522308CD70039A875 /* UserData_DB_v2 */; };
@@ -266,6 +267,7 @@
 		08624E66223B114D007D919A /* UserData_DB_v5 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v5; sourceTree = "<group>"; };
 		08B327A6221324810051DDA6 /* HistoryTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistoryTestCase.m; sourceTree = "<group>"; };
 		08C9919A22537833003E7816 /* SRGPlaylistEntry+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylistEntry+Private.h"; sourceTree = "<group>"; };
+		08C9919C22538379003E7816 /* PlaylistTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaylistTestCase.m; sourceTree = "<group>"; };
 		08E9CC112230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v1_v2.xcmappingmodel; sourceTree = "<group>"; };
 		08E9CC132230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v2_v3.xcmappingmodel; sourceTree = "<group>"; };
 		08E9CC1522308CD70039A875 /* UserData_DB_v2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v2; sourceTree = "<group>"; };
@@ -727,6 +729,7 @@
 				6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */,
 				08B327A6221324810051DDA6 /* HistoryTestCase.m */,
 				6FCCE4802212BFD600423EFF /* MigrationTestCase.m */,
+				08C9919C22538379003E7816 /* PlaylistTestCase.m */,
 				0850E2C822304999003BDCB8 /* UserDataTestCase.m */,
 				6FB19596221442BF00D3BF88 /* UserObjectTestCase.m */,
 			);
@@ -1067,6 +1070,7 @@
 				6F3234322212ED240046E265 /* UserDataBaseTestCase.m in Sources */,
 				6FB19597221442BF00D3BF88 /* UserObjectTestCase.m in Sources */,
 				6F32342D2212E9B90046E265 /* TestData.xcdatamodeld in Sources */,
+				08C9919D22538379003E7816 /* PlaylistTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
