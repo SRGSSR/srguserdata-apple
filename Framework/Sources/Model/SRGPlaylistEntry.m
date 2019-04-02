@@ -10,7 +10,7 @@
 
 #import <libextobjc/libextobjc.h>
 
-@interface SRGUserObject ()
+@interface SRGPlaylistEntry ()
 
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic) BOOL system;
