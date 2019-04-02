@@ -50,6 +50,31 @@ OBJC_EXPORT NSString * const SRGPlaylistDidFinishSynchronizationNotification;
 @interface SRGPlaylist : SRGUserDataService
 
 /**
+ *  Return playlist entries, optionally matching a specific predicate and / or sorted with descriptors. If no sort
+ *  descriptors are provided, entries are still returned in a stable order.
+ *
+ *  @discussion This method can only be called from the main thread. Reads on other threads must occur asynchronously
+ *              with `-playlistEntriesMatchingPredicate:sortedWithDescriptors:completionBlock:`.
+ */
+- (NSArray<SRGPlaylistEntry *> *)playlistEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                                            sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
+
+/**
+ *  Return playlist entries, optionally matching a specific predicate and / or sorted with descriptors. If no sort
+ *  descriptors are provided, entries are still returned in a stable order. The read occurs asynchronously, calling
+ *  the provided block on completion.
+ *
+ *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
+ *                     will be called with an error.
+ *
+ *  @discussion The completion block is called on a background thread. You can only use the returned object on this
+ *              thread.
+ */
+- (NSString *)playlistEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                         sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
+                               completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error))completionBlock;
+
+/**
  *  Return the playlist entry matching the specified identifier, if any.
  *
  *  @discussion This method can only be called from the main thread.
@@ -75,11 +100,24 @@ OBJC_EXPORT NSString * const SRGPlaylistDidFinishSynchronizationNotification;
  *                     will be called with an error and the corresponding transaction rollbacked.
  *
  *  @discussion The completion block is called on a background thread.
- *              Set aname to a system playlist has no effect.
+ *              Set a name to a system playlist has no effect.
  */
 - (NSString *)savePlaylistEntryForUid:(NSString *)uid
                              withName:(NSString *)name
                      completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
+
+/**
+ *  Asynchronously discard playlist entries matching an identifier list, calling the provided block on completion. If no
+ *  list is provided, all entries are discarded, expect system playlists.
+ *
+ *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
+ *                     will be called with an error and the corresponding transaction rollbacked.
+ *
+ *  @discussion The completion block is called on a background thread.
+ *              Discard a system playlist has no effect.
+ */
+- (NSString *)discardPlaylistEntriesWithUids:(nullable NSArray<NSString *> *)uids
+                             completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
  *  Cancel the task having the specified handle.
