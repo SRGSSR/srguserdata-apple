@@ -108,7 +108,7 @@ OBJC_EXPORT NSString * const SRGPlaylistDidFinishSynchronizationNotification;
                  completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
- *  Asynchronously discard playlists matching an identifier list, calling the provided block on completion. If no
+ *  Asynchronously discard playlists matching an identifier in the list, calling the provided block on completion. If no
  *  list is provided, all entries are discarded, expect system playlists.
  *
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
@@ -157,6 +157,7 @@ OBJC_EXPORT NSString * const SRGPlaylistDidFinishSynchronizationNotification;
  *
  *  @discussion The completion block is called on a background thread.
  *              Adding an already added entry with the same uid will just update the added date, not duplicate the entry.
+ *              This method adds nothing if the playlist does not exist and returns an error.
  */
 - (NSString *)addEntryWithUid:(NSString *)uid
             toPlaylistWithUid:(NSString *)playlistUid

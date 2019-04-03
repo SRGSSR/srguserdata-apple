@@ -567,11 +567,21 @@
 {
     NSString *uid = @"1234";
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry added"];
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist entry added"];
     
     [self.userData.playlists addEntryWithUid:uid toPlaylistWithUid:SRGPlaylistSystemWatchLaterUid completionBlock:^(NSError * _Nullable error) {
         XCTAssertNil(error);
-        [expectation fulfill];
+        [expectation1 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlist entry not added"];
+    
+    [self.userData.playlists addEntryWithUid:uid toPlaylistWithUid:@"notFound" completionBlock:^(NSError * _Nullable error) {
+        XCTAssertEqualObjects(error.domain, SRGUserDataErrorDomain);
+        XCTAssertEqual(error.code, SRGUserDataErrorPlaylistNotFound);
+        [expectation2 fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];

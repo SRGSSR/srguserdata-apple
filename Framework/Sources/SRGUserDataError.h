@@ -13,7 +13,11 @@ typedef NS_ENUM(NSInteger, SRGUserDataErrorCode) {
     /**
      *  An operation has been cancelled
      */
-    SRGUserDataErrorCancelled
+    SRGUserDataErrorCancelled,
+    /**
+     *  A not found playlist
+     */
+    SRGUserDataErrorPlaylistNotFound
 };
 
 /**

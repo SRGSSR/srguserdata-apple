@@ -11,6 +11,7 @@
 #import "SRGPlaylist+Private.h"
 #import "SRGPlaylistEntry+Private.h"
 #import "SRGUser+Private.h"
+#import "SRGUserDataError.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserObject+Private.h"
 #import "SRGUserObject+Subclassing.h"
@@ -329,10 +330,24 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
 
 - (NSString *)addEntryWithUid:(NSString *)uid toPlaylistWithUid:(NSString *)playlistUid completionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
+    __block BOOL isPlaylistFound = NO;
+    
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
-        [SRGPlaylistEntry upsertWithUid:uid playlist:playlist inManagedObjectContext:managedObjectContext];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
+        if (playlist) {
+            isPlaylistFound = YES;
+            [SRGPlaylistEntry upsertWithUid:uid playlist:playlist inManagedObjectContext:managedObjectContext];
+        }
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        if (!error && !isPlaylistFound) {
+            completionBlock([NSError errorWithDomain:SRGUserDataErrorDomain
+                                                code:SRGUserDataErrorPlaylistNotFound
+                                            userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when adding an entry to an unknown playlist.") }]);
+        }
+        else {
+            completionBlock(error);
+        }
+    }];
 }
 
 - (void)cancelTaskWithHandle:(NSString *)handle
