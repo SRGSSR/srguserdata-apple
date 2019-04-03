@@ -4,20 +4,20 @@
 //  License information is available from the LICENSE file.
 //
 
-#import "SRGPlaylistEntry.h"
+#import "SRGPlaylist.h"
 
 #import "SRGUserObject+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
 
-@interface SRGPlaylistEntry ()
+@interface SRGPlaylist ()
 
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic) BOOL system;
 
 @end
 
-@implementation SRGPlaylistEntry
+@implementation SRGPlaylist
 
 @dynamic name;
 @dynamic system;

@@ -4,17 +4,17 @@
 //  License information is available from the LICENSE file.
 //
 
-#import "SRGPlaylistEntry.h"
+#import "SRGPlaylist.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  Private interface for implementation purposes.
  */
-@interface SRGPlaylistEntry (Private)
+@interface SRGPlaylist (Private)
 
 /**
- *  @see `SRGPlaylistEntry.h`
+ *  @see `SRGPlaylist.h`
  */
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic) BOOL system;

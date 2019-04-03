@@ -89,7 +89,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
     self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
                                             historyServiceURL:historyServiceURL
-                                           playlistServiceURL:nil
+                                          playlistsServiceURL:nil
                                               identityService:self.identityService];
 }
 

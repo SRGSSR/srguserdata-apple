@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @discussion Instances must not be shared among threads.
  */
-@interface SRGPlaylistEntry : SRGUserObject
+@interface SRGPlaylist : SRGUserObject
 
 /**
  *  A display name.

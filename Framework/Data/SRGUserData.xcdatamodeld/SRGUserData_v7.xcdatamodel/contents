@@ -4,7 +4,7 @@
         <attribute name="deviceUid" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="lastPlaybackPosition" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
     </entity>
-    <entity name="SRGPlaylistEntry" representedClassName="SRGPlaylistEntry" parentEntity="SRGUserObject" syncable="YES">
+    <entity name="SRGPlaylist" representedClassName="SRGPlaylist" parentEntity="SRGUserObject" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="system" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
     </entity>
@@ -21,8 +21,8 @@
     </entity>
     <elements>
         <element name="SRGHistoryEntry" positionX="-63" positionY="-18" width="128" height="75"/>
+        <element name="SRGPlaylist" positionX="-54" positionY="36" width="128" height="75"/>
         <element name="SRGUser" positionX="-63" positionY="27" width="128" height="90"/>
         <element name="SRGUserObject" positionX="-45" positionY="36" width="128" height="105"/>
-        <element name="SRGPlaylistEntry" positionX="-54" positionY="36" width="128" height="75"/>
     </elements>
 </model>
