@@ -36,6 +36,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (__kindof SRGPlaylistEntry *)upsertWithUid:(NSString *)uid playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
+/**
+ *  Discard the entries with the specified identifiers in a playlist. Since some of them might not be found, the method returns the actual
+ *  list of identifiers which will be discarded. For logged in users, objects will be deleted when the next synchronization
+ *  is performed. For logged out users, objects are removed immediately.
+ *
+ *  @discussion Order is not preserved in the rerturned value (in comparison to the original list). Already discarded objects
+ *              are omitted.
+ */
++ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+
 @end
 
 NS_ASSUME_NONNULL_END

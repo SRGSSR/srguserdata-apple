@@ -164,6 +164,20 @@ OBJC_EXPORT NSString * const SRGPlaylistDidFinishSynchronizationNotification;
               completionBlock:(void (^)(NSError * _Nullable error))completionBlock;
 
 /**
+ *  Asynchronously remove playlist entries matching an identifier in the list, calling the provided block on completion.
+ *  If no list is provided, all entries in the playlist are removed.
+ *
+ *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
+ *                     will be called with an error and the corresponding transaction rollbacked.
+ *
+ *  @discussion The completion block is called on a background thread.
+ *              This method remove nothing if the playlist does not exist and returns an error.
+ */
+- (NSString *)removeEntriesWithUids:(nullable NSArray<NSString *> *)uids
+                fromPlaylistWithUid:(NSString *)playlistUid
+                    completionBlock:(void (^)(NSError * _Nullable error))completionBlock;
+
+/**
  *  Cancel the task having the specified handle.
  */
 - (void)cancelTaskWithHandle:(NSString *)handle;

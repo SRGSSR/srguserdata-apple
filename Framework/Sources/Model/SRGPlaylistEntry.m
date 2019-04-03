@@ -6,6 +6,8 @@
 
 #import "SRGPlaylistEntry.h"
 
+#import "SRGUser+Private.h"
+
 #import <libextobjc/libextobjc.h>
 
 @interface SRGPlaylistEntry ()
@@ -70,6 +72,33 @@
     object.discarded = NO;
     object.date = NSDate.date;
     return object;
+}
+
++ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+{
+    NSAssert(playlist, @"Playlist entry must have a playlist");
+    
+    NSPredicate *predicate = uids ? [NSPredicate predicateWithFormat:@"%K IN %@ AND discarded == NO && %K == %@", @keypath(SRGUserObject.new, uid), uids, @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid] : [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid];
+    NSArray<SRGPlaylistEntry *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+    NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
+    
+    if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
+        NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
+        fetchRequest.predicate = predicate;
+        
+        NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
+        [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
+    }
+    else {
+        NSBatchUpdateRequest *batchUpdateRequest = [[NSBatchUpdateRequest alloc] initWithEntityName:NSStringFromClass(self)];
+        batchUpdateRequest.predicate = predicate;
+        batchUpdateRequest.propertiesToUpdate = @{ @keypath(SRGPlaylistEntry.new, discarded) : @YES,
+                                                   @keypath(SRGPlaylistEntry.new, dirty) : @YES,
+                                                   @keypath(SRGPlaylistEntry.new, date) : NSDate.date };
+        [managedObjectContext executeRequest:batchUpdateRequest error:NULL];
+    }
+    
+    return discardedUids;
 }
 
 @end

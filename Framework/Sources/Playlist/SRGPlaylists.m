@@ -350,6 +350,28 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
     }];
 }
 
+- (NSString *)removeEntriesWithUids:(NSArray<NSString *> *)uids fromPlaylistWithUid:(NSString *)playlistUid completionBlock:(void (^)(NSError * _Nullable error))completionBlock
+{
+    __block BOOL isPlaylistFound = NO;
+    
+    return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
+        if (playlist) {
+            isPlaylistFound = YES;
+            [SRGPlaylistEntry discardObjectsWithUids:uids playlist:playlist inManagedObjectContext:managedObjectContext];
+        }
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        if (!error && !isPlaylistFound) {
+            completionBlock([NSError errorWithDomain:SRGUserDataErrorDomain
+                                                code:SRGUserDataErrorPlaylistNotFound
+                                            userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }]);
+        }
+        else {
+            completionBlock(error);
+        }
+    }];
+}
+
 - (void)cancelTaskWithHandle:(NSString *)handle
 {
     [self.dataStore cancelBackgroundTaskWithHandle:handle];
