@@ -5,6 +5,7 @@
 //
 
 #import "SRGPlaylist.h"
+#import "SRGPlaylistEntry.h"
 
 #import "SRGUserObject+Subclassing.h"
 
@@ -15,12 +16,16 @@
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic) BOOL system;
 
+@property (nonatomic, nullable) NSOrderedSet<SRGPlaylistEntry *> *entries;
+
 @end
 
 @implementation SRGPlaylist
 
 @dynamic name;
 @dynamic system;
+
+@dynamic entries;
 
 #pragma mark Getters and Setters
 

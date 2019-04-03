@@ -31,7 +31,7 @@
     
     for (NSString *uid in uids) {
         NSString *name = [NSString stringWithFormat:@"Playlist %@", uid];
-        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry saved"];
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
         
         [self.userData.playlists savePlaylistForUid:uid withName:name completionBlock:^(NSError * _Nonnull error) {
             XCTAssertNil(error);
@@ -90,7 +90,7 @@
         return YES;
     }];
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry saved"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
     
     [self.userData.playlists savePlaylistForUid:uid withName:name completionBlock:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -120,7 +120,7 @@
     
     for (NSString *uid in uids) {
         NSString *name = [NSString stringWithFormat:nameFormat, uid];
-        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry saved"];
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
         
         [self.userData.playlists savePlaylistForUid:uid withName:name completionBlock:^(NSError * _Nullable error) {
             XCTAssertNil(error);
@@ -161,7 +161,7 @@
     }];
     
     for (NSUInteger i = 0; i < numberOfSaves; i++) {
-        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry saved"];
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
         
         [self.userData.playlists savePlaylistForUid:uid withName:name completionBlock:^(NSError * _Nonnull error) {
             XCTAssertNil(error);
@@ -191,7 +191,7 @@
     NSString *uid = @"1234";
     NSString *name = @"Playlist 1234";
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry saved"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
     
     [self.userData.playlists savePlaylistForUid:uid withName:name completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
@@ -217,7 +217,7 @@
     NSString *uid = @"1234";
     NSString *name = @"Playlist 1234";
     
-    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist entry saved"];
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist saved"];
     
     [self.userData.playlists savePlaylistForUid:uid withName:name completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
@@ -226,7 +226,7 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlist entry fetched"];
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlist fetched"];
     
     [self.userData.playlists playlistWithUid:uid completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
@@ -239,7 +239,7 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Playlist entry fetched"];
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Playlist fetched"];
     
     [self.userData.playlists playlistWithUid:@"notFound" completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
         XCTAssertNil(playlist);
@@ -270,7 +270,7 @@
 
 - (void)testPlaylistsMatchingEmptyPredicateEmptySortDescriptorAsynchronously
 {
-    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist entries fetched"];
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlists fetched"];
     
     [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylist *> * _Nonnull playlists1, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
@@ -285,7 +285,7 @@
     [self saveUids:uids];
     NSArray<NSString *> *resultUids = [uids arrayByAddingObject:SRGPlaylistSystemWatchLaterUid];
     
-    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlist entries fetched"];
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlists fetched"];
     
     [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylist *> * _Nonnull playlists2, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
@@ -360,7 +360,7 @@
     NSArray<NSString *> *resultUids = [uids arrayByAddingObject:SRGPlaylistSystemWatchLaterUid];
     NSArray<NSString *> *resultByDateUids = [@[SRGPlaylistSystemWatchLaterUid] arrayByAddingObjectsFromArray:uids];
     
-    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist entries fetched"];
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlists fetched"];
     
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, date) ascending:YES];
     [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor1] completionBlock:^(NSArray<SRGPlaylist *> * _Nonnull playlists1, NSError * _Nullable error) {
@@ -373,7 +373,7 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlist entries fetched"];
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlists fetched"];
     
     NSSortDescriptor *sortDescriptor2 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, uid) ascending:YES];
     [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor2] completionBlock:^(NSArray<SRGPlaylist *> * _Nonnull playlists2, NSError * _Nullable error) {
@@ -386,7 +386,7 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Playlist entries fetched"];
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Playlists fetched"];
     
     NSPredicate *predicate3 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylist.new, discarded)];
     [self.userData.playlists playlistsMatchingPredicate:predicate3 sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylist *> * _Nonnull playlists3, NSError * _Nullable error) {
@@ -399,7 +399,7 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    XCTestExpectation *expectation4 = [self expectationWithDescription:@"Playlist entries fetched"];
+    XCTestExpectation *expectation4 = [self expectationWithDescription:@"Playlists fetched"];
     
     NSPredicate *predicate4 = [NSPredicate predicateWithFormat:@"%K == 'Playlist 78'", @keypath(SRGPlaylist.new, name)];
     [self.userData.playlists playlistsMatchingPredicate:predicate4 sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylist *> * _Nonnull playlists4, NSError * _Nullable error) {
@@ -412,7 +412,7 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    XCTestExpectation *expectation5 = [self expectationWithDescription:@"Playlist entries fetched"];
+    XCTestExpectation *expectation5 = [self expectationWithDescription:@"Playlists fetched"];
     
     NSString *queryUid = @"34";
     NSPredicate *predicate5 = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylist.new, uid), queryUid];
@@ -427,7 +427,7 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    XCTestExpectation *expectation6 = [self expectationWithDescription:@"Playlist entries fetched"];
+    XCTestExpectation *expectation6 = [self expectationWithDescription:@"Playlists fetched"];
     
     NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ || %K CONTAINS[cd] %@", @keypath(SRGPlaylist.new, uid), @"1", @keypath(SRGPlaylist.new, uid), @"9"];
     NSSortDescriptor *sortDescriptor6 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, date) ascending:YES];
@@ -561,6 +561,111 @@
     [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
         [NSNotificationCenter.defaultCenter removeObserver:playlistDidChangeObserver];
     }];
+}
+
+- (void)testAddEntryToPlaylist
+{
+    NSString *uid = @"1234";
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry added"];
+    
+    [self.userData.playlists addEntryWithUid:uid toPlaylistWithUid:SRGPlaylistSystemWatchLaterUid completionBlock:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+}
+
+- (void)testFetchEntriesFromPlaylist
+{
+    NSString *uid = @"1234";
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry saved"];
+    
+    [self.userData.playlists addEntryWithUid:uid toPlaylistWithUid:SRGPlaylistSystemWatchLaterUid completionBlock:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    NSArray<SRGPlaylistEntry *> *playlistEntries1 = [self.userData.playlists entriesFromPlaylistWithUid:SRGPlaylistSystemWatchLaterUid matchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertEqual(playlistEntries1.count, 1);
+    
+    NSArray<SRGPlaylistEntry *> *playlistEntries2 = [self.userData.playlists entriesFromPlaylistWithUid:@"notFound" matchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertNil(playlistEntries2);
+}
+
+- (void)testFetchEntriesFromPlaylistAsynchronously
+{
+    NSString *uid = @"1234";
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry saved"];
+    
+    [self.userData.playlists addEntryWithUid:uid toPlaylistWithUid:SRGPlaylistSystemWatchLaterUid completionBlock:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlist entry fetched"];
+    
+    [self.userData.playlists entriesFromPlaylistWithUid:SRGPlaylistSystemWatchLaterUid matchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
+        XCTAssertEqual(playlistEntries.count, 1);
+        [expectation2 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Playlist entry fetched"];
+    
+    [self.userData.playlists entriesFromPlaylistWithUid:@"notFound" matchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
+        XCTAssertNil(playlistEntries);
+        [expectation3 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+}
+
+- (void)testAddEntriesToPlaylist
+{
+    NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
+    
+    for (NSString *uid in uids) {
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry added"];
+        
+        [self.userData.playlists addEntryWithUid:uid toPlaylistWithUid:SRGPlaylistSystemWatchLaterUid completionBlock:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [expectation fulfill];
+        }];
+    }
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    NSArray<SRGPlaylistEntry *> *playlistEntries = [self.userData.playlists entriesFromPlaylistWithUid:SRGPlaylistSystemWatchLaterUid matchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertEqual(playlistEntries.count, 5);
+}
+
+- (void)testAddSameEntriesToPlaylist
+{
+    NSString *uid = @"1234";
+    
+    NSUInteger numberOfSaves = 5;
+    for (NSUInteger i = 0; i < numberOfSaves; i++) {
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry added"];
+        
+        [self.userData.playlists addEntryWithUid:uid toPlaylistWithUid:SRGPlaylistSystemWatchLaterUid completionBlock:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [expectation fulfill];
+        }];
+    }
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    NSArray<SRGPlaylistEntry *> *playlistEntries = [self.userData.playlists entriesFromPlaylistWithUid:SRGPlaylistSystemWatchLaterUid matchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertEqual(playlistEntries.count, 1);
 }
 
 @end

@@ -9,6 +9,7 @@
 #import "NSBundle+SRGUserData.h"
 #import "SRGDataStore.h"
 #import "SRGPlaylist+Private.h"
+#import "SRGPlaylistEntry+Private.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserObject+Private.h"
@@ -294,6 +295,44 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
         }
         completionBlock ? completionBlock(error) : nil;
     }];
+}
+
+- (NSArray<SRGPlaylistEntry *> *)entriesFromPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(nullable NSPredicate *)predicate sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
+{
+    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
+        if (!playlist) {
+            return nil;
+        }
+        NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlistUid];
+        if (predicate) {
+            fetchPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[fetchPredicate, predicate]];
+        }
+        return [SRGPlaylistEntry objectsMatchingPredicate:fetchPredicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+    }];
+}
+
+- (NSString *)entriesFromPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(nullable NSPredicate *)predicate sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable, NSError * _Nullable))completionBlock
+{
+    return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
+        if (!playlist) {
+            return nil;
+        }
+        NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlistUid];
+        if (predicate) {
+            fetchPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[fetchPredicate, predicate]];
+        }
+        return [SRGPlaylistEntry objectsMatchingPredicate:fetchPredicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
+}
+
+- (NSString *)addEntryWithUid:(NSString *)uid toPlaylistWithUid:(NSString *)playlistUid completionBlock:(void (^)(NSError * _Nullable))completionBlock
+{
+    return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
+        [SRGPlaylistEntry upsertWithUid:uid playlist:playlist inManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
 - (void)cancelTaskWithHandle:(NSString *)handle

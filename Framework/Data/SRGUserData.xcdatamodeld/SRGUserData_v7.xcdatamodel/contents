@@ -7,6 +7,14 @@
     <entity name="SRGPlaylist" representedClassName="SRGPlaylist" parentEntity="SRGUserObject" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="system" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="entries" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="SRGPlaylistEntry" inverseName="playlist" inverseEntity="SRGPlaylistEntry" syncable="YES"/>
+    </entity>
+    <entity name="SRGPlaylistEntry" representedClassName="SRGPlaylistEntry" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="dirty" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="discarded" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="playlist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SRGPlaylist" inverseName="entries" inverseEntity="SRGPlaylist" syncable="YES"/>
     </entity>
     <entity name="SRGUser" representedClassName="SRGUser" syncable="YES">
         <attribute name="accountUid" optional="YES" attributeType="String" syncable="YES"/>
@@ -21,8 +29,9 @@
     </entity>
     <elements>
         <element name="SRGHistoryEntry" positionX="-63" positionY="-18" width="128" height="75"/>
-        <element name="SRGPlaylist" positionX="-54" positionY="36" width="128" height="75"/>
+        <element name="SRGPlaylist" positionX="-54" positionY="36" width="128" height="90"/>
         <element name="SRGUser" positionX="-63" positionY="27" width="128" height="90"/>
         <element name="SRGUserObject" positionX="-45" positionY="36" width="128" height="105"/>
+        <element name="SRGPlaylistEntry" positionX="-45" positionY="45" width="128" height="120"/>
     </elements>
 </model>
