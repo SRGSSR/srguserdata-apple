@@ -161,7 +161,7 @@ OBJC_EXPORT NSString * const SRGPlaylistDidFinishSynchronizationNotification;
  */
 - (NSString *)addEntryWithUid:(NSString *)uid
             toPlaylistWithUid:(NSString *)playlistUid
-              completionBlock:(void (^)(NSError * _Nullable error))completionBlock;
+              completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
  *  Asynchronously remove playlist entries matching an identifier in the list, calling the provided block on completion.
@@ -175,7 +175,7 @@ OBJC_EXPORT NSString * const SRGPlaylistDidFinishSynchronizationNotification;
  */
 - (NSString *)removeEntriesWithUids:(nullable NSArray<NSString *> *)uids
                 fromPlaylistWithUid:(NSString *)playlistUid
-                    completionBlock:(void (^)(NSError * _Nullable error))completionBlock;
+                    completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
  *  Cancel the task having the specified handle.

@@ -340,13 +340,11 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
         }
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (!error && !isPlaylistFound) {
-            completionBlock([NSError errorWithDomain:SRGUserDataErrorDomain
-                                                code:SRGUserDataErrorPlaylistNotFound
-                                            userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when adding an entry to an unknown playlist.") }]);
+            error = [NSError errorWithDomain:SRGUserDataErrorDomain
+                                        code:SRGUserDataErrorPlaylistNotFound
+                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when adding an entry to an unknown playlist.") }];
         }
-        else {
-            completionBlock(error);
-        }
+        completionBlock ? completionBlock(error) : nil;
     }];
 }
 
@@ -362,13 +360,11 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
         }
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (!error && !isPlaylistFound) {
-            completionBlock([NSError errorWithDomain:SRGUserDataErrorDomain
-                                                code:SRGUserDataErrorPlaylistNotFound
-                                            userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }]);
+            error = [NSError errorWithDomain:SRGUserDataErrorDomain
+                                        code:SRGUserDataErrorPlaylistNotFound
+                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
         }
-        else {
-            completionBlock(error);
-        }
+        completionBlock ? completionBlock(error) : nil;
     }];
 }
 
