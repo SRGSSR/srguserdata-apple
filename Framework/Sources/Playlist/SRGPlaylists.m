@@ -391,19 +391,54 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
 
 - (NSString *)removeEntriesWithUids:(NSArray<NSString *> *)uids fromPlaylistWithUid:(NSString *)playlistUid completionBlock:(void (^)(NSError * _Nullable error))completionBlock
 {
+    __block NSArray<NSString *> *previousPlaylistUids = nil;
+    __block NSArray<NSString *> *currentPlaylistUids = nil;
+    
+    __block NSArray<NSString *> *changedPlaylistEntryUids = nil;
+    
+    __block NSArray<NSString *> *previousPlaylistEntryUids = nil;
+    __block NSArray<NSString *> *currentPlaylistEntryUids = nil;
+    
     __block BOOL isPlaylistFound = NO;
     
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
         if (playlist) {
             isPlaylistFound = YES;
-            [SRGPlaylistEntry discardObjectsWithUids:uids playlist:playlist inManagedObjectContext:managedObjectContext];
+            
+            NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+            previousPlaylistUids = currentPlaylistUids = [playlists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
+            
+            NSOrderedSet<SRGPlaylistEntry *> *previousPlaylistEntries = playlist.entries;
+            NSOrderedSet<NSString *> *previousPlaylistEntryUidsOrderedSet = [previousPlaylistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
+            previousPlaylistEntryUids = previousPlaylistEntryUidsOrderedSet.array;
+            
+            changedPlaylistEntryUids = [SRGPlaylistEntry discardObjectsWithUids:uids playlist:playlist inManagedObjectContext:managedObjectContext];
+            
+            NSMutableArray<NSString *> *playlistEntryUids = [previousPlaylistEntryUids mutableCopy];
+            [playlistEntryUids removeObjectsInArray:changedPlaylistEntryUids];
+            currentPlaylistEntryUids = [playlistEntryUids copy];
         }
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (!error && !isPlaylistFound) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                         code:SRGUserDataErrorPlaylistNotFound
                                     userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
+        }
+        
+        if (! error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSDictionary<NSString *, NSArray *> *playlistEntryChanges = @{ SRGPlaylistEntryChangedUidsSubKey : changedPlaylistEntryUids,
+                                                                               SRGPlaylistEntryPreviousUidsSubKey : previousPlaylistEntryUids,
+                                                                               SRGPlaylistEntryUidsSubKey : currentPlaylistEntryUids };
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGPlaylistChangedUidsKey : @[playlistUid],
+                                                                            SRGPlaylistPreviousUidsKey : previousPlaylistUids,
+                                                                            SRGPlaylistUidsKey : currentPlaylistUids,
+                                                                            SRGPlaylistEntryChangesKey : @{ playlistUid : playlistEntryChanges }
+                                                                            }];
+            });
         }
         completionBlock ? completionBlock(error) : nil;
     }];
