@@ -44,6 +44,16 @@
 
 - (void)addPlaylistEntryUids:(NSArray<NSString *> *)uids toPlaylistUid:(NSString *)playlistUid
 {
+    NSMutableArray<NSString *> *expectedAddedNotifications = uids.mutableCopy;
+    
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistEntryChangesKey][playlistUid][SRGPlaylistEntryChangedUidsSubKey];
+        [expectedAddedNotifications removeObjectsInArray:uids];
+        return (expectedAddedNotifications.count == 0);
+        return YES;
+    }];
+    
     for (NSString *uid in uids) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry added"];
         
@@ -581,6 +591,25 @@
 {
     NSString *uid = @"1234";
     
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistChangedUidsKey], @[SRGPlaylistSystemWatchLaterUid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistPreviousUidsKey], @[SRGPlaylistSystemWatchLaterUid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidsKey], @[SRGPlaylistSystemWatchLaterUid]);
+        
+        NSDictionary *playlistEntryChanges = notification.userInfo[SRGPlaylistEntryChangesKey];
+        XCTAssertNotNil(playlistEntryChanges);
+        XCTAssertEqual(playlistEntryChanges.count, 1);
+        
+        NSDictionary *systemWatchLaterPlaylistEntryChanges = playlistEntryChanges[SRGPlaylistSystemWatchLaterUid];
+        XCTAssertNotNil(systemWatchLaterPlaylistEntryChanges);
+        XCTAssertEqualObjects(systemWatchLaterPlaylistEntryChanges[SRGPlaylistEntryChangedUidsSubKey], @[uid]);
+        XCTAssertEqualObjects(systemWatchLaterPlaylistEntryChanges[SRGPlaylistEntryPreviousUidsSubKey], @[]);
+        XCTAssertEqualObjects(systemWatchLaterPlaylistEntryChanges[SRGPlaylistEntryUidsSubKey], @[uid]);
+        
+        return YES;
+    }];
+    
     XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist entry added"];
     
     [self.userData.playlists addEntryWithUid:uid toPlaylistWithUid:SRGPlaylistSystemWatchLaterUid completionBlock:^(NSError * _Nullable error) {
@@ -657,6 +686,15 @@
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
     
+    NSMutableArray<NSString *> *expectedAddedNotifications = uids.mutableCopy;
+    
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistEntryChangesKey][SRGPlaylistSystemWatchLaterUid][SRGPlaylistEntryChangedUidsSubKey];
+        [expectedAddedNotifications removeObjectsInArray:uids];
+        return (expectedAddedNotifications.count == 0);
+    }];
+    
     for (NSString *uid in uids) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry added"];
         
@@ -676,8 +714,17 @@
 {
     NSString *uid = @"1234";
     
-    NSUInteger numberOfSaves = 5;
-    for (NSUInteger i = 0; i < numberOfSaves; i++) {
+    NSUInteger numberOfAdditions = 5;
+    __block NSUInteger expectedAddedNotifications = numberOfAdditions;
+    
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistEntryChangesKey][SRGPlaylistSystemWatchLaterUid][SRGPlaylistEntryChangedUidsSubKey];
+        expectedAddedNotifications -= uids.count;
+        return (expectedAddedNotifications == 0);
+    }];
+    
+    for (NSUInteger i = 0; i < numberOfAdditions; i++) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entry added"];
         
         [self.userData.playlists addEntryWithUid:uid toPlaylistWithUid:SRGPlaylistSystemWatchLaterUid completionBlock:^(NSError * _Nullable error) {

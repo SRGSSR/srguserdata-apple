@@ -26,9 +26,19 @@ OBJC_EXPORT NSString * const SRGPlaylistSystemWatchLaterUid;
  */
 OBJC_EXPORT NSString * const SRGPlaylistsDidChangeNotification;                   // Notification name.
 
-OBJC_EXPORT NSString * const SRGPlaylistChangedUidsKey;                           // Key to access the list of uids which have changed as an `NSArray` of `NSString` objects.
-OBJC_EXPORT NSString * const SRGPlaylistPreviousUidsKey;                          // Key to access the previous uid list as an `NSArray` of `NSString` objects.
-OBJC_EXPORT NSString * const SRGPlaylistUidsKey;                                  // Key to access the current uid list as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPlaylistChangedUidsKey;                           // Key to access the list of playlist uids which have changed as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPlaylistPreviousUidsKey;                          // Key to access the previous playlist uid list as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPlaylistUidsKey;                                  // Key to access the current playlist uid list as an `NSArray` of `NSString` objects.
+
+/**
+ *  Additionnal keys sent in the playlist notification when one or more playlist entries change. Use the key below to
+ *  retrieve detailed information from the notification `userInfo` dictionary, ans sub keys in each sub dictionnaries.
+ */
+OBJC_EXPORT NSString * const SRGPlaylistEntryChangesKey;                          // Key to access the list of playlist entry uids which have changed as an `NSDictionnary` of `NSDictionnary` objects, which is a playlist uid to a dictionnary of playlist entry keys.
+
+OBJC_EXPORT NSString * const SRGPlaylistEntryChangedUidsSubKey;                   // Key to access the list of entry uids which have changed as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPlaylistEntryPreviousUidsSubKey;                  // Key to access the previous entry uid list as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPlaylistEntryUidsSubKey;                          // Key to access the current entry uid list as an `NSArray` of `NSString` objects.
 
 /**
  *  Notification sent when playlists synchronization has started.

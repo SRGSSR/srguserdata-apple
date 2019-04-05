@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic) BOOL system;
 
+@property (nonatomic, nullable) NSOrderedSet<SRGPlaylistEntry *> *entries;
+
 @end
 
 NS_ASSUME_NONNULL_END
