@@ -8,6 +8,7 @@
 
 #import "HistoryViewController.h"
 #import "MediasViewController.h"
+#import "PlaylistsViewController.h"
 
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGIdentity/SRGIdentity.h>
@@ -47,8 +48,12 @@
     UINavigationController *historyNavigationController = [[UINavigationController alloc] initWithRootViewController:historyViewController];
     historyNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"History", nil) image:[UIImage imageNamed:@"history_30"] tag:0];
     
+    PlaylistsViewController *playlistsViewController = [[PlaylistsViewController alloc] init];
+    UINavigationController *playlistsNavigationController = [[UINavigationController alloc] initWithRootViewController:playlistsViewController];
+    playlistsNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Playlists", nil) image:[UIImage imageNamed:@"playlists_30"] tag:0];
+    
     UITabBarController *tabBarController = [[UITabBarController alloc] init];
-    tabBarController.viewControllers = @[mediasNavigationController, historyNavigationController];
+    tabBarController.viewControllers = @[mediasNavigationController, historyNavigationController, playlistsNavigationController];
     
     self.window.rootViewController = tabBarController;
     return YES;

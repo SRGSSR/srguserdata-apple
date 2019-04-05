@@ -19,6 +19,7 @@
 @property (nonatomic) IBOutlet SRGLetterboxController *letterboxController;     // top-level object, retained
 
 @property (nonatomic, weak) IBOutlet UIButton *closeButton;
+@property (nonatomic, weak) IBOutlet UIButton *playlistsButton;
 
 @end
 
@@ -66,6 +67,7 @@
     [self.view layoutIfNeeded];
     [letterboxView animateAlongsideUserInterfaceWithAnimations:^(BOOL hidden, BOOL minimal, CGFloat heightOffset) {
         self.closeButton.alpha = (minimal || ! hidden) ? 1.f : 0.f;
+        self.playlistsButton.alpha = (minimal || ! hidden) ? 1.f : 0.f;
         [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
         if (@available(iOS 11, *)) {
@@ -79,6 +81,35 @@
 - (IBAction)close:(id)sender
 {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (IBAction)playlists:(id)sender
+{
+    SRGMedia *media = self.letterboxController.media;
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add to playlist", nil)
+                                                                             message:media.title
+                                                                      preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylist.new, discarded)];
+    NSSortDescriptor *systemSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, system) ascending:NO];
+    NSSortDescriptor *nameSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, name) ascending:YES];
+    NSArray<SRGPlaylist *> *playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:@[systemSortDescriptor, nameSortDescriptor]];
+    
+    for (SRGPlaylist *playlist in playlists) {
+        UIAlertAction *action = [UIAlertAction actionWithTitle:playlist.name style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [SRGUserData.currentUserData.playlists addEntryWithUid:media.URN
+                                                 toPlaylistWithUid:playlist.uid
+                                                   completionBlock:nil];
+        }];
+        [alertController addAction:action];
+        
+        if ([playlist.uid isEqualToString:SRGPlaylistSystemWatchLaterUid]) {
+            alertController.preferredAction = action;
+        }
+    }
+    
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 @end
