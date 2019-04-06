@@ -279,9 +279,13 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
         previousUids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
         NSArray<NSString *> *discardUids = uids ?: previousUids;
-        if ([discardUids containsObject:SRGWatchLaterPlaylistUid]) {
+        
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@ && %K IN %@", @keypath(SRGPlaylist.new, system), @(YES), @keypath(SRGPlaylist.new, uid), discardUids];
+        NSArray<SRGPlaylist *> *excludePlaylists = [previousPlaylists filteredArrayUsingPredicate:predicate];
+        if (excludePlaylists.count > 0) {
+            NSArray<NSString *> *excludeUids = [excludePlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
             NSMutableArray<NSString *> *mutableUids = discardUids.mutableCopy;
-            [mutableUids removeObject:SRGWatchLaterPlaylistUid];
+            [mutableUids removeObjectsInArray:excludeUids];
             discardUids = mutableUids.copy;
         }
         
