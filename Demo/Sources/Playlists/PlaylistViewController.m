@@ -169,10 +169,15 @@
 
 - (void)playlistsDidChange:(NSNotification *)notification
 {
-    NSArray<NSString *> *previousURNs = notification.userInfo[SRGHistoryPreviousUidsKey];
-    NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
-    if (URNs.count == 0 || previousURNs.count == 0) {
-        [self refresh];
+    if ([notification.userInfo[SRGPlaylistChangedUidsKey] containsObject:self.playlist.uid]) {
+        NSDictionary *playlistEntryChanges = notification.userInfo[SRGPlaylistEntryChangesKey][self.playlist.uid];
+        if (playlistEntryChanges) {
+            NSArray<NSString *> *previousURNs = playlistEntryChanges[SRGPlaylistEntryPreviousUidsSubKey];
+            NSArray<NSString *> *URNs = playlistEntryChanges[SRGPlaylistEntryUidsSubKey];
+            if (URNs.count == 0 || previousURNs.count == 0) {
+                [self refresh];
+            }
+        }
     }
 }
 
