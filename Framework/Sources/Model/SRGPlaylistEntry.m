@@ -74,6 +74,43 @@
     return object;
 }
 
++ (SRGPlaylistEntry *)synchronizeWithDictionary:(NSDictionary *)dictionary playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+{
+    NSString *uid = dictionary[@"media_id"];
+    if (! uid) {
+        return nil;
+    }
+    
+    NSNumber *timestamp = dictionary[@"date"];
+    if (! timestamp) {
+        return nil;
+    }
+    
+    // If the local entry is dirty and more recent than the server version, keep the local version as is.
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.];
+    SRGPlaylistEntry *object = [self objectWithUid:uid playlist:playlist inManagedObjectContext:managedObjectContext];
+    if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
+        return object;
+    }
+    
+    BOOL isDeleted = [dictionary[@"deleted"] boolValue];
+    if (isDeleted) {
+        if (object) {
+            [managedObjectContext deleteObject:object];
+        }
+        return object;
+    }
+    
+    if (! object) {
+        object = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(self) inManagedObjectContext:managedObjectContext];
+        object.playlist = playlist;
+    }
+    
+    [object updateWithDictionary:dictionary];
+    object.dirty = NO;
+    return object;
+}
+
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 {
     NSAssert(playlist, @"Playlist entry must have a playlist");
@@ -99,6 +136,15 @@
     }
     
     return discardedUids;
+}
+
+#pragma mark Updates
+
+- (void)updateWithDictionary:(NSDictionary *)dictionary
+{
+    self.uid = dictionary[@"media_id"];
+    self.date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
+    self.discarded = [dictionary[@"deleted"] boolValue];
 }
 
 @end

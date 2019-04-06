@@ -37,6 +37,15 @@ NS_ASSUME_NONNULL_BEGIN
 + (__kindof SRGPlaylistEntry *)upsertWithUid:(NSString *)uid playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
+ *  Synchronize the receiver with the information from the provided dictionary. The entry might be created, updated
+ *  or deleted automatically, in which it is returned by the method. If the dictionary data is invalid, the method
+ *  returns `nil`.
+ *
+ *  @discussion To persist changes, the Core Data managed object context needs to be saved.
+ */
++ (nullable __kindof SRGPlaylistEntry *)synchronizeWithDictionary:(NSDictionary *)dictionary playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+
+/**
  *  Discard the entries with the specified identifiers in a playlist. Since some of them might not be found, the method returns the actual
  *  list of identifiers which will be discarded. For logged in users, objects will be deleted when the next synchronization
  *  is performed. For logged out users, objects are removed immediately.

@@ -6,6 +6,8 @@
 
 #import "UserDataBaseTestCase.h"
 
+#import "SRGPlaylists+Private.h"
+
 #import <libextobjc/libextobjc.h>
 
 @interface SRGPlaylistsTestCase : UserDataBaseTestCase
@@ -805,5 +807,43 @@
     XCTAssertNotNil(playlistEntries4);
 }
 
+- (void)testPlaylistEntriesMigrationToPlaylist
+{
+    NSDate *date = NSDate.date;
+    NSArray<NSDictionary *> *migrations = @[ @{ @"media_id" : @"90",
+                                                @"date" : @(round((date.timeIntervalSince1970 - 2) * 1000.)) },
+                                             @{ @"media_id" : @"78",
+                                                @"date" : @(round((date.timeIntervalSince1970 - 4) * 1000.)) },
+                                             @{ @"media_id" : @"56",
+                                                @"date" : @(round((date.timeIntervalSince1970 - 6) * 1000.)) },
+                                             @{ @"media_id" : @"34",
+                                                @"date" : @(round((date.timeIntervalSince1970 - 8) * 1000.)) },
+                                             @{ @"media_id" : @"12",
+                                                @"date" : @(round((date.timeIntervalSince1970 - 10) * 1000.)) } ];
+    
+    NSMutableArray<NSString *> *expectedAddedNotifications = [[migrations valueForKey:@"media_id"] mutableCopy];
+    
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistEntryChangesKey][SRGWatchLaterPlaylistUid][SRGPlaylistEntryChangedUidsSubKey];
+        [expectedAddedNotifications removeObjectsInArray:uids];
+        return (expectedAddedNotifications.count == 0);
+    }];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entries added"];
+    
+    [self.userData.playlists saveEntryDictionaries:migrations toPlaylistUid:SRGWatchLaterPlaylistUid withCompletionBlock:^(NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGUserObject.new, date) ascending:NO];
+    NSArray<SRGPlaylistEntry *> *playlistEntries = [self.userData.playlists entriesFromPlaylistWithUid:SRGWatchLaterPlaylistUid matchingPredicate:nil sortedWithDescriptors:@[ sortDescriptor ]];
+    XCTAssertEqual(playlistEntries.count, 5);
+    XCTAssertEqualObjects([playlistEntries valueForKey:@keypath(SRGPlaylistEntry.new, uid)], [migrations valueForKey:@"media_id"]);
+}
 
 @end

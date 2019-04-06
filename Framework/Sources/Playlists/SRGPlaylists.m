@@ -5,6 +5,7 @@
 //
 
 #import "SRGPlaylists.h"
+#import "SRGPlaylists+Private.h"
 
 #import "NSBundle+SRGUserData.h"
 #import "SRGDataStore.h"
@@ -133,6 +134,76 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
                                                                 userInfo:@{ SRGPlaylistChangedUidsKey : [changedUids copy],
                                                                             SRGPlaylistPreviousUidsKey : previousUids,
                                                                             SRGPlaylistUidsKey : currentUids }];
+            });
+        }
+        completionBlock(error);
+    }];
+}
+
+- (void)saveEntryDictionaries:(NSArray<NSDictionary *> *)playlistEntryDictionaries toPlaylistUid:(NSString *)playlistUid withCompletionBlock:(void (^)(NSError *error))completionBlock
+{
+    if (playlistEntryDictionaries.count == 0) {
+        completionBlock(nil);
+        return;
+    }
+    
+    __block NSArray<NSString *> *previousPlaylistUids = nil;
+    __block NSArray<NSString *> *currentPlaylistUids = nil;
+    
+    __block NSMutableArray<NSString *> *changedPlaylistEntryUids = [NSMutableArray array];
+    
+    __block NSArray<NSString *> *previousPlaylistEntryUids = nil;
+    __block NSArray<NSString *> *currentPlaylistEntryUids = nil;
+    
+    __block BOOL isPlaylistFound = NO;
+    
+    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
+        if (playlist) {
+            isPlaylistFound = YES;
+            
+            NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+            previousPlaylistUids = currentPlaylistUids = [playlists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
+            
+            NSOrderedSet<SRGPlaylistEntry *> *previousPlaylistEntries = playlist.entries;
+            NSOrderedSet<NSString *> *previousPlaylistEntryUidsOrderedSet = [previousPlaylistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
+            previousPlaylistEntryUids = previousPlaylistEntryUidsOrderedSet.array;
+            
+            NSMutableArray<NSString *> *uids = [previousPlaylistEntryUids mutableCopy];
+            for (NSDictionary *playlistEntryDictionary in playlistEntryDictionaries) {
+                SRGPlaylistEntry *playlistEntry = [SRGPlaylistEntry synchronizeWithDictionary:playlistEntryDictionary playlist:playlist inManagedObjectContext:managedObjectContext];
+                if (playlistEntry) {
+                    [changedPlaylistEntryUids addObject:playlistEntry.uid];
+                    
+                    if (playlistEntry.inserted) {
+                        [uids addObject:playlistEntry.uid];
+                    }
+                    else if (playlistEntry.deleted) {
+                        [uids removeObject:playlistEntry.uid];
+                    }
+                }
+            }
+            currentPlaylistEntryUids = [uids copy];
+        }
+    } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
+        if (!error && !isPlaylistFound) {
+            error = [NSError errorWithDomain:SRGUserDataErrorDomain
+                                        code:SRGUserDataErrorPlaylistNotFound
+                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
+        }
+        
+        if (! error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSDictionary<NSString *, NSArray<NSString *> *> *playlistEntryChanges = @{ SRGPlaylistEntryChangedUidsSubKey : [changedPlaylistEntryUids copy],
+                                                                                           SRGPlaylistEntryPreviousUidsSubKey : previousPlaylistEntryUids,
+                                                                                           SRGPlaylistEntryUidsSubKey : currentPlaylistEntryUids };
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGPlaylistChangedUidsKey : @[playlistUid],
+                                                                            SRGPlaylistPreviousUidsKey : previousPlaylistUids,
+                                                                            SRGPlaylistUidsKey : currentPlaylistUids,
+                                                                            SRGPlaylistEntryChangesKey : @{ playlistUid : playlistEntryChanges }
+                                                                            }];
             });
         }
         completionBlock(error);
