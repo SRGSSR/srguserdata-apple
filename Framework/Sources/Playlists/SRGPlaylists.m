@@ -69,21 +69,24 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
         
-        // Check that system playlist exists.
-        SRGPlaylist *watchItLaterPlaylist = [self playlistWithUid:SRGWatchLaterPlaylistUid];
-        if (! watchItLaterPlaylist) {
-            dispatch_group_t group = dispatch_group_create();
-            
-            dispatch_group_enter(group);
-            [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                SRGPlaylist *systemPlaylist = [SRGPlaylist upsertWithUid:SRGWatchLaterPlaylistUid inManagedObjectContext:managedObjectContext];
-                systemPlaylist.system = @YES;
-                systemPlaylist.name = SRGPlaylistNameForPlaylistWithUid(SRGWatchLaterPlaylistUid);
-            } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-                dispatch_group_leave(group);
-            }];
-            
-            dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+        // Check that the default playlists exists.
+        NSArray<NSString *> *defaultPlaylistUids = @[ SRGWatchLaterPlaylistUid ];
+        for (NSString *uid in defaultPlaylistUids) {
+            SRGPlaylist *playlist = [self playlistWithUid:uid];
+            if (! playlist) {
+                dispatch_group_t group = dispatch_group_create();
+                
+                dispatch_group_enter(group);
+                [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                    SRGPlaylist *defaultlaylist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
+                    defaultlaylist.system = @YES;
+                    defaultlaylist.name = SRGPlaylistNameForPlaylistWithUid(uid);
+                } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
+                    dispatch_group_leave(group);
+                }];
+                
+                dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+            }
         }
     }
     return self;
