@@ -29,7 +29,7 @@ NSString *SRGPlaylistNameForPlaylistWithUid(NSString *uid)
     static dispatch_once_t s_onceToken;
     static NSDictionary *s_names;
     dispatch_once(&s_onceToken, ^{
-        s_names = @{ SRGPlaylistSystemWatchLaterUid : SRGUserDataLocalizedString(@"Watch it later", @"Default Watch it later playlist name") };
+        s_names = @{ SRGPlaylistSystemWatchLaterUid : SRGUserDataLocalizedString(@"Watch later", @"Default Watch later playlist name") };
     });
     return s_names[uid];
 }
