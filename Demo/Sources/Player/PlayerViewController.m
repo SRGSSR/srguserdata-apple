@@ -103,7 +103,7 @@
         }];
         [alertController addAction:action];
         
-        if ([playlist.uid isEqualToString:SRGPlaylistSystemWatchLaterUid]) {
+        if ([playlist.uid isEqualToString:SRGWatchLaterPlaylistUid]) {
             alertController.preferredAction = action;
         }
     }

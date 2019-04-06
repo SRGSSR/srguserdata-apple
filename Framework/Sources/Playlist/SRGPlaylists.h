@@ -16,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 OBJC_EXPORT NSString * _Nullable SRGPlaylistNameForPlaylistWithUid(NSString *uid);
 
 /**
- *  Watch later system playlist uid
+ *  Watch later playlist uid.
  */
-OBJC_EXPORT NSString * const SRGPlaylistSystemWatchLaterUid;
+OBJC_EXPORT NSString * const SRGWatchLaterPlaylistUid;
 
 /**
  *  Notification sent when one or more playlists change. Use the keys below to retrieve detailed information from the notification

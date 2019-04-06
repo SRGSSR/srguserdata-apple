@@ -29,12 +29,12 @@ NSString *SRGPlaylistNameForPlaylistWithUid(NSString *uid)
     static dispatch_once_t s_onceToken;
     static NSDictionary *s_names;
     dispatch_once(&s_onceToken, ^{
-        s_names = @{ SRGPlaylistSystemWatchLaterUid : SRGUserDataLocalizedString(@"Watch later", @"Default Watch later playlist name") };
+        s_names = @{ SRGWatchLaterPlaylistUid : SRGUserDataLocalizedString(@"Watch later", @"Default Watch later playlist name") };
     });
     return s_names[uid];
 }
 
-NSString * const SRGPlaylistSystemWatchLaterUid = @"watch_later";
+NSString * const SRGWatchLaterPlaylistUid = @"watch_later";
 
 NSString * const SRGPlaylistsDidChangeNotification = @"SRGPlaylistsDidChangeNotification";
 
@@ -70,15 +70,15 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
         
         // Check that system playlist exists.
-        SRGPlaylist *watchItLaterPlaylist = [self playlistWithUid:SRGPlaylistSystemWatchLaterUid];
+        SRGPlaylist *watchItLaterPlaylist = [self playlistWithUid:SRGWatchLaterPlaylistUid];
         if (! watchItLaterPlaylist) {
             dispatch_group_t group = dispatch_group_create();
             
             dispatch_group_enter(group);
             [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                SRGPlaylist *systemPlaylist = [SRGPlaylist upsertWithUid:SRGPlaylistSystemWatchLaterUid inManagedObjectContext:managedObjectContext];
+                SRGPlaylist *systemPlaylist = [SRGPlaylist upsertWithUid:SRGWatchLaterPlaylistUid inManagedObjectContext:managedObjectContext];
                 systemPlaylist.system = @YES;
-                systemPlaylist.name = SRGPlaylistNameForPlaylistWithUid(SRGPlaylistSystemWatchLaterUid);
+                systemPlaylist.name = SRGPlaylistNameForPlaylistWithUid(SRGWatchLaterPlaylistUid);
             } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
                 dispatch_group_leave(group);
             }];
@@ -279,9 +279,9 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
         previousUids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
         NSArray<NSString *> *discardUids = uids ?: previousUids;
-        if ([discardUids containsObject:SRGPlaylistSystemWatchLaterUid]) {
+        if ([discardUids containsObject:SRGWatchLaterPlaylistUid]) {
             NSMutableArray<NSString *> *mutableUids = discardUids.mutableCopy;
-            [mutableUids removeObject:SRGPlaylistSystemWatchLaterUid];
+            [mutableUids removeObject:SRGWatchLaterPlaylistUid];
             discardUids = mutableUids.copy;
         }
         
