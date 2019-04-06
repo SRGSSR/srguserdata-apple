@@ -601,7 +601,7 @@
         XCTAssertNotNil(playlistEntryChanges);
         XCTAssertEqual(playlistEntryChanges.count, 1);
         
-        NSDictionary *systemWatchLaterPlaylistEntryChanges = playlistEntryChanges[SRGWatchLaterPlaylistUid];
+        NSDictionary<NSString *, NSArray<NSString *> *> *systemWatchLaterPlaylistEntryChanges = playlistEntryChanges[SRGWatchLaterPlaylistUid];
         XCTAssertNotNil(systemWatchLaterPlaylistEntryChanges);
         XCTAssertEqualObjects(systemWatchLaterPlaylistEntryChanges[SRGPlaylistEntryChangedUidsSubKey], @[uid]);
         XCTAssertEqualObjects(systemWatchLaterPlaylistEntryChanges[SRGPlaylistEntryPreviousUidsSubKey], @[]);
@@ -763,7 +763,7 @@
         XCTAssertNotNil(playlistEntryChanges);
         XCTAssertEqual(playlistEntryChanges.count, 1);
         
-        NSDictionary *systemWatchLaterPlaylistEntryChanges = playlistEntryChanges[playlistUid];
+        NSDictionary<NSString *, NSArray<NSString *> *> *systemWatchLaterPlaylistEntryChanges = playlistEntryChanges[playlistUid];
         XCTAssertNotNil(systemWatchLaterPlaylistEntryChanges);
         XCTAssertEqualObjects([NSSet setWithArray:systemWatchLaterPlaylistEntryChanges[SRGPlaylistEntryChangedUidsSubKey]],  [NSSet setWithArray:removedUids]);
         XCTAssertEqualObjects([NSSet setWithArray:systemWatchLaterPlaylistEntryChanges[SRGPlaylistEntryPreviousUidsSubKey]], [NSSet setWithArray:uids]);
