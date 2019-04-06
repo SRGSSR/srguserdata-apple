@@ -110,7 +110,7 @@
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return ! [self.playlists[indexPath.row].uid isEqualToString:SRGWatchLaterPlaylistUid];
+    return ! self.playlists[indexPath.row].system;
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
