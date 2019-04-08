@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  Synchronize the receiver with the information from the provided dictionary. The entry might be created, updated
- *  or deleted automatically, in which it is returned by the method. If the dictionary data is invalid, the method
+ *  or deleted automatically, in which case it is returned by the method. If the dictionary data is invalid, the method
  *  returns `nil`.
  *
  *  @discussion To persist changes, the Core Data managed object context needs to be saved.
@@ -43,9 +43,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Discard the objects with the specified identifiers. Since some of them might not be found, the method returns the actual
  *  list of identifiers which will be discarded. For logged in users, objects will be deleted when the next synchronization
- *  is performed. For logged out users, objects are removed immediately.
+ *  is performed. For offline users, objects are removed immediately.
  *
- *  @discussion Order is not preserved in the rerturned value (in comparison to the original list). Already discarded objects
+ *  @discussion Order is not preserved in the rerturned list (in comparison to the original list). Already discarded objects
  *              are omitted.
  */
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
