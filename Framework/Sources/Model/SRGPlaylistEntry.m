@@ -13,11 +13,11 @@
 @interface SRGPlaylistEntry ()
 
 @property (nonatomic, copy) NSString *uid;
-@property (nonatomic, copy) NSDate *date;
+@property (nonatomic) NSDate *date;
 @property (nonatomic) BOOL discarded;
 @property (nonatomic) BOOL dirty;
 
-@property (nonatomic, nullable) SRGPlaylist *playlist;
+@property (nonatomic) SRGPlaylist *playlist;
 
 @end
 
@@ -29,6 +29,8 @@
 @dynamic dirty;
 
 @dynamic playlist;
+
+#pragma mark Class methods
 
 + (NSArray<SRGPlaylistEntry *> *)objectsMatchingPredicate:(NSPredicate *)predicate
                                     sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors

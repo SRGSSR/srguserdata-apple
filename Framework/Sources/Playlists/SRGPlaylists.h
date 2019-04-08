@@ -51,9 +51,9 @@ OBJC_EXPORT NSString * const SRGPlaylistsDidStartSynchronizationNotification;
 OBJC_EXPORT NSString * const SRGPlaylistsDidFinishSynchronizationNotification;
 
 /**
- *  Manages a local cache for playlists. Playlists are characterized by an identifier, a system flag and
- *  a name. Based on a local cache, this class ensures efficient playlist retrieval from a webservice and keeps local and
- *  distant playlists in sync.
+ *  Manages a local cache for playlists. Playlists are characterized by an identifier, a system flag and a name. Based
+ *  on a local cache, this class ensures efficient playlist retrieval from a webservice and keeps local and distant
+ *  playlists in sync.
  *
  *  You can register for playlists update notifications, see above. These will be sent by the `SRGPlaylists` instance
  *  itself.
@@ -105,13 +105,13 @@ OBJC_EXPORT NSString * const SRGPlaylistsDidFinishSynchronizationNotification;
 - (NSString *)playlistWithUid:(NSString *)uid completionBlock:(void (^)(SRGPlaylist * _Nullable playlist, NSError * _Nullable error))completionBlock;
 
 /**
- *  Asynchronously save a playlist for a given name, calling the specified block on completion.
+ *  Asynchronously save a playlist for a given name and identifier, calling the specified block on completion.
  *
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error and the corresponding transaction rollbacked.
  *
- *  @discussion The completion block is called on a background thread.
- *              Set a name to a system playlist has no effect.
+ *  @discussion The completion block is called on a background thread. Attempting to set a name for a system playlist
+ *              has no effect.
  */
 - (NSString *)savePlaylistForUid:(NSString *)uid
                         withName:(NSString *)name
@@ -119,40 +119,38 @@ OBJC_EXPORT NSString * const SRGPlaylistsDidFinishSynchronizationNotification;
 
 /**
  *  Asynchronously discard playlists matching an identifier in the list, calling the provided block on completion. If no
- *  list is provided, all entries are discarded, expect system playlists.
+ *  list is provided, all playlists are discarded, system playlists excepted.
  *
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error and the corresponding transaction rollbacked.
  *
- *  @discussion The completion block is called on a background thread.
- *              Discard a system playlist has no effect.
+ *  @discussion The completion block is called on a background thread. Attempting to discard a system playlist has no effect.
  */
 - (NSString *)discardPlaylistsWithUids:(nullable NSArray<NSString *> *)uids
                        completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
- *  Return playlist entries for a given playlist uid, optionally matching a specific predicate and / or sorted with descriptors. If no sort
- *  descriptors are provided, entries are still returned in a stable order.
+ *  Return playlist entries for a given playlist identifier, optionally matching a specific predicate and / or sorted with
+ *  descriptors. If no sort descriptors are provided, entries are still returned in a stable order.
  *
  *  @discussion This method can only be called from the main thread. Reads on other threads must occur asynchronously
  *              with `-entriesFromPlaylistWithUid:matchingPredicate:sortedWithDescriptors:completionBlock:`.
- *              This method returns `nil` if the playlist uid does not exist.
+ *              This method returns `nil` if the playlist identifier does not exist.
  */
 - (nullable NSArray<SRGPlaylistEntry *> *)entriesFromPlaylistWithUid:(NSString *)playlistUid
                                           matchingPredicate:(nullable NSPredicate *)predicate
                                       sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
 
 /**
- *  Return playlist entries for a given playlist uid, optionally matching a specific predicate and / or sorted with descriptors. If no sort
- *  descriptors are provided, entries are still returned in a stable order. The read occurs asynchronously, calling
- *  the provided block on completion.
+ *  Return playlist entries for a given playlist identifier, optionally matching a specific predicate and / or sorted
+ *  with descriptors. If no sort descriptors are provided, entries are still returned in a stable order. The read occurs
+ *  asynchronously, calling the provided block on completion.
  *
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error.
  *
  *  @discussion The completion block is called on a background thread. You can only use the returned object on this
- *              thread.
- *              This method returns `nil` if the playlist uid does not exist.
+ *              thread. This method returns `nil` if the playlist identifier does not exist.
  */
 - (NSString *)entriesFromPlaylistWithUid:(NSString *)playlistUid
                        matchingPredicate:(nullable NSPredicate *)predicate
@@ -160,14 +158,15 @@ OBJC_EXPORT NSString * const SRGPlaylistsDidFinishSynchronizationNotification;
                          completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error))completionBlock;
 
 /**
- *  Asynchronously add a playlist entry for a given uid to the given playlist, calling the specified block on completion.
+ *  Asynchronously add a playlist entry with a given identifier to the specified playlist, calling the provided block on
+ *  completion.
  *
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error and the corresponding transaction rollbacked.
  *
- *  @discussion The completion block is called on a background thread.
- *              Adding an already added entry with the same uid will just update the added date, not duplicate the entry.
- *              This method adds nothing if the playlist does not exist and returns an error.
+ *  @discussion The completion block is called on a background thread. Adding an entry for an existing identifier only
+ *              update its date but does not duplicate it. This method returns an error and adds nothing if the playlist
+ *              does not exist.
  */
 - (NSString *)addEntryWithUid:(NSString *)uid
             toPlaylistWithUid:(NSString *)playlistUid
@@ -180,8 +179,8 @@ OBJC_EXPORT NSString * const SRGPlaylistsDidFinishSynchronizationNotification;
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error and the corresponding transaction rollbacked.
  *
- *  @discussion The completion block is called on a background thread.
- *              This method remove nothing if the playlist does not exist and returns an error.
+ *  @discussion The completion block is called on a background thread. This method removes nothing and returns an error
+ *              if the playlist does not exist.
  */
 - (NSString *)removeEntriesWithUids:(nullable NSArray<NSString *> *)uids
                 fromPlaylistWithUid:(NSString *)playlistUid

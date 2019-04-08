@@ -11,21 +11,21 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- *  Bookmark in a playlist.
+ *  Entry in a playlist.
  *
  *  @discussion Instances must not be shared among threads.
  */
 @interface SRGPlaylistEntry : NSManagedObject
 
 /**
- *  The item unique identifier.
+ *  The entry unique identifier.
  */
 @property (nonatomic, readonly, copy, nullable) NSString *uid;
 
 /**
  *  The date at which the entry was updated for the last time.
  */
-@property (nonatomic, readonly, copy, nullable) NSDate *date;
+@property (nonatomic, readonly, nullable) NSDate *date;
 
 /**
  *  `YES` iff the entry has been marked as discarded.
