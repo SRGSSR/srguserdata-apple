@@ -97,6 +97,8 @@
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     cell.textLabel.text = self.playlists[indexPath.row].name;
+    cell.imageView.image = ([self.playlists[indexPath.row].uid isEqualToString:SRGWatchLaterPlaylistUid]) ? [UIImage imageNamed:@"watch_later_22"] : [UIImage imageNamed:@"playlist_22"];
+    cell.imageView.tintColor = UIColor.blackColor;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
