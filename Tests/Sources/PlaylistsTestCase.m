@@ -625,7 +625,7 @@
     
     [self.userData.playlists addEntryWithUid:uid toPlaylistWithUid:@"notFound" completionBlock:^(NSError * _Nullable error) {
         XCTAssertEqualObjects(error.domain, SRGUserDataErrorDomain);
-        XCTAssertEqual(error.code, SRGUserDataErrorPlaylistNotFound);
+        XCTAssertEqual(error.code, SRGUserDataErrorNotFound);
         [expectation2 fulfill];
     }];
     
