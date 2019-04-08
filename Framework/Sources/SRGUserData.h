@@ -9,8 +9,8 @@
 // Public headers.
 #import "SRGHistory.h"
 #import "SRGHistoryEntry.h"
-#import "SRGPlaylists.h"
 #import "SRGPlaylist.h"
+#import "SRGPlaylists.h"
 #import "SRGUser.h"
 #import "SRGUserDataError.h"
 #import "SRGUserDataService.h"

@@ -56,7 +56,7 @@ NSString *SRGUserDataMarketingVersion(void)
 
 - (instancetype)initWithStoreFileURL:(NSURL *)storeFileURL
                    historyServiceURL:(NSURL *)historyServiceURL
-                 playlistsServiceURL:(nullable NSURL *)playlistsServiceURL
+                 playlistsServiceURL:(NSURL *)playlistsServiceURL
                      identityService:(SRGIdentityService *)identityService
 {
     if (self = [super init]) {
