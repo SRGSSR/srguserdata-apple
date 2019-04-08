@@ -22,9 +22,6 @@
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGNetwork/SRGNetwork.h>
 
-typedef void (^SRGPlaylistPullCompletionBlock)(NSDate * _Nullable serverDate, NSError * _Nullable error);
-typedef void (^SRGPlaylistPushCompletionBlock)(NSError * _Nullable error);
-
 NSString *SRGPlaylistNameForPlaylistWithUid(NSString *uid)
 {
     static dispatch_once_t s_onceToken;
@@ -70,7 +67,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
         
-        // Check that the default playlists exists.
+        // Check that the default playlists exist.
         NSArray<NSString *> *defaultPlaylistUids = @[ SRGWatchLaterPlaylistUid ];
         for (NSString *uid in defaultPlaylistUids) {
             SRGPlaylist *playlist = [self playlistWithUid:uid];
@@ -79,9 +76,9 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
                 
                 dispatch_group_enter(group);
                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                    SRGPlaylist *defaultlaylist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
-                    defaultlaylist.system = @YES;
-                    defaultlaylist.name = SRGPlaylistNameForPlaylistWithUid(uid);
+                    SRGPlaylist *defaultPlaylist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
+                    defaultPlaylist.system = @YES;
+                    defaultPlaylist.name = SRGPlaylistNameForPlaylistWithUid(uid);
                 } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
                     dispatch_group_leave(group);
                 }];
@@ -186,7 +183,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
             currentPlaylistEntryUids = [uids copy];
         }
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-        if (!error && !isPlaylistFound) {
+        if (! error && ! isPlaylistFound) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                         code:SRGUserDataErrorNotFound
                                     userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
