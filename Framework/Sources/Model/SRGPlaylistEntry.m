@@ -54,16 +54,12 @@
 
 + (SRGPlaylistEntry *)objectWithUid:(NSString *)uid playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSAssert(playlist, @"Playlist entry must have a playlist");
-    
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@ && %K == %@", @keypath(SRGPlaylistEntry.new, uid), uid, @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@ AND %K == %@", @keypath(SRGPlaylistEntry.new, uid), uid, @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid];
     return [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext].firstObject;
 }
 
 + (SRGPlaylistEntry *)upsertWithUid:(NSString *)uid playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSAssert(playlist, @"Playlist entry must have a playlist");
-    
     SRGPlaylistEntry *object = [self objectWithUid:uid playlist:playlist inManagedObjectContext:managedObjectContext];
     if (! object) {
         object = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(self) inManagedObjectContext:managedObjectContext];
@@ -115,11 +111,9 @@
 
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 {
-    NSAssert(playlist, @"Playlist entry must have a playlist");
-    
-    NSPredicate *predicate = uids ? [NSPredicate predicateWithFormat:@"%K IN %@ AND discarded == NO && %K == %@", @keypath(SRGUserObject.new, uid), uids, @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid] : [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid];
+    NSPredicate *predicate = uids ? [NSPredicate predicateWithFormat:@"%K IN %@ AND discarded == NO AND %K == %@", @keypath(SRGPlaylistEntry.new, uid), uids, @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid] : [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid];
     NSArray<SRGPlaylistEntry *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-    NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
+    NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, uid)]];
     
     if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
         NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];

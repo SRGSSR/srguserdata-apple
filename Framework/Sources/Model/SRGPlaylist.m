@@ -16,7 +16,7 @@
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic) BOOL system;
 
-@property (nonatomic, nullable) NSOrderedSet<SRGPlaylistEntry *> *entries;
+@property (nonatomic) NSOrderedSet<SRGPlaylistEntry *> *entries;
 
 @end
 
