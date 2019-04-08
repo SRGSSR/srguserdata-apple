@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- *  Return a suggested name for a system playlist, `nil` if none or unknown uid.
+ *  Return the suggested name for a system playlist uid, `nil` if none or the uid is unknown.
  */
 OBJC_EXPORT NSString * _Nullable SRGPlaylistNameForPlaylistWithUid(NSString *uid);
 
@@ -26,13 +26,13 @@ OBJC_EXPORT NSString * const SRGWatchLaterPlaylistUid;
  */
 OBJC_EXPORT NSString * const SRGPlaylistsDidChangeNotification;                   // Notification name.
 
-OBJC_EXPORT NSString * const SRGPlaylistChangedUidsKey;                           // Key to access the list of playlist uids which have changed as an `NSArray` of `NSString` objects.
-OBJC_EXPORT NSString * const SRGPlaylistPreviousUidsKey;                          // Key to access the previous playlist uid list as an `NSArray` of `NSString` objects.
-OBJC_EXPORT NSString * const SRGPlaylistUidsKey;                                  // Key to access the current playlist uid list as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPlaylistsChangedUidsKey;                          // Key to access the list of playlist uids which have changed as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPlaylistsPreviousUidsKey;                         // Key to access the previous playlist uid list as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPlaylistsUidsKey;                                 // Key to access the current playlist uid list as an `NSArray` of `NSString` objects.
 
 /**
  *  Additionnal keys sent in the playlist notification when one or more playlist entries change. Use the key below to
- *  retrieve detailed information from the notification `userInfo` dictionary, ans sub keys in each sub dictionnaries.
+ *  retrieve detailed information from the notification `userInfo` dictionary, and sub keys in each sub dictionnaries.
  */
 OBJC_EXPORT NSString * const SRGPlaylistEntryChangesKey;                          // Key to access the list of playlist entry uids which have changed as an `NSDictionnary` of `NSDictionnary` objects, which is a playlist uid to a dictionnary of playlist entry keys.
 
@@ -48,7 +48,7 @@ OBJC_EXPORT NSString * const SRGPlaylistsDidStartSynchronizationNotification;
 /**
  *  Notification sent when playlists synchronization has finished.
  */
-OBJC_EXPORT NSString * const SRGPlaylistDidFinishSynchronizationNotification;
+OBJC_EXPORT NSString * const SRGPlaylistsDidFinishSynchronizationNotification;
 
 /**
  *  Manages a local cache for playlists. Playlists are characterized by an identifier, a system flag and

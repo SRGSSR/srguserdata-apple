@@ -26,7 +26,7 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistChangedUidsKey];
+        NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistsChangedUidsKey];
         [expectedSavedNotifications removeObjectsInArray:uids];
         return (expectedSavedNotifications.count == 0);
     }];
@@ -109,10 +109,10 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistChangedUidsKey], @[uid]);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistPreviousUidsKey], @[SRGWatchLaterPlaylistUid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], @[uid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsPreviousUidsKey], @[SRGWatchLaterPlaylistUid]);
         NSArray<NSString *> *uids = @[SRGWatchLaterPlaylistUid, uid];
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidsKey], uids);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], uids);
         return YES;
     }];
     
@@ -139,7 +139,7 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistChangedUidsKey];
+        NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistsChangedUidsKey];
         [expectedSavedNotifications removeObjectsInArray:uids];
         return (expectedSavedNotifications.count == 0);
     }];
@@ -181,7 +181,7 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistChangedUidsKey];
+        NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistsChangedUidsKey];
         expectedSavedNotifications -= uids.count;
         return (expectedSavedNotifications == 0);
     }];
@@ -480,9 +480,9 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistChangedUidsKey]], [NSSet setWithArray:discardedUids]);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistPreviousUidsKey]], [NSSet setWithArray:resultUids]);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistUidsKey]], [NSSet setWithArray:remainingUids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistsChangedUidsKey]], [NSSet setWithArray:discardedUids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistsPreviousUidsKey]], [NSSet setWithArray:resultUids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistsUidsKey]], [NSSet setWithArray:remainingUids]);
         return YES;
     }];
     
@@ -521,9 +521,9 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistChangedUidsKey]], [NSSet setWithArray:discardedUids]);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistPreviousUidsKey]], [NSSet setWithArray:resultUids]);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistUidsKey]], [NSSet setWithArray:remainingUids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistsChangedUidsKey]], [NSSet setWithArray:discardedUids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistsPreviousUidsKey]], [NSSet setWithArray:resultUids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistsUidsKey]], [NSSet setWithArray:remainingUids]);
         return YES;
     }];
     
@@ -559,9 +559,9 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistChangedUidsKey]], [NSSet setWithArray:uids]);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistPreviousUidsKey]], [NSSet setWithArray:resultUids]);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidsKey], @[SRGWatchLaterPlaylistUid]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistsChangedUidsKey]], [NSSet setWithArray:uids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGPlaylistsPreviousUidsKey]], [NSSet setWithArray:resultUids]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], @[SRGWatchLaterPlaylistUid]);
         return YES;
     }];
     
@@ -595,9 +595,9 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistChangedUidsKey], @[SRGWatchLaterPlaylistUid]);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistPreviousUidsKey], @[SRGWatchLaterPlaylistUid]);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidsKey], @[SRGWatchLaterPlaylistUid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], @[SRGWatchLaterPlaylistUid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsPreviousUidsKey], @[SRGWatchLaterPlaylistUid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], @[SRGWatchLaterPlaylistUid]);
         
         NSDictionary *playlistEntryChanges = notification.userInfo[SRGPlaylistEntryChangesKey];
         XCTAssertNotNil(playlistEntryChanges);
@@ -757,9 +757,9 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistChangedUidsKey], @[playlistUid]);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistPreviousUidsKey], resultPlaylistUids);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidsKey], resultPlaylistUids);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], @[playlistUid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsPreviousUidsKey], resultPlaylistUids);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], resultPlaylistUids);
         
         NSDictionary *playlistEntryChanges = notification.userInfo[SRGPlaylistEntryChangesKey];
         XCTAssertNotNil(playlistEntryChanges);

@@ -183,8 +183,8 @@
 
 - (void)playlistsDidChange:(NSNotification *)notification
 {
-    NSArray<NSString *> *previousUids = notification.userInfo[SRGPlaylistPreviousUidsKey];
-    NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistUidsKey];
+    NSArray<NSString *> *previousUids = notification.userInfo[SRGPlaylistsPreviousUidsKey];
+    NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistsUidsKey];
     if (uids.count == 0 || previousUids.count == 0) {
         [self refresh];
     }

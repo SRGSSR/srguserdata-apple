@@ -39,9 +39,9 @@ NSString * const SRGWatchLaterPlaylistUid = @"watch_later";
 
 NSString * const SRGPlaylistsDidChangeNotification = @"SRGPlaylistsDidChangeNotification";
 
-NSString * const SRGPlaylistChangedUidsKey = @"SRGPlaylistChangedUids";
-NSString * const SRGPlaylistPreviousUidsKey = @"SRGPlaylistPreviousUids";
-NSString * const SRGPlaylistUidsKey = @"SRGPlaylistUids";
+NSString * const SRGPlaylistsChangedUidsKey = @"SRGPlaylistChangedUids";
+NSString * const SRGPlaylistsPreviousUidsKey = @"SRGPlaylistPreviousUids";
+NSString * const SRGPlaylistsUidsKey = @"SRGPlaylistUids";
 
 NSString * const SRGPlaylistEntryChangesKey = @"SRGPlaylistEntryChanges";
 
@@ -50,7 +50,7 @@ NSString * const SRGPlaylistEntryPreviousUidsSubKey = @"SRGPlaylistEntryPrevious
 NSString * const SRGPlaylistEntryUidsSubKey = @"SRGPlaylistEntryUids";
 
 NSString * const SRGPlaylistsDidStartSynchronizationNotification = @"SRGPlaylistsDidStartSynchronizationNotification";
-NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylistsDidFinishSynchronizationNotification";
+NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylistsDidFinishSynchronizationNotification";
 
 @interface SRGPlaylists ()
 
@@ -131,9 +131,9 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistChangedUidsKey : [changedUids copy],
-                                                                            SRGPlaylistPreviousUidsKey : previousUids,
-                                                                            SRGPlaylistUidsKey : currentUids }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : [changedUids copy],
+                                                                            SRGPlaylistsPreviousUidsKey : previousUids,
+                                                                            SRGPlaylistsUidsKey : currentUids }];
             });
         }
         completionBlock(error);
@@ -199,11 +199,10 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
                                                                                            SRGPlaylistEntryUidsSubKey : currentPlaylistEntryUids };
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistChangedUidsKey : @[playlistUid],
-                                                                            SRGPlaylistPreviousUidsKey : previousPlaylistUids,
-                                                                            SRGPlaylistUidsKey : currentPlaylistUids,
-                                                                            SRGPlaylistEntryChangesKey : @{ playlistUid : playlistEntryChanges }
-                                                                            }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : @[playlistUid],
+                                                                            SRGPlaylistsPreviousUidsKey : previousPlaylistUids,
+                                                                            SRGPlaylistsUidsKey : currentPlaylistUids,
+                                                                            SRGPlaylistEntryChangesKey : @{ playlistUid : playlistEntryChanges }}];
             });
         }
         completionBlock(error);
@@ -216,7 +215,7 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
 {
     void (^finishSynchronization)(void) = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistDidFinishSynchronizationNotification object:self];
+            [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidFinishSynchronizationNotification object:self];
         });
         completionBlock();
     };
@@ -270,9 +269,9 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
             if (previousUids.count > 0) {
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistChangedUidsKey : previousUids,
-                                                                            SRGPlaylistPreviousUidsKey : previousUids,
-                                                                            SRGPlaylistUidsKey : @[] }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : previousUids,
+                                                                            SRGPlaylistsPreviousUidsKey : previousUids,
+                                                                            SRGPlaylistsUidsKey : @[] }];
             }
         });
     }];
@@ -332,9 +331,9 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistChangedUidsKey : @[uid],
-                                                                            SRGPlaylistPreviousUidsKey : previousUids,
-                                                                            SRGPlaylistUidsKey : currentUids }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : @[uid],
+                                                                            SRGPlaylistsPreviousUidsKey : previousUids,
+                                                                            SRGPlaylistsUidsKey : currentUids }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
@@ -373,9 +372,9 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistChangedUidsKey : changedUids,
-                                                                            SRGPlaylistPreviousUidsKey : previousUids,
-                                                                            SRGPlaylistUidsKey : currentUids }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : changedUids,
+                                                                            SRGPlaylistsPreviousUidsKey : previousUids,
+                                                                            SRGPlaylistsUidsKey : currentUids }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
@@ -456,11 +455,10 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
                                                                                            SRGPlaylistEntryUidsSubKey : currentPlaylistEntryUids };
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistChangedUidsKey : @[playlistUid],
-                                                                            SRGPlaylistPreviousUidsKey : previousPlaylistUids,
-                                                                            SRGPlaylistUidsKey : currentPlaylistUids,
-                                                                            SRGPlaylistEntryChangesKey : @{ playlistUid : playlistEntryChanges }
-                                                                            }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : @[playlistUid],
+                                                                            SRGPlaylistsPreviousUidsKey : previousPlaylistUids,
+                                                                            SRGPlaylistsUidsKey : currentPlaylistUids,
+                                                                            SRGPlaylistEntryChangesKey : @{ playlistUid : playlistEntryChanges }}];
             });
         }
         completionBlock ? completionBlock(error) : nil;
@@ -511,11 +509,10 @@ NSString * const SRGPlaylistDidFinishSynchronizationNotification = @"SRGPlaylist
                                                                                            SRGPlaylistEntryUidsSubKey : currentPlaylistEntryUids };
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistChangedUidsKey : @[playlistUid],
-                                                                            SRGPlaylistPreviousUidsKey : previousPlaylistUids,
-                                                                            SRGPlaylistUidsKey : currentPlaylistUids,
-                                                                            SRGPlaylistEntryChangesKey : @{ playlistUid : playlistEntryChanges }
-                                                                            }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : @[playlistUid],
+                                                                            SRGPlaylistsPreviousUidsKey : previousPlaylistUids,
+                                                                            SRGPlaylistsUidsKey : currentPlaylistUids,
+                                                                            SRGPlaylistEntryChangesKey : @{ playlistUid : playlistEntryChanges }}];
             });
         }
         completionBlock ? completionBlock(error) : nil;
