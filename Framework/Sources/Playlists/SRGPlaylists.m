@@ -186,7 +186,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
         if (! error && ! isPlaylistFound) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                         code:SRGUserDataErrorNotFound
-                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
+                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
         }
         
         if (! error) {
@@ -348,18 +348,18 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         previousUids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
-        NSArray<NSString *> *discardUids = uids ?: previousUids;
+        NSArray<NSString *> *discardedUids = uids ?: previousUids;
         
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@ && %K IN %@", @keypath(SRGPlaylist.new, system), @(YES), @keypath(SRGPlaylist.new, uid), discardUids];
-        NSArray<SRGPlaylist *> *excludePlaylists = [previousPlaylists filteredArrayUsingPredicate:predicate];
-        if (excludePlaylists.count > 0) {
-            NSArray<NSString *> *excludeUids = [excludePlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
-            NSMutableArray<NSString *> *mutableUids = discardUids.mutableCopy;
-            [mutableUids removeObjectsInArray:excludeUids];
-            discardUids = mutableUids.copy;
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES AND %K IN %@", @keypath(SRGPlaylist.new, system), @keypath(SRGPlaylist.new, uid), discardedUids];
+        NSArray<SRGPlaylist *> *excludedPlaylists = [previousPlaylists filteredArrayUsingPredicate:predicate];
+        if (excludedPlaylists.count > 0) {
+            NSArray<NSString *> *excludedUids = [excludedPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
+            NSMutableArray<NSString *> *mutableUids = discardedUids.mutableCopy;
+            [mutableUids removeObjectsInArray:excludedUids];
+            discardedUids = mutableUids.copy;
         }
         
-        changedUids = [SRGPlaylist discardObjectsWithUids:discardUids inManagedObjectContext:managedObjectContext];
+        changedUids = [SRGPlaylist discardObjectsWithUids:discardedUids inManagedObjectContext:managedObjectContext];
         
         NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
         [uids removeObjectsInArray:changedUids];
@@ -378,11 +378,11 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
     }];
 }
 
-- (NSArray<SRGPlaylistEntry *> *)entriesFromPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(nullable NSPredicate *)predicate sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
+- (NSArray<SRGPlaylistEntry *> *)entriesFromPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
 {
     return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
-        if (!playlist) {
+        if (! playlist) {
             return nil;
         }
         NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlistUid];
@@ -393,11 +393,11 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
     }];
 }
 
-- (NSString *)entriesFromPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(nullable NSPredicate *)predicate sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable, NSError * _Nullable))completionBlock
+- (NSString *)entriesFromPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable, NSError * _Nullable))completionBlock
 {
     return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
-        if (!playlist) {
+        if (! playlist) {
             return nil;
         }
         NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlistUid];
@@ -439,10 +439,10 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
             currentPlaylistEntryUids = [playlistEntryUids copy];
         }
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (!error && !isPlaylistFound) {
+        if (! error && ! isPlaylistFound) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                         code:SRGUserDataErrorNotFound
-                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when adding an entry to an unknown playlist.") }];
+                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when adding an entry to an unknown playlist.") }];
         }
         
         if (! error) {
@@ -493,10 +493,10 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
             currentPlaylistEntryUids = [playlistEntryUids copy];
         }
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (!error && !isPlaylistFound) {
+        if (! error && ! isPlaylistFound) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                         code:SRGUserDataErrorNotFound
-                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
+                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
         }
         
         if (! error) {
