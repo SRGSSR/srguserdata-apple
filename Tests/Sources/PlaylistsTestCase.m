@@ -808,6 +808,11 @@
     XCTAssertNotNil(playlistEntries4);
 }
 
+- (void)testRemovePlaylistEntriesForLoggedInUser
+{
+    XCTFail(@"To be implemented");
+}
+
 - (void)testPlaylistEntriesMigrationToPlaylist
 {
     NSDate *date = NSDate.date;

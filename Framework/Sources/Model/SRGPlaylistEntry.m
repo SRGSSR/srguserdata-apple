@@ -115,20 +115,22 @@
     NSArray<SRGPlaylistEntry *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, uid)]];
     
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
     if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
-        NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
         fetchRequest.predicate = predicate;
         
         NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
         [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
     }
     else {
-        NSBatchUpdateRequest *batchUpdateRequest = [[NSBatchUpdateRequest alloc] initWithEntityName:NSStringFromClass(self)];
-        batchUpdateRequest.predicate = predicate;
-        batchUpdateRequest.propertiesToUpdate = @{ @keypath(SRGPlaylistEntry.new, discarded) : @YES,
-                                                   @keypath(SRGPlaylistEntry.new, dirty) : @YES,
-                                                   @keypath(SRGPlaylistEntry.new, date) : NSDate.date };
-        [managedObjectContext executeRequest:batchUpdateRequest error:NULL];
+        // TODO: Predicates which lead to two tables being joined (here playlist entry / playlist) are not supported
+        //       by batch update requests. Check if we can still do something to use them anyway.
+        NSArray<SRGPlaylistEntry *> *playlistEntries = [managedObjectContext executeFetchRequest:fetchRequest error:NULL];
+        [playlistEntries enumerateObjectsUsingBlock:^(SRGPlaylistEntry * _Nonnull playlistEntry, NSUInteger idx, BOOL * _Nonnull stop) {
+            playlistEntry.discarded = YES;
+            playlistEntry.dirty = YES;
+            playlistEntry.date = NSDate.date;
+        }];
     }
     
     return discardedUids;
