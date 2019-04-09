@@ -75,7 +75,7 @@
     }
     
     NSNumber *timestamp = dictionary[@"date"];
-    if (! timestamp) {
+    if (timestamp == nil) {
         return nil;
     }
     
