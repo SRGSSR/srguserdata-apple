@@ -46,15 +46,25 @@
     self.refreshControl = refreshControl;
     
     [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(didLogin:)
+                                               name:SRGIdentityServiceUserDidLoginNotification
+                                             object:SRGIdentityService.currentIdentityService];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(didUpdateAccount:)
+                                               name:SRGIdentityServiceDidUpdateAccountNotification
+                                             object:SRGIdentityService.currentIdentityService];
+    [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(playlistsDidChange:)
                                                name:SRGPlaylistsDidChangeNotification
                                              object:SRGUserData.currentUserData.playlists];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"PlaylistCell"];
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                                                                                           target:self
-                                                                                           action:@selector(addPlaylist:)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                                                                          target:self
+                                                                                          action:@selector(addPlaylist:)];
+    
+    [self updateNavigationBar];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -62,6 +72,24 @@
     [super viewWillAppear:animated];
     
     [self refresh];
+}
+
+#pragma mark UI
+
+- (void)updateNavigationBar
+{
+    if (! SRGIdentityService.currentIdentityService.loggedIn) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Login", nil)
+                                                                                  style:UIBarButtonItemStylePlain
+                                                                                 target:self
+                                                                                 action:@selector(login:)];
+    }
+    else {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
+                                                                                  style:UIBarButtonItemStylePlain
+                                                                                 target:self
+                                                                                 action:@selector(showAccount:)];
+    }
 }
 
 #pragma mark Data
@@ -96,8 +124,9 @@
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    cell.textLabel.text = self.playlists[indexPath.row].name;
-    cell.imageView.image = ([self.playlists[indexPath.row].uid isEqualToString:SRGWatchLaterPlaylistUid]) ? [UIImage imageNamed:@"watch_later_22"] : [UIImage imageNamed:@"playlist_22"];
+    SRGPlaylist *playlist = self.playlists[indexPath.row];
+    cell.textLabel.text = playlist.name;
+    cell.imageView.image = [playlist.uid isEqualToString:SRGWatchLaterPlaylistUid] ? [UIImage imageNamed:@"watch_later_22"] : [UIImage imageNamed:@"playlist_22"];
     cell.imageView.tintColor = UIColor.blackColor;
 }
 
@@ -180,6 +209,16 @@
 }
 
 #pragma mark Notifications
+
+- (void)didLogin:(NSNotification *)notification
+{
+    [self updateNavigationBar];
+}
+
+- (void)didUpdateAccount:(NSNotification *)notification
+{
+    [self updateNavigationBar];
+}
 
 - (void)playlistsDidChange:(NSNotification *)notification
 {

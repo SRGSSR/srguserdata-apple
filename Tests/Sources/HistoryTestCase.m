@@ -8,13 +8,13 @@
 
 #import <libextobjc/libextobjc.h>
 
-@interface SRGHistoryTestCase : UserDataBaseTestCase
+@interface HistoryTestCase : UserDataBaseTestCase
 
 @property (nonatomic) SRGUserData *userData;
 
 @end
 
-@implementation SRGHistoryTestCase
+@implementation HistoryTestCase
 
 #pragma mark Helpers
 

@@ -65,14 +65,14 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     return [NSURL URLWithString:URLString];
 }
 
-@interface SRGHistorySynchronizationTestCase : UserDataBaseTestCase
+@interface HistorySynchronizationTestCase : UserDataBaseTestCase
 
 @property (nonatomic) SRGIdentityService *identityService;
 @property (nonatomic) SRGUserData *userData;
 
 @end
 
-@implementation SRGHistorySynchronizationTestCase
+@implementation HistorySynchronizationTestCase
 
 #pragma mark Helpers
 

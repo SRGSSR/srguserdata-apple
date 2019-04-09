@@ -39,7 +39,7 @@
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <state key="normal" image="playlists_48"/>
                                 <connections>
-                                    <action selector="playlists:" destination="A6A-Ps-0a8" eventType="touchUpInside" id="CAl-Ii-uvJ"/>
+                                    <action selector="addToPlaylist:" destination="A6A-Ps-0a8" eventType="touchUpInside" id="Knm-9Q-Nax"/>
                                 </connections>
                             </button>
                         </subviews>

@@ -10,13 +10,13 @@
 
 #import <libextobjc/libextobjc.h>
 
-@interface SRGPlaylistsTestCase : UserDataBaseTestCase
+@interface PlaylistsTestCase : UserDataBaseTestCase
 
 @property (nonatomic) SRGUserData *userData;
 
 @end
 
-@implementation SRGPlaylistsTestCase
+@implementation PlaylistsTestCase
 
 #pragma mark Helpers
 

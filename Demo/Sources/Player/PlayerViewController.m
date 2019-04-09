@@ -66,8 +66,9 @@
 {
     [self.view layoutIfNeeded];
     [letterboxView animateAlongsideUserInterfaceWithAnimations:^(BOOL hidden, BOOL minimal, CGFloat heightOffset) {
-        self.closeButton.alpha = (minimal || ! hidden) ? 1.f : 0.f;
-        self.playlistsButton.alpha = (minimal || ! hidden) ? 1.f : 0.f;
+        CGFloat alpha = (minimal || ! hidden) ? 1.f : 0.f;
+        self.closeButton.alpha = alpha;
+        self.playlistsButton.alpha = alpha;
         [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
         if (@available(iOS 11, *)) {
@@ -83,7 +84,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)playlists:(id)sender
+- (IBAction)addToPlaylist:(id)sender
 {
     SRGMedia *media = self.letterboxController.media;
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add to playlist", nil)

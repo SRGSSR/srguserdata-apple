@@ -26,8 +26,7 @@
 
 - (instancetype)initWithPlaylist:(SRGPlaylist *)playlist
 {
-    self = [self init];
-    if (self) {
+    if (self = [super init]) {
         self.playlist = playlist;
     }
     return self;
@@ -144,7 +143,7 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (editingStyle == UITableViewCellEditingStyleDelete){
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
         SRGMedia *media = self.medias[indexPath.row];
         [SRGUserData.currentUserData.playlists removeEntriesWithUids:@[media.URN] fromPlaylistWithUid:self.playlist.uid completionBlock:^(NSError * _Nonnull error) {
             dispatch_async(dispatch_get_main_queue(), ^{
