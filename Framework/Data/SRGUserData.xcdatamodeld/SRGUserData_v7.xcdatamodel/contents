@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.98" systemVersion="18D109" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.98" systemVersion="18E226" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
     <entity name="SRGHistoryEntry" representedClassName="SRGHistoryEntry" parentEntity="SRGUserObject" syncable="YES">
         <attribute name="deviceUid" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="lastPlaybackPosition" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
@@ -7,7 +7,7 @@
     <entity name="SRGPlaylist" representedClassName="SRGPlaylist" parentEntity="SRGUserObject" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="system" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="entries" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="SRGPlaylistEntry" inverseName="playlist" inverseEntity="SRGPlaylistEntry" syncable="YES"/>
+        <relationship name="entries" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="SRGPlaylistEntry" inverseName="playlist" inverseEntity="SRGPlaylistEntry" syncable="YES"/>
     </entity>
     <entity name="SRGPlaylistEntry" representedClassName="SRGPlaylistEntry" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
@@ -30,8 +30,8 @@
     <elements>
         <element name="SRGHistoryEntry" positionX="-63" positionY="-18" width="128" height="75"/>
         <element name="SRGPlaylist" positionX="-54" positionY="36" width="128" height="90"/>
+        <element name="SRGPlaylistEntry" positionX="-45" positionY="45" width="128" height="120"/>
         <element name="SRGUser" positionX="-63" positionY="27" width="128" height="90"/>
         <element name="SRGUserObject" positionX="-45" positionY="36" width="128" height="105"/>
-        <element name="SRGPlaylistEntry" positionX="-45" positionY="45" width="128" height="120"/>
     </elements>
 </model>
