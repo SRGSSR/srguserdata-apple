@@ -324,7 +324,7 @@
     XCTAssertEqualObjects(historyEntry.deviceUid, @"Test device");
     XCTAssertFalse(historyEntry.discarded);
     
-    NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ || %K CONTAINS[cd] %@", @keypath(SRGHistoryEntry.new, uid), @"1", @keypath(SRGHistoryEntry.new, uid), @"9"];
+    NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ OR %K CONTAINS[cd] %@", @keypath(SRGHistoryEntry.new, uid), @"1", @keypath(SRGHistoryEntry.new, uid), @"9"];
     NSSortDescriptor *sortDescriptor6 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:YES];
     NSArray<SRGHistoryEntry *> *historyEntries6 = [self.userData.history historyEntriesMatchingPredicate:predicate6 sortedWithDescriptors:@[sortDescriptor6]];
     
@@ -419,7 +419,7 @@
     
     XCTestExpectation *expectation6 = [self expectationWithDescription:@"History entries fetched"];
     
-    NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ || %K CONTAINS[cd] %@", @keypath(SRGHistoryEntry.new, uid), @"1", @keypath(SRGHistoryEntry.new, uid), @"9"];
+    NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ OR %K CONTAINS[cd] %@", @keypath(SRGHistoryEntry.new, uid), @"1", @keypath(SRGHistoryEntry.new, uid), @"9"];
     NSSortDescriptor *sortDescriptor6 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:YES];
     [self.userData.history historyEntriesMatchingPredicate:predicate6 sortedWithDescriptors:@[sortDescriptor6] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nonnull historyEntries6, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);

@@ -269,6 +269,7 @@
     
     [self.userData.playlists playlistWithUid:@"notFound" completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
         XCTAssertNil(playlist);
+        XCTAssertNil(error);
         [expectation3 fulfill];
     }];
     
@@ -369,7 +370,7 @@
     XCTAssertEqualObjects(playlist.uid, queryUid);
     XCTAssertFalse(playlist.discarded);
     
-    NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ || %K CONTAINS[cd] %@", @keypath(SRGPlaylist.new, uid), @"1", @keypath(SRGPlaylist.new, uid), @"9"];
+    NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ OR %K CONTAINS[cd] %@", @keypath(SRGPlaylist.new, uid), @"1", @keypath(SRGPlaylist.new, uid), @"9"];
     NSSortDescriptor *sortDescriptor6 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, date) ascending:YES];
     NSArray<SRGPlaylist *> *playlists6 = [self.userData.playlists playlistsMatchingPredicate:predicate6 sortedWithDescriptors:@[sortDescriptor6]];
     
@@ -455,7 +456,7 @@
     
     XCTestExpectation *expectation6 = [self expectationWithDescription:@"Playlists fetched"];
     
-    NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ || %K CONTAINS[cd] %@", @keypath(SRGPlaylist.new, uid), @"1", @keypath(SRGPlaylist.new, uid), @"9"];
+    NSPredicate *predicate6 = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@ OR %K CONTAINS[cd] %@", @keypath(SRGPlaylist.new, uid), @"1", @keypath(SRGPlaylist.new, uid), @"9"];
     NSSortDescriptor *sortDescriptor6 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, date) ascending:YES];
     [self.userData.playlists playlistsMatchingPredicate:predicate6 sortedWithDescriptors:@[sortDescriptor6] completionBlock:^(NSArray<SRGPlaylist *> * _Nonnull playlists6, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
