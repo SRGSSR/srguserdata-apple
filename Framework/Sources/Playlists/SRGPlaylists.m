@@ -77,7 +77,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
                 dispatch_group_enter(group);
                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                     SRGPlaylist *defaultPlaylist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
-                    defaultPlaylist.system = @YES;
+                    defaultPlaylist.system = YES;
                     defaultPlaylist.name = SRGPlaylistNameForPlaylistWithUid(uid);
                 } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
                     dispatch_group_leave(group);
