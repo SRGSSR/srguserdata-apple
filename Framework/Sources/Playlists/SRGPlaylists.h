@@ -105,7 +105,18 @@ OBJC_EXPORT NSString * const SRGPlaylistsDidFinishSynchronizationNotification;
 - (NSString *)playlistWithUid:(NSString *)uid completionBlock:(void (^)(SRGPlaylist * _Nullable playlist, NSError * _Nullable error))completionBlock;
 
 /**
- *  Asynchronously save a playlist for a given name and identifier, calling the specified block on completion.
+ *  Asynchronously add a playlist for a given name, calling the specified block on completion.
+ *
+ *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
+ *                     will be called with an error and the corresponding transaction rollbacked.
+ *
+ *  @discussion The completion block is called on a background thread.
+ */
+- (NSString *)addPlaylistWithName:(NSString *)name
+                  completionBlock:(nullable void (^)(NSString * _Nullable uid, NSError * _Nullable error))completionBlock;
+
+/**
+ *  Asynchronously update a playlist for a given identifier, calling the specified block on completion.
  *
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error and the corresponding transaction rollbacked.
@@ -113,9 +124,9 @@ OBJC_EXPORT NSString * const SRGPlaylistsDidFinishSynchronizationNotification;
  *  @discussion The completion block is called on a background thread. Attempting to set a name for a system playlist
  *              has no effect.
  */
-- (NSString *)savePlaylistForUid:(NSString *)uid
-                        withName:(NSString *)name
-                 completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
+- (NSString *)updatePlaylistWithUid:(NSString *)uid
+                               name:(NSString *)name
+                    completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
  *  Asynchronously discard playlists matching an identifier in the list, calling the provided block on completion. If no

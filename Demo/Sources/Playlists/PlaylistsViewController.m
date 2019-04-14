@@ -180,8 +180,7 @@
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Create", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         NSString *name = [alertController.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
         if (name.length > 0) {
-            NSString *uid = NSUUID.UUID.UUIDString;
-            [SRGUserData.currentUserData.playlists savePlaylistForUid:uid withName:name completionBlock:^(NSError * _Nullable error) {
+            [SRGUserData.currentUserData.playlists addPlaylistWithName:name completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
                 if (! error) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self refresh];

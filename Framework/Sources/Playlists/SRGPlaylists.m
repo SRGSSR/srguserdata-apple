@@ -304,26 +304,69 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
-- (NSString *)savePlaylistForUid:(NSString *)uid withName:(NSString *)name completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+- (NSString *)addPlaylistWithName:(NSString *)name completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
 {
     __block NSArray<NSString *> *previousUids = nil;
     __block NSArray<NSString *> *currentUids = nil;
+    
+    __block NSString *uid = nil;
     
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         previousUids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
-        SRGPlaylist *playlist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
-        if (! playlist.system) {
-            playlist.name = name;
+        while (uid == nil) {
+            NSString *newUid = NSUUID.UUID.UUIDString;
+            SRGPlaylist *playlist = [SRGPlaylist upsertWithUid:newUid inManagedObjectContext:managedObjectContext];
+            if (playlist.inserted) {
+                uid = newUid;
+                playlist.name = name;
+            }
         }
         
         NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
-        if (playlist.inserted) {
-            [uids addObject:uid];
-        }
+        [uids addObject:uid];
         currentUids = [uids copy];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        if (! error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : @[uid],
+                                                                            SRGPlaylistsPreviousUidsKey : previousUids,
+                                                                            SRGPlaylistsUidsKey : currentUids }];
+            });
+        }
+        completionBlock ? completionBlock(uid, error) : nil;
+    }];
+}
+
+- (NSString *)updatePlaylistWithUid:(NSString *)uid name:(NSString *)name completionBlock:(void (^)(NSError * _Nullable))completionBlock
+{
+    __block NSArray<NSString *> *previousUids = nil;
+    __block NSArray<NSString *> *currentUids = nil;
+    
+    __block BOOL isPlaylistFound = NO;
+    
+    return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        SRGPlaylist *playlist = [SRGPlaylist objectWithUid:uid inManagedObjectContext:managedObjectContext];
+        if (playlist) {
+            isPlaylistFound = YES;
+            
+            NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+            previousUids = currentUids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
+            
+            if (! playlist.system) {
+                playlist.name = name;
+            }
+        }
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
+        if (! error && ! isPlaylistFound) {
+            error = [NSError errorWithDomain:SRGUserDataErrorDomain
+                                        code:SRGUserDataErrorNotFound
+                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when updating an unknown playlist.") }];
+        }
+        
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification

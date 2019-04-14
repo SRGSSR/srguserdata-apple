@@ -61,6 +61,12 @@
                                              object:SRGUserData.currentUserData.playlists];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
+    
+    if (! self.playlist.system) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit
+                                                                                               target:self
+                                                                                               action:@selector(updatePlaylist:)];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -162,6 +168,34 @@
 - (void)refresh:(id)sender
 {
     [self refresh];
+}
+
+- (void)updatePlaylist:(id)sender
+{
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Update playlist name", nil)
+                                                                             message:nil
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.placeholder = NSLocalizedString(@"Playlist name", nil);
+        textField.text = self.playlist.name;
+    }];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleDefault handler:nil]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Update", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        NSString *name = [alertController.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+        if (name.length > 0) {
+            [SRGUserData.currentUserData.playlists updatePlaylistWithUid:self.playlist.uid name:name completionBlock:^(NSError * _Nullable error) {
+                if (! error) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        self.playlist = [SRGUserData.currentUserData.playlists playlistWithUid:self.playlist.uid];
+                        self.navigationItem.title = self.playlist.name;
+                        [self refresh];
+                    });
+                }
+            }];
+        }
+    }]];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 #pragma mark Notifications
