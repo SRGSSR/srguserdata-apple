@@ -205,9 +205,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         completionBlock();
     };
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
-    });
+    [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
