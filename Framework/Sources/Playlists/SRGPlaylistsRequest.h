@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Block signatures.
 typedef void (^SRGSRGPlaylistsCompletionBlock)(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
 typedef void (^SRGSRGPlaylistPostCompletionBlock)(NSDictionary * _Nullable playlistDictionnary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
+typedef void (^SRGSRGPlaylistEntriesCompletionBlock)(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
 typedef void (^SRGSRGPlaylistDeleteCompletionBlock)(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
 
 /**
@@ -43,6 +44,35 @@ typedef void (^SRGSRGPlaylistDeleteCompletionBlock)(NSHTTPURLResponse * _Nullabl
                       forSessionToken:(NSString *)sessionToken
                           withSession:(NSURLSession *)session
                       completionBlock:(SRGSRGPlaylistDeleteCompletionBlock)completionBlock;
+
+/**
+ *  Retrieve entries for the specified playlist.
+ */
++ (SRGRequest *)entriesForPlaylistWithUid:(NSString *)playlistUid
+                           fromServiceURL:(NSURL *)serviceURL
+                          forSessionToken:(NSString *)sessionToken
+                              withSession:(NSURLSession *)session
+                          completionBlock:(SRGSRGPlaylistEntriesCompletionBlock)completionBlock;
+
+/**
+ *  Update entries for the specified playlist.
+ */
++ (SRGRequest *)putPlaylistEntryDictionaries:(NSArray<NSDictionary *> *)dictionaries
+                          forPlaylistWithUid:(NSString *)playlistUid
+                                toServiceURL:(NSURL *)serviceURL
+                             forSessionToken:(NSString *)sessionToken
+                                 withSession:(NSURLSession *)session
+                             completionBlock:(SRGSRGPlaylistEntriesCompletionBlock)completionBlock;
+
+/**
+ *  Update entries for the specified playlist.
+ */
++ (SRGRequest *)deletePlaylistEntriesWithUids:(nullable NSArray<NSString *> *)uids
+                           forPlaylistWithUid:(NSString *)playlistUid
+                               fromServiceURL:(NSURL *)serviceURL
+                              forSessionToken:(NSString *)sessionToken
+                                  withSession:(NSURLSession *)session
+                              completionBlock:(SRGSRGPlaylistDeleteCompletionBlock)completionBlock;
 
 @end
 
