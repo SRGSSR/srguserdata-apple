@@ -237,13 +237,13 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
     NSParameterAssert(completionBlock);
     
 
-    SRGRequest *request = [[SRGPlaylistsRequest playlistsFromServiceURL:self.serviceURL forSessionToken:sessionToken session:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistsDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    SRGRequest *request = [[SRGPlaylistsRequest playlistsFromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         if (error) {
             completionBlock(error);
             return;
         }
         
-        [self savePlaylistDictionaries:playlistsDictionaries withCompletionBlock:^(NSError *error) {
+        [self savePlaylistDictionaries:playlistDictionaries withCompletionBlock:^(NSError *error) {
             completionBlock(error);
         }];
     }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
@@ -273,7 +273,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
     for (SRGPlaylist *playlist in playlists) {
         if (playlist.discarded) {
             NSString *uid = playlist.uid;
-            SRGRequest *pushRequest = [[SRGPlaylistsRequest deletePlaylistUid:uid toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+            SRGRequest *pushRequest = [[SRGPlaylistsRequest deletePlaylistWithUid:uid fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
                 if (! error) {
                     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull mangedObjectContext) {
                         // TODO: Delete playlist object.

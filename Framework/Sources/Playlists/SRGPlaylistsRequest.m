@@ -12,7 +12,7 @@
 
 + (SRGRequest *)playlistsFromServiceURL:(NSURL *)serviceURL
                         forSessionToken:(NSString *)sessionToken
-                                session:(NSURLSession *)session
+                            withSession:(NSURLSession *)session
                         completionBlock:(SRGSRGPlaylistsCompletionBlock)completionBlock
 {
     NSURL *URL = [serviceURL URLByAppendingPathComponent:@"v3"];
@@ -33,9 +33,7 @@
                            withSession:(NSURLSession *)session
                        completionBlock:(SRGSRGPlaylistPostCompletionBlock)completionBlock
 {
-    if (! dictionary[@"businessId"]) {
-        return nil;
-    }
+    NSAssert(dictionary[@"businessId"] != nil, @"A business identifier is required");
     
     NSURL *URL = [[serviceURL URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:dictionary[@"businessId"]];
     NSURLComponents *URLComponents = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:NO];
@@ -52,11 +50,11 @@
     }];
 }
 
-+ (SRGRequest *)deletePlaylistUid:(NSString *)uid
-                     toServiceURL:(NSURL *)serviceURL
-                  forSessionToken:(NSString *)sessionToken
-                      withSession:(NSURLSession *)session
-                  completionBlock:(SRGSRGPlaylistDeleteCompletionBlock)completionBlock
++ (SRGRequest *)deletePlaylistWithUid:(NSString *)uid
+                       fromServiceURL:(NSURL *)serviceURL
+                      forSessionToken:(NSString *)sessionToken
+                          withSession:(NSURLSession *)session
+                      completionBlock:(SRGSRGPlaylistDeleteCompletionBlock)completionBlock
 {
     NSURL *URL = [[serviceURL URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:uid];
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URL];

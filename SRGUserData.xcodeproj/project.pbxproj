@@ -495,11 +495,11 @@
 		08280F092258DEBD00AC978D /* Playlists */ = {
 			isa = PBXGroup;
 			children = (
-				08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */,
-				08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */,
 				08280F0B2258DEBD00AC978D /* SRGPlaylists.h */,
 				08280F0A2258DEBD00AC978D /* SRGPlaylists.m */,
 				08280F1B2259406C00AC978D /* SRGPlaylists+Private.h */,
+				08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */,
+				08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */,
 			);
 			path = Playlists;
 			sourceTree = "<group>";
