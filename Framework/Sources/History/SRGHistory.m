@@ -19,9 +19,6 @@
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGNetwork/SRGNetwork.h>
 
-typedef void (^SRGHistoryPullCompletionBlock)(NSDate * _Nullable serverDate, NSError * _Nullable error);
-typedef void (^SRGHistoryPushCompletionBlock)(NSError * _Nullable error);
-
 NSString * const SRGHistoryDidChangeNotification = @"SRGHistoryDidChangeNotification";
 
 NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
@@ -63,6 +60,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
 {
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
+        // TODO: Could use separate session
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
     }
     return self;
@@ -119,7 +117,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 - (void)pullHistoryEntriesForSessionToken:(NSString *)sessionToken
                                 afterDate:(NSDate *)date
-                      withCompletionBlock:(SRGHistoryPullCompletionBlock)completionBlock
+                      withCompletionBlock:(void (^)(NSDate *serverDate, NSError *error))completionBlock
 {
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
@@ -128,7 +126,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     __block SRGFirstPageRequest *firstRequest = [[[SRGHistoryRequest historyUpdatesFromServiceURL:self.serviceURL forSessionToken:sessionToken afterDate:date withDeletedEntries:YES session:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         @strongify(self)
         
-        SRGHistoryPullCompletionBlock pullCompletionBlock = ^(NSDate *serverDate, NSError *error) {
+        void (^pullCompletionBlock)(NSDate *, NSError *) = ^(NSDate *serverDate, NSError *error) {
             completionBlock(serverDate, error);
             firstRequest = nil;
         };
@@ -160,7 +158,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 
 - (void)pushHistoryEntries:(NSArray<SRGHistoryEntry *> *)historyEntries
            forSessionToken:(NSString *)sessionToken
-       withCompletionBlock:(SRGHistoryPushCompletionBlock)completionBlock
+       withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
     NSParameterAssert(historyEntries);
     NSParameterAssert(sessionToken);
@@ -178,9 +176,9 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
     
     SRGRequest *pushRequest = [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:historyEntriesMap.allValues toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         if (! error) {
-            [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull mangedObjectContext) {
+            [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                 for (NSManagedObjectID *historyEntryID in historyEntriesMap.allKeys) {
-                    SRGHistoryEntry *historyEntry = [mangedObjectContext existingObjectWithID:historyEntryID error:NULL];
+                    SRGHistoryEntry *historyEntry = [managedObjectContext existingObjectWithID:historyEntryID error:NULL];
                     [historyEntry updateWithDictionary:historyEntriesMap[historyEntryID]];
                     historyEntry.dirty = NO;
                 }

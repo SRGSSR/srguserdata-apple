@@ -34,7 +34,7 @@ OBJC_EXPORT NSString * const SRGPlaylistsUidsKey;                               
  *  Additionnal keys sent in the playlist notification when one or more playlist entries change. Use the key below to
  *  retrieve detailed information from the notification `userInfo` dictionary, and sub keys in each sub dictionnaries.
  */
-OBJC_EXPORT NSString * const SRGPlaylistEntryChangesKey;                          // Key to access the list of playlist entry uids which have changed as an `NSDictionnary` of `NSDictionnary` objects, which is a playlist uid to a dictionnary of playlist entry keys.
+OBJC_EXPORT NSString * const SRGPlaylistEntryChangesKey;                          // Key to access the list of playlist entry uids which have changed as an `NSDictionary` of `NSDictionary` objects, which is a playlist uid to a dictionary of playlist entry keys.
 
 OBJC_EXPORT NSString * const SRGPlaylistEntryChangedUidsSubKey;                   // Key to access the list of entry uids which have changed as an `NSArray` of `NSString` objects.
 OBJC_EXPORT NSString * const SRGPlaylistEntryPreviousUidsSubKey;                  // Key to access the previous entry uid list as an `NSArray` of `NSString` objects.

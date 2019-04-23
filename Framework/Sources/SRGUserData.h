@@ -48,6 +48,8 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
  *  @param playlistsServiceURL The URL of the service with which local playlists information can be synchronized. If none
  *                             is provided, no playlist data synchronization will occur.
  */
+// TODO: Instead of having several URLs for the services, have only one (it does not really make sense to only synchronize
+//       part of the user data, does it?)
 - (nullable instancetype)initWithStoreFileURL:(NSURL *)storeFileURL
                             historyServiceURL:(nullable NSURL *)historyServiceURL
                           playlistsServiceURL:(nullable NSURL *)playlistsServiceURL

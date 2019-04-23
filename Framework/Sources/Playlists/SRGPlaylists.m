@@ -23,9 +23,6 @@
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGNetwork/SRGNetwork.h>
 
-typedef void (^SRGPlaylistsPullCompletionBlock)(NSError * _Nullable error);
-typedef void (^SRGPlaylistsPushCompletionBlock)(NSError * _Nullable error);
-
 NSString *SRGPlaylistNameForPlaylistWithUid(NSString *uid)
 {
     static dispatch_once_t s_onceToken;
@@ -85,6 +82,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
 {
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
+        // TODO: Could use separate session
         self.session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration];
         
         // Check that the default playlists exist.
@@ -231,7 +229,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 #pragma mark Requests
 
 - (void)pullPlaylistsForSessionToken:(NSString *)sessionToken
-                 withCompletionBlock:(SRGPlaylistsPullCompletionBlock)completionBlock
+                 withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
@@ -243,9 +241,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
             return;
         }
         
-        [self savePlaylistDictionaries:playlistDictionaries withCompletionBlock:^(NSError *error) {
-            completionBlock(error);
-        }];
+        [self savePlaylistDictionaries:playlistDictionaries withCompletionBlock:completionBlock];
     }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
     [request resume];
     self.pullPlaylistsRequest = request;
@@ -253,7 +249,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 
 - (void)pushPlaylists:(NSArray<SRGPlaylist *> *)playlists
       forSessionToken:(NSString *)sessionToken
-  withCompletionBlock:(SRGPlaylistsPushCompletionBlock)completionBlock
+  withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
     NSParameterAssert(playlists);
     NSParameterAssert(sessionToken);
@@ -269,30 +265,37 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
             completionBlock(error);
         }
     }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
-
+    
     for (SRGPlaylist *playlist in playlists) {
+        NSManagedObjectID *playlistID = playlist.objectID;
+        
         if (playlist.discarded) {
-            NSString *uid = playlist.uid;
-            SRGRequest *pushRequest = [[SRGPlaylistsRequest deletePlaylistWithUid:uid fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+            SRGRequest *deleteRequest = [[SRGPlaylistsRequest deletePlaylistWithUid:playlist.uid fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                [self.pushRequestQueue reportError:error];
+                
                 if (! error) {
-                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull mangedObjectContext) {
-                        // TODO: Delete playlist object.
+                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                        SRGPlaylist *playlist = [managedObjectContext existingObjectWithID:playlistID error:NULL];
+                        [managedObjectContext deleteObject:playlist];
                     } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
                 }
-                completionBlock(error); // TODO: reprot error to queue
+                completionBlock(error);
             }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
-            [self.pushRequestQueue addRequest:pushRequest resume:YES];
+            [self.pushRequestQueue addRequest:deleteRequest resume:YES];
         }
         else {
-            SRGRequest *pushRequest = [[SRGPlaylistsRequest postPlaylistDictionary:playlist.dictionary toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSDictionary * _Nullable playlistDictionnary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+            SRGRequest *postRequest = [[SRGPlaylistsRequest postPlaylistDictionary:playlist.dictionary toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                [self.pushRequestQueue reportError:error];
+                
                 if (! error) {
-                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull mangedObjectContext) {
-                        // TODO: Update playlist object.
+                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                        SRGPlaylist *playlist = [managedObjectContext existingObjectWithID:playlistID error:NULL];
+                        [playlist updateWithDictionary:playlistDictionary];
+                        playlist.dirty = NO;
                     } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
                 }
-                completionBlock(error); // TODO: reprot error to queue
             }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
-            [self.pushRequestQueue addRequest:pushRequest resume:YES];
+            [self.pushRequestQueue addRequest:postRequest resume:YES];
         }
     }
 }
