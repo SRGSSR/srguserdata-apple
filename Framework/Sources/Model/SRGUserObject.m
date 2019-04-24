@@ -8,6 +8,7 @@
 
 #import "SRGUser+Private.h"
 #import "SRGUserObject+Private.h"
+#import "SRGUserObject+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
 
@@ -28,6 +29,11 @@
 @dynamic dirty;
 
 #pragma mark Class methods
+
++ (NSString *)uidKey
+{
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"Subclasses of 'SRGUserObject' must provide a uidKey" userInfo:nil];
+}
 
 + (NSArray<SRGUserObject *> *)objectsMatchingPredicate:(NSPredicate *)predicate
                                  sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
@@ -67,9 +73,9 @@
     return object;
 }
 
-+ (SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary uidKey:(NSString *)uidKey inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSString *uid = dictionary[uidKey];
+    NSString *uid = dictionary[self.uidKey];
     if (! uid) {
         return nil;
     }
@@ -139,7 +145,7 @@
 
 - (void)updateWithDictionary:(NSDictionary *)dictionary
 {
-    self.uid = dictionary[@"item_id"];
+    self.uid = dictionary[self.class.uidKey];
     self.date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
     self.discarded = [dictionary[@"deleted"] boolValue];
 }
@@ -147,7 +153,7 @@
 - (NSDictionary *)dictionary
 {
     NSMutableDictionary *JSONDictionary = [NSMutableDictionary dictionary];
-    JSONDictionary[@"item_id"] = self.uid;
+    JSONDictionary[self.class.uidKey] = self.uid;
     JSONDictionary[@"date"] = @(round(self.date.timeIntervalSince1970 * 1000.));
     JSONDictionary[@"deleted"] = @(self.discarded);
     return [JSONDictionary copy];

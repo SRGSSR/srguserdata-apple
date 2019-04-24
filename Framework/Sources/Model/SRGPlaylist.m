@@ -27,6 +27,13 @@
 
 @dynamic entries;
 
+#pragma mark Overrides
+
++ (NSString *)uidKey
+{
+    return @"businessId";
+}
+
 #pragma mark Getters and Setters
 
 - (NSDictionary *)dictionary

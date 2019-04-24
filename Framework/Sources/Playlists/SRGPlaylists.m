@@ -130,7 +130,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         for (NSDictionary *playlistDictionary in playlistDictionaries) {
             NSMutableDictionary *mutablePlaylistDictionary = playlistDictionary.mutableCopy;
             mutablePlaylistDictionary[@"date"] = @(round(NSDate.date.timeIntervalSince1970 * 1000.));
-            SRGPlaylist *playlist = [SRGPlaylist synchronizeWithDictionary:mutablePlaylistDictionary.copy uidKey:@"businessId" inManagedObjectContext:managedObjectContext];
+            SRGPlaylist *playlist = [SRGPlaylist synchronizeWithDictionary:mutablePlaylistDictionary.copy inManagedObjectContext:managedObjectContext];
             if (playlist) {
                 [changedUids addObject:playlist.uid];
                 

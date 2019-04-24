@@ -15,6 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SRGUserObject (Subclassing)
 
 /**
+ *  Subclasses must implement this method to provide the JSON key which is used to identity the item in a unique way.
+ */
+@property (class, nonatomic) NSString *uidKey;
+
+/**
  *  Update the current entry using the provided dictionary, in the format delivered by the associated service.
  */
 - (void)updateWithDictionary:(NSDictionary *)dictionary NS_REQUIRES_SUPER;

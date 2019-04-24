@@ -22,6 +22,13 @@
 @dynamic lastPlaybackPosition;
 @dynamic deviceUid;
 
+#pragma mark Overrides
+
++ (NSString *)uidKey
+{
+    return @"item_id";
+}
+
 #pragma mark Getters and Setters
 
 - (CMTime)lastPlaybackTime
