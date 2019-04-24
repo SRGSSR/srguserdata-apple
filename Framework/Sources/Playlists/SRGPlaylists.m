@@ -312,7 +312,9 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         completionBlock();
     };
     
-    [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidStartSynchronizationNotification object:self];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidStartSynchronizationNotification object:self];
+    });
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];

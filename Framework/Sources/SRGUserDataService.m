@@ -109,8 +109,6 @@
         return;
     }
     
-    NSAssert(NSThread.isMainThread, @"Synchronization is currently documented as started on the main thread");
-    
     self.synchronizing = YES;
     [self synchronizeWithCompletionBlock:^{
         NSCAssert(self.synchronizing, @"Must be synchronizing: The completion block must be called only once per sync attempt");
