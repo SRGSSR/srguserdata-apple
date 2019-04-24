@@ -279,7 +279,6 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
                         [managedObjectContext deleteObject:playlist];
                     } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
                 }
-                completionBlock(error);
             }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
             [self.pushRequestQueue addRequest:deleteRequest resume:YES];
         }
