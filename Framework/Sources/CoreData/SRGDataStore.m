@@ -236,7 +236,7 @@
 {
     NSAssert(! NSThread.isMainThread, @"Saves are only made on background contexts and thus notified on background threads");
     
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
         NSManagedObjectContext *viewContext = self.persistentContainer.viewContext;
         if (notification.object != viewContext) {
             [viewContext mergeChangesFromContextDidSaveNotification:notification];
