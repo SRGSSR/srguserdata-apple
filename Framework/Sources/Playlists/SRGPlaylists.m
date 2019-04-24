@@ -427,34 +427,26 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 - (NSString *)addPlaylistWithName:(NSString *)name completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
 {
     __block NSArray<NSString *> *previousUids = nil;
-    __block NSArray<NSString *> *currentUids = nil;
     
-    __block NSString *uid = nil;
+    NSString *uid = NSUUID.UUID.UUIDString;
     
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         previousUids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
-        while (uid == nil) {
-            NSString *newUid = NSUUID.UUID.UUIDString;
-            SRGPlaylist *playlist = [SRGPlaylist upsertWithUid:newUid inManagedObjectContext:managedObjectContext];
-            if (playlist.inserted) {
-                uid = newUid;
-                playlist.name = name;
-            }
-        }
-        
-        NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
-        [uids addObject:uid];
-        currentUids = [uids copy];
+        SRGPlaylist *playlist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
+        playlist.name = name;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                NSMutableArray<NSString *> *currentUids = [previousUids mutableCopy];
+                [currentUids addObject:uid];
+                
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGPlaylistsChangedUidsKey : @[uid],
                                                                             SRGPlaylistsPreviousUidsKey : previousUids,
-                                                                            SRGPlaylistsUidsKey : currentUids }];
+                                                                            SRGPlaylistsUidsKey : [currentUids copy] }];
             });
         }
         completionBlock ? completionBlock(uid, error) : nil;
