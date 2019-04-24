@@ -41,6 +41,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable __kindof SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
+ *  Return the list of dictionaries which would need to be saved in order to replace a list of objects with a list of
+ *  dictionaries representing another object list.
+ */
++ (NSArray<NSDictionary *> *)dictionariesForObjects:(NSArray<SRGUserObject *> *)objects replacedWithDictionaries:(NSArray<NSDictionary *> *)dictionaries;
+
+/**
  *  Discard the objects with the specified identifiers. Since some of them might not be found, the method returns the actual
  *  list of identifiers which will be discarded. For logged in users, objects will be deleted when the next synchronization
  *  is performed. For offline users, objects are removed immediately.

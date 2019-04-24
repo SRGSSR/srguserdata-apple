@@ -80,13 +80,9 @@
         return nil;
     }
     
-    NSNumber *timestamp = dictionary[@"date"];
-    if (timestamp == nil) {
-        return nil;
-    }
-    
     // If the local entry is dirty and more recent than the server version, keep the local version as is.
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.];
+    NSNumber *timestamp = dictionary[@"date"];
+    NSDate *date = timestamp ? [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.] : NSDate.date;
     SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
     if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
         return object;
@@ -107,6 +103,35 @@
     [object updateWithDictionary:dictionary];
     object.dirty = NO;
     return object;
+}
+
++ (NSArray<NSDictionary *> *)dictionariesForObjects:(NSArray<SRGUserObject *> *)objects replacedWithDictionaries:(NSArray<NSDictionary *> *)dictionaries
+{
+    NSMutableDictionary<NSString *, NSDictionary *> *dictionaryIndex = [NSMutableDictionary dictionary];
+    for (NSDictionary *dictionary in dictionaries) {
+        NSString *uid = dictionary[self.class.uidKey];
+        if (uid) {
+            dictionaryIndex[uid] = dictionary;
+        }
+    }
+    
+    NSMutableArray<NSDictionary *> *mergedDictionaries = [NSMutableArray array];
+    for (SRGUserObject *object in objects) {
+        if (object.dirty) {
+            [mergedDictionaries addObject:object.dictionary];
+        }
+        else if ([dictionaryIndex.allKeys containsObject:object.uid]) {
+            [mergedDictionaries addObject:dictionaryIndex[object.uid]];
+        }
+        else {
+            [mergedDictionaries addObject:object.deletedDictionary];
+        }
+        
+        dictionaryIndex[object.uid] = nil;
+    }
+    
+    [mergedDictionaries addObjectsFromArray:dictionaryIndex.allValues];
+    return [mergedDictionaries copy];
 }
 
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
@@ -156,6 +181,15 @@
     JSONDictionary[self.class.uidKey] = self.uid;
     JSONDictionary[@"date"] = @(round(self.date.timeIntervalSince1970 * 1000.));
     JSONDictionary[@"deleted"] = @(self.discarded);
+    return [JSONDictionary copy];
+}
+
+#pragma mark helpers
+
+- (NSDictionary *)deletedDictionary
+{
+    NSMutableDictionary *JSONDictionary = [self.dictionary mutableCopy];
+    JSONDictionary[@"deleted"] = @YES;
     return [JSONDictionary copy];
 }
 

@@ -82,6 +82,7 @@
         // complexity and not make sense anyway, as tasks should be individually small.
         [managedObjectContext performBlockAndWait:^{
             result = task(managedObjectContext);
+            NSCAssert(! managedObjectContext.hasChanges, @"The managed object context must not be altered");
         }];
         
         __block BOOL cancelled = NO;
