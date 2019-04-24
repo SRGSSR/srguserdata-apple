@@ -62,6 +62,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) BOOL dirty;
 
+/**
+ *  Return a dictionary representation of the entry, which can be sent to the associated service.
+ */
+@property (nonatomic, readonly) NSDictionary *dictionary;
+
 @end
 
 NS_ASSUME_NONNULL_END

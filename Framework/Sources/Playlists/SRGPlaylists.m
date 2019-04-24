@@ -69,8 +69,9 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 
 @interface SRGPlaylists ()
 
+// TODO: Probably only use a single queue for everything
 @property (nonatomic, weak) SRGRequest *pullPlaylistsRequest;
-@property (nonatomic) SRGRequestQueue *pushRequestQueue;
+@property (nonatomic) SRGRequestQueue *requestQueue;
 
 @property (nonatomic) NSURLSession *session;
 
@@ -235,7 +236,6 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-
     SRGRequest *request = [[SRGPlaylistsRequest playlistsFromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         if (error) {
             completionBlock(error);
@@ -261,7 +261,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         return;
     }
     
-    self.pushRequestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
+    self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
         if (finished) {
             completionBlock(error);
         }
@@ -272,7 +272,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         
         if (playlist.discarded) {
             SRGRequest *deleteRequest = [[SRGPlaylistsRequest deletePlaylistWithUid:playlist.uid fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-                [self.pushRequestQueue reportError:error];
+                [self.requestQueue reportError:error];
                 
                 if (! error) {
                     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -281,11 +281,11 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
                     } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
                 }
             }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
-            [self.pushRequestQueue addRequest:deleteRequest resume:YES];
+            [self.requestQueue addRequest:deleteRequest resume:YES];
         }
         else {
             SRGRequest *postRequest = [[SRGPlaylistsRequest postPlaylistDictionary:playlist.dictionary toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-                [self.pushRequestQueue reportError:error];
+                [self.requestQueue reportError:error];
                 
                 if (! error) {
                     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -295,7 +295,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
                     } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
                 }
             }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
-            [self.pushRequestQueue addRequest:postRequest resume:YES];
+            [self.requestQueue addRequest:postRequest resume:YES];
         }
     }
 }
@@ -306,8 +306,28 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-    // TODO: Implement!
-    completionBlock(nil);
+    self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
+        if (finished) {
+            completionBlock(error);
+        }
+    }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
+    
+    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGPlaylist *> * _Nullable playlists, NSError * _Nullable error) {
+        NSArray<NSString *> *playlistUids = [playlists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
+        for (NSString *playlistUid in playlistUids) {
+            SRGRequest *request = [SRGPlaylistsRequest entriesForPlaylistWithUid:playlistUid fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                [self.requestQueue reportError:error];
+                
+                if (! error) {
+                    // TODO: Save to local storage; use similar strategy as for playlists (server version wins)
+                    NSLog(@"Pulled playlist entries for playlist %@: %@", playlistUid, playlistEntryDictionaries);
+                }
+            }];
+            [self.requestQueue addRequest:request resume:YES];
+        }
+    }];
 }
 
 - (void)pushPlaylistEntries:(NSArray<SRGPlaylistEntry *> *)playlistEntries
@@ -323,8 +343,32 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         return;
     }
     
-    // TODO: Group entries by playlist uid and make the necessary requests
-    completionBlock(nil);
+    self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
+        if (finished) {
+            completionBlock(error);
+        }
+    }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
+    
+    NSArray<NSString *> *playlistUids = [playlistEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, uid)]];
+    for (NSString *playlistUid in playlistUids) {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlistUid];
+        NSArray<SRGPlaylistEntry *> *filteredPlaylistEntries = [playlistEntries filteredArrayUsingPredicate:predicate];
+        
+        NSMutableArray<NSDictionary *> *playlistDictionaries = [NSMutableArray array];
+        for (SRGPlaylistEntry *playlistEntry in filteredPlaylistEntries) {
+            [playlistDictionaries addObject:playlistEntry.dictionary];
+        }
+        
+        SRGRequest *request = [SRGPlaylistsRequest putPlaylistEntryDictionaries:[playlistDictionaries copy] forPlaylistWithUid:playlistUid toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+            [self.requestQueue reportError:error];
+            
+            if (! error) {
+                // TODO: Update local entries
+                NSLog(@"Pushed playlist entries for playlist %@: %@", playlistUid, playlistEntryDictionaries);
+            }
+        }];
+        [self.requestQueue addRequest:request resume:YES];
+    }
 }
 
 #pragma mark Subclassing hooks
@@ -425,7 +469,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 - (void)userDidLogout
 {
     [self.pullPlaylistsRequest cancel];
-    [self.pushRequestQueue cancel];
+    [self.requestQueue cancel];
 }
 
 - (void)clearData

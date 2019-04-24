@@ -144,4 +144,15 @@
     self.discarded = [dictionary[@"deleted"] boolValue];
 }
 
+#pragma mark JSON construction
+
+- (NSDictionary *)dictionary
+{
+    NSMutableDictionary *JSONDictionary = [NSMutableDictionary dictionary];
+    JSONDictionary[@"media_id"] = self.uid;
+    JSONDictionary[@"date"] = @(round(self.date.timeIntervalSince1970 * 1000.));
+    JSONDictionary[@"deleted"] = @(self.discarded);
+    return [JSONDictionary copy];
+}
+
 @end
