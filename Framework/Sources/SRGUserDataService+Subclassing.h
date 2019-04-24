@@ -14,8 +14,8 @@
 @interface SRGUserDataService (Subclassing)
 
 /**
- *  This methid is called when synchronization starts. Services can implement their logic here (usually retrieve
- *  data with network requests and save it).
+ *  This method is called when synchronization starts, from any thread. Services can implement their logic here (usually
+ *  retrieve data with network requests and save it).
  *
  *  The provided completion block must be called on completion, otherwise the behavior is undefined. The block can
  *  be called from any thread.
