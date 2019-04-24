@@ -28,6 +28,7 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
 NSString * const SRGHistoryDidStartSynchronizationNotification = @"SRGHistoryDidStartSynchronizationNotification";
 NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDidFinishSynchronizationNotification";
 
+// TODO: Factor out
 static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
 {
     if ([error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorMultiple) {

@@ -50,6 +50,7 @@ NSString * const SRGPlaylistEntryUidsSubKey = @"SRGPlaylistEntryUids";
 NSString * const SRGPlaylistsDidStartSynchronizationNotification = @"SRGPlaylistsDidStartSynchronizationNotification";
 NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylistsDidFinishSynchronizationNotification";
 
+// TODO: Factor out
 static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 {
     if ([error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorMultiple) {
@@ -299,6 +300,33 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
     }
 }
 
+- (void)pullPlaylistEntriesForSessionToken:(NSString *)sessionToken
+                       withCompletionBlock:(void (^)(NSError *error))completionBlock
+{
+    NSParameterAssert(sessionToken);
+    NSParameterAssert(completionBlock);
+    
+    // TODO: Implement!
+    completionBlock(nil);
+}
+
+- (void)pushPlaylistEntries:(NSArray<SRGPlaylistEntry *> *)playlistEntries
+            forSessionToken:(NSString *)sessionToken
+        withCompletionBlock:(void (^)(NSError *error))completionBlock
+{
+    NSParameterAssert(playlistEntries);
+    NSParameterAssert(sessionToken);
+    NSParameterAssert(completionBlock);
+    
+    if (playlistEntries.count == 0) {
+        completionBlock(nil);
+        return;
+    }
+    
+    // TODO: Group entries by playlist uid and make the necessary requests
+    completionBlock(nil);
+}
+
 #pragma mark Subclassing hooks
 
 - (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock
@@ -340,14 +368,40 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
                     return;
                 }
                 
-                [self pullPlaylistsForSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pullError) {
-                    if (SRGPlaylistsIsUnauthorizationError(pullError)) {
-                        [self.identityService reportUnauthorization];
+                [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGPlaylistEntry.new, dirty)];
+                    return [SRGPlaylistEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+                } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
+                    if (error) {
                         finishSynchronization();
                         return;
                     }
                     
-                    finishSynchronization();
+                    [self pushPlaylistEntries:playlistEntries forSessionToken:sessionToken withCompletionBlock:^(NSError *error) {
+                        if (SRGPlaylistsIsUnauthorizationError(pushError)) {
+                            [self.identityService reportUnauthorization];
+                            finishSynchronization();
+                            return;
+                        }
+                        
+                        [self pullPlaylistsForSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pullError) {
+                            if (SRGPlaylistsIsUnauthorizationError(pullError)) {
+                                [self.identityService reportUnauthorization];
+                                finishSynchronization();
+                                return;
+                            }
+                            
+                            [self pullPlaylistEntriesForSessionToken:sessionToken withCompletionBlock:^(NSError *error) {
+                                if (SRGPlaylistsIsUnauthorizationError(pullError)) {
+                                    [self.identityService reportUnauthorization];
+                                    finishSynchronization();
+                                    return;
+                                }
+                                
+                                finishSynchronization();
+                            }];
+                        }];
+                    }];
                 }];
             }];
         }];

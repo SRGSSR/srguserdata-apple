@@ -55,6 +55,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
+/**
+ *  Set to `YES` to flag the object as requiring a synchronization for the currently logged in user.
+ *
+ *  @discussion The value of this flag is unspecified when no user is logged in.
+ */
+@property (nonatomic) BOOL dirty;
+
 @end
 
 NS_ASSUME_NONNULL_END
