@@ -112,11 +112,6 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 
 - (void)savePlaylistDictionaries:(NSArray<NSDictionary *> *)playlistDictionaries withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
-    if (playlistDictionaries.count == 0) {
-        completionBlock(nil);
-        return;
-    }
-    
     NSMutableArray<NSString *> *changedUids = [NSMutableArray array];
     
     __block NSArray<NSString *> *previousUids = nil;
@@ -124,12 +119,16 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        NSArray<NSDictionary *> *replacementPlaylistDictionaries = [SRGPlaylist dictionariesForObjects:previousPlaylists replacedWithDictionaries:playlistDictionaries];
+        
+        if (replacementPlaylistDictionaries.count == 0) {
+            completionBlock(nil);
+            return;
+        }
+        
         previousUids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
         NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
-        
-        // TODO: Move at the top
-        NSArray<NSDictionary *> *replacementPlaylistDictionaries = [SRGPlaylist dictionariesForObjects:previousPlaylists replacedWithDictionaries:playlistDictionaries];
         for (NSDictionary *playlistDictionary in replacementPlaylistDictionaries) {
             SRGPlaylist *playlist = [SRGPlaylist synchronizeWithDictionary:playlistDictionary inManagedObjectContext:managedObjectContext];
             if (playlist) {
