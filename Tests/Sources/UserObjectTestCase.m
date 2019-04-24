@@ -101,11 +101,8 @@
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
-        SRGHistoryEntry *historyEntry1 = [SRGHistoryEntry synchronizeWithDictionary:@{} inManagedObjectContext:viewContext];
-        XCTAssertNil(historyEntry1);
-        
-        SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"123456" } inManagedObjectContext:viewContext];
-        XCTAssertNil(historyEntry2);
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{} inManagedObjectContext:viewContext];
+        XCTAssertNil(historyEntry);
     }];
 }
 
