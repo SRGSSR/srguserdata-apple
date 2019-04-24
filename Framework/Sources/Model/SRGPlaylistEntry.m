@@ -79,13 +79,9 @@
         return nil;
     }
     
-    NSNumber *timestamp = dictionary[@"date"];
-    if (timestamp == nil) {
-        return nil;
-    }
-    
     // If the local entry is dirty and more recent than the server version, keep the local version as is.
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.];
+    NSNumber *timestamp = dictionary[@"date"];
+    NSDate *date = timestamp ? [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.] : NSDate.date;
     SRGPlaylistEntry *object = [self objectWithUid:uid playlist:playlist inManagedObjectContext:managedObjectContext];
     if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
         return object;
@@ -141,7 +137,10 @@
 - (void)updateWithDictionary:(NSDictionary *)dictionary
 {
     self.uid = dictionary[@"media_id"];
-    self.date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
+    
+    NSString *dateString = dictionary[@"date"];
+    self.date = dateString ? [NSDate dateWithTimeIntervalSince1970:dateString.doubleValue / 1000.] : NSDate.date;
+    
     self.discarded = [dictionary[@"deleted"] boolValue];
 }
 
