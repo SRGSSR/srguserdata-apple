@@ -846,18 +846,18 @@
 - (void)testPlaylistEntriesMigrationToWatchLaterPlaylist
 {
     NSDate *date = NSDate.date;
-    NSArray<NSDictionary *> *migrations = @[ @{ @"media_id" : @"90",
+    NSArray<NSDictionary *> *migrations = @[ @{ @"itemId" : @"90",
                                                 @"date" : @(round((date.timeIntervalSince1970 - 2) * 1000.)) },
-                                             @{ @"media_id" : @"78",
+                                             @{ @"itemId" : @"78",
                                                 @"date" : @(round((date.timeIntervalSince1970 - 4) * 1000.)) },
-                                             @{ @"media_id" : @"56",
+                                             @{ @"itemId" : @"56",
                                                 @"date" : @(round((date.timeIntervalSince1970 - 6) * 1000.)) },
-                                             @{ @"media_id" : @"34",
+                                             @{ @"itemId" : @"34",
                                                 @"date" : @(round((date.timeIntervalSince1970 - 8) * 1000.)) },
-                                             @{ @"media_id" : @"12",
+                                             @{ @"itemId" : @"12",
                                                 @"date" : @(round((date.timeIntervalSince1970 - 10) * 1000.)) } ];
     
-    NSMutableArray<NSString *> *expectedAddedNotifications = [[migrations valueForKey:@"media_id"] mutableCopy];
+    NSMutableArray<NSString *> *expectedAddedNotifications = [[migrations valueForKey:@"itemId"] mutableCopy];
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
@@ -879,7 +879,7 @@
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGUserObject.new, date) ascending:NO];
     NSArray<SRGPlaylistEntry *> *playlistEntries = [self.userData.playlists entriesFromPlaylistWithUid:SRGWatchLaterPlaylistUid matchingPredicate:nil sortedWithDescriptors:@[ sortDescriptor ]];
     XCTAssertEqual(playlistEntries.count, 5);
-    XCTAssertEqualObjects([playlistEntries valueForKey:@keypath(SRGPlaylistEntry.new, uid)], [migrations valueForKey:@"media_id"]);
+    XCTAssertEqualObjects([playlistEntries valueForKey:@keypath(SRGPlaylistEntry.new, uid)], [migrations valueForKey:@"itemId"]);
 }
 
 @end
