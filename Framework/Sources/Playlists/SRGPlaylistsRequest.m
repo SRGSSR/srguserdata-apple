@@ -91,7 +91,7 @@
                                  withSession:(NSURLSession *)session
                              completionBlock:(SRGSRGPlaylistEntriesCompletionBlock)completionBlock
 {
-    NSURL *URL = [[serviceURL URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:playlistUid];
+    NSURL *URL = [[[serviceURL URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:playlistUid] URLByAppendingPathComponent:@"bookmarks"];
     
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URL];
     URLRequest.HTTPMethod = @"PUT";
@@ -112,7 +112,7 @@
                                   withSession:(NSURLSession *)session
                               completionBlock:(SRGSRGPlaylistDeleteCompletionBlock)completionBlock
 {
-    NSURL *URL = [[serviceURL URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:playlistUid];
+    NSURL *URL = [[[serviceURL URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:playlistUid] URLByAppendingPathComponent:@"bookmarks"];
     NSURLComponents *URLComponents = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:NO];
     
     NSMutableArray<NSURLQueryItem *> *queryItems = [NSMutableArray array];

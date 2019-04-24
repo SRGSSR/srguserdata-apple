@@ -63,6 +63,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL dirty;
 
 /**
+ *  Update the current entry using the provided dictionary, in the format delivered by the associated service.
+ */
+- (void)updateWithDictionary:(NSDictionary *)dictionary;
+
+/**
  *  Return a dictionary representation of the entry, which can be sent to the associated service.
  */
 @property (nonatomic, readonly) NSDictionary *dictionary;

@@ -74,7 +74,7 @@
 
 + (SRGPlaylistEntry *)synchronizeWithDictionary:(NSDictionary *)dictionary playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSString *uid = dictionary[@"media_id"];
+    NSString *uid = dictionary[@"itemId"];
     if (! uid) {
         return nil;
     }
@@ -136,7 +136,7 @@
 
 - (void)updateWithDictionary:(NSDictionary *)dictionary
 {
-    self.uid = dictionary[@"media_id"];
+    self.uid = dictionary[@"itemId"];
     
     NSString *dateString = dictionary[@"date"];
     self.date = dateString ? [NSDate dateWithTimeIntervalSince1970:dateString.doubleValue / 1000.] : NSDate.date;
@@ -149,7 +149,7 @@
 - (NSDictionary *)dictionary
 {
     NSMutableDictionary *JSONDictionary = [NSMutableDictionary dictionary];
-    JSONDictionary[@"media_id"] = self.uid;
+    JSONDictionary[@"itemId"] = self.uid;
     JSONDictionary[@"date"] = @(round(self.date.timeIntervalSince1970 * 1000.));
     JSONDictionary[@"deleted"] = @(self.discarded);
     return [JSONDictionary copy];
