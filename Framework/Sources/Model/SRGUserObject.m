@@ -171,7 +171,10 @@
 - (void)updateWithDictionary:(NSDictionary *)dictionary
 {
     self.uid = dictionary[self.class.uidKey];
-    self.date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
+    
+    NSString *dateString = dictionary[@"date"];
+    self.date = dateString ? [NSDate dateWithTimeIntervalSince1970:dateString.doubleValue / 1000.] : NSDate.date;
+    
     self.discarded = [dictionary[@"deleted"] boolValue];
 }
 
