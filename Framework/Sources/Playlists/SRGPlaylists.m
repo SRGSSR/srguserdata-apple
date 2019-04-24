@@ -354,29 +354,49 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlistUid];
         NSArray<SRGPlaylistEntry *> *filteredPlaylistEntries = [playlistEntries filteredArrayUsingPredicate:predicate];
         
-        NSMutableDictionary<NSString *, NSDictionary *> *playlistEntryDictionaryIndex = [NSMutableDictionary dictionary];
-        for (SRGPlaylistEntry *playlistEntry in filteredPlaylistEntries) {
-            playlistEntryDictionaryIndex[playlistEntry.uid] = playlistEntry.dictionary;
-        }
+        NSPredicate *discardedPredicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGPlaylistEntry.new, discarded)];
         
-        NSArray<NSManagedObjectID *> *filteredPlaylistEntryIDs = [playlistEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, objectID)]];
+        NSArray<SRGPlaylistEntry *> *discardedPlaylistEntries = [filteredPlaylistEntries filteredArrayUsingPredicate:discardedPredicate];
+        NSArray<NSManagedObjectID *> *discardedPlaylistEntryIDs = [discardedPlaylistEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, objectID)]];
         
-        // TODO: Deletion of discarded entries
-        SRGRequest *request = [SRGPlaylistsRequest putPlaylistEntryDictionaries:playlistEntryDictionaryIndex.allValues forPlaylistWithUid:playlistUid toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        NSArray<NSString *> *discardedPlaylistEntryUids = [discardedPlaylistEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, uid)]];
+        SRGRequest *deleteRequest = [SRGPlaylistsRequest deletePlaylistEntriesWithUids:discardedPlaylistEntryUids forPlaylistWithUid:playlistUid fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
             [self.requestQueue reportError:error];
             
             if (! error) {
                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                    for (NSManagedObjectID *playlistEntryID in filteredPlaylistEntryIDs) {
+                    for (NSManagedObjectID *playlistEntryID in discardedPlaylistEntryIDs) {
                         SRGPlaylistEntry *playlistEntry = [managedObjectContext existingObjectWithID:playlistEntryID error:NULL];
-                        NSDictionary *playlistEntryDictionary = playlistEntryDictionaryIndex[playlistEntry.uid];
+                        [managedObjectContext deleteObject:playlistEntry];
+                    }
+                } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
+            }
+        }];
+        [self.requestQueue addRequest:deleteRequest resume:YES];
+        
+        NSArray<SRGPlaylistEntry *> *updatedPlaylistEntries = [filteredPlaylistEntries arrayByAddingObjectsFromArray:discardedPlaylistEntries];
+        NSArray<NSManagedObjectID *> *updatedPlaylistEntryIDs = [updatedPlaylistEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, objectID)]];
+        
+        NSMutableDictionary<NSString *, NSDictionary *> *updatedPlaylistEntryDictionaryIndex = [NSMutableDictionary dictionary];
+        for (SRGPlaylistEntry *playlistEntry in updatedPlaylistEntries) {
+            updatedPlaylistEntryDictionaryIndex[playlistEntry.uid] = playlistEntry.dictionary;
+        }
+        
+        SRGRequest *putRequest = [SRGPlaylistsRequest putPlaylistEntryDictionaries:updatedPlaylistEntryDictionaryIndex.allValues forPlaylistWithUid:playlistUid toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+            [self.requestQueue reportError:error];
+            
+            if (! error) {
+                [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                    for (NSManagedObjectID *playlistEntryID in updatedPlaylistEntryIDs) {
+                        SRGPlaylistEntry *playlistEntry = [managedObjectContext existingObjectWithID:playlistEntryID error:NULL];
+                        NSDictionary *playlistEntryDictionary = updatedPlaylistEntryDictionaryIndex[playlistEntry.uid];
                         [playlistEntry updateWithDictionary:playlistEntryDictionary];
                         playlistEntry.dirty = NO;
                     }
                 } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
             }
         }];
-        [self.requestQueue addRequest:request resume:YES];
+        [self.requestQueue addRequest:putRequest resume:YES];
     }
 }
 
