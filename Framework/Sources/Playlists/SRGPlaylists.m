@@ -186,7 +186,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         previousPlaylistEntryUids = [previousPlaylistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
         
         NSMutableArray<NSString *> *uids = [previousPlaylistEntryUids mutableCopy];
-        for (NSDictionary *playlistEntryDictionary in playlistEntryDictionaries) {
+        for (NSDictionary *playlistEntryDictionary in replacementPlaylistEntryDictionaries) {
             SRGPlaylistEntry *playlistEntry = [SRGPlaylistEntry synchronizeWithDictionary:playlistEntryDictionary playlist:playlist inManagedObjectContext:managedObjectContext];
             if (playlistEntry) {
                 [changedPlaylistEntryUids addObject:playlistEntry.uid];
