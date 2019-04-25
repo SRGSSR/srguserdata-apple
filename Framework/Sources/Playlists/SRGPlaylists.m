@@ -252,6 +252,12 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
+    // System playlists cannot be pushed (read-only).
+    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(SRGPlaylist * _Nullable playlist, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return ! playlist.system;
+    }];
+    playlists = [playlists filteredArrayUsingPredicate:predicate];
+    
     if (playlists.count == 0) {
         completionBlock(nil);
         return;
@@ -486,7 +492,10 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 - (void)userDidLogin
 {
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(SRGPlaylist * _Nullable playlist, NSDictionary<NSString *,id> * _Nullable bindings) {
+            return ! playlist.system;
+        }];
+        NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         for (SRGPlaylist *playlist in playlists) {
             playlist.dirty = YES;
         }
