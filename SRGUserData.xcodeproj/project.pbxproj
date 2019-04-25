@@ -119,6 +119,8 @@
 		6F8A93FE20FDCAA800AA6434 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8A93F620FDCAA800AA6434 /* AppDelegate.m */; };
 		6F8A940320FDD01B00AA6434 /* SRGUserData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; };
 		6F8A940420FDD01B00AA6434 /* SRGUserData.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F9E50742271CE2900CB7F56 /* NSArray+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F9E50722271CE2900CB7F56 /* NSArray+SRGUserData.h */; };
+		6F9E50752271CE2900CB7F56 /* NSArray+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F9E50732271CE2900CB7F56 /* NSArray+SRGUserData.m */; };
 		6FA1D10D220C7A21003976D9 /* SRGUserObject+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */; };
 		6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */; };
 		6FA62D5F2204389A008569DC /* FXReachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FA62D5C2204389A008569DC /* FXReachability.framework */; };
@@ -356,6 +358,8 @@
 		6F8A93F520FDCAA800AA6434 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6F8A93F620FDCAA800AA6434 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		6F8A93FA20FDCAA800AA6434 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6F9E50722271CE2900CB7F56 /* NSArray+SRGUserData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+SRGUserData.h"; sourceTree = "<group>"; };
+		6F9E50732271CE2900CB7F56 /* NSArray+SRGUserData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+SRGUserData.m"; sourceTree = "<group>"; };
 		6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserObject+Subclassing.h"; sourceTree = "<group>"; };
 		6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataService+Subclassing.h"; sourceTree = "<group>"; };
 		6FA62D5C2204389A008569DC /* FXReachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FXReachability.framework; path = Carthage/Build/iOS/FXReachability.framework; sourceTree = "<group>"; };
@@ -543,6 +547,8 @@
 		6F0178CD2208199800B4BCD9 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				6F9E50722271CE2900CB7F56 /* NSArray+SRGUserData.h */,
+				6F9E50732271CE2900CB7F56 /* NSArray+SRGUserData.m */,
 				6F0178CE2208199800B4BCD9 /* SRGUserDataTimerTarget.h */,
 				6F0178CF2208199800B4BCD9 /* SRGUserDataTimerTarget.m */,
 			);
@@ -845,6 +851,7 @@
 				6FFB34852209BF8D00E76E6D /* SRGUserObject+Private.h in Headers */,
 				6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */,
 				08083BD922639F8B00BE9F19 /* SRGPlaylistsRequest.h in Headers */,
+				6F9E50742271CE2900CB7F56 /* NSArray+SRGUserData.h in Headers */,
 				6FFB347422089A5E00E76E6D /* SRGPersistentContainer.h in Headers */,
 				6F0178D822086F6D00B4BCD9 /* SRGUser+Private.h in Headers */,
 				08C991AB2254CCAF003E7816 /* SRGPlaylistEntry+Private.h in Headers */,
@@ -1091,6 +1098,7 @@
 				6FFB347222089A5E00E76E6D /* SRGHistory.m in Sources */,
 				084ACC2D22535F48008ACBD0 /* SRGPlaylist.m in Sources */,
 				6F0178CB2208192B00B4BCD9 /* NSTimer+SRGUserData.m in Sources */,
+				6F9E50752271CE2900CB7F56 /* NSArray+SRGUserData.m in Sources */,
 				6FFB347522089A5E00E76E6D /* SRGDataStore.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

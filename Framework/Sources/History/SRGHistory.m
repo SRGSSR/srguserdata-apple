@@ -6,6 +6,7 @@
 
 #import "SRGHistory.h"
 
+#import "NSArray+SRGUserData.h"
 #import "SRGDataStore.h"
 #import "SRGHistoryEntry+Private.h"
 #import "SRGHistoryRequest.h"
@@ -378,9 +379,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         
         changedUids = [SRGHistoryEntry discardObjectsWithUids:uids inManagedObjectContext:managedObjectContext];
         
-        NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
-        [uids removeObjectsInArray:changedUids];
-        currentUids = [uids copy];
+        currentUids = [previousUids srguserdata_arrayByRemovingObjectsInArray:changedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{

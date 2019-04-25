@@ -5,12 +5,13 @@
 //
 
 #import "SRGPlaylists.h"
-#import "SRGPlaylists+Private.h"
 
+#import "NSArray+SRGUserData.h"
 #import "NSBundle+SRGUserData.h"
 #import "SRGDataStore.h"
 #import "SRGPlaylist+Private.h"
 #import "SRGPlaylistEntry+Private.h"
+#import "SRGPlaylists+Private.h"
 #import "SRGPlaylistsRequest.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataError.h"
@@ -373,7 +374,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
             [self.requestQueue addRequest:deleteRequest resume:YES];
         }
         
-        NSArray<SRGPlaylistEntry *> *updatedPlaylistEntries = [filteredPlaylistEntries arrayByAddingObjectsFromArray:discardedPlaylistEntries];
+        NSArray<SRGPlaylistEntry *> *updatedPlaylistEntries = [filteredPlaylistEntries srguserdata_arrayByRemovingObjectsInArray:discardedPlaylistEntries];
         if (updatedPlaylistEntries.count > 0) {
             NSArray<NSManagedObjectID *> *updatedPlaylistEntryIDs = [updatedPlaylistEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, objectID)]];
             
