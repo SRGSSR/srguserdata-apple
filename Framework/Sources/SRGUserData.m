@@ -122,7 +122,8 @@ NSString *SRGUserDataMarketingVersion(void)
         
         dispatch_group_enter(group);
         [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-            [SRGUser upsertInManagedObjectContext:managedObjectContext];
+            SRGUser *user = [SRGUser upsertInManagedObjectContext:managedObjectContext];
+            [user attachToAccountUid:identityService.account.uid];
         } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
             dispatch_group_leave(group);
         }];
@@ -265,8 +266,8 @@ NSString *SRGUserDataMarketingVersion(void)
     SRGAccount *account = notification.userInfo[SRGIdentityServiceAccountKey];
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
-        [mainUser attachToAccountUid:account.uid];
+        SRGUser *user = [SRGUser userInManagedObjectContext:managedObjectContext];
+        [user attachToAccountUid:account.uid];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
 }
 
