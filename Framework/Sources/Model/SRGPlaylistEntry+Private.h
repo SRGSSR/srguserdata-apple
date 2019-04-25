@@ -46,6 +46,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable __kindof SRGPlaylistEntry *)synchronizeWithDictionary:(NSDictionary *)dictionary playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
+ *  Return the list of dictionaries which would need to be saved in order to replace a list of objects with a list of
+ *  dictionaries representing another object list.
+ */
++ (NSArray<NSDictionary *> *)dictionariesForObjects:(NSArray<SRGPlaylistEntry *> *)objects replacedWithDictionaries:(NSArray<NSDictionary *> *)dictionaries;
+
+/**
  *  Discard the entries with the specified identifiers in a playlist. Since some of them might not be found, the method returns
  *  the actual list of identifiers which will be discarded. For logged in users, objects will be deleted when the next synchronization
  *  is performed. For offline users, objects are removed immediately.

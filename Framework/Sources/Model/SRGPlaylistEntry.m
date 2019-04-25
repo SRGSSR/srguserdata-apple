@@ -105,6 +105,35 @@
     return object;
 }
 
++ (NSArray<NSDictionary *> *)dictionariesForObjects:(NSArray<SRGPlaylistEntry *> *)objects replacedWithDictionaries:(NSArray<NSDictionary *> *)dictionaries
+{
+    NSMutableDictionary<NSString *, NSDictionary *> *dictionaryIndex = [NSMutableDictionary dictionary];
+    for (NSDictionary *dictionary in dictionaries) {
+        NSString *uid = dictionary[@"itemId"];
+        if (uid) {
+            dictionaryIndex[uid] = dictionary;
+        }
+    }
+    
+    NSMutableArray<NSDictionary *> *mergedDictionaries = [NSMutableArray array];
+    for (SRGPlaylistEntry *object in objects) {
+        if (object.dirty) {
+            [mergedDictionaries addObject:object.dictionary];
+        }
+        else if ([dictionaryIndex.allKeys containsObject:object.uid]) {
+            [mergedDictionaries addObject:dictionaryIndex[object.uid]];
+        }
+        else {
+            [mergedDictionaries addObject:object.deletedDictionary];
+        }
+        
+        dictionaryIndex[object.uid] = nil;
+    }
+    
+    [mergedDictionaries addObjectsFromArray:dictionaryIndex.allValues];
+    return [mergedDictionaries copy];
+}
+
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 {
     NSPredicate *predicate = uids ? [NSPredicate predicateWithFormat:@"%K IN %@ AND discarded == NO AND %K == %@", @keypath(SRGPlaylistEntry.new, uid), uids, @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid] : [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid];
@@ -152,6 +181,13 @@
     JSONDictionary[@"itemId"] = self.uid;
     JSONDictionary[@"date"] = @(round(self.date.timeIntervalSince1970 * 1000.));
     JSONDictionary[@"deleted"] = @(self.discarded);
+    return [JSONDictionary copy];
+}
+
+- (NSDictionary *)deletedDictionary
+{
+    NSMutableDictionary *JSONDictionary = [self.dictionary mutableCopy];
+    JSONDictionary[@"deleted"] = @YES;
     return [JSONDictionary copy];
 }
 

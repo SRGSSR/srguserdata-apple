@@ -187,7 +187,7 @@
     return [JSONDictionary copy];
 }
 
-#pragma mark helpers
+#pragma mark Helpers
 
 - (NSDictionary *)deletedDictionary
 {

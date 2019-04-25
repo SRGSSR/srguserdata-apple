@@ -124,7 +124,6 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         NSArray<NSDictionary *> *replacementPlaylistDictionaries = [SRGPlaylist dictionariesForObjects:previousPlaylists replacedWithDictionaries:playlistDictionaries];
         
         if (replacementPlaylistDictionaries.count == 0) {
-            completionBlock(nil);
             return;
         }
         
@@ -177,7 +176,13 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         playlistUids = [playlists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
-        previousPlaylistEntryUids = [playlist.entries.array valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
+        NSArray<SRGPlaylistEntry *> *previousPlaylistEntries = playlist.entries.array;
+        NSArray<NSDictionary *> *replacementPlaylistEntryDictionaries = [SRGPlaylistEntry dictionariesForObjects:previousPlaylistEntries replacedWithDictionaries:playlistEntryDictionaries];
+        if (replacementPlaylistEntryDictionaries.count == 0) {
+            return;
+        }
+        
+        previousPlaylistEntryUids = [previousPlaylistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
         
         NSMutableArray<NSString *> *uids = [previousPlaylistEntryUids mutableCopy];
         for (NSDictionary *playlistEntryDictionary in playlistEntryDictionaries) {
@@ -201,7 +206,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
                                     userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
         }
         
-        if (! error) {
+        if (! error && changedPlaylistEntryUids.count > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSDictionary<NSString *, NSArray<NSString *> *> *playlistEntryChanges = @{ SRGPlaylistEntryChangedUidsSubKey : [changedPlaylistEntryUids copy],
                                                                                            SRGPlaylistEntryPreviousUidsSubKey : previousPlaylistEntryUids,
@@ -312,7 +317,9 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
                 
                 if (! error) {
                     // TODO: Wait for all completion blocks?
-                    // [self saveEntryDictionaries:playlistEntryDictionaries toPlaylistUid:playlistUid withCompletionBlock:nil];
+                    [self saveEntryDictionaries:playlistEntryDictionaries toPlaylistUid:playlistUid withCompletionBlock:^(NSError * _Nullable error) {
+                        
+                    }];
                 }
             }];
             [self.requestQueue addRequest:request resume:YES];
