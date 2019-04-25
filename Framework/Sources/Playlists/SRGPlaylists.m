@@ -594,25 +594,23 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 
 - (NSString *)updatePlaylistWithUid:(NSString *)uid name:(NSString *)name completionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
-    __block NSArray<NSString *> *previousUids = nil;
-    __block NSArray<NSString *> *currentUids = nil;
-    
-    __block BOOL isPlaylistFound = NO;
+    __block NSArray<NSString *> *uids = nil;
     
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:uid inManagedObjectContext:managedObjectContext];
-        if (playlist) {
-            isPlaylistFound = YES;
-            
-            NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-            previousUids = currentUids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
-            
-            if (! playlist.system) {
-                playlist.name = name;
-            }
+        if (! playlist) {
+            return;
+        }
+        
+        NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        uids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
+        
+        if (! playlist.system) {
+            playlist.name = name;
+            playlist.dirty = YES;
         }
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (! error && ! isPlaylistFound) {
+        if (! error && ! uids) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                         code:SRGUserDataErrorNotFound
                                     userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when updating an unknown playlist.") }];
@@ -623,8 +621,8 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGPlaylistsChangedUidsKey : @[uid],
-                                                                            SRGPlaylistsPreviousUidsKey : previousUids,
-                                                                            SRGPlaylistsUidsKey : currentUids }];
+                                                                            SRGPlaylistsPreviousUidsKey : uids,
+                                                                            SRGPlaylistsUidsKey : uids }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
