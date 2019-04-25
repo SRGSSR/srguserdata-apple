@@ -141,9 +141,9 @@
     NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, uid)]];
     
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
+    fetchRequest.predicate = predicate;
+    
     if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
-        fetchRequest.predicate = predicate;
-        
         NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
         [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
     }
