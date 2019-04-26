@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08083BD822639F8B00BE9F19 /* SRGPlaylistsRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */; };
+		08083BD922639F8B00BE9F19 /* SRGPlaylistsRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */; };
 		082442A8220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 082442A7220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel */; };
 		082442AF220CB0DD00F39785 /* UserData_DB_v4 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AD220CB0DD00F39785 /* UserData_DB_v4 */; };
 		082442B0220CB0DD00F39785 /* UserData_DB_v3 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AE220CB0DD00F39785 /* UserData_DB_v3 */; };
@@ -254,6 +256,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylistsRequest.m; sourceTree = "<group>"; };
+		08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPlaylistsRequest.h; sourceTree = "<group>"; };
 		082442A5220C8A8800F39785 /* SRGUserData_v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v2.xcdatamodel; sourceTree = "<group>"; };
 		082442A6220C8BA000F39785 /* SRGUserData_v3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v3.xcdatamodel; sourceTree = "<group>"; };
 		082442A7220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v5_v6.xcmappingmodel; sourceTree = "<group>"; };
@@ -491,6 +495,8 @@
 		08280F092258DEBD00AC978D /* Playlists */ = {
 			isa = PBXGroup;
 			children = (
+				08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */,
+				08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */,
 				08280F0B2258DEBD00AC978D /* SRGPlaylists.h */,
 				08280F0A2258DEBD00AC978D /* SRGPlaylists.m */,
 				08280F1B2259406C00AC978D /* SRGPlaylists+Private.h */,
@@ -838,6 +844,7 @@
 				6FFB34892209C10800E76E6D /* SRGUserDataService+Private.h in Headers */,
 				6FFB34852209BF8D00E76E6D /* SRGUserObject+Private.h in Headers */,
 				6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */,
+				08083BD922639F8B00BE9F19 /* SRGPlaylistsRequest.h in Headers */,
 				6FFB347422089A5E00E76E6D /* SRGPersistentContainer.h in Headers */,
 				6F0178D822086F6D00B4BCD9 /* SRGUser+Private.h in Headers */,
 				08C991AB2254CCAF003E7816 /* SRGPlaylistEntry+Private.h in Headers */,
@@ -1073,6 +1080,7 @@
 				6F0178D12208199800B4BCD9 /* SRGUserDataTimerTarget.m in Sources */,
 				6FA9AE00222C4944007446BD /* SRGUserDataError.m in Sources */,
 				6FFB347E2209773F00E76E6D /* SRGUserDataService.m in Sources */,
+				08083BD822639F8B00BE9F19 /* SRGPlaylistsRequest.m in Sources */,
 				6FFB347622089A5E00E76E6D /* SRGPersistentContainer.m in Sources */,
 				6F0178B022080FEC00B4BCD9 /* SRGUser.m in Sources */,
 				6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */,

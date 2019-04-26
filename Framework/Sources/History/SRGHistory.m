@@ -88,7 +88,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
         
         NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
         for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
-            SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
+            SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary uidKey:@"item_id" inManagedObjectContext:managedObjectContext];
             if (historyEntry) {
                 [changedUids addObject:historyEntry.uid];
                 

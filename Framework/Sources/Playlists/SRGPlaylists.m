@@ -11,6 +11,7 @@
 #import "SRGDataStore.h"
 #import "SRGPlaylist+Private.h"
 #import "SRGPlaylistEntry+Private.h"
+#import "SRGPlaylistsRequest.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataError.h"
 #import "SRGUserDataService+Private.h"
@@ -21,6 +22,9 @@
 #import <MAKVONotificationCenter/MAKVONotificationCenter.h>
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGNetwork/SRGNetwork.h>
+
+typedef void (^SRGPlaylistsPullCompletionBlock)(NSError * _Nullable error);
+typedef void (^SRGPlaylistsPushCompletionBlock)(NSError * _Nullable error);
 
 NSString *SRGPlaylistNameForPlaylistWithUid(NSString *uid)
 {
@@ -49,10 +53,26 @@ NSString * const SRGPlaylistEntryUidsSubKey = @"SRGPlaylistEntryUids";
 NSString * const SRGPlaylistsDidStartSynchronizationNotification = @"SRGPlaylistsDidStartSynchronizationNotification";
 NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylistsDidFinishSynchronizationNotification";
 
+static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
+{
+    if ([error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorMultiple) {
+        NSArray<NSError *> *errors = error.userInfo[SRGNetworkErrorsKey];
+        for (NSError *error in errors) {
+            if (SRGPlaylistsIsUnauthorizationError(error)) {
+                return YES;
+            }
+        }
+        return NO;
+    }
+    else {
+        return [error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorHTTP && [error.userInfo[SRGNetworkHTTPStatusCodeKey] integerValue] == 401;
+    }
+}
+
 @interface SRGPlaylists ()
 
-@property (nonatomic, weak) SRGPageRequest *pullRequest;
-@property (nonatomic, weak) SRGRequest *pushRequest;
+@property (nonatomic, weak) SRGRequest *pullPlaylistsRequest;
+@property (nonatomic) SRGRequestQueue *pushRequestQueue;
 
 @property (nonatomic) NSURLSession *session;
 
@@ -110,7 +130,9 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
         
         NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
         for (NSDictionary *playlistDictionary in playlistDictionaries) {
-            SRGPlaylist *playlist = [SRGPlaylist synchronizeWithDictionary:playlistDictionary inManagedObjectContext:managedObjectContext];
+            NSMutableDictionary *mutablePlaylistDictionary = playlistDictionary.mutableCopy;
+            mutablePlaylistDictionary[@"date"] = @(round(NSDate.date.timeIntervalSince1970 * 1000.));
+            SRGPlaylist *playlist = [SRGPlaylist synchronizeWithDictionary:mutablePlaylistDictionary.copy uidKey:@"businessId" inManagedObjectContext:managedObjectContext];
             if (playlist) {
                 [changedUids addObject:playlist.uid];
                 
@@ -206,10 +228,81 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
     }];
 }
 
+#pragma mark Requests
+
+- (void)pullPlaylistsForSessionToken:(NSString *)sessionToken
+                 withCompletionBlock:(SRGPlaylistsPullCompletionBlock)completionBlock
+{
+    NSParameterAssert(sessionToken);
+    NSParameterAssert(completionBlock);
+    
+
+    SRGRequest *request = [[SRGPlaylistsRequest playlistsFromServiceURL:self.serviceURL forSessionToken:sessionToken session:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistsDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        if (error) {
+            completionBlock(error);
+            return;
+        }
+        
+        [self savePlaylistDictionaries:playlistsDictionaries withCompletionBlock:^(NSError *error) {
+            completionBlock(error);
+        }];
+    }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
+    [request resume];
+    self.pullPlaylistsRequest = request;
+}
+
+- (void)pushPlaylists:(NSArray<SRGPlaylist *> *)playlists
+      forSessionToken:(NSString *)sessionToken
+  withCompletionBlock:(SRGPlaylistsPushCompletionBlock)completionBlock
+{
+    NSParameterAssert(playlists);
+    NSParameterAssert(sessionToken);
+    NSParameterAssert(completionBlock);
+    
+    if (playlists.count == 0) {
+        completionBlock(nil);
+        return;
+    }
+    
+    self.pushRequestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
+        if (finished) {
+            completionBlock(error);
+        }
+    }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
+
+    for (SRGPlaylist *playlist in playlists) {
+        if (playlist.discarded) {
+            NSString *uid = playlist.uid;
+            SRGRequest *pushRequest = [[SRGPlaylistsRequest deletePlaylistUid:uid toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                if (! error) {
+                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull mangedObjectContext) {
+                        // TODO: Delete playlist object.
+                    } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
+                }
+                completionBlock(error); // TODO: reprot error to queue
+            }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
+            [self.pushRequestQueue addRequest:pushRequest resume:YES];
+        }
+        else {
+            SRGRequest *pushRequest = [[SRGPlaylistsRequest postPlaylistDictionary:playlist.dictionary toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSDictionary * _Nullable playlistDictionnary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                if (! error) {
+                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull mangedObjectContext) {
+                        // TODO: Update playlist object.
+                    } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
+                }
+                completionBlock(error); // TODO: reprot error to queue
+            }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
+            [self.pushRequestQueue addRequest:pushRequest resume:YES];
+        }
+    }
+}
+
 #pragma mark Subclassing hooks
 
 - (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock
 {
+    NSString *sessionToken = self.identityService.sessionToken;
+    
     void (^finishSynchronization)(void) = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidFinishSynchronizationNotification object:self];
@@ -229,7 +322,33 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
             return;
         }
         
-        finishSynchronization();
+        [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGPlaylist.new, dirty)];
+            return [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGPlaylist *> * _Nullable playlists, NSError * _Nullable error) {
+            if (error) {
+                finishSynchronization();
+                return;
+            }
+            
+            [self pushPlaylists:playlists forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pushError) {
+                if (SRGPlaylistsIsUnauthorizationError(pushError)) {
+                    [self.identityService reportUnauthorization];
+                    finishSynchronization();
+                    return;
+                }
+                
+                [self pullPlaylistsForSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pullError) {
+                    if (SRGPlaylistsIsUnauthorizationError(pullError)) {
+                        [self.identityService reportUnauthorization];
+                        finishSynchronization();
+                        return;
+                    }
+                    
+                    finishSynchronization();
+                }];
+            }];
+        }];
     }];
 }
 
@@ -249,8 +368,8 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
 
 - (void)userDidLogout
 {
-    [self.pullRequest cancel];
-    [self.pushRequest cancel];
+    [self.pullPlaylistsRequest cancel];
+    [self.pushRequestQueue cancel];
 }
 
 - (void)clearData

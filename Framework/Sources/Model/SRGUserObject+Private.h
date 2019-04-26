@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @discussion To persist changes, the Core Data managed object context needs to be saved.
  */
-+ (nullable __kindof SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (nullable __kindof SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary uidKey:(NSString *)uidKey inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Discard the objects with the specified identifiers. Since some of them might not be found, the method returns the actual

@@ -67,9 +67,9 @@
     return object;
 }
 
-+ (SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary uidKey:(NSString *)uidKey inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSString *uid = dictionary[@"item_id"];
+    NSString *uid = dictionary[uidKey];
     if (! uid) {
         return nil;
     }

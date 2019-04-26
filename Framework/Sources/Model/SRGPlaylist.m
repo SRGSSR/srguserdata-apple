@@ -44,7 +44,7 @@
     [super updateWithDictionary:dictionary];
     
     self.name = dictionary[@"name"];
-    self.system = [dictionary[@"system"] boolValue];
+    self.system = ! [dictionary[@"type"] isEqualToString:@"standard"];
 }
 
 @end
