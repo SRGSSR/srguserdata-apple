@@ -553,6 +553,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
         
         SRGPlaylist *playlist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
         playlist.name = name;
+        playlist.type = SRGPlaylistTypeStandard;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
