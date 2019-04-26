@@ -9,6 +9,24 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ *  Playlist types.
+ */
+typedef NS_ENUM(NSInteger, SRGPlaylistType) {
+    /**
+     *  Not specified.
+     */
+    SRGPlaylistTypeNone = 0,
+    /**
+     *  Standard user-generated playlist.
+     */
+    SRGPlaylistTypeStandard,
+    /**
+     *  System playlist.
+     */
+    SRGPlaylistTypeSystem
+};
+
+/**
  *  Entry in the playlist service.
  *
  *  @discussion Instances must not be shared among threads.
@@ -21,9 +39,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy) NSString *name;
 
 /**
- *  `YES` iff the playlist is a system mandatory one, otherwise, it's a user playlist.
+ *  The type of the playlist.
  */
-@property (nonatomic, readonly) BOOL system;
+@property (nonatomic, readonly) SRGPlaylistType type;
 
 @end
 

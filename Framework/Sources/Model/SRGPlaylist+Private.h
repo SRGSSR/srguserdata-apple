@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  @see `SRGPlaylist.h`
  */
 @property (nonatomic, copy) NSString *name;
-@property (nonatomic) BOOL system;
+@property (nonatomic) SRGPlaylistType type;
 
 @property (nonatomic, nullable) NSOrderedSet<SRGPlaylistEntry *> *entries;
 

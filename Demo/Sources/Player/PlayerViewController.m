@@ -92,9 +92,9 @@
                                                                       preferredStyle:UIAlertControllerStyleActionSheet];
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylist.new, discarded)];
-    NSSortDescriptor *systemSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, system) ascending:NO];
+    NSSortDescriptor *typeSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, type) ascending:NO];
     NSSortDescriptor *nameSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, name) ascending:YES];
-    NSArray<SRGPlaylist *> *playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:@[systemSortDescriptor, nameSortDescriptor]];
+    NSArray<SRGPlaylist *> *playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:@[typeSortDescriptor, nameSortDescriptor]];
     
     for (SRGPlaylist *playlist in playlists) {
         UIAlertAction *action = [UIAlertAction actionWithTitle:playlist.name style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {

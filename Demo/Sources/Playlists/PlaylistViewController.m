@@ -62,7 +62,7 @@
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     
-    if (! self.playlist.system) {
+    if (self.playlist.type != SRGPlaylistTypeSystem) {
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit
                                                                                                target:self
                                                                                                action:@selector(updatePlaylist:)];

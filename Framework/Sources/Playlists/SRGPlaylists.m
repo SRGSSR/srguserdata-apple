@@ -98,7 +98,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
                 dispatch_group_enter(group);
                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                     SRGPlaylist *defaultPlaylist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
-                    defaultPlaylist.system = YES;
+                    defaultPlaylist.type = SRGPlaylistTypeSystem;
                     defaultPlaylist.name = SRGPlaylistNameForPlaylistWithUid(uid);
                 } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
                     dispatch_group_leave(group);
@@ -254,7 +254,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
     
     // System playlists cannot be pushed (read-only).
     NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(SRGPlaylist * _Nullable playlist, NSDictionary<NSString *,id> * _Nullable bindings) {
-        return ! playlist.system;
+        return playlist.type != SRGPlaylistTypeSystem;
     }];
     playlists = [playlists filteredArrayUsingPredicate:predicate];
     
@@ -493,7 +493,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
 {
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(SRGPlaylist * _Nullable playlist, NSDictionary<NSString *,id> * _Nullable bindings) {
-            return ! playlist.system;
+            return playlist.type != SRGPlaylistTypeSystem;
         }];
         NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         for (SRGPlaylist *playlist in playlists) {
@@ -605,7 +605,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         uids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
-        if (! playlist.system) {
+        if (playlist.type != SRGPlaylistTypeSystem) {
             playlist.name = name;
             playlist.dirty = YES;
         }
@@ -642,7 +642,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
         
         NSArray<NSString *> *discardedUids = uids ?: previousUids;
         
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES AND %K IN %@", @keypath(SRGPlaylist.new, system), @keypath(SRGPlaylist.new, uid), discardedUids];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@ AND %K IN %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeSystem), @keypath(SRGPlaylist.new, uid), discardedUids];
         NSArray<SRGPlaylist *> *excludedPlaylists = [previousPlaylists filteredArrayUsingPredicate:predicate];
         if (excludedPlaylists.count > 0) {
             NSArray<NSString *> *excludedUids = [excludedPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];

@@ -97,9 +97,9 @@
 - (void)refresh
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylist.new, discarded)];
-    NSSortDescriptor *systemSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, system) ascending:NO];
+    NSSortDescriptor *typeSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, type) ascending:NO];
     NSSortDescriptor *nameSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, name) ascending:YES];
-    self.playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:@[systemSortDescriptor, nameSortDescriptor]];
+    self.playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:@[typeSortDescriptor, nameSortDescriptor]];
     
     if (self.refreshControl.refreshing) {
         [self.refreshControl endRefreshing];
@@ -141,7 +141,8 @@
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return ! self.playlists[indexPath.row].system;
+    SRGPlaylist *playlist = self.playlists[indexPath.row];
+    return playlist.type != SRGPlaylistTypeSystem;
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
