@@ -222,13 +222,13 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
             return;
         }
         
+        NSManagedObjectID *userID = user.objectID;
         [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historySynchronizationDate withCompletionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable error) {
             if (error) {
                 finishSynchronization(error);
                 return;
             }
             
-            NSManagedObjectID *userID = user.objectID;
             [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                 SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
                 user.historySynchronizationDate = serverDate;

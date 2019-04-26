@@ -451,6 +451,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
             return;
         }
         
+        NSManagedObjectID *userID = user.objectID;
         [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGPlaylist.new, dirty)];
             return [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
@@ -487,7 +488,17 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
                                 return;
                             }
                             
-                            [self pullPlaylistEntriesForSessionToken:sessionToken withCompletionBlock:finishSynchronization];
+                            [self pullPlaylistEntriesForSessionToken:sessionToken withCompletionBlock:^(NSError *error) {
+                                if (error) {
+                                    finishSynchronization(error);
+                                    return;
+                                }
+                                
+                                [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                                    SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
+                                    user.playlistsSynchronizationDate = NSDate.date;
+                                } withPriority:NSOperationQueuePriorityLow completionBlock:finishSynchronization];
+                            }];
                         }];
                     }];
                 }];
