@@ -102,7 +102,6 @@
     
     XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
     XCTAssertEqual(playlist.type, SRGPlaylistTypeWatchLater);
-    XCTAssertEqualObjects(playlist.name, SRGPlaylistNameForPlaylistWithUid(SRGPlaylistUidWatchLater));
     XCTAssertFalse(playlist.discarded);
 }
 

@@ -18,11 +18,6 @@ typedef NSString * SRGPlaylistUid NS_TYPED_ENUM;
 OBJC_EXPORT SRGPlaylistUid const SRGPlaylistUidWatchLater;                          // Watch later playlist
 
 /**
- *  Return the suggested standard name for a playlist uid, `nil` if the uid has no suggested standard name.
- */
-OBJC_EXPORT NSString * _Nullable SRGPlaylistNameForPlaylistWithUid(NSString *uid);
-
-/**
  *  Notification sent when one or more playlists change. Use the keys below to retrieve detailed information from the notification
  *  `userInfo` dictionary.
  */
