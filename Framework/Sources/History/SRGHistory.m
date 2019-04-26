@@ -31,8 +31,6 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
 NSString * const SRGHistoryDidStartSynchronizationNotification = @"SRGHistoryDidStartSynchronizationNotification";
 NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDidFinishSynchronizationNotification";
 
-NSString * const SRGHistorySynchronizationErrorKey = @"SRGHistorySynchronizationError";
-
 @interface SRGHistory ()
 
 @property (nonatomic, weak) SRGPageRequest *pullRequest;
@@ -204,7 +202,7 @@ NSString * const SRGHistorySynchronizationErrorKey = @"SRGHistorySynchronization
                                                              code:SRGUserDataErrorFailed
                                                          userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"History synchronization has failed.", @"Error message returned when history synchronization failed for some reason"),
                                                                      NSUnderlyingErrorKey : error }];
-                userInfo[SRGHistorySynchronizationErrorKey] = friendlyError;
+                userInfo[NSUnderlyingErrorKey] = friendlyError;
             }
             
             [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidFinishSynchronizationNotification object:self userInfo:[userInfo copy]];
