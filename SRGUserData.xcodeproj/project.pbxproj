@@ -68,6 +68,7 @@
 		6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54220FC7FF4009C02CF /* SRGUserData.m */; };
 		6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */; };
 		6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */; };
+		6F1747F322735B6800CC9C39 /* SRGUserData_v6_v7.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 6F1747F222735B6800CC9C39 /* SRGUserData_v6_v7.xcmappingmodel */; };
 		6F19DA8B221ED8A300085C7D /* Masonry.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F19DAA6221FF61800085C7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAA3221FF61800085C7D /* main.m */; };
 		6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F19DAA9222005A800085C7D /* SRGHistoryRequest.h */; };
@@ -112,7 +113,6 @@
 		6F41C9AB2216C3CC003F434A /* PlayerViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F41C9A82216C3CB003F434A /* PlayerViewController.storyboard */; };
 		6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F41C9AA2216C3CB003F434A /* PlayerViewController.m */; };
 		6F46DD76221429110013C10A /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F46DD75221429100013C10A /* Person.m */; };
-		6F6523A82272F3970037D9BB /* SRGUserData_v6_v7.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 6F6523A62272F38F0037D9BB /* SRGUserData_v6_v7.xcmappingmodel */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
 		6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F120FDCAA800AA6434 /* Images.xcassets */; };
 		6F8A93FD20FDCAA800AA6434 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8A93F520FDCAA800AA6434 /* main.m */; };
@@ -318,6 +318,7 @@
 		6F0EB54220FC7FF4009C02CF /* SRGUserData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGUserData.m; sourceTree = "<group>"; };
 		6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+SRGUserData.m"; sourceTree = "<group>"; };
 		6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+SRGUserData.h"; sourceTree = "<group>"; };
+		6F1747F222735B6800CC9C39 /* SRGUserData_v6_v7.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v6_v7.xcmappingmodel; sourceTree = "<group>"; };
 		6F19DA90221FF5F800085C7D /* SRGUserData-testapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-testapp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F19DAA3221FF61800085C7D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6F19DAA5221FF61800085C7D /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -351,7 +352,6 @@
 		6F41C9AA2216C3CB003F434A /* PlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerViewController.m; sourceTree = "<group>"; };
 		6F46DD74221429100013C10A /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 		6F46DD75221429100013C10A /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
-		6F6523A62272F38F0037D9BB /* SRGUserData_v6_v7.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v6_v7.xcmappingmodel; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6F8A93F120FDCAA800AA6434 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -760,7 +760,7 @@
 				08624E62223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel */,
 				08624E64223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel */,
 				082442A7220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel */,
-				6F6523A62272F38F0037D9BB /* SRGUserData_v6_v7.xcmappingmodel */,
+				6F1747F222735B6800CC9C39 /* SRGUserData_v6_v7.xcmappingmodel */,
 				6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */,
 			);
 			path = Data;
@@ -1074,7 +1074,7 @@
 			files = (
 				08E9CC122230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel in Sources */,
 				082442A8220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel in Sources */,
-				6F6523A82272F3970037D9BB /* SRGUserData_v6_v7.xcmappingmodel in Sources */,
+				6F1747F322735B6800CC9C39 /* SRGUserData_v6_v7.xcmappingmodel in Sources */,
 				6FB521C02208838E0042FCC3 /* SRGUserData.xcdatamodeld in Sources */,
 				08624E63223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel in Sources */,
 				08624E65223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel in Sources */,

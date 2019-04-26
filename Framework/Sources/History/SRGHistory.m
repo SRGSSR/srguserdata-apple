@@ -222,7 +222,7 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
             return;
         }
         
-        [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historyServerSynchronizationDate withCompletionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable error) {
+        [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historySynchronizationDate withCompletionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable error) {
             if (error) {
                 finishSynchronization(error);
                 return;
@@ -231,7 +231,7 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
             NSManagedObjectID *userID = user.objectID;
             [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                 SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
-                user.historyServerSynchronizationDate = serverDate;
+                user.historySynchronizationDate = serverDate;
             } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
                 if (error) {
                     finishSynchronization(error);
@@ -255,8 +255,9 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
                         
                         NSManagedObjectID *userID = user.objectID;
                         [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                            // FIXME: Should be common sync date for all services. Not set here
                             SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
-                            user.historyLocalSynchronizationDate = NSDate.date;
+                            user.synchronizationDate = NSDate.date;
                         } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
                             finishSynchronization(error);
                         }];

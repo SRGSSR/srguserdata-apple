@@ -66,8 +66,8 @@
     SRGUser *user = userData.user;
     
     XCTAssertNotNil(user);
-    XCTAssertNil([user valueForKey:@keypath(SRGUser.new, historyLocalSynchronizationDate)]);
-    XCTAssertNil([user valueForKey:@keypath(SRGUser.new, historyServerSynchronizationDate)]);
+    XCTAssertNil([user valueForKey:@keypath(SRGUser.new, synchronizationDate)]);
+    XCTAssertNil([user valueForKey:@keypath(SRGUser.new, historySynchronizationDate)]);
     XCTAssertNil([user valueForKey:@keypath(SRGUser.new, accountUid)]);
     
     // Database is writable.
@@ -122,8 +122,8 @@
     SRGUser *user = userData.user;
     
     XCTAssertNotNil(user);
-    XCTAssertNil([user valueForKey:@keypath(SRGUser.new, historyLocalSynchronizationDate)]);
-    XCTAssertNil([user valueForKey:@keypath(SRGUser.new, historyServerSynchronizationDate)]);
+    XCTAssertNil([user valueForKey:@keypath(SRGUser.new, synchronizationDate)]);
+    XCTAssertNil([user valueForKey:@keypath(SRGUser.new, historySynchronizationDate)]);
     XCTAssertNil([user valueForKey:@keypath(SRGUser.new, accountUid)]);
     
     // Database is writable.
@@ -178,8 +178,8 @@
     SRGUser *user = userData.user;
     
     XCTAssertNotNil(user);
-    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyLocalSynchronizationDate)]);
-    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyServerSynchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, synchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historySynchronizationDate)]);
     XCTAssertNil([user valueForKey:@keypath(SRGUser.new, accountUid)]);
     
     // Database is writable.
@@ -234,8 +234,8 @@
     SRGUser *user = userData.user;
     
     XCTAssertNotNil(user);
-    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyLocalSynchronizationDate)]);
-    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyServerSynchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, synchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historySynchronizationDate)]);
     XCTAssertNil([user valueForKey:@keypath(SRGUser.new, accountUid)]);
     
     // Database is writable.
@@ -290,8 +290,8 @@
     SRGUser *user = userData.user;
     
     XCTAssertNotNil(user);
-    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyLocalSynchronizationDate)]);
-    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyServerSynchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, synchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historySynchronizationDate)]);
     XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, accountUid)]);
     
     // Database is writable.
@@ -346,8 +346,8 @@
     SRGUser *user = userData.user;
     
     XCTAssertNotNil(user);
-    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyLocalSynchronizationDate)]);
-    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historyServerSynchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, synchronizationDate)]);
+    XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historySynchronizationDate)]);
     XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, accountUid)]);
     
     // Database is writable.

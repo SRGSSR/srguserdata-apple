@@ -18,8 +18,9 @@
     </entity>
     <entity name="SRGUser" representedClassName="SRGUser" syncable="YES">
         <attribute name="accountUid" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="historyLocalSynchronizationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="historyServerSynchronizationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="historySynchronizationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="playlistsSynchronizationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="synchronizationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
     </entity>
     <entity name="SRGUserObject" representedClassName="SRGUserObject" isAbstract="YES" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
@@ -31,7 +32,7 @@
         <element name="SRGHistoryEntry" positionX="-63" positionY="-18" width="128" height="75"/>
         <element name="SRGPlaylist" positionX="-54" positionY="36" width="128" height="90"/>
         <element name="SRGPlaylistEntry" positionX="-45" positionY="45" width="128" height="120"/>
-        <element name="SRGUser" positionX="-63" positionY="27" width="128" height="90"/>
+        <element name="SRGUser" positionX="-63" positionY="27" width="128" height="105"/>
         <element name="SRGUserObject" positionX="-45" positionY="36" width="128" height="105"/>
     </elements>
 </model>
