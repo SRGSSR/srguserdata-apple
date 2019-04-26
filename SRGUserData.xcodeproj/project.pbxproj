@@ -119,8 +119,6 @@
 		6F8A93FE20FDCAA800AA6434 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8A93F620FDCAA800AA6434 /* AppDelegate.m */; };
 		6F8A940320FDD01B00AA6434 /* SRGUserData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; };
 		6F8A940420FDD01B00AA6434 /* SRGUserData.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		6F9E50742271CE2900CB7F56 /* NSArray+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F9E50722271CE2900CB7F56 /* NSArray+SRGUserData.h */; };
-		6F9E50752271CE2900CB7F56 /* NSArray+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F9E50732271CE2900CB7F56 /* NSArray+SRGUserData.m */; };
 		6F9E50772272DF8900CB7F56 /* SRGUserDataError+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F9E50762272DF8800CB7F56 /* SRGUserDataError+Private.h */; };
 		6FA1D10D220C7A21003976D9 /* SRGUserObject+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */; };
 		6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */; };
@@ -153,6 +151,8 @@
 		6FB74D6C2101D4D200E2D365 /* SRGUserData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; };
 		6FB74D772101D5D600E2D365 /* HistorySynchronizationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */; };
 		6FB74D7B2101D69F00E2D365 /* SRGNetwork.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6FC44DE7227349CC0022DC99 /* NSArray+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FC44DE5227349CC0022DC99 /* NSArray+SRGUserData.m */; };
+		6FC44DE8227349CC0022DC99 /* NSArray+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FC44DE6227349CC0022DC99 /* NSArray+SRGUserData.h */; };
 		6FCCE4812212BFD600423EFF /* MigrationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FCCE4802212BFD600423EFF /* MigrationTestCase.m */; };
 		6FE91E7B2108A36A001B5E8F /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6FFB346522088BA200E76E6D /* SRGDataProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFB346422088BA200E76E6D /* SRGDataProvider.framework */; };
@@ -359,8 +359,6 @@
 		6F8A93F520FDCAA800AA6434 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6F8A93F620FDCAA800AA6434 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		6F8A93FA20FDCAA800AA6434 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6F9E50722271CE2900CB7F56 /* NSArray+SRGUserData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+SRGUserData.h"; sourceTree = "<group>"; };
-		6F9E50732271CE2900CB7F56 /* NSArray+SRGUserData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+SRGUserData.m"; sourceTree = "<group>"; };
 		6F9E50762272DF8800CB7F56 /* SRGUserDataError+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataError+Private.h"; sourceTree = "<group>"; };
 		6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserObject+Subclassing.h"; sourceTree = "<group>"; };
 		6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataService+Subclassing.h"; sourceTree = "<group>"; };
@@ -377,6 +375,8 @@
 		6FB74D672101D4D200E2D365 /* SRGUserData-tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SRGUserData-tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistorySynchronizationTestCase.m; sourceTree = "<group>"; };
 		6FB74D762101D5D600E2D365 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6FC44DE5227349CC0022DC99 /* NSArray+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+SRGUserData.m"; sourceTree = "<group>"; };
+		6FC44DE6227349CC0022DC99 /* NSArray+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+SRGUserData.h"; sourceTree = "<group>"; };
 		6FCBFEF8210B578B006BC355 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCBFEFA210B57BD006BC355 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCBFEFB210B57BD006BC355 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -549,8 +549,6 @@
 		6F0178CD2208199800B4BCD9 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				6F9E50722271CE2900CB7F56 /* NSArray+SRGUserData.h */,
-				6F9E50732271CE2900CB7F56 /* NSArray+SRGUserData.m */,
 				6F0178CE2208199800B4BCD9 /* SRGUserDataTimerTarget.h */,
 				6F0178CF2208199800B4BCD9 /* SRGUserDataTimerTarget.m */,
 			);
@@ -617,6 +615,8 @@
 		6F0EB54420FC8049009C02CF /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				6FC44DE6227349CC0022DC99 /* NSArray+SRGUserData.h */,
+				6FC44DE5227349CC0022DC99 /* NSArray+SRGUserData.m */,
 				6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */,
 				6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */,
 				6F0178CA2208192B00B4BCD9 /* NSTimer+SRGUserData.h */,
@@ -838,6 +838,7 @@
 				6F0178B122080FEC00B4BCD9 /* SRGUser.h in Headers */,
 				6F9E50772272DF8900CB7F56 /* SRGUserDataError+Private.h in Headers */,
 				6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */,
+				6FC44DE8227349CC0022DC99 /* NSArray+SRGUserData.h in Headers */,
 				6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */,
 				084ACC2E22535F48008ACBD0 /* SRGPlaylist.h in Headers */,
 				6FFB347322089A5E00E76E6D /* SRGDataStore.h in Headers */,
@@ -855,7 +856,6 @@
 				6FFB34852209BF8D00E76E6D /* SRGUserObject+Private.h in Headers */,
 				6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */,
 				08083BD922639F8B00BE9F19 /* SRGPlaylistsRequest.h in Headers */,
-				6F9E50742271CE2900CB7F56 /* NSArray+SRGUserData.h in Headers */,
 				6FFB347422089A5E00E76E6D /* SRGPersistentContainer.h in Headers */,
 				6F0178D822086F6D00B4BCD9 /* SRGUser+Private.h in Headers */,
 				08C991AB2254CCAF003E7816 /* SRGPlaylistEntry+Private.h in Headers */,
@@ -1095,6 +1095,7 @@
 				6FFB347622089A5E00E76E6D /* SRGPersistentContainer.m in Sources */,
 				6F0178B022080FEC00B4BCD9 /* SRGUser.m in Sources */,
 				6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */,
+				6FC44DE7227349CC0022DC99 /* NSArray+SRGUserData.m in Sources */,
 				6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */,
 				08C991A92254B97E003E7816 /* SRGPlaylistEntry.m in Sources */,
 				08280F0C2258DEBD00AC978D /* SRGPlaylists.m in Sources */,
@@ -1102,7 +1103,6 @@
 				6FFB347222089A5E00E76E6D /* SRGHistory.m in Sources */,
 				084ACC2D22535F48008ACBD0 /* SRGPlaylist.m in Sources */,
 				6F0178CB2208192B00B4BCD9 /* NSTimer+SRGUserData.m in Sources */,
-				6F9E50752271CE2900CB7F56 /* NSArray+SRGUserData.m in Sources */,
 				6FFB347522089A5E00E76E6D /* SRGDataStore.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
