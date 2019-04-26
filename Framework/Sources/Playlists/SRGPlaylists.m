@@ -507,30 +507,19 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
     }];
 }
 
-- (void)userDidLogin
-{
-    // TODO: Service abstraction to declare the list of objects to be marked as dirty!
-#if 0
-    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard)];
-        NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        for (SRGPlaylist *playlist in playlists) {
-            playlist.dirty = YES;
-            
-            // TODO: Entries as well!
-        }
-    } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self synchronize];
-        });
-    }];
-#endif
-}
-
-- (void)userDidLogout
+- (void)cancelSynchronization
 {
     [self.pullPlaylistsRequest cancel];
     [self.requestQueue cancel];
+}
+
+- (NSArray<SRGUserObject *> *)userObjectsInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard)];
+    NSArray<SRGUserObject *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+    // TODO: <SRGPlaylistEntry *>, no cast
+    NSArray<SRGUserObject *> *playlistEntries = (NSArray<SRGUserObject *> *)[SRGPlaylistEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+    return [playlists arrayByAddingObjectsFromArray:playlistEntries];
 }
 
 - (void)clearData

@@ -254,27 +254,15 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
     }];
 }
 
-- (void)userDidLogin
-{
-    NSAssert(NO, @"Fix");
-#if 0
-    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        for (SRGHistoryEntry *historyEntry in historyEntries) {
-            historyEntry.dirty = YES;
-        }
-    } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self synchronize];
-        });
-    }];
-#endif
-}
-
-- (void)userDidLogout
+- (void)cancelSynchronization
 {
     [self.pullRequest cancel];
     [self.pushRequest cancel];
+}
+
+- (NSArray<SRGUserObject *> *)userObjectsInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+{
+    return [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
 }
 
 - (void)clearData

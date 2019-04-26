@@ -5,6 +5,7 @@
 //
 
 #import "SRGUserDataService.h"
+#import "SRGUserObject.h"
 
 #import <SRGIdentity/SRGIdentity.h>
 
@@ -23,14 +24,15 @@
 - (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock;
 
 /**
- *  Method called when the user logged in.
+ *  This method is called when synchronization is cancelled. Services can implement their logic here (usually cancel
+ *  network requests retrieving and sending data).
  */
-- (void)userDidLogin;
+- (void)cancelSynchronization;
 
 /**
- *  Method called when user logged out.
+ *  Services must implement this method to return the objects they are responsible to synchronize.
  */
-- (void)userDidLogout;
+- (NSArray<SRGUserObject *> *)userObjectsInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Method called when local service data needs to be cleared.

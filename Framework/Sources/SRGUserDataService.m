@@ -7,6 +7,7 @@
 #import "SRGUserDataService.h"
 
 #import "SRGDataStore.h"
+#import "SRGUserDataService+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
 #import <SRGIdentity/SRGIdentity.h>
@@ -27,15 +28,6 @@
         self.serviceURL = serviceURL;
         self.identityService = identityService;
         self.dataStore = dataStore;
-        
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(userDidLogin:)
-                                                   name:SRGIdentityServiceUserDidLoginNotification
-                                                 object:identityService];
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(userDidLogout:)
-                                                   name:SRGIdentityServiceUserDidLogoutNotification
-                                                 object:identityService];
     }
     return self;
 }
@@ -53,25 +45,15 @@
     completionBlock();
 }
 
-- (void)userDidLogin
+- (void)cancelSynchronization
 {}
 
-- (void)userDidLogout
-{}
+- (NSArray<SRGUserObject *> *)userObjectsInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+{
+    return @[];
+}
 
 - (void)clearData
 {}
-
-#pragma mark Notifications
-
-- (void)userDidLogin:(NSNotification *)notification
-{
-    [self userDidLogin];
-}
-
-- (void)userDidLogout:(NSNotification *)notification
-{
-    [self userDidLogout];
-}
 
 @end

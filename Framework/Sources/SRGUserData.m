@@ -157,6 +157,10 @@ NSString *SRGUserDataMarketingVersion(void)
         }
         
         [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(userDidLogin:)
+                                                   name:SRGIdentityServiceUserDidLoginNotification
+                                                 object:identityService];
+        [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(userDidLogout:)
                                                    name:SRGIdentityServiceUserDidLogoutNotification
                                                  object:identityService];
@@ -319,6 +323,22 @@ NSString *SRGUserDataMarketingVersion(void)
 }
 
 #pragma mark Notifications
+
+- (void)userDidLogin:(NSNotification *)notification
+{
+    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
+            NSArray<SRGUserObject *> *objects = [service userObjectsInManagedObjectContext:managedObjectContext];
+            for (SRGUserObject *object in objects) {
+                object.dirty = YES;
+            }
+        }];
+    } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self synchronize];
+        });
+    }];
+}
 
 - (void)userDidLogout:(NSNotification *)notification
 {
