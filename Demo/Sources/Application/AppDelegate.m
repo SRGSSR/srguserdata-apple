@@ -29,8 +29,7 @@
     NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
     NSURL *fileURL = [[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:@"UserData-demo.sqlite"];
     SRGUserData.currentUserData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
-                                                          historyServiceURL:[NSURL URLWithString:@"https://profil.rts.ch/api/history"]
-                                                        playlistsServiceURL:nil
+                                                                 serviceURL:[NSURL URLWithString:@"https://profil.rts.ch/api"]
                                                             identityService:SRGIdentityService.currentIdentityService];
     
     SRGDataProvider.currentDataProvider = [[SRGDataProvider alloc] initWithServiceURL:SRGIntegrationLayerProductionServiceURL()];

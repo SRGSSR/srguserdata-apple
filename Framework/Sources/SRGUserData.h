@@ -40,19 +40,14 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
  *  Create a user data repository. The repository can be used to store data on device. Provided it is setup appropriately,
  *  logged in users can keep their data synchronized with their account.
  *
- *  @param storeFileURL        The file URL where the data is locally stored.
- *  @param identityService     The service which identities can be retrieved from. If none, no data synchronization will
- *                             occur.
- *  @param historyServiceURL   The URL of the service with which local history information can be synchronized. If none
- *                             is provided, no history data synchronization will occur.
- *  @param playlistsServiceURL The URL of the service with which local playlists information can be synchronized. If none
- *                             is provided, no playlist data synchronization will occur.
+ *  @param storeFileURL    The file URL where the data is locally stored.
+ *  @param serviceURL      The URL of the service with which user data can be synchronized. If none is provided, no user
+ *                         data synchronization is made.
+ *  @param identityService The service which identities can be retrieved from. If none, no data synchronization will
+ *                         occur.
  */
-// TODO: Instead of having several URLs for the services, have only one (it does not really make sense to only synchronize
-//       part of the user data, does it?)
 - (nullable instancetype)initWithStoreFileURL:(NSURL *)storeFileURL
-                            historyServiceURL:(nullable NSURL *)historyServiceURL
-                          playlistsServiceURL:(nullable NSURL *)playlistsServiceURL
+                                   serviceURL:(nullable NSURL *)serviceURL
                               identityService:(nullable SRGIdentityService *)identityService;
 
 /**

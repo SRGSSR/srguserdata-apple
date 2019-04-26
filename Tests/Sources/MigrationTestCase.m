@@ -23,7 +23,7 @@
 - (void)testFailingMigration
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_invalid"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil playlistsServiceURL:nil identityService:nil];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:nil identityService:nil];
     XCTAssertNil(userData);
 }
 
@@ -31,7 +31,7 @@
 - (void)testMigrationFromV1
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v1"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil playlistsServiceURL:nil identityService:nil];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:nil identityService:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -94,7 +94,7 @@
 - (void)testMigrationFromV2
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v2"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil playlistsServiceURL:nil identityService:nil];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:nil identityService:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -150,7 +150,7 @@
 - (void)testMigrationFromV3
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v3"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil playlistsServiceURL:nil identityService:nil];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:nil identityService:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -206,7 +206,7 @@
 - (void)testMigrationFromV4
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v4"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil playlistsServiceURL:nil identityService:nil];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:nil identityService:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -262,7 +262,7 @@
 - (void)testMigrationFromV5
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v5"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil playlistsServiceURL:nil identityService:nil];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:nil identityService:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
@@ -318,7 +318,7 @@
 - (void)testMigrationFromV6
 {
     NSURL *fileURL = [self URLForStoreFromPackage:@"UserData_DB_v6"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil playlistsServiceURL:nil identityService:nil];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:nil identityService:nil];
     
     NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];

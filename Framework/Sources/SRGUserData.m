@@ -55,8 +55,7 @@ NSString *SRGUserDataMarketingVersion(void)
 #pragma mark Object lifecycle
 
 - (instancetype)initWithStoreFileURL:(NSURL *)storeFileURL
-                   historyServiceURL:(NSURL *)historyServiceURL
-                 playlistsServiceURL:(NSURL *)playlistsServiceURL
+                          serviceURL:(NSURL *)serviceURL
                      identityService:(SRGIdentityService *)identityService
 {
     if (self = [super init]) {
@@ -131,7 +130,11 @@ NSString *SRGUserDataMarketingVersion(void)
         dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
         
         NSMutableDictionary<SRGUserDataServiceType, SRGUserDataService *> *services = [NSMutableDictionary dictionary];
+        
+        NSURL *historyServiceURL = [serviceURL URLByAppendingPathComponent:@"history"];
         services[SRGUserDataServiceTypeHistory] = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
+        
+        NSURL *playlistsServiceURL = [serviceURL URLByAppendingPathComponent:@"playlist"];
         services[SRGUserDataServiceTypePlaylists] = [[SRGPlaylists alloc] initWithServiceURL:playlistsServiceURL identityService:identityService dataStore:self.dataStore];
         self.services = [services copy];
         

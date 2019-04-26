@@ -43,11 +43,6 @@ static NSURL *TestServiceURL(void)
     return [NSURL URLWithString:@"https://profil.rts.ch/api"];
 }
 
-static NSURL *TestHistoryServiceURL(void)
-{
-    return [TestServiceURL() URLByAppendingPathComponent:@"history"];
-}
-
 static NSURL *TestDataServiceURL(void)
 {
     return [TestServiceURL() URLByAppendingPathComponent:@"data"];
@@ -76,7 +71,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 #pragma mark Helpers
 
-- (void)setupUserDataWithHistoryServiceURL:(NSURL *)historyServiceURL
+- (void)setupUserDataWithServiceURL:(NSURL *)serviceURL
 {
     [self eraseRemoteHistory];
     
@@ -88,8 +83,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     // session token into the identity service.
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
     self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
-                                            historyServiceURL:historyServiceURL
-                                          playlistsServiceURL:nil
+                                                   serviceURL:serviceURL
                                               identityService:self.identityService];
 }
 
@@ -127,7 +121,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     NSDictionary *JSONDictionary = @{ @"item_id" : uid,
                                       @"device_id" : @"test suite",
                                       @"deleted": @YES };
-    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:@[JSONDictionary] toServiceURL:TestHistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:@[JSONDictionary] toServiceURL:TestServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];
@@ -147,7 +141,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
         [JSONDictionaries addObject:JSONDictionary];
     }
     
-    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:JSONDictionaries toServiceURL:TestHistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:JSONDictionaries toServiceURL:TestServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];
@@ -190,7 +184,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testEmptyHistorySynchronization
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self setupUserDataWithServiceURL:TestServiceURL()];
     [self loginAndWaitForSynchronization];
     
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
@@ -215,7 +209,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
     
-    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertEqual(historyEntryDictionaries.count, 0);
         [expectation fulfill];
@@ -226,7 +220,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testHistoryInitialSynchronizationWithExistingRemoteEntries
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self setupUserDataWithServiceURL:TestServiceURL()];
     [self loginAndWaitForSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
     
@@ -252,7 +246,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
     
-    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertEqual(historyEntryDictionaries.count, 2);
         [expectation fulfill];
@@ -263,7 +257,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testHistoryInitialSynchronizationWithExistingLocalEntries
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self setupUserDataWithServiceURL:TestServiceURL()];
     [self loginAndWaitForSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
     [self insertLocalTestHistoryEntriesWithName:@"local" count:3];
@@ -290,7 +284,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
     
-    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertEqual(historyEntryDictionaries.count, 5);
         [expectation fulfill];
@@ -301,7 +295,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testSynchronizationWithDeletedLocalEntries
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self setupUserDataWithServiceURL:TestServiceURL()];
     [self loginAndWaitForSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:3];
     
@@ -344,7 +338,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
     
-    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertEqual(historyEntryDictionaries.count, 2);
         [expectation fulfill];
@@ -355,7 +349,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testSynchronizationWithDeletedRemoteEntries
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self setupUserDataWithServiceURL:TestServiceURL()];
     [self loginAndWaitForSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:3];
     
@@ -398,7 +392,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testLargeHistory
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self setupUserDataWithServiceURL:TestServiceURL()];
     [self loginAndWaitForSynchronization];
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:1000];
     [self insertLocalTestHistoryEntriesWithName:@"local" count:2000];
@@ -435,7 +429,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
     
-    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertEqual(historyEntryDictionaries.count, 3000);
         [expectation fulfill];
@@ -446,7 +440,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testSynchronizationAfterLogoutDuringSynchronization
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self setupUserDataWithServiceURL:TestServiceURL()];
     [self loginAndWaitForSynchronization];
     
     [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
@@ -465,7 +459,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testSynchronizationWithoutLoggedInUser
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self setupUserDataWithServiceURL:TestServiceURL()];
     
     id startObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidStartSynchronizationNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"No start notification is expected");
@@ -490,7 +484,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testSynchronizationWithUnavailableService
 {
-    [self setupUserDataWithHistoryServiceURL:[NSURL URLWithString:@"https://missing.service"]];
+    [self setupUserDataWithServiceURL:[NSURL URLWithString:@"https://missing.service"]];
     [self login];
     
     [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {

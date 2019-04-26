@@ -13,17 +13,17 @@ To instantiate a purely local user data storage without account synchronization,
 
 ```objective-c
 SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
-                                                historyServiceURL:nil
+                                                       serviceURL:nil
                                                   identityService:nil];
 ```
 
 #### Online user data
 
-To instantiate a user data storage which can synchronized with a user account if a user logs in, you must provide an `SRGIdentityService` at creation time. For history data to be synchronized, an associated service URL is required as well:
+To instantiate a user data storage which can synchronized with a user account if a user logs in, you must provide an `SRGIdentityService` at creation time. For user data to be synchronized, an associated service URL is required as well:
 
 ```objective-c
 SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
-                                                historyServiceURL:historyServiceURL
+                                                       serviceURL:serviceURL
                                                   identityService:identityService];
 ```
 
@@ -33,7 +33,7 @@ You can have several `SRGUserData` instances in an application, though most appl
 
 ```objective-c
 SRGUserData.currentUserData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
-                                                      historyServiceURL:historyServiceURL
+                                                             serviceURL:serviceURL
                                                         identityService:identityService];
 ```
 

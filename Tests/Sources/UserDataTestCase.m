@@ -17,7 +17,7 @@
 - (void)testInstantiation
 {
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil playlistsServiceURL:nil identityService:nil];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:nil identityService:nil];
     XCTAssertNotNil(userData);
     XCTAssertNotNil(userData.user);
     XCTAssertNotNil(userData.history);
@@ -26,8 +26,8 @@
 - (void)testInstantiationWithHistoryServiceURL
 {
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
-    NSURL *historyServiceURL = [NSURL URLWithString:@"https://history.service"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:historyServiceURL playlistsServiceURL:nil identityService:nil];
+    NSURL *serviceURL = [NSURL URLWithString:@"https://userdata.service"];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:serviceURL identityService:nil];
     XCTAssertNotNil(userData);
     XCTAssertNotNil(userData.user);
     XCTAssertNotNil(userData.history);
@@ -37,7 +37,7 @@
 {
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
     SRGIdentityService *identityService = [[SRGIdentityService alloc] initWithWebserviceURL:[NSURL URLWithString:@"https://identity.webservice"] websiteURL:[NSURL URLWithString:@"https://identity.website"]];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:nil playlistsServiceURL:nil identityService:identityService];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:nil identityService:identityService];
     XCTAssertNotNil(userData);
     XCTAssertNotNil(userData.user);
     XCTAssertNotNil(userData.history);
@@ -46,8 +46,8 @@
 - (void)testInstantiationWithHistoryServiceURLAndIdentityService
 {
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
-    NSURL *historyServiceURL = [NSURL URLWithString:@"https://history.service"];
-    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL historyServiceURL:historyServiceURL playlistsServiceURL:nil identityService:nil];
+    NSURL *serviceURL = [NSURL URLWithString:@"https://userdata.service"];
+    SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:serviceURL identityService:nil];
     XCTAssertNotNil(userData);
     XCTAssertNotNil(userData.user);
     XCTAssertNotNil(userData.history);
