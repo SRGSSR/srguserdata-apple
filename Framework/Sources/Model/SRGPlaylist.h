@@ -13,17 +13,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 typedef NS_ENUM(NSInteger, SRGPlaylistType) {
     /**
-     *  Not specified.
-     */
-    SRGPlaylistTypeNone = 0,
-    /**
      *  Standard user-generated playlist.
      */
-    SRGPlaylistTypeStandard,
+    SRGPlaylistTypeStandard = 0,
     /**
-     *  System playlist.
+     *  Watch later system playlist.
      */
-    SRGPlaylistTypeSystem
+    SRGPlaylistTypeWatchLater
 };
 
 /**

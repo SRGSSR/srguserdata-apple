@@ -80,7 +80,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
                 dispatch_group_enter(group);
                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                     SRGPlaylist *defaultPlaylist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
-                    defaultPlaylist.type = SRGPlaylistTypeSystem;
+                    defaultPlaylist.type = SRGPlaylistTypeWatchLater;
                     defaultPlaylist.name = SRGPlaylistNameForPlaylistWithUid(uid);
                 } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
                     dispatch_group_leave(group);
@@ -234,8 +234,8 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-    // System playlists cannot be pushed (read-only).
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K != %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeSystem)];
+    // Only standard playlists can be updated (entries can be edited for any kind of playlist, though)
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard)];
     playlists = [playlists filteredArrayUsingPredicate:predicate];
     
     if (playlists.count == 0) {
@@ -472,7 +472,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
 - (void)userDidLogin
 {
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K != %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeSystem)];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard)];
         NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         for (SRGPlaylist *playlist in playlists) {
             playlist.dirty = YES;
@@ -584,7 +584,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         uids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
-        if (playlist.type != SRGPlaylistTypeSystem) {
+        if (playlist.type == SRGPlaylistTypeStandard) {
             playlist.name = name;
             playlist.dirty = YES;
         }
@@ -621,7 +621,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
         
         NSArray<NSString *> *discardedUids = uids ?: previousUids;
         
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@ AND %K IN %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeSystem), @keypath(SRGPlaylist.new, uid), discardedUids];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K != %@ AND %K IN %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard), @keypath(SRGPlaylist.new, uid), discardedUids];
         NSArray<SRGPlaylist *> *excludedPlaylists = [previousPlaylists filteredArrayUsingPredicate:predicate];
         if (excludedPlaylists.count > 0) {
             NSArray<NSString *> *excludedUids = [excludedPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];

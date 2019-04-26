@@ -18,13 +18,12 @@ static NSValueTransformer *SRGPlaylistTypeJSONTransformer(void)
     static dispatch_once_t s_onceToken;
     dispatch_once(&s_onceToken, ^{
         s_transformer = [NSValueTransformer mtl_valueMappingTransformerWithDictionary:@{ @"standard" : @(SRGPlaylistTypeStandard),
-                                                                                         @"system" : @(SRGPlaylistTypeSystem) }
-                                                                         defaultValue:@(SRGPlaylistTypeNone)
+                                                                                         @"watch_later" : @(SRGPlaylistTypeWatchLater) }
+                                                                         defaultValue:@(SRGPlaylistTypeStandard)
                                                                   reverseDefaultValue:nil];
     });
     return s_transformer;
 }
-
 
 @interface SRGPlaylist ()
 

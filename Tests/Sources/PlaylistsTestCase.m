@@ -101,7 +101,7 @@
     SRGPlaylist *playlist = [self.userData.playlists playlistWithUid:SRGWatchLaterPlaylistUid];
     
     XCTAssertEqualObjects(playlist.uid, SRGWatchLaterPlaylistUid);
-    XCTAssertEqual(playlist.type, SRGPlaylistTypeSystem);
+    XCTAssertEqual(playlist.type, SRGPlaylistTypeWatchLater);
     XCTAssertEqualObjects(playlist.name, SRGPlaylistNameForPlaylistWithUid(SRGWatchLaterPlaylistUid));
     XCTAssertFalse(playlist.discarded);
 }
@@ -255,7 +255,7 @@
     SRGPlaylist *playlist = [self.userData.playlists playlistWithUid:SRGWatchLaterPlaylistUid];
     
     XCTAssertEqualObjects(playlist.uid, SRGWatchLaterPlaylistUid);
-    XCTAssertEqual(playlist.type, SRGPlaylistTypeSystem);
+    XCTAssertEqual(playlist.type, SRGPlaylistTypeWatchLater);
     XCTAssertNotEqualObjects(playlist.name, updatedName);
     XCTAssertFalse(playlist.discarded);
 }

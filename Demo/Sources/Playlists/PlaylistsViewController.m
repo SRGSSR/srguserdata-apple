@@ -142,7 +142,7 @@
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     SRGPlaylist *playlist = self.playlists[indexPath.row];
-    return playlist.type != SRGPlaylistTypeSystem;
+    return playlist.type == SRGPlaylistTypeStandard;
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
