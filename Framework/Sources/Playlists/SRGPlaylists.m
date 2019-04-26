@@ -27,14 +27,24 @@
 NSString *SRGPlaylistNameForPlaylistWithUid(NSString *uid)
 {
     static dispatch_once_t s_onceToken;
-    static NSDictionary *s_names;
+    static NSDictionary<NSString *, NSString *>  *s_names;
     dispatch_once(&s_onceToken, ^{
-        s_names = @{ SRGWatchLaterPlaylistUid : SRGUserDataLocalizedString(@"Watch later", @"Default Watch later playlist name") };
+        s_names = @{ SRGPlaylistUidWatchLater : SRGUserDataLocalizedString(@"Watch later", @"Default Watch later playlist name") };
     });
     return s_names[uid];
 }
 
-NSString * const SRGWatchLaterPlaylistUid = @"watch_later";
+static SRGPlaylistType SRGPlaylistTypeForPlaylistWithUid(NSString *uid)
+{
+    static dispatch_once_t s_onceToken;
+    static NSDictionary *s_types;
+    dispatch_once(&s_onceToken, ^{
+        s_types = @{ SRGPlaylistUidWatchLater : @(SRGPlaylistTypeWatchLater) };
+    });
+    return [s_types[uid] integerValue];
+}
+
+SRGPlaylistUid const SRGPlaylistUidWatchLater = @"watch_later";
 
 NSString * const SRGPlaylistsDidChangeNotification = @"SRGPlaylistsDidChangeNotification";
 
@@ -71,7 +81,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
         self.session = [NSURLSession sessionWithConfiguration:sessionConfiguration];
         
         // Check that the default playlists exist.
-        NSArray<NSString *> *defaultPlaylistUids = @[ SRGWatchLaterPlaylistUid ];
+        NSArray<NSString *> *defaultPlaylistUids = @[ SRGPlaylistUidWatchLater ];
         for (NSString *uid in defaultPlaylistUids) {
             SRGPlaylist *playlist = [self playlistWithUid:uid];
             if (! playlist) {
@@ -80,7 +90,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
                 dispatch_group_enter(group);
                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                     SRGPlaylist *defaultPlaylist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
-                    defaultPlaylist.type = SRGPlaylistTypeWatchLater;
+                    defaultPlaylist.type = SRGPlaylistTypeForPlaylistWithUid(uid);
                     defaultPlaylist.name = SRGPlaylistNameForPlaylistWithUid(uid);
                 } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
                     dispatch_group_leave(group);

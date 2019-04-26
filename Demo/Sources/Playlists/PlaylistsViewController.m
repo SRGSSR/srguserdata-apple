@@ -126,7 +126,7 @@
 {
     SRGPlaylist *playlist = self.playlists[indexPath.row];
     cell.textLabel.text = playlist.name;
-    cell.imageView.image = [playlist.uid isEqualToString:SRGWatchLaterPlaylistUid] ? [UIImage imageNamed:@"watch_later_22"] : [UIImage imageNamed:@"playlist_22"];
+    cell.imageView.image = [playlist.uid isEqualToString:SRGPlaylistUidWatchLater] ? [UIImage imageNamed:@"watch_later_22"] : [UIImage imageNamed:@"playlist_22"];
     cell.imageView.tintColor = UIColor.blackColor;
 }
 

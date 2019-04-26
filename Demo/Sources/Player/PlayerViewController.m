@@ -104,7 +104,7 @@
         }];
         [alertController addAction:action];
         
-        if ([playlist.uid isEqualToString:SRGWatchLaterPlaylistUid]) {
+        if ([playlist.uid isEqualToString:SRGPlaylistUidWatchLater]) {
             alertController.preferredAction = action;
         }
     }

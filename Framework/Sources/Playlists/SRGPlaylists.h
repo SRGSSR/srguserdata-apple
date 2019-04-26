@@ -11,14 +11,16 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- *  Return the suggested name for a system playlist uid, `nil` if none or the uid is unknown.
+ *  Standard playlist identifiers. Use to access system playlists widely available.
  */
-OBJC_EXPORT NSString * _Nullable SRGPlaylistNameForPlaylistWithUid(NSString *uid);
+typedef NSString * SRGPlaylistUid NS_TYPED_ENUM;
+
+OBJC_EXPORT SRGPlaylistUid const SRGPlaylistUidWatchLater;                          // Watch later playlist
 
 /**
- *  Watch later playlist uid.
+ *  Return the suggested standard name for a playlist uid, `nil` if the uid has no suggested standard name.
  */
-OBJC_EXPORT NSString * const SRGWatchLaterPlaylistUid;
+OBJC_EXPORT NSString * _Nullable SRGPlaylistNameForPlaylistWithUid(NSString *uid);
 
 /**
  *  Notification sent when one or more playlists change. Use the keys below to retrieve detailed information from the notification
