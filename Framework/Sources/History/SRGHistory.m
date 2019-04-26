@@ -251,7 +251,6 @@ NSString * const SRGHistorySynchronizationErrorKey = @"SRGHistorySynchronization
                     
                     [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable error) {
                         if (error) {
-                            [self.identityService reportUnauthorization];
                             finishSynchronization(error);
                             return;
                         }
