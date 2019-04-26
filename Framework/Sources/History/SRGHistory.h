@@ -25,9 +25,12 @@ OBJC_EXPORT NSString * const SRGHistoryUidsKey;                                 
 OBJC_EXPORT NSString * const SRGHistoryDidStartSynchronizationNotification;
 
 /**
- *  Notification sent when history synchronization has finished.
+ *  Notification sent when history synchronization has finished. Use the keys below to retrieve detailed information from
+ *  the notification `userInfo` dictionary.
  */
 OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
+
+OBJC_EXPORT NSString * const SRGHistorySynchronizationErrorKey;                 // Key to access error information as an `NSError` object.
 
 /**
  *  Manages a local cache for history entries. History entries are characterized by an identifier and an associated
