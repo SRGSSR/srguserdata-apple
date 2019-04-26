@@ -11,6 +11,7 @@
 #import "SRGHistoryEntry+Private.h"
 #import "SRGHistoryRequest.h"
 #import "SRGUser+Private.h"
+#import "SRGUserDataError+Private.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserObject+Private.h"
 #import "SRGUserObject+Subclassing.h"
@@ -28,23 +29,6 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
 
 NSString * const SRGHistoryDidStartSynchronizationNotification = @"SRGHistoryDidStartSynchronizationNotification";
 NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDidFinishSynchronizationNotification";
-
-// TODO: Factor out
-static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
-{
-    if ([error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorMultiple) {
-        NSArray<NSError *> *errors = error.userInfo[SRGNetworkErrorsKey];
-        for (NSError *error in errors) {
-            if (SRGHistoryIsUnauthorizationError(error)) {
-                return YES;
-            }
-        }
-        return NO;
-    }
-    else {
-        return [error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorHTTP && [error.userInfo[SRGNetworkHTTPStatusCodeKey] integerValue] == 401;
-    }
-}
 
 @interface SRGHistory ()
 
@@ -225,7 +209,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                     user.historyServerSynchronizationDate = serverDate;
                 } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
             }
-            else if (SRGHistoryIsUnauthorizationError(pullError)) {
+            else if (SRGUserDataIsUnauthorizationError(pullError)) {
                 [self.identityService reportUnauthorization];
                 finishSynchronization();
                 return;
@@ -250,7 +234,7 @@ static BOOL SRGHistoryIsUnauthorizationError(NSError *error)
                             finishSynchronization();
                         }];
                     }
-                    else if (SRGHistoryIsUnauthorizationError(pushError)) {
+                    else if (SRGUserDataIsUnauthorizationError(pushError)) {
                         [self.identityService reportUnauthorization];
                         finishSynchronization();
                     }

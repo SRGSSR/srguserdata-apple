@@ -14,7 +14,7 @@
 #import "SRGPlaylists+Private.h"
 #import "SRGPlaylistsRequest.h"
 #import "SRGUser+Private.h"
-#import "SRGUserDataError.h"
+#import "SRGUserDataError+Private.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserObject+Private.h"
 #import "SRGUserObject+Subclassing.h"
@@ -51,26 +51,8 @@ NSString * const SRGPlaylistEntryUidsSubKey = @"SRGPlaylistEntryUids";
 NSString * const SRGPlaylistsDidStartSynchronizationNotification = @"SRGPlaylistsDidStartSynchronizationNotification";
 NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylistsDidFinishSynchronizationNotification";
 
-// TODO: Factor out
-static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
-{
-    if ([error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorMultiple) {
-        NSArray<NSError *> *errors = error.userInfo[SRGNetworkErrorsKey];
-        for (NSError *error in errors) {
-            if (SRGPlaylistsIsUnauthorizationError(error)) {
-                return YES;
-            }
-        }
-        return NO;
-    }
-    else {
-        return [error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorHTTP && [error.userInfo[SRGNetworkHTTPStatusCodeKey] integerValue] == 401;
-    }
-}
-
 @interface SRGPlaylists ()
 
-// TODO: Probably only use a single queue for everything
 @property (nonatomic, weak) SRGRequest *pullPlaylistsRequest;
 @property (nonatomic) SRGRequestQueue *requestQueue;
 
@@ -443,7 +425,7 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
             }
             
             [self pushPlaylists:playlists forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pushError) {
-                if (SRGPlaylistsIsUnauthorizationError(pushError)) {
+                if (SRGUserDataIsUnauthorizationError(pushError)) {
                     [self.identityService reportUnauthorization];
                     finishSynchronization();
                     return;
@@ -459,21 +441,21 @@ static BOOL SRGPlaylistsIsUnauthorizationError(NSError *error)
                     }
                     
                     [self pushPlaylistEntries:playlistEntries forSessionToken:sessionToken withCompletionBlock:^(NSError *error) {
-                        if (SRGPlaylistsIsUnauthorizationError(pushError)) {
+                        if (SRGUserDataIsUnauthorizationError(pushError)) {
                             [self.identityService reportUnauthorization];
                             finishSynchronization();
                             return;
                         }
                         
                         [self pullPlaylistsForSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable pullError) {
-                            if (SRGPlaylistsIsUnauthorizationError(pullError)) {
+                            if (SRGUserDataIsUnauthorizationError(pullError)) {
                                 [self.identityService reportUnauthorization];
                                 finishSynchronization();
                                 return;
                             }
                             
                             [self pullPlaylistEntriesForSessionToken:sessionToken withCompletionBlock:^(NSError *error) {
-                                if (SRGPlaylistsIsUnauthorizationError(pullError)) {
+                                if (SRGUserDataIsUnauthorizationError(pullError)) {
                                     [self.identityService reportUnauthorization];
                                     finishSynchronization();
                                     return;
