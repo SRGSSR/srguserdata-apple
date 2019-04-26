@@ -101,7 +101,7 @@
     SRGPlaylist *playlist = [self.userData.playlists playlistWithUid:SRGWatchLaterPlaylistUid];
     
     XCTAssertEqualObjects(playlist.uid, SRGWatchLaterPlaylistUid);
-    XCTAssertTrue(playlist.system);
+    XCTAssertEqual(playlist.type, SRGPlaylistTypeSystem);
     XCTAssertEqualObjects(playlist.name, SRGPlaylistNameForPlaylistWithUid(SRGWatchLaterPlaylistUid));
     XCTAssertFalse(playlist.discarded);
 }
@@ -235,7 +235,7 @@
     SRGPlaylist *playlist = [self.userData.playlists playlistWithUid:uid];
     
     XCTAssertEqualObjects(playlist.uid, uid);
-    XCTAssertFalse(playlist.system);
+    XCTAssertEqual(playlist.type, SRGPlaylistTypeStandard);
     XCTAssertEqualObjects(playlist.name, updatedName);
     XCTAssertFalse(playlist.discarded);
 }
@@ -255,7 +255,7 @@
     SRGPlaylist *playlist = [self.userData.playlists playlistWithUid:SRGWatchLaterPlaylistUid];
     
     XCTAssertEqualObjects(playlist.uid, SRGWatchLaterPlaylistUid);
-    XCTAssertTrue(playlist.system);
+    XCTAssertEqual(playlist.type, SRGPlaylistTypeSystem);
     XCTAssertNotEqualObjects(playlist.name, updatedName);
     XCTAssertFalse(playlist.discarded);
 }
@@ -268,7 +268,7 @@
     SRGPlaylist *playlist1 = [self.userData.playlists playlistWithUid:uid];
     
     XCTAssertEqualObjects(playlist1.uid, uid);
-    XCTAssertFalse(playlist1.system);
+    XCTAssertEqual(playlist1.type, SRGPlaylistTypeStandard);
     XCTAssertEqualObjects(playlist1.name, name);
     XCTAssertFalse(playlist1.discarded);
     
@@ -287,7 +287,7 @@
     [self.userData.playlists playlistWithUid:addedUid completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
         XCTAssertEqualObjects(playlist.uid, addedUid);
-        XCTAssertFalse(playlist.system);
+        XCTAssertEqual(playlist.type, SRGPlaylistTypeStandard);
         XCTAssertEqualObjects(playlist.name, name);
         XCTAssertFalse(playlist.discarded);
         [expectation1 fulfill];
