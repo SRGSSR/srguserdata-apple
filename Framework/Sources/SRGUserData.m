@@ -7,6 +7,7 @@
 #import "SRGUserData.h"
 
 #import "NSBundle+SRGUserData.h"
+#import "NSTimer+SRGUserData.h"
 #import "SRGDataStore.h"
 #import "SRGHistory.h"
 #import "SRGUser+Private.h"
@@ -15,6 +16,7 @@
 #import "SRGUserDataService+Subclassing.h"
 #import "SRGUserObject+Private.h"
 
+#import <FXReachability/FXReachability.h>
 #import <libextobjc/libextobjc.h>
 
 static NSUInteger s_currentPersistentStoreVersion = 7;
@@ -32,9 +34,14 @@ NSString *SRGUserDataMarketingVersion(void)
 
 @interface SRGUserData ()
 
+@property (nonatomic) NSURL *serviceURL;
 @property (nonatomic) SRGIdentityService *identityService;
+
 @property (nonatomic) SRGDataStore *dataStore;
 @property (nonatomic) NSDictionary<SRGUserDataServiceType, SRGUserDataService *> *services;
+
+@property (nonatomic, getter=isSynchronizing) BOOL synchronizing;
+@property (nonatomic) NSTimer *synchronizationTimer;
 
 @end
 
@@ -59,6 +66,7 @@ NSString *SRGUserDataMarketingVersion(void)
                      identityService:(SRGIdentityService *)identityService
 {
     if (self = [super init]) {
+        self.serviceURL = serviceURL;
         self.identityService = identityService;
         
         // Bundling the model file in a resource bundle requires a few things:
@@ -136,7 +144,17 @@ NSString *SRGUserDataMarketingVersion(void)
         
         NSURL *playlistsServiceURL = [serviceURL URLByAppendingPathComponent:@"playlist"];
         services[SRGUserDataServiceTypePlaylists] = [[SRGPlaylists alloc] initWithServiceURL:playlistsServiceURL identityService:identityService dataStore:self.dataStore];
+        
         self.services = [services copy];
+        
+        if (serviceURL && identityService) {
+            @weakify(self)
+            self.synchronizationTimer = [NSTimer srguserdata_timerWithTimeInterval:60. repeats:YES block:^(NSTimer * _Nonnull timer) {
+                @strongify(self)
+                [self synchronize];
+            }];
+            [self synchronize];
+        }
         
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(userDidLogout:)
@@ -146,8 +164,25 @@ NSString *SRGUserDataMarketingVersion(void)
                                                selector:@selector(didUpdateAccount:)
                                                    name:SRGIdentityServiceDidUpdateAccountNotification
                                                  object:identityService];
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(reachabilityDidChange:)
+                                                   name:FXReachabilityStatusDidChangeNotification
+                                                 object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(applicationWillEnterForeground:)
+                                                   name:UIApplicationWillEnterForegroundNotification
+                                                 object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(applicationDidEnterBackground:)
+                                                   name:UIApplicationDidEnterBackgroundNotification
+                                                 object:nil];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    self.synchronizationTimer = nil;
 }
 
 #pragma mark Getters and setters
@@ -171,6 +206,12 @@ NSString *SRGUserDataMarketingVersion(void)
     SRGUserDataService *playlist = self.services[SRGUserDataServiceTypePlaylists];
     NSAssert([playlist isKindOfClass:SRGPlaylists.class], @"Playlist service expected");
     return (SRGPlaylists *)playlist;
+}
+
+- (void)setSynchronizationTimer:(NSTimer *)synchronizationTimer
+{
+    [_synchronizationTimer invalidate];
+    _synchronizationTimer = synchronizationTimer;
 }
 
 #pragma mark Migration
@@ -245,6 +286,38 @@ NSString *SRGUserDataMarketingVersion(void)
     }
 }
 
+#pragma mark Synchronization
+
+- (void)synchronize
+{
+    if (self.synchronizing || ! self.serviceURL) {
+        return;
+    }
+    
+    if (! self.identityService.isLoggedIn) {
+        return;
+    }
+    
+    self.synchronizing = YES;
+    
+    __block NSUInteger remainingServiceCount = self.services.count;
+    [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
+        [service synchronizeWithCompletionBlock:^{
+            NSCAssert(self.synchronizing, @"Must be synchronizing: The completion block must be called only once per service and sync attempt");
+            
+            --remainingServiceCount;
+            if (remainingServiceCount == 0) {
+                [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                    SRGUser *user = [SRGUser userInManagedObjectContext:managedObjectContext];
+                    user.synchronizationDate = NSDate.date;
+                } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
+                    self.synchronizing = NO;
+                }];
+            }
+        }];
+    }];
+}
+
 #pragma mark Notifications
 
 - (void)userDidLogout:(NSNotification *)notification
@@ -272,6 +345,23 @@ NSString *SRGUserDataMarketingVersion(void)
         SRGUser *user = [SRGUser userInManagedObjectContext:managedObjectContext];
         [user attachToAccountUid:account.uid];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:nil];
+}
+
+- (void)reachabilityDidChange:(NSNotification *)notification
+{
+    if ([FXReachability sharedInstance].reachable) {
+        [self synchronize];
+    }
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification
+{
+    [self synchronize];
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)notification
+{
+    [self synchronize];
 }
 
 @end

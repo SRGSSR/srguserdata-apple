@@ -19,7 +19,7 @@
 
 @end
 
-@interface SRGHistory (Private)
+@interface SRGUserData (Private)
 
 - (void)synchronize;
 
@@ -206,7 +206,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
         XCTFail(@"No change notification is expected. The history was empty and still must be");
     }];
     
-    [self.userData.history synchronize];
+    [self.userData synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
         [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
@@ -245,7 +245,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
         return YES;
     }];
     
-    [self.userData.history synchronize];
+    [self.userData synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
@@ -283,7 +283,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
         return YES;
     }];
     
-    [self.userData.history synchronize];
+    [self.userData synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
@@ -320,7 +320,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
         return YES;
     }];
     
-    [self.userData.history synchronize];
+    [self.userData synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
@@ -336,7 +336,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     [self.userData.history discardHistoryEntriesWithUids:@[@"remote_1"] completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
-        [self.userData.history synchronize];
+        [self.userData synchronize];
     }];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
@@ -374,7 +374,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
         return YES;
     }];
     
-    [self.userData.history synchronize];
+    [self.userData synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
@@ -390,7 +390,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
         return YES;
     }];
     
-    [self.userData.history synchronize];
+    [self.userData synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
@@ -428,7 +428,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
         }
     }];
     
-    [self.userData.history synchronize];
+    [self.userData synchronize];
     
     [self waitForExpectationsWithTimeout:100. handler:nil];
     
@@ -453,7 +453,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
     
-    [self.userData.history synchronize];
+    [self.userData synchronize];
     [self logout];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
@@ -478,7 +478,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     [self expectationForElapsedTimeInterval:5. withHandler:nil];
     
-    [self.userData.history synchronize];
+    [self.userData synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
         [NSNotificationCenter.defaultCenter removeObserver:startObserver];
@@ -507,7 +507,7 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
     
     [self expectationForElapsedTimeInterval:5. withHandler:nil];
     
-    [self.userData.history synchronize];
+    [self.userData synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
         [NSNotificationCenter.defaultCenter removeObserver:changeObserver];

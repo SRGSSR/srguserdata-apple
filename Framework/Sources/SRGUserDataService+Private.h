@@ -39,11 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) SRGDataStore *dataStore;
 
-/**
- *  Trigger a synchronization if the user is logged in.
- */
-- (void)synchronize;
-
 @end
 
 NS_ASSUME_NONNULL_END

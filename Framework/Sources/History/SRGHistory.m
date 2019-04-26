@@ -247,21 +247,7 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
                         return;
                     }
                     
-                    [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable error) {
-                        if (error) {
-                            finishSynchronization(error);
-                            return;
-                        }
-                        
-                        NSManagedObjectID *userID = user.objectID;
-                        [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                            // FIXME: Should be common sync date for all services. Not set here
-                            SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
-                            user.synchronizationDate = NSDate.date;
-                        } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-                            finishSynchronization(error);
-                        }];
-                    }];
+                    [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:finishSynchronization];
                 }];
             }];
         }];
@@ -270,6 +256,8 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
 
 - (void)userDidLogin
 {
+    NSAssert(NO, @"Fix");
+#if 0
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         for (SRGHistoryEntry *historyEntry in historyEntries) {
@@ -280,6 +268,7 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
             [self synchronize];
         });
     }];
+#endif
 }
 
 - (void)userDidLogout
