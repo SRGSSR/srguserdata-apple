@@ -10,8 +10,6 @@
 
 @interface HistoryTestCase : UserDataBaseTestCase
 
-@property (nonatomic) SRGUserData *userData;
-
 @end
 
 @implementation HistoryTestCase
@@ -46,13 +44,9 @@
 
 - (void)setUp
 {
-    NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
-    self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL serviceURL:nil identityService:nil];
-}
-
-- (void)tearDown
-{
-    self.userData = nil;
+    [super setUp];
+    
+    [self setupForOfflineOnly];
 }
 
 #pragma mark Tests

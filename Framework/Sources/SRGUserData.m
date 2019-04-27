@@ -130,7 +130,12 @@ NSString *SRGUserDataMarketingVersion(void)
         dispatch_group_enter(group);
         [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
             SRGUser *user = [SRGUser upsertInManagedObjectContext:managedObjectContext];
-            [user attachToAccountUid:identityService.account.uid];
+            
+            // If an account is readily available, immediately bind it.
+            NSString *accountUid = identityService.account.uid;
+            if (accountUid) {
+                [user attachToAccountUid:accountUid];
+            }
         } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
             dispatch_group_leave(group);
         }];
