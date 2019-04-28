@@ -21,7 +21,7 @@
     for (NSUInteger i = 0; i < count; ++i) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
         
-        NSString *uid = [NSString stringWithFormat:@"%@_%@", name, @(i)];
+        NSString *uid = [NSString stringWithFormat:@"%@_%@", name, @(i + 1)];
         [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
             [expectation fulfill];
         }];
