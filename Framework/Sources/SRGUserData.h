@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // TODO:
 // 0) Proper completion block calls (synchronize with counter)
-// 1) Have global sync notifications? (yes! with error info & emitter = service)
+// 1) Have global sync notifications? (yes! with error info & emitter = service). Add UT (+ check error)
 // 2) Replace sync method with two hooks pull / push returning errors? If possible, then return unauthorization
 //    errors once at the top level
 // 3) push / pull also for history data

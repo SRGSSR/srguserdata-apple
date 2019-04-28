@@ -7,6 +7,7 @@
 #import "UserDataBaseTestCase.h"
 
 #import "SRGHistoryRequest.h"
+#import "SRGPlaylistsRequest.h"
 
 #import <OHHTTPStubs/OHHTTPStubs.h>
 
@@ -269,11 +270,11 @@ NSURL *TestPlaylistsServiceURL(void)
     XCTAssertNil(self.identityService.sessionToken);
 }
 
-#pragma mark History
+#pragma mark History remote data management
 
 - (void)insertRemoteTestHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count
 {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Remote entry creation finished"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Remote history entry creation finished"];
     
     NSMutableArray<NSDictionary *> *JSONDictionaries = [NSMutableArray array];
     for (NSUInteger i = 0; i < count; ++i) {
@@ -293,17 +294,41 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)deleteRemoteHistoryEntryWithUid:(NSString *)uid
 {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History cleared"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Remote history entry deleted"];
     
     NSDictionary *JSONDictionary = @{ @"item_id" : uid,
                                       @"device_id" : @"test suite",
-                                      @"deleted": @YES };
+                                      @"deleted" : @YES };
     [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:@[JSONDictionary] toServiceURL:TestHistoryServiceURL() forSessionToken:TestToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+#pragma mark Playlist remote data management
+
+- (void)insertRemoteTestPlaylistsWithName:(NSString *)name count:(NSUInteger)count entryCount:(NSUInteger)entryCount
+{
+    // FIXME: Insert entries
+    for (NSUInteger i = 0; i < count; ++i) {
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Remote playlist creation finished"];
+        
+        NSDictionary *JSONDictionary = @{ @"businessId" : [NSString stringWithFormat:@"%@_%@", name, @(i + 1)],
+                                          @"name" : [NSString stringWithFormat:@"%@ %@", name, @(i + 1)] };
+        [[SRGPlaylistsRequest postPlaylistDictionary:JSONDictionary toServiceURL:TestPlaylistsServiceURL() forSessionToken:TestToken withSession:NSURLSession.sharedSession completionBlock:^(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [expectation fulfill];
+        }] resume];
+    }
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)deleteRemotePlaylistWithUid:(NSString *)uid
+{
+    
 }
 
 @end

@@ -147,7 +147,7 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 @interface UserDataBaseTestCase (HistoryTestData)
 
 /**
- *  Insert a number of test history entries with name `name_<index>`. Wait until all have been inserted.
+ *  Insert a number of test history entries with name `<name>_<index>`. Wait until all have been inserted.
  */
 - (void)insertRemoteTestHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count;
 
@@ -162,6 +162,17 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
  *  Playlist test data creation on the remote user data service.
  */
 @interface UserDataBaseTestCase (PlaylistTestData)
+
+/**
+ *  Insert a number of remote playlists with name `<name>_<index>`. For each playlist, inserts a number of entries named
+ *  `entry_<index>`. Wait until all have been inserted
+ */
+- (void)insertRemoteTestPlaylistsWithName:(NSString *)name count:(NSUInteger)count entryCount:(NSUInteger)entryCount;
+
+/**
+ *  Delete the remote playlist having the specified identifier. Wait until deletion is successful.
+ */
+- (void)deleteRemotePlaylistWithUid:(NSString *)uid;
 
 @end
 

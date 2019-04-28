@@ -61,7 +61,40 @@
 
 - (void)testInitialSynchronizationWithExistingRemoteEntries
 {
+    [self setupForAvailableService];
+    [self loginAndWaitForInitalSynchronization];
+    [self insertRemoteTestPlaylistsWithName:@"remote" count:2 entryCount:3];
     
+    [self expectationForSingleNotification:SRGPlaylistsDidStartSynchronizationNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
+    }];
+    [self expectationForSingleNotification:SRGPlaylistsDidFinishSynchronizationNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
+    }];
+    
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqual([notification.userInfo[SRGPlaylistsPreviousUidsKey] count], 1);
+        XCTAssertEqual([notification.userInfo[SRGPlaylistsChangedUidsKey] count], 2);
+        XCTAssertEqual([notification.userInfo[SRGPlaylistsUidsKey] count], 3);
+        return YES;
+    }];
+    
+    [self.userData synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
+    
+    [[SRGPlaylistsRequest playlistsFromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(playlistDictionaries.count, 3);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 - (void)testInitialSynchronizationWithExistingLocalEntries
