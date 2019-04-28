@@ -58,6 +58,11 @@ NSURL *TestHistoryServiceURL(void)
     return [TestServiceURL() URLByAppendingPathComponent:@"history"];
 }
 
+NSURL *TestPlaylistsServiceURL(void)
+{
+    return [TestServiceURL() URLByAppendingPathComponent:@"playlist"];
+}
+
 @interface UserDataBaseTestCase ()
 
 @property (nonatomic) SRGIdentityService *identityService;

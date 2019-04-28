@@ -32,7 +32,7 @@
 
 #pragma mark Tests
 
-- (void)testEmptyHistorySynchronization
+- (void)testEmptySynchronization
 {
     [self setupForAvailableService];
     [self loginAndWaitForInitalSynchronization];
@@ -68,7 +68,7 @@
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)testHistoryInitialSynchronizationWithExistingRemoteEntries
+- (void)testInitialSynchronizationWithExistingRemoteEntries
 {
     [self setupForAvailableService];
     [self loginAndWaitForInitalSynchronization];
@@ -105,7 +105,7 @@
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)testHistoryInitialSynchronizationWithExistingLocalEntries
+- (void)testInitialSynchronizationWithExistingLocalEntries
 {
     [self setupForAvailableService];
     [self loginAndWaitForInitalSynchronization];

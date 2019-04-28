@@ -29,9 +29,14 @@ OBJC_EXPORT NSString * const TestToken;
 OBJC_EXPORT NSString * const TestAccountUid;
 
 /**
- *  The URL of the history service for tests.
+ *  The URL of the history service.
  */
 OBJC_EXPORT NSURL *TestHistoryServiceURL(void);
+
+/**
+ *  The URL of the playlists service.
+ */
+OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 
 /**
  *  Base class for user data tests. Provides helpers to create a user data store and to perform remote insertions
@@ -137,9 +142,9 @@ OBJC_EXPORT NSURL *TestHistoryServiceURL(void);
 @end
 
 /**
- *  Test data creation on the remote user data service.
+ *  History test data creation on the remote user data service.
  */
-@interface UserDataBaseTestCase (TestData)
+@interface UserDataBaseTestCase (HistoryTestData)
 
 /**
  *  Insert a number of test history entries with name `name_<index>`. Wait until all have been inserted.
@@ -150,6 +155,13 @@ OBJC_EXPORT NSURL *TestHistoryServiceURL(void);
  *  Delete the remote history entry having the specified identifier. Wait until deletion is successful.
  */
 - (void)deleteRemoteHistoryEntryWithUid:(NSString *)uid;
+
+@end
+
+/**
+ *  Playlist test data creation on the remote user data service.
+ */
+@interface UserDataBaseTestCase (PlaylistTestData)
 
 @end
 

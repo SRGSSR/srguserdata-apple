@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 //    errors once at the top level
 // 3) push / pull also for history data
 // 4) UT
+// 5) Refactor: Inherit from SRGUserObject. Remove tests now redundant.
 
 // Official version number.
 FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
