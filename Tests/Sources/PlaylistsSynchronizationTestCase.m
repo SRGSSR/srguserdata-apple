@@ -46,16 +46,16 @@
         return YES;
     }];
     
-    [self expectationForNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsPreviousUidsKey], @[@"watch_later"]);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], @[@"watch_later"]);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], @[@"watch_later"]);
-        return YES;
+    [self expectationForElapsedTimeInterval:5. withHandler:nil];
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistsDidChangeNotification object:self.userData.playlists queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No change notification is expected. No user-created playlist exist");
     }];
     
     [self.userData synchronize];
     
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
