@@ -254,6 +254,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
     NSParameterAssert(completionBlock);
     
     // Only standard playlists can be updated (entries can be edited for any kind of playlist, though)
+    // TODO: Is an abstraction possible? (filtering out non-synchronizable objects)
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard)];
     playlists = [playlists filteredArrayUsingPredicate:predicate];
     
@@ -515,6 +516,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
 
 - (NSArray<SRGUserObject *> *)userObjectsInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
+    // TODO: Is an abstraction possible? (filtering out non-synchronizable objects)
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard)];
     NSArray<SRGUserObject *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     // TODO: <SRGPlaylistEntry *>, no cast
@@ -616,7 +618,7 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         uids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
-        if (playlist.type == SRGPlaylistTypeStandard) {
+        if (playlist.synchronizable) {
             playlist.name = name;
             playlist.dirty = YES;
         }
@@ -652,7 +654,8 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
         previousUids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
         
         NSArray<NSString *> *discardedUids = uids ?: previousUids;
-        
+
+        // TODO: Is an abstraction possible? (filtering out non-synchronizable objects)
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K != %@ AND %K IN %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard), @keypath(SRGPlaylist.new, uid), discardedUids];
         NSArray<SRGPlaylist *> *excludedPlaylists = [previousPlaylists filteredArrayUsingPredicate:predicate];
         if (excludedPlaylists.count > 0) {
