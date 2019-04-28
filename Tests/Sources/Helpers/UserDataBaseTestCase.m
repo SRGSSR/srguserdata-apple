@@ -196,9 +196,6 @@ NSURL *TestPlaylistsServiceURL(void)
     [self eraseUserData];
     [self logout];
     
-    // We could mock history services to implement true unit tests, but to be able to catch their possible issues (!),
-    // we rather want integration tests. We therefore need to use a test user, simulating login by injecting its
-    // session token into the identity service.
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
     self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
                                                    serviceURL:serviceURL
@@ -207,7 +204,10 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)setupForOfflineOnly
 {
-    [self setupUserDataWithServiceURL:nil];
+    NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
+    self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
+                                                   serviceURL:nil
+                                              identityService:self.identityService];
 }
 
 - (void)setupForAvailableService

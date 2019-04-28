@@ -15,9 +15,20 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SRGUserObject (Subclassing)
 
 /**
+ *  Subclasses must return `YES` iff the object described by the dictionary is synchronizable. The default implementation
+ *  returns `YES`.
+ */
++ (BOOL)isSynchronizableWithDictionary:(NSDictionary *)dictionary;
+
+/**
  *  Subclasses must implement this method to provide the JSON key which is used to identity the item in a unique way.
  */
 @property (class, nonatomic) NSString *uidKey;
+
+/**
+ *  Subclasses must return `YES`iff the object is synchronizable. The default implementation returns `YES`.
+ */
+@property (nonatomic, readonly, getter=isSynchronizable) BOOL synchronizable;
 
 /**
  *  Update the current entry using the provided dictionary, in the format delivered by the associated service.

@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 // 3) push / pull also for history data
 // 4) UT
 // 5) Refactor: Inherit from SRGUserObject. Remove tests now redundant.
+// 6) Introduce mapping at SRGUserObject level (instead of uidKey)?
 
 // Official version number.
 FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);

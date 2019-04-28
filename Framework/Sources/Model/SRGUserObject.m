@@ -109,6 +109,10 @@
 {
     NSMutableDictionary<NSString *, NSDictionary *> *dictionaryIndex = [NSMutableDictionary dictionary];
     for (NSDictionary *dictionary in dictionaries) {
+        if (! [self.class isSynchronizableWithDictionary:dictionary]) {
+            continue;
+        }
+        
         NSString *uid = dictionary[self.class.uidKey];
         if (uid) {
             dictionaryIndex[uid] = dictionary;
@@ -117,6 +121,9 @@
     
     NSMutableArray<NSDictionary *> *mergedDictionaries = [NSMutableArray array];
     for (SRGUserObject *object in objects) {
+        if (! object.synchronizable) {
+            continue;
+        }
         if (object.dirty) {
             [mergedDictionaries addObject:object.dictionary];
         }
@@ -168,6 +175,11 @@
 
 #pragma mark Default implementations
 
++ (BOOL)isSynchronizableWithDictionary:(NSDictionary *)dictionary
+{
+    return YES;
+}
+
 - (void)updateWithDictionary:(NSDictionary *)dictionary
 {
     self.uid = dictionary[self.class.uidKey];
@@ -176,6 +188,11 @@
     self.date = dateString ? [NSDate dateWithTimeIntervalSince1970:dateString.doubleValue / 1000.] : NSDate.date;
     
     self.discarded = [dictionary[@"deleted"] boolValue];
+}
+
+- (BOOL)isSynchronizable
+{
+    return YES;
 }
 
 - (NSDictionary *)dictionary

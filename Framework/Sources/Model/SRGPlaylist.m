@@ -58,7 +58,13 @@ static NSValueTransformer *SRGPlaylistTypeJSONTransformer(void)
     return [JSONDictionary copy];
 }
 
-#pragma mark Updates
+#pragma mark Overrides
+
++ (BOOL)isSynchronizableWithDictionary:(NSDictionary *)dictionary
+{
+    SRGPlaylistType type = [[SRGPlaylistTypeJSONTransformer() transformedValue:dictionary[@"type"]] integerValue];;
+    return type == SRGPlaylistTypeStandard;
+}
 
 - (void)updateWithDictionary:(NSDictionary *)dictionary
 {
@@ -66,6 +72,11 @@ static NSValueTransformer *SRGPlaylistTypeJSONTransformer(void)
     
     self.name = dictionary[@"name"];
     self.type = [[SRGPlaylistTypeJSONTransformer() transformedValue:dictionary[@"type"]] integerValue];
+}
+
+- (BOOL)isSynchronizable
+{
+    return self.type == SRGPlaylistTypeStandard;
 }
 
 @end
