@@ -57,11 +57,6 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
 
 - (void)saveHistoryEntryDictionaries:(NSArray<NSDictionary *> *)historyEntryDictionaries withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
-    if (historyEntryDictionaries.count == 0) {
-        completionBlock(nil);
-        return;
-    }
-    
     NSMutableArray<NSString *> *changedUids = [NSMutableArray array];
     
     __block NSArray<NSString *> *previousUids = nil;
@@ -69,10 +64,16 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGHistoryEntry *> *previousHistoryEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        NSArray<NSDictionary *> *replacementHistoryEntryDictionaries = [SRGHistoryEntry dictionariesForObjects:previousHistoryEntries replacedWithDictionaries:historyEntryDictionaries];
+        
+        if (replacementHistoryEntryDictionaries.count == 0) {
+            return;
+        }
+        
         previousUids = [previousHistoryEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)]];
         
         NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
-        for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
+        for (NSDictionary *historyEntryDictionary in replacementHistoryEntryDictionaries) {
             SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
             if (historyEntry) {
                 [changedUids addObject:historyEntry.uid];
@@ -212,6 +213,7 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
             
             [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidFinishSynchronizationNotification object:self userInfo:[userInfo copy]];
         });
+        
         completionBlock();
     };
     
@@ -236,7 +238,7 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
             
             [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
                 return [SRGUser userInManagedObjectContext:managedObjectContext];
-            } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
+            } withPriority:NSOperationQueuePriorityLow completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
                 if (error) {
                     finishSynchronization(error);
                     return;
@@ -244,6 +246,11 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
                 
                 NSManagedObjectID *userID = user.objectID;
                 [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historySynchronizationDate withCompletionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable error) {
+                    if (error) {
+                        finishSynchronization(error);
+                        return;
+                    }
+                    
                     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                         SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
                         user.historySynchronizationDate = serverDate;
