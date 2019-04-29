@@ -19,16 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- *  A token associated with a test user (playsrgtests+userdata1@gmail.com).
- */
-OBJC_EXPORT NSString * const TestToken;
-
-/**
- *  The user identifier for the test user (playsrgtests+userdata1@gmail.com).
- */
-OBJC_EXPORT NSString * const TestAccountUid;
-
-/**
  *  The URL of the history service.
  */
 OBJC_EXPORT NSURL *TestHistoryServiceURL(void);
@@ -125,7 +115,13 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 @interface UserDataBaseTestCase (SessionManagement)
 
 /**
- *  Login a test user (with `TestToken` as token).
+ *  Subclasses must implement this method to provide a meaningful token to associate with the user. The default
+ *  value is an invalid token. Different test suites should use different tokens for safe parallelization.
+ */
+@property (nonatomic, readonly) NSString *sessionToken;
+
+/**
+ *  Login a test user (with `sessionToken` as token).
  */
 - (void)login;
 

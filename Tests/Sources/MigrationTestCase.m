@@ -192,7 +192,7 @@
     XCTAssertNotNil(user);
     XCTAssertNil([user valueForKey:@keypath(SRGUser.new, synchronizationDate)]);
     XCTAssertNil([user valueForKey:@keypath(SRGUser.new, historySynchronizationDate)]);
-    XCTAssertEqualObjects([user valueForKey:@keypath(SRGUser.new, accountUid)], TestAccountUid);
+    XCTAssertEqualObjects([user valueForKey:@keypath(SRGUser.new, accountUid)], @"1234");
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
@@ -249,7 +249,7 @@
     XCTAssertNotNil(user);
     XCTAssertNil([user valueForKey:@keypath(SRGUser.new, synchronizationDate)]);
     XCTAssertNil([user valueForKey:@keypath(SRGUser.new, historySynchronizationDate)]);
-    XCTAssertEqualObjects([user valueForKey:@keypath(SRGUser.new, accountUid)], TestAccountUid);
+    XCTAssertEqualObjects([user valueForKey:@keypath(SRGUser.new, accountUid)], @"1234");
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
@@ -305,7 +305,7 @@
     XCTAssertNotNil(user);
     XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, synchronizationDate)]);
     XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historySynchronizationDate)]);
-    XCTAssertEqualObjects([user valueForKey:@keypath(SRGUser.new, accountUid)], TestAccountUid);
+    XCTAssertEqualObjects([user valueForKey:@keypath(SRGUser.new, accountUid)], @"1234");
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
@@ -361,7 +361,7 @@
     XCTAssertNotNil(user);
     XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, synchronizationDate)]);
     XCTAssertNotNil([user valueForKey:@keypath(SRGUser.new, historySynchronizationDate)]);
-    XCTAssertEqualObjects([user valueForKey:@keypath(SRGUser.new, accountUid)], TestAccountUid);
+    XCTAssertEqualObjects([user valueForKey:@keypath(SRGUser.new, accountUid)], @"1234");
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";

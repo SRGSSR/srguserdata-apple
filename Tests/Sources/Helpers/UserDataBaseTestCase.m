@@ -19,9 +19,6 @@
 
 @end
 
-NSString * const TestToken = @"s:t9ipSL-EefFt-FJCqj4KgYikQijCk_Sv.ZPHvjSuP6/wOhc6wEz005NkAv51RlbANspnT2esz/Bo";
-NSString * const TestAccountUid = @"1234";
-
 static NSURL *TestServiceURL(void)
 {
     return [NSURL URLWithString:@"https://profil.rts.ch/api"];
@@ -120,9 +117,9 @@ NSURL *TestPlaylistsServiceURL(void)
                                                       headers:nil] requestTime:1. responseTime:OHHTTPStubsDownloadSpeedWifi];
             }
             else if ([request.URL.path containsString:@"userinfo"]) {
-                NSString *validAuthorizationHeader = [NSString stringWithFormat:@"sessionToken %@", TestToken];
+                NSString *validAuthorizationHeader = [NSString stringWithFormat:@"sessionToken %@", self.sessionToken];
                 if ([[request valueForHTTPHeaderField:@"Authorization"] isEqualToString:validAuthorizationHeader]) {
-                    NSDictionary<NSString *, id> *account = @{ @"id" : TestAccountUid,
+                    NSDictionary<NSString *, id> *account = @{ @"id" : @"1234",
                                                                @"publicUid" : @"1012",
                                                                @"login" : @"test@srgssr.ch",
                                                                @"displayName": @"Test user",
@@ -233,7 +230,7 @@ NSURL *TestPlaylistsServiceURL(void)
     
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:TestDataServiceURL()];
     URLRequest.HTTPMethod = @"DELETE";
-    [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", TestToken] forHTTPHeaderField:@"Authorization"];
+    [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", self.sessionToken] forHTTPHeaderField:@"Authorization"];
     [[SRGRequest dataRequestWithURLRequest:URLRequest session:NSURLSession.sharedSession completionBlock:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
@@ -242,12 +239,17 @@ NSURL *TestPlaylistsServiceURL(void)
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
+- (NSString *)sessionToken
+{
+    return @"invalid_token";
+}
+
 - (void)login
 {
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLoginNotification object:self.identityService handler:nil];
     [self expectationForSingleNotification:SRGIdentityServiceDidUpdateAccountNotification object:self.identityService handler:nil];
     
-    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, TestToken)];
+    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, self.sessionToken)];
     XCTAssertTrue(hasHandledCallbackURL);
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
@@ -265,7 +267,7 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)logout
 {
-    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLogoutCallbackURL(self.identityService, TestToken)];
+    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLogoutCallbackURL(self.identityService, self.sessionToken)];
     XCTAssertTrue(hasHandledCallbackURL);
     XCTAssertNil(self.identityService.sessionToken);
 }
@@ -284,7 +286,7 @@ NSURL *TestPlaylistsServiceURL(void)
         [JSONDictionaries addObject:JSONDictionary];
     }
     
-    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:JSONDictionaries toServiceURL:TestHistoryServiceURL() forSessionToken:TestToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:JSONDictionaries toServiceURL:TestHistoryServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];
@@ -299,7 +301,7 @@ NSURL *TestPlaylistsServiceURL(void)
     NSDictionary *JSONDictionary = @{ @"item_id" : uid,
                                       @"device_id" : @"test suite",
                                       @"deleted" : @YES };
-    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:@[JSONDictionary] toServiceURL:TestHistoryServiceURL() forSessionToken:TestToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:@[JSONDictionary] toServiceURL:TestHistoryServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];
@@ -317,7 +319,7 @@ NSURL *TestPlaylistsServiceURL(void)
         
         NSDictionary *JSONDictionary = @{ @"businessId" : [NSString stringWithFormat:@"%@_%@", name, @(i + 1)],
                                           @"name" : [NSString stringWithFormat:@"%@ %@", name, @(i + 1)] };
-        [[SRGPlaylistsRequest postPlaylistDictionary:JSONDictionary toServiceURL:TestPlaylistsServiceURL() forSessionToken:TestToken withSession:NSURLSession.sharedSession completionBlock:^(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        [[SRGPlaylistsRequest postPlaylistDictionary:JSONDictionary toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }] resume];

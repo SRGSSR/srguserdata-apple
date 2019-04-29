@@ -14,6 +14,14 @@
 
 @implementation HistorySynchronizationTestCase
 
+#pragma mark Overrides
+
+- (NSString *)sessionToken
+{
+    // For playsrgtests+userdata1@gmail.com
+    return @"s:t9ipSL-EefFt-FJCqj4KgYikQijCk_Sv.ZPHvjSuP6/wOhc6wEz005NkAv51RlbANspnT2esz/Bo";
+}
+
 #pragma mark Helpers
 
 - (void)insertLocalTestHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count
