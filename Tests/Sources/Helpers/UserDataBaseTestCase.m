@@ -104,9 +104,6 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)setUp
 {
-    self.identityService = [[SRGIdentityService alloc] initWithWebserviceURL:TestWebserviceURL() websiteURL:TestWebsiteURL()];
-    [self.identityService logout];
-    
     [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
         return [request.URL.host isEqual:TestWebserviceURL().host];
     } withStubResponse:^OHHTTPStubsResponse *(NSURLRequest *request) {
@@ -117,8 +114,7 @@ NSURL *TestPlaylistsServiceURL(void)
                                                       headers:nil] requestTime:1. responseTime:OHHTTPStubsDownloadSpeedWifi];
             }
             else if ([request.URL.path containsString:@"userinfo"]) {
-                NSString *validAuthorizationHeader = [NSString stringWithFormat:@"sessionToken %@", self.sessionToken];
-                if ([[request valueForHTTPHeaderField:@"Authorization"] isEqualToString:validAuthorizationHeader]) {
+                if (self.sessionToken) {
                     NSDictionary<NSString *, id> *account = @{ @"id" : @"1234",
                                                                @"publicUid" : @"1012",
                                                                @"login" : @"test@srgssr.ch",
@@ -144,6 +140,9 @@ NSURL *TestPlaylistsServiceURL(void)
                                            statusCode:404
                                               headers:nil] requestTime:1. responseTime:OHHTTPStubsDownloadSpeedWifi];
     }];
+    
+    self.identityService = [[SRGIdentityService alloc] initWithWebserviceURL:TestWebserviceURL() websiteURL:TestWebsiteURL()];
+    [self.identityService logout];
 }
 
 - (void)tearDown
@@ -188,11 +187,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 #pragma mark Data
 
-- (void)setupUserDataWithServiceURL:(NSURL *)serviceURL
+- (void)setupWithServiceURL:(NSURL *)serviceURL
 {
-    [self eraseUserData];
-    [self logout];
-    
     NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
     self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
                                                    serviceURL:serviceURL
@@ -209,12 +205,12 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)setupForAvailableService
 {
-    [self setupUserDataWithServiceURL:TestServiceURL()];
+    [self setupWithServiceURL:TestServiceURL()];
 }
 
 - (void)setupForUnavailableService
 {
-    [self setupUserDataWithServiceURL:[NSURL URLWithString:@"https://missing.service"]];
+    [self setupWithServiceURL:[NSURL URLWithString:@"https://missing.service"]];
 }
 
 - (void)synchronizeUserData
@@ -222,10 +218,12 @@ NSURL *TestPlaylistsServiceURL(void)
     [self.userData synchronize];
 }
 
-// GDPR special endpoint which erases the entire change history, returning the account to a pristine state. This endpoint
-// is undocumented but publicly available.
-- (void)eraseUserData
+// GDPR special endpoint which erases all user data, returning the account to a pristine state. This endpoin is undocumented
+// but publicly available.
+- (void)eraseData
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"History cleared"];
     
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:TestDataServiceURL()];
@@ -241,11 +239,13 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (NSString *)sessionToken
 {
-    return @"invalid_token";
+    return nil;
 }
 
 - (void)login
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLoginNotification object:self.identityService handler:nil];
     [self expectationForSingleNotification:SRGIdentityServiceDidUpdateAccountNotification object:self.identityService handler:nil];
     
@@ -267,6 +267,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)logout
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLogoutCallbackURL(self.identityService, self.sessionToken)];
     XCTAssertTrue(hasHandledCallbackURL);
     XCTAssertNil(self.identityService.sessionToken);
@@ -276,6 +278,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)insertRemoteTestHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Remote history entry creation finished"];
     
     NSMutableArray<NSDictionary *> *JSONDictionaries = [NSMutableArray array];
@@ -296,6 +300,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)deleteRemoteHistoryEntryWithUid:(NSString *)uid
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Remote history entry deleted"];
     
     NSDictionary *JSONDictionary = @{ @"item_id" : uid,
@@ -313,6 +319,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)insertRemoteTestPlaylistsWithName:(NSString *)name count:(NSUInteger)count entryCount:(NSUInteger)entryCount
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     // FIXME: Insert entries
     for (NSUInteger i = 0; i < count; ++i) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Remote playlist creation finished"];

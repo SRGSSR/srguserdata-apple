@@ -38,6 +38,17 @@
     [self waitForExpectationsWithTimeout:100. handler:nil];
 }
 
+#pragma mark Setup and teardown
+
+- (void)setUp
+{
+    [super setUp];
+    
+    [self eraseData];
+    [self logout];
+    [self setupForOfflineOnly];
+}
+
 #pragma mark Tests
 
 - (void)testEmptySynchronization

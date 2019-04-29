@@ -18,6 +18,15 @@
 
 @implementation MigrationTestCase
 
+#pragma mark Overrides
+
+- (NSString *)sessionToken
+{
+    // No need for a real token. We just want to be able to stub valid requests, but no real data management request
+    // is required by this test suite.
+    return @"dummy_token";
+}
+
 #pragma mark Setup and teardown
 
 - (void)setUp

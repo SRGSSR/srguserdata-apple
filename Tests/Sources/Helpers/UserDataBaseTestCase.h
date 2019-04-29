@@ -115,13 +115,13 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 @interface UserDataBaseTestCase (SessionManagement)
 
 /**
- *  Subclasses must implement this method to provide a meaningful token to associate with the user. The default
- *  value is an invalid token. Different test suites should use different tokens for safe parallelization.
+ *  Subclasses must implement this method to provide a meaningful token to associate with the user. By default none
+ *  is provided. Attempting to use methods which need a token will fail with a test assertion.
  */
-@property (nonatomic, readonly) NSString *sessionToken;
+@property (nonatomic, readonly, nullable) NSString *sessionToken;
 
 /**
- *  Login a test user (with `sessionToken` as token).
+ *  Login a test user with SRG Identity, associating it with the provided session token.
  */
 - (void)login;
 
@@ -134,6 +134,11 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
  *  Logout the current user.
  */
 - (void)logout;
+
+/**
+ *  Remotely all data associated with the user whose session token is provided.
+ */
+- (void)eraseData;
 
 @end
 

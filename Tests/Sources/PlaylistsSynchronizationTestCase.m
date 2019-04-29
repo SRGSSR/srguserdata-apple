@@ -14,6 +14,14 @@
 
 @implementation PlaylistsSynchronizationTestCase
 
+#pragma mark Overrides
+
+- (NSString *)sessionToken
+{
+    // For playsrgtests+userdata2@gmail.com
+    return @"s:zqlZDM1QTjSgCImtircirQr8KOgybQTj.nCgIw2PSk6mhO3ofFhbPErFBD+IGQ0dBcwsJ1lQn5fA";
+}
+
 #pragma mark Helpers
 
 - (void)insertLocalTestPlaylistsWithName:(NSString *)name count:(NSUInteger)count entryCount:(NSUInteger)entryCount
@@ -28,6 +36,17 @@
     }
     
     [self waitForExpectationsWithTimeout:100. handler:NULL];
+}
+
+#pragma mark Setup and teardown
+
+- (void)setUp
+{
+    [super setUp];
+    
+    [self eraseData];
+    [self logout];
+    [self setupForOfflineOnly];
 }
 
 #pragma mark Tests
