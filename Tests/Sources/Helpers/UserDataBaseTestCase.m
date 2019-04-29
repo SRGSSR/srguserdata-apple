@@ -21,7 +21,7 @@
 
 static NSURL *TestServiceURL(void)
 {
-    return [NSURL URLWithString:@"https://profil.rts.ch/api"];
+    return [NSURL URLWithString:@"https://stage-profil.rts.ch/api"];
 }
 
 static NSURL *TestWebserviceURL(void)
@@ -286,7 +286,8 @@ NSURL *TestPlaylistsServiceURL(void)
     for (NSUInteger i = 0; i < count; ++i) {
         NSDictionary *JSONDictionary = @{ @"item_id" : [NSString stringWithFormat:@"%@_%@", name, @(i + 1)],
                                           @"device_id" : @"test suite",
-                                          @"lastPlaybackPosition" : @(i * 1000.) };
+                                          @"lastPlaybackPosition" : @(i * 1000.),
+                                          @"date" : @(round(NSDate.date.timeIntervalSince1970 * 1000.)) };
         [JSONDictionaries addObject:JSONDictionary];
     }
     
@@ -306,7 +307,8 @@ NSURL *TestPlaylistsServiceURL(void)
     
     NSDictionary *JSONDictionary = @{ @"item_id" : uid,
                                       @"device_id" : @"test suite",
-                                      @"deleted" : @YES };
+                                      @"deleted" : @YES,
+                                      @"date" : @(round(NSDate.date.timeIntervalSince1970 * 1000.)) };
     [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:@[JSONDictionary] toServiceURL:TestHistoryServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
@@ -321,7 +323,7 @@ NSURL *TestPlaylistsServiceURL(void)
 {
     XCTAssertNotNil(self.sessionToken);
     
-    // FIXME: Insert entries
+    // FIXME: Insert entries (attention: dates!)
     for (NSUInteger i = 0; i < count; ++i) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Remote playlist creation finished"];
         
