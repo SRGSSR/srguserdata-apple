@@ -176,8 +176,13 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
         [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
             for (NSManagedObjectID *historyEntryID in historyEntriesMap.allKeys) {
                 SRGHistoryEntry *historyEntry = [managedObjectContext existingObjectWithID:historyEntryID error:NULL];
-                [historyEntry updateWithDictionary:historyEntriesMap[historyEntryID]];
-                historyEntry.dirty = NO;
+                if (historyEntry.discarded) {
+                    [managedObjectContext deleteObject:historyEntry];
+                }
+                else {
+                    [historyEntry updateWithDictionary:historyEntriesMap[historyEntryID]];
+                    historyEntry.dirty = NO;
+                }
             }
         } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
             completionBlock(error);
@@ -215,39 +220,34 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
     });
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGUser userInManagedObjectContext:managedObjectContext];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGHistoryEntry.new, dirty)];
+        return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
         if (error) {
             finishSynchronization(error);
             return;
         }
         
-        NSManagedObjectID *userID = user.objectID;
-        [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historySynchronizationDate withCompletionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable error) {
+        [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError *error) {
             if (error) {
                 finishSynchronization(error);
                 return;
             }
             
-            [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
-                user.historySynchronizationDate = serverDate;
-            } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
+            [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                return [SRGUser userInManagedObjectContext:managedObjectContext];
+            } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
                 if (error) {
                     finishSynchronization(error);
                     return;
                 }
                 
-                [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGHistoryEntry.new, dirty)];
-                    return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-                } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
-                    if (error) {
-                        finishSynchronization(error);
-                        return;
-                    }
-                    
-                    [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:finishSynchronization];
+                NSManagedObjectID *userID = user.objectID;
+                [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historySynchronizationDate withCompletionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable error) {
+                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                        SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
+                        user.historySynchronizationDate = serverDate;
+                    } withPriority:NSOperationQueuePriorityLow completionBlock:finishSynchronization];
                 }];
             }];
         }];

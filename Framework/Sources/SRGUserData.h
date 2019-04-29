@@ -32,6 +32,16 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
 
 /**
+ *  Notification sent when global synchronization has started.
+ */
+OBJC_EXPORT NSString * const SRGUserDataDidStartSynchronizationNotification;
+
+/**
+ *  Notification sent when global synchronization has finished.
+ */
+OBJC_EXPORT NSString * const SRGUserDataDidFinishSynchronizationNotification;
+
+/**
  *  Manages data associated with a user. An identity service and service endpoints can be optionally provided, so that
  *  logged in users can synchronize their data with their account.
  *

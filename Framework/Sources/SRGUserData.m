@@ -27,6 +27,9 @@ static SRGUserDataServiceType const SRGUserDataServiceTypePlaylists = @"Playlist
 
 static SRGUserData *s_currentUserData = nil;
 
+NSString * const SRGUserDataDidStartSynchronizationNotification = @"SRGUserDataDidStartSynchronizationNotification";
+NSString * const SRGUserDataDidFinishSynchronizationNotification = @"SRGUserDataDidFinishSynchronizationNotification";
+
 NSString *SRGUserDataMarketingVersion(void)
 {
     return NSBundle.srg_userDataBundle.infoDictionary[@"CFBundleShortVersionString"];
@@ -303,11 +306,15 @@ NSString *SRGUserDataMarketingVersion(void)
         return;
     }
     
-    if (! self.identityService.isLoggedIn) {
+    if (! self.identityService.loggedIn) {
         return;
     }
     
     self.synchronizing = YES;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:SRGUserDataDidStartSynchronizationNotification object:self];
+    });
     
     __block NSUInteger remainingServiceCount = self.services.count;
     [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
@@ -321,6 +328,10 @@ NSString *SRGUserDataMarketingVersion(void)
                     user.synchronizationDate = NSDate.date;
                 } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
                     self.synchronizing = NO;
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [NSNotificationCenter.defaultCenter postNotificationName:SRGUserDataDidFinishSynchronizationNotification object:self];
+                    });
                 }];
             }
         }];
