@@ -260,9 +260,19 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)loginAndWaitForInitalSynchronization
 {
-    // Wait until the 1st synchronization has been performed (automatic after login)
+    XCTAssertNotNil(self.sessionToken);
+    
+    [self expectationForSingleNotification:SRGIdentityServiceUserDidLoginNotification object:self.identityService handler:nil];
+    [self expectationForSingleNotification:SRGIdentityServiceDidUpdateAccountNotification object:self.identityService handler:nil];
     [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:nil];
-    [self login];
+    
+    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, self.sessionToken)];
+    XCTAssertTrue(hasHandledCallbackURL);
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    XCTAssertTrue(self.identityService.loggedIn);
+    XCTAssertNotNil(self.identityService.account);
 }
 
 - (void)logout
