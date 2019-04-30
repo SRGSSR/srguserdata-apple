@@ -373,11 +373,13 @@ NSString *SRGUserDataMarketingVersion(void)
         [mainUser detach];
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
         BOOL unexpectedLogout = [notification.userInfo[SRGIdentityServiceUnauthorizedKey] boolValue];
-        if (! unexpectedLogout) {
-            [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
+        [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
+            [service cancelSynchronization];
+            
+            if (! unexpectedLogout) {
                 [service clearData];
-            }];
-        }
+            }
+        }];
     }];
 }
 
