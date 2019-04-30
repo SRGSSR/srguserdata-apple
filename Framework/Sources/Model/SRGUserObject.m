@@ -124,7 +124,7 @@
         if (! object.synchronizable) {
             continue;
         }
-        if (object.dirty) {
+        else if (object.dirty) {
             [mergedDictionaries addObject:object.dictionary];
         }
         else if ([dictionaryIndex.allKeys containsObject:object.uid]) {
