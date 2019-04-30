@@ -64,16 +64,15 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGHistoryEntry *> *previousHistoryEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        NSArray<NSDictionary *> *replacementHistoryEntryDictionaries = [SRGHistoryEntry dictionariesForObjects:previousHistoryEntries replacedWithDictionaries:historyEntryDictionaries];
         
-        if (replacementHistoryEntryDictionaries.count == 0) {
+        if (historyEntryDictionaries.count == 0) {
             return;
         }
         
         previousUids = [previousHistoryEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)]];
         
         NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
-        for (NSDictionary *historyEntryDictionary in replacementHistoryEntryDictionaries) {
+        for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
             SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
             if (historyEntry) {
                 [changedUids addObject:historyEntry.uid];
