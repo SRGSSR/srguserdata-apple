@@ -64,9 +64,6 @@ NSString * const SRGPlaylistEntryChangedUidsSubKey = @"SRGPlaylistEntryChangedUi
 NSString * const SRGPlaylistEntryPreviousUidsSubKey = @"SRGPlaylistEntryPreviousUids";
 NSString * const SRGPlaylistEntryUidsSubKey = @"SRGPlaylistEntryUids";
 
-NSString * const SRGPlaylistsDidStartSynchronizationNotification = @"SRGPlaylistsDidStartSynchronizationNotification";
-NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylistsDidFinishSynchronizationNotification";
-
 @interface SRGPlaylists ()
 
 @property (nonatomic, weak) SRGRequest *pullPlaylistsRequest;

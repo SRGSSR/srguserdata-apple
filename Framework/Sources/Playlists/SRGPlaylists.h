@@ -38,17 +38,6 @@ OBJC_EXPORT NSString * const SRGPlaylistEntryPreviousUidsSubKey;                
 OBJC_EXPORT NSString * const SRGPlaylistEntryUidsSubKey;                          // Key to access the current entry uid list as an `NSArray` of `NSString` objects.
 
 /**
- *  Notification sent when playlist synchronization has started.
- */
-OBJC_EXPORT NSString * const SRGPlaylistsDidStartSynchronizationNotification;
-
-/**
- *  Notification sent when playlist synchronization has finished. Use the `NSUnderlyingErrorKey` key to retrieve error
- *  information (if any) from the notification `userInfo` dictionary.
- */
-OBJC_EXPORT NSString * const SRGPlaylistsDidFinishSynchronizationNotification;
-
-/**
  *  Manages a local cache for playlists. Playlists are characterized by an identifier, a system flag and a name. Based
  *  on a local cache, this class ensures efficient playlist retrieval from a webservice and keeps local and distant
  *  playlists in sync.
