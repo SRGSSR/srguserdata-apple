@@ -317,13 +317,14 @@
     [self insertLocalTestHistoryEntriesWithName:@"local" count:3];
     
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
+    [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:nil];
     
     [self.userData synchronize];
     [self logout];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
-    // Login again and check that synchronization is still possible
+    // Login again and check that synchronization still works
     [self loginAndWaitForInitalSynchronization];
 }
 
