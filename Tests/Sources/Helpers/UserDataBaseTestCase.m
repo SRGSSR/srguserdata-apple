@@ -261,7 +261,7 @@ NSURL *TestPlaylistsServiceURL(void)
 - (void)loginAndWaitForInitalSynchronization
 {
     // Wait until the 1st synchronization has been performed (automatic after login)
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
+    [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:nil];
     [self login];
 }
 

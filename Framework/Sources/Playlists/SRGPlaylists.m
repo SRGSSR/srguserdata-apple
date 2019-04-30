@@ -419,36 +419,15 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
 
 #pragma mark Subclassing hooks
 
-- (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock
+- (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
     NSString *sessionToken = self.identityService.sessionToken;
-    
-    void (^finishSynchronization)(NSError *error) = ^(NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-            
-            if (error) {
-                NSError *friendlyError = [NSError errorWithDomain:SRGUserDataErrorDomain
-                                                             code:SRGUserDataErrorFailed
-                                                         userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"Playlist synchronization has failed.", @"Error message returned when history synchronization failed for some reason"),
-                                                                     NSUnderlyingErrorKey : error }];
-                userInfo[NSUnderlyingErrorKey] = friendlyError;
-            }
-            
-            [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidFinishSynchronizationNotification object:self userInfo:[userInfo copy]];
-        });
-        completionBlock();
-    };
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidStartSynchronizationNotification object:self];
-    });
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (error) {
-            finishSynchronization(error);
+            completionBlock(error);
             return;
         }
         
@@ -458,13 +437,13 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
             return [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGPlaylist *> * _Nullable playlists, NSError * _Nullable error) {
             if (error) {
-                finishSynchronization(error);
+                completionBlock(error);
                 return;
             }
             
             [self pushPlaylists:playlists forSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable error) {
                 if (error) {
-                    finishSynchronization(error);
+                    completionBlock(error);
                     return;
                 }
                 
@@ -473,32 +452,32 @@ NSString * const SRGPlaylistsDidFinishSynchronizationNotification = @"SRGPlaylis
                     return [SRGPlaylistEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
                 } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
                     if (error) {
-                        finishSynchronization(error);
+                        completionBlock(error);
                         return;
                     }
                     
                     [self pushPlaylistEntries:playlistEntries forSessionToken:sessionToken withCompletionBlock:^(NSError *error) {
                         if (error) {
-                            finishSynchronization(error);
+                            completionBlock(error);
                             return;
                         }
                         
                         [self pullPlaylistsForSessionToken:sessionToken withCompletionBlock:^(NSError * _Nullable error) {
                             if (error) {
-                                finishSynchronization(error);
+                                completionBlock(error);
                                 return;
                             }
                             
                             [self pullPlaylistEntriesForSessionToken:sessionToken withCompletionBlock:^(NSError *error) {
                                 if (error) {
-                                    finishSynchronization(error);
+                                    completionBlock(error);
                                     return;
                                 }
                                 
                                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                                     SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
                                     user.playlistsSynchronizationDate = NSDate.date;
-                                } withPriority:NSOperationQueuePriorityLow completionBlock:finishSynchronization];
+                                } withPriority:NSOperationQueuePriorityLow completionBlock:completionBlock];
                             }];
                         }];
                     }];

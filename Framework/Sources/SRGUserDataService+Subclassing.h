@@ -9,6 +9,8 @@
 
 #import <SRGIdentity/SRGIdentity.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  Methods hooks for service subclass implementations.
  */
@@ -21,7 +23,7 @@
  *  The provided completion block must be called on completion, otherwise the behavior is undefined. The block can
  *  be called from any thread.
  */
-- (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock;
+- (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable error))completionBlock;
 
 /**
  *  This method is called when synchronization is cancelled. Services can implement their logic here (usually cancel
@@ -40,3 +42,5 @@
 - (void)clearData;
 
 @end
+
+NS_ASSUME_NONNULL_END

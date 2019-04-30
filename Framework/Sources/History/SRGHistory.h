@@ -20,17 +20,6 @@ OBJC_EXPORT NSString * const SRGHistoryPreviousUidsKey;                         
 OBJC_EXPORT NSString * const SRGHistoryUidsKey;                                  // Key to access the current uid list as an `NSArray` of `NSString` objects.
 
 /**
- *  Notification sent when history synchronization has started.
- */
-OBJC_EXPORT NSString * const SRGHistoryDidStartSynchronizationNotification;
-
-/**
- *  Notification sent when history synchronization has finished. Use the `NSUnderlyingErrorKey` key to retrieve error
- *  information (if any) from the notification `userInfo` dictionary.
- */
-OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
-
-/**
  *  Manages a local cache for history entries. History entries are characterized by an identifier and an associated
  *  playback position. Based on a local cache, this class ensures efficient history retrieval from a webservice and
  *  keeps local and distant histories in sync.

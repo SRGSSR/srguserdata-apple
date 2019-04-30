@@ -107,18 +107,18 @@ NSString *SRGUserDataMarketingVersion(void)
                     [persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
                         if (error) {
                             success = NO;
-                            SRGUserDataLogError(@"userdata", @"Data store failed to load after migration. Reason: %@", error);
+                            SRGUserDataLogError(@"user_data", @"Data store failed to load after migration. Reason: %@", error);
                         }
                     }];
                 }
                 else {
                     success = NO;
-                    SRGUserDataLogError(@"userdata", @"Data store failed to load and no migration found. Reason: %@", error);
+                    SRGUserDataLogError(@"user_data", @"Data store failed to load and no migration found. Reason: %@", error);
                 }
             }
             else if (error) {
                 success = NO;
-                SRGUserDataLogError(@"userdata", @"Data store failed to load. Reason: %@", error);
+                SRGUserDataLogError(@"user_data", @"Data store failed to load. Reason: %@", error);
             }
         }];
         
@@ -312,7 +312,7 @@ NSString *SRGUserDataMarketingVersion(void)
     
     self.synchronizing = YES;
     
-    SRGUserDataLogInfo(@"userdata", @"Started synchronization");
+    SRGUserDataLogInfo(@"user_data", @"Started synchronization");
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:SRGUserDataDidStartSynchronizationNotification object:self];
@@ -320,9 +320,9 @@ NSString *SRGUserDataMarketingVersion(void)
     
     __block NSUInteger remainingServiceCount = self.services.count;
     [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
-        SRGUserDataLogInfo(@"userdata", @"Started synchronization for service %@", service);
+        SRGUserDataLogInfo(@"user_data", @"Started synchronization for service %@", service);
         
-        [service synchronizeWithCompletionBlock:^{
+        [service synchronizeWithCompletionBlock:^(NSError * _Nullable error) {
             NSCAssert(self.synchronizing, @"Must be synchronizing");
             
             --remainingServiceCount;
@@ -337,11 +337,11 @@ NSString *SRGUserDataMarketingVersion(void)
                         [NSNotificationCenter.defaultCenter postNotificationName:SRGUserDataDidFinishSynchronizationNotification object:self];
                     });
                     
-                    SRGUserDataLogInfo(@"userdata", @"Finished synchronization");
+                    SRGUserDataLogInfo(@"user_data", @"Finished synchronization");
                 }];
             }
             
-            SRGUserDataLogInfo(@"userdata", @"Finished synchronization for service %@", service);
+            SRGUserDataLogInfo(@"user_data", @"Finished synchronization for service %@", service);
         }];
     }];
 }

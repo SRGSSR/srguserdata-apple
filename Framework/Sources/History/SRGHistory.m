@@ -28,9 +28,6 @@ NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
 NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
 NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
 
-NSString * const SRGHistoryDidStartSynchronizationNotification = @"SRGHistoryDidStartSynchronizationNotification";
-NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDidFinishSynchronizationNotification";
-
 @interface SRGHistory ()
 
 @property (nonatomic, weak) SRGPageRequest *pullRequest;
@@ -194,44 +191,22 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
 
 #pragma mark Subclassing hooks
 
-- (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock
+- (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
     NSString *sessionToken = self.identityService.sessionToken;
-    
-    void (^finishSynchronization)(NSError *error) = ^(NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-            
-            if (error) {
-                NSError *friendlyError = [NSError errorWithDomain:SRGUserDataErrorDomain
-                                                             code:SRGUserDataErrorFailed
-                                                         userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"History synchronization has failed.", @"Error message returned when history synchronization failed for some reason"),
-                                                                     NSUnderlyingErrorKey : error }];
-                userInfo[NSUnderlyingErrorKey] = friendlyError;
-            }
-            
-            [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidFinishSynchronizationNotification object:self userInfo:[userInfo copy]];
-        });
-        
-        completionBlock();
-    };
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidStartSynchronizationNotification object:self];
-    });
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGHistoryEntry.new, dirty)];
         return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
         if (error) {
-            finishSynchronization(error);
+            completionBlock(error);
             return;
         }
         
         [self pushHistoryEntries:historyEntries forSessionToken:sessionToken withCompletionBlock:^(NSError *error) {
             if (error) {
-                finishSynchronization(error);
+                completionBlock(error);
                 return;
             }
             
@@ -239,21 +214,21 @@ NSString * const SRGHistoryDidFinishSynchronizationNotification = @"SRGHistoryDi
                 return [SRGUser userInManagedObjectContext:managedObjectContext];
             } withPriority:NSOperationQueuePriorityLow completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
                 if (error) {
-                    finishSynchronization(error);
+                    completionBlock(error);
                     return;
                 }
                 
                 NSManagedObjectID *userID = user.objectID;
                 [self pullHistoryEntriesForSessionToken:sessionToken afterDate:user.historySynchronizationDate withCompletionBlock:^(NSDate * _Nullable serverDate, NSError * _Nullable error) {
                     if (error) {
-                        finishSynchronization(error);
+                        completionBlock(error);
                         return;
                     }
                     
                     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                         SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
                         user.historySynchronizationDate = serverDate;
-                    } withPriority:NSOperationQueuePriorityLow completionBlock:finishSynchronization];
+                    } withPriority:NSOperationQueuePriorityLow completionBlock:completionBlock];
                 }];
             }];
         }];

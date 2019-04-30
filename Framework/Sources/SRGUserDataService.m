@@ -40,9 +40,9 @@
 
 #pragma mark Subclassing hooks
 
-- (void)synchronizeWithCompletionBlock:(void (^)(void))completionBlock
+- (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
-    completionBlock();
+    completionBlock(nil);
 }
 
 - (void)cancelSynchronization
