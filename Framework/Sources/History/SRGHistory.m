@@ -54,6 +54,11 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
 
 - (void)saveHistoryEntryDictionaries:(NSArray<NSDictionary *> *)historyEntryDictionaries withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
+    if (historyEntryDictionaries.count == 0) {
+        completionBlock(nil);
+        return;
+    }
+    
     NSMutableArray<NSString *> *changedUids = [NSMutableArray array];
     
     __block NSArray<NSString *> *previousUids = nil;
@@ -61,11 +66,6 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGHistoryEntry *> *previousHistoryEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        
-        if (historyEntryDictionaries.count == 0) {
-            return;
-        }
-        
         previousUids = [previousHistoryEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)]];
         
         NSMutableArray<NSString *> *uids = [previousUids mutableCopy];

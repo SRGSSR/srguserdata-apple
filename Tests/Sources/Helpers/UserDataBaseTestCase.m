@@ -11,6 +11,12 @@
 
 #import <OHHTTPStubs/OHHTTPStubs.h>
 
+@interface SRGUserData (TestsPrivate)
+
+- (void)synchronize;
+
+@end
+
 @interface SRGIdentityService (Private)
 
 - (BOOL)handleCallbackURL:(NSURL *)callbackURL;
@@ -258,7 +264,7 @@ NSURL *TestPlaylistsServiceURL(void)
     XCTAssertNotNil(self.identityService.account);
 }
 
-- (void)loginAndWaitForInitalSynchronization
+- (void)loginAndWaitForInitialSynchronization
 {
     XCTAssertNotNil(self.sessionToken);
     
@@ -282,6 +288,27 @@ NSURL *TestPlaylistsServiceURL(void)
     BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLogoutCallbackURL(self.identityService, self.sessionToken)];
     XCTAssertTrue(hasHandledCallbackURL);
     XCTAssertNil(self.identityService.sessionToken);
+}
+
+- (void)synchronize
+{
+    [self.userData synchronize];
+}
+
+- (void)synchronizeAndWait
+{
+    [self expectationForSingleNotification:SRGUserDataDidStartSynchronizationNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
+    }];
+    [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
+    }];
+    
+    [self.userData synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 #pragma mark History remote data management
@@ -321,6 +348,19 @@ NSURL *TestPlaylistsServiceURL(void)
                                       @"date" : @(round(NSDate.date.timeIntervalSince1970 * 1000.)) };
     [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:@[JSONDictionary] toServiceURL:TestHistoryServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)assertRemoteHistoryEntryCount:(NSUInteger)count
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
+    
+    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(historyEntryDictionaries.count, count);
         [expectation fulfill];
     }] resume];
     

@@ -29,12 +29,6 @@ static NSString *SRGPlaylistNameForPlaylistWithUid(NSString *uid)
     static dispatch_once_t s_onceToken;
     static NSDictionary<NSString *, NSString *>  *s_names;
     dispatch_once(&s_onceToken, ^{
-        // TODO: This defines the default name for locally created playlists. At the moment it is localized, but we should
-        //       either:
-        //         - Have the server deliver localized names (e.g. based on a locale specified in request headers) and
-        //           ensure our localizations match.
-        //         - Remove the localization on our side so that the server value (always the same no matter the language)
-        //           always match the value used locally.
         s_names = @{ SRGPlaylistUidWatchLater : SRGUserDataLocalizedString(@"Watch later", @"Default Watch later playlist name") };
     });
     return s_names[uid];

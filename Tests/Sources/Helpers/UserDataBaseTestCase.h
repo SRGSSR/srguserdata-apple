@@ -9,15 +9,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SRGUserData (Tests)
-
-/**
- *  Call to force user data synchronization.
- */
-- (void)synchronize;
-
-@end
-
 /**
  *  The URL of the history service.
  */
@@ -128,12 +119,22 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 /**
  *  Login a test user, perform an initial synchronization and wait until it finishes.
  */
-- (void)loginAndWaitForInitalSynchronization;
+- (void)loginAndWaitForInitialSynchronization;
 
 /**
  *  Logout the current user.
  */
 - (void)logout;
+
+/**
+ *  Synchronize user data.
+ */
+- (void)synchronize;
+
+/**
+ *  Synchronize user data and wait until the process finishes.
+ */
+- (void)synchronizeAndWait;
 
 /**
  *  Remotely all data associated with the user whose session token is provided.
@@ -156,6 +157,11 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
  *  Delete the remote history entry having the specified identifier. Wait until deletion is successful.
  */
 - (void)deleteRemoteHistoryEntryWithUid:(NSString *)uid;
+
+/**
+ *  Perform assertions to ensure that the number of remote history entries matches an expected value.
+ */
+- (void)assertRemoteHistoryEntryCount:(NSUInteger)count;
 
 @end
 
