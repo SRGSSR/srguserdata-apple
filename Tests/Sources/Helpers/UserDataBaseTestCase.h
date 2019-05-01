@@ -139,7 +139,7 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 /**
  *  Remotely all data associated with the user whose session token is provided.
  */
-- (void)eraseData;
+- (void)eraseDataAndWait;
 
 @end
 
@@ -154,12 +154,12 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 - (void)insertRemoteTestHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count;
 
 /**
- *  Delete the remote history entry having the specified identifier. Wait until deletion is successful.
+ *  Delete the remote history entries having the specified identifiers. Wait until deletion is successful.
  */
-- (void)deleteRemoteHistoryEntryWithUid:(NSString *)uid;
+- (void)deleteRemoteHistoryEntriesWithUids:(NSArray<NSString *> *)uids;
 
 /**
- *  Perform assertions to ensure that the number of remote history entries matches an expected value.
+ *  Assert that the number of remote history entries matches an expected value.
  */
 - (void)assertRemoteHistoryEntryCount:(NSUInteger)count;
 
@@ -177,9 +177,14 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 - (void)insertRemoteTestPlaylistsWithName:(NSString *)name count:(NSUInteger)count entryCount:(NSUInteger)entryCount;
 
 /**
- *  Delete the remote playlist having the specified identifier. Wait until deletion is successful.
+ *  Delete the remote playlists having the specified identifiers. Wait until deletion is successful.
  */
-- (void)deleteRemotePlaylistWithUid:(NSString *)uid;
+- (void)deleteRemotePlaylistWithUids:(NSArray<NSString *> *)uids;
+
+/**
+ *  Assert that the number of remote playlists matches an expected value.
+ */
+- (void)assertRemotePlaylistCount:(NSUInteger)count;
 
 @end
 

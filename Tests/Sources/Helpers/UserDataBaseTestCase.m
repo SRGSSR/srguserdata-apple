@@ -226,7 +226,7 @@ NSURL *TestPlaylistsServiceURL(void)
 
 // GDPR special endpoint which erases all user data, returning the account to a pristine state. This endpoin is undocumented
 // but publicly available.
-- (void)eraseData
+- (void)eraseDataAndWait
 {
     XCTAssertNotNil(self.sessionToken);
     
@@ -336,17 +336,22 @@ NSURL *TestPlaylistsServiceURL(void)
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)deleteRemoteHistoryEntryWithUid:(NSString *)uid
+- (void)deleteRemoteHistoryEntriesWithUids:(NSArray<NSString *> *)uids
 {
     XCTAssertNotNil(self.sessionToken);
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Remote history entry deleted"];
     
-    NSDictionary *JSONDictionary = @{ @"item_id" : uid,
+    NSMutableArray<NSDictionary *> *dictionaries = [NSMutableArray array];
+    for (NSString *uid in uids) {
+        NSDictionary *dictionary = @{ @"item_id" : uid,
                                       @"device_id" : @"test suite",
                                       @"deleted" : @YES,
                                       @"date" : @(round(NSDate.date.timeIntervalSince1970 * 1000.)) };
-    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:@[JSONDictionary] toServiceURL:TestHistoryServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        [dictionaries addObject:dictionary];
+    }
+    
+    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:[dictionaries copy] toServiceURL:TestHistoryServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];
@@ -388,9 +393,31 @@ NSURL *TestPlaylistsServiceURL(void)
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)deleteRemotePlaylistWithUid:(NSString *)uid
+- (void)deleteRemotePlaylistWithUids:(NSArray<NSString *> *)uids
 {
+    for (NSString *uid in uids) {
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
+        
+        [[SRGPlaylistsRequest deletePlaylistWithUid:uid fromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [expectation fulfill];
+        }] resume];
+    }
     
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)assertRemotePlaylistCount:(NSUInteger)count
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
+    
+    [[SRGPlaylistsRequest playlistsFromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(playlistDictionaries.count, count);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 @end

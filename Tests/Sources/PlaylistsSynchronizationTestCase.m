@@ -39,72 +39,190 @@
     [self waitForExpectationsWithTimeout:100. handler:NULL];
 }
 
+- (void)assertLocalPlaylistCount:(NSUInteger)count
+{
+    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertEqual(playlists.count, count);
+}
+
 #pragma mark Setup and teardown
 
 - (void)setUp
 {
     [super setUp];
     
-    [self eraseData];
+    [self eraseDataAndWait];
     [self logout];
-    [self setupForOfflineOnly];
 }
 
 #pragma mark Tests
 
-- (void)testSystemPlaylistSynchronization
+- (void)testSystemPlaylistAvailability
 {
-
-}
-
-- (void)testInitialSynchronizationWithExistingRemoteEntries
-{
-
-}
-
-- (void)testSynchronizationWithRemoteEntriesAddedAfterInitialization
-{
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
+        return [notification.userInfo[SRGPlaylistsUidsKey] count] == 1;
+    }];
     
+    [self setupForOfflineOnly];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertEqual(playlists.count, 1);
+    
+    SRGPlaylist *playlist = playlists.firstObject;
+    XCTAssertEqual(playlist.type, SRGPlaylistTypeWatchLater);
+    XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
 }
 
-- (void)testSynchronizationWithExistingLocalEntries
+- (void)testSystemPlaylistAvailabilityAfterLogout
 {
+    // TODO: Not entirely trivial
+#if 0
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalPlaylistCount:1];
+    
+    [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
+    
+    [self logout];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertEqual(playlists.count, 1);
+    
+    SRGPlaylist *playlist = playlists.firstObject;
+    XCTAssertEqual(playlist.type, SRGPlaylistTypeWatchLater);
+    XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
+#endif
+}
 
+- (void)testInitialSynchronizationWithoutRemotePlaylists
+{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalPlaylistCount:1];
+    [self assertRemotePlaylistCount:1];
+}
+
+- (void)testInitialSynchronizationWithExistingRemotePlaylists
+{
+    [self insertRemoteTestPlaylistsWithName:@"a" count:4 entryCount:10];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalPlaylistCount:5];
+    [self assertRemotePlaylistCount:5];
+}
+
+- (void)testSynchronizationWithoutPlaylistChanges
+{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalPlaylistCount:1];
+    [self assertRemotePlaylistCount:1];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalPlaylistCount:1];
+    [self assertRemotePlaylistCount:1];
+}
+
+- (void)testSynchronizationWithAddedRemotePlaylists
+{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self insertRemoteTestPlaylistsWithName:@"a" count:4 entryCount:10];
+    
+    [self assertLocalPlaylistCount:1];
+    [self assertRemotePlaylistCount:5];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalPlaylistCount:5];
+    [self assertRemotePlaylistCount:5];
+}
+
+- (void)testSynchronizationWithAddedLocalPlaylists
+{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self insertLocalTestPlaylistsWithName:@"a" count:3 entryCount:9];
+    
+    [self assertLocalPlaylistCount:4];
+    [self assertRemotePlaylistCount:1];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalPlaylistCount:4];
+    [self assertRemotePlaylistCount:4];
+}
+
+- (void)testSynchronizationWithAddedRemoteAndLocalPlaylists
+{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self insertLocalTestPlaylistsWithName:@"a" count:7 entryCount:8];
+    [self insertRemoteTestPlaylistsWithName:@"b" count:9 entryCount:5];
+    
+    [self assertLocalPlaylistCount:8];
+    [self assertRemotePlaylistCount:10];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalPlaylistCount:17];
+    [self assertRemotePlaylistCount:17];
 }
 
 - (void)testSynchronizationWithDeletedLocalEntries
 {
-
+    [self insertRemoteTestPlaylistsWithName:@"a" count:7 entryCount:10];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalPlaylistCount:8];
+    [self assertRemotePlaylistCount:8];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
+    
+    [self.userData.playlists discardPlaylistsWithUids:@[@"a_1", @"a_3"] completionBlock:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalPlaylistCount:6];
+    [self assertRemotePlaylistCount:6];
 }
 
 - (void)testSynchronizationWithDeletedRemoteEntries
 {
+    [self insertRemoteTestPlaylistsWithName:@"a" count:7 entryCount:10];
     
-}
-
-- (void)testLargePlaylists
-{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
-}
-
-- (void)testSynchronizationAfterLogoutDuringSynchronization
-{
+    [self assertLocalPlaylistCount:8];
+    [self assertRemotePlaylistCount:8];
     
-}
-
-- (void)testSynchronizationWithoutLoggedInUser
-{
+    [self deleteRemotePlaylistWithUids:@[ @"a_2", @"a_3" ]];
     
-}
-
-- (void)testSynchronizationWithUnavailableService
-{
+    [self assertRemotePlaylistCount:6];
     
-}
-
-- (void)testAfterLogout
-{
-    // Check that the default playlists are inserted again
+    [self synchronizeAndWait];
+    
+    [self assertLocalPlaylistCount:6];
+    [self assertRemotePlaylistCount:6];
 }
 
 @end

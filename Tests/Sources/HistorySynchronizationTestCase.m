@@ -50,9 +50,8 @@
 {
     [super setUp];
     
-    [self eraseData];
+    [self eraseDataAndWait];
     [self logout];
-    [self setupForOfflineOnly];
 }
 
 #pragma mark Tests
@@ -77,7 +76,7 @@
     [self assertRemoteHistoryEntryCount:2];
 }
 
-- (void)testSynchronizationWithNoChanges
+- (void)testSynchronizationWithoutEntryChanges
 {
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
@@ -173,8 +172,7 @@
     [self assertLocalHistoryEntryCount:3];
     [self assertRemoteHistoryEntryCount:3];
     
-    [self deleteRemoteHistoryEntryWithUid:@"a_2"];
-    [self deleteRemoteHistoryEntryWithUid:@"a_3"];
+    [self deleteRemoteHistoryEntriesWithUids:@[ @"a_2", @"a_3" ]];
     
     [self assertRemoteHistoryEntryCount:1];
     
@@ -194,8 +192,7 @@
     [self assertLocalHistoryEntryCount:5];
     [self assertRemoteHistoryEntryCount:5];
     
-    [self deleteRemoteHistoryEntryWithUid:@"a_2"];
-    [self deleteRemoteHistoryEntryWithUid:@"a_3"];
+    [self deleteRemoteHistoryEntriesWithUids:@[ @"a_2", @"a_3" ]];
     
     [self assertRemoteHistoryEntryCount:3];
 
