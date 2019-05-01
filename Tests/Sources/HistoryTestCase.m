@@ -51,7 +51,7 @@
 
 #pragma mark Tests
 
-- (void)testEmptyHistoryInitialization
+- (void)testEmptyInitialization
 {
     XCTAssertNotNil(self.userData.history);
     

@@ -195,4 +195,9 @@
     
 }
 
+- (void)testAfterLogout
+{
+    // Check that the default playlists are inserted again
+}
+
 @end

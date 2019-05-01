@@ -307,7 +307,32 @@
     [self waitForExpectationsWithTimeout:100. handler:nil];
 }
 
-// TODO: This is a general sync test and should be moved to another test suite
+- (void)testAfterLogout
+{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitalSynchronization];
+    
+    [self insertLocalTestHistoryEntriesWithName:@"local" count:10];
+    
+    NSArray<SRGHistoryEntry *> *historyEntries1 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertEqual(historyEntries1.count, 10);
+    
+    [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
+    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 10);
+        XCTAssertEqual([notification.userInfo[SRGHistoryChangedUidsKey] count], 10);
+        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 0);
+        return YES;
+    }];
+    
+    [self.identityService logout];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    NSArray<SRGHistoryEntry *> *historyEntries2 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertEqual(historyEntries2.count, 0);
+}
+
 - (void)testSynchronizationAfterLogoutDuringSynchronization
 {
     [self setupForAvailableService];
@@ -328,7 +353,6 @@
     [self loginAndWaitForInitalSynchronization];
 }
 
-// TODO: This is a general sync test and should be moved to another test suite
 - (void)testSynchronizationWithoutLoggedInUser
 {
     [self setupForAvailableService];
@@ -354,7 +378,6 @@
     }];
 }
 
-// TODO: This is a general sync test and should be moved to another test suite
 - (void)testSynchronizationWithUnavailableService
 {
     [self setupForUnavailableService];

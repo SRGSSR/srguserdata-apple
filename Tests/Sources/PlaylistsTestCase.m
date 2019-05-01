@@ -70,6 +70,21 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
+- (void)waitForDefaultPlaylistInsertion
+{
+    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertEqual(playlists.count, 0);
+    
+    // Automatically inserted after initialization
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsPreviousUidsKey], @[]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], @[ SRGPlaylistUidWatchLater ]);
+        return YES;
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
 #pragma mark Setup and tear down
 
 - (void)setUp
@@ -77,20 +92,12 @@
     [super setUp];
     
     [self setupForOfflineOnly];
+    [self waitForDefaultPlaylistInsertion];
 }
 
 #pragma mark Tests
 
-- (void)testEmptyPlaylistInitialization
-{
-    XCTAssertNotNil(self.userData.playlists);
-    
-    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
-    
-    XCTAssertEqual(playlists.count, 1);
-}
-
-- (void)testWatchLaterEntryWithUid
+- (void)testDefaultPlaylists
 {
     SRGPlaylist *playlist = [self.userData.playlists playlistWithUid:SRGPlaylistUidWatchLater];
     
