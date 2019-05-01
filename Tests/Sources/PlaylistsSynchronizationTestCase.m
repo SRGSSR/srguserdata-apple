@@ -225,4 +225,48 @@
     [self assertRemotePlaylistCount:6];
 }
 
+- (void)testSynchronizationWithDeletedRemoteAndLocalEntries
+{
+    [self insertRemoteTestPlaylistsWithName:@"a" count:7 entryCount:10];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalPlaylistCount:8];
+    [self assertRemotePlaylistCount:8];
+    
+    [self deleteRemotePlaylistWithUids:@[ @"a_2", @"a_3" ]];
+    
+    [self assertRemotePlaylistCount:6];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
+    
+    [self.userData.playlists discardPlaylistsWithUids:@[@"a_1", @"a_4"] completionBlock:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalPlaylistCount:4];
+    [self assertRemotePlaylistCount:4];
+}
+
+- (void)testLargePlaylists
+{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self insertLocalTestPlaylistsWithName:@"b" count:80 entryCount:100];
+    [self insertRemoteTestPlaylistsWithName:@"a" count:120 entryCount:100];
+    
+    [self assertLocalPlaylistCount:81];
+    [self assertRemotePlaylistCount:121];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalPlaylistCount:201];
+    [self assertRemotePlaylistCount:201];
+}
+
 @end

@@ -308,7 +308,7 @@ NSURL *TestPlaylistsServiceURL(void)
     
     [self.userData synchronize];
     
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self waitForExpectationsWithTimeout:100. handler:nil];
 }
 
 #pragma mark History remote data management
@@ -390,7 +390,7 @@ NSURL *TestPlaylistsServiceURL(void)
         }] resume];
     }
     
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self waitForExpectationsWithTimeout:100. handler:nil];
 }
 
 - (void)deleteRemotePlaylistWithUids:(NSArray<NSString *> *)uids

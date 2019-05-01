@@ -214,8 +214,11 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:1000];
-    [self insertLocalHistoryEntriesWithName:@"local" count:2000];
+    [self insertRemoteTestHistoryEntriesWithName:@"a" count:1000];
+    [self insertLocalHistoryEntriesWithName:@"b" count:2000];
+    
+    [self assertRemoteHistoryEntryCount:1000];
+    [self assertLocalHistoryEntryCount:2000];
     
     [self synchronizeAndWait];
     
@@ -228,7 +231,7 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertLocalHistoryEntriesWithName:@"local" count:10];
+    [self insertLocalHistoryEntriesWithName:@"a" count:10];
     
     [self assertLocalHistoryEntryCount:10];
     
@@ -249,8 +252,8 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
-    [self insertLocalHistoryEntriesWithName:@"local" count:3];
+    [self insertRemoteTestHistoryEntriesWithName:@"a" count:2];
+    [self insertLocalHistoryEntriesWithName:@"b" count:3];
     
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
     [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:nil];
