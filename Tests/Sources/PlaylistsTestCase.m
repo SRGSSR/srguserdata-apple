@@ -34,7 +34,7 @@
     for (NSString *name in names) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
         
-        [self.userData.playlists addPlaylistWithName:name completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        [self.userData.playlists savePlaylistWithName:name uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
             XCTAssertNil(error);
             XCTAssertNotNil(uid);
             [expectation fulfill];
@@ -122,7 +122,7 @@
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
     
-    [self.userData.playlists addPlaylistWithName:name completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+    [self.userData.playlists savePlaylistWithName:name uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertNotNil(uid);
         addedUid = uid;
@@ -152,7 +152,7 @@
     for (NSString *name in names) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
         
-        [self.userData.playlists addPlaylistWithName:name completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        [self.userData.playlists savePlaylistWithName:name uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
             XCTAssertNil(error);
             XCTAssertNotNil(uid);
             [expectation fulfill];
@@ -193,7 +193,7 @@
     for (NSUInteger i = 0; i < numberOfAdditions; i++) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
         
-        [self.userData.playlists addPlaylistWithName:name completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        [self.userData.playlists savePlaylistWithName:name uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
             XCTAssertNil(error);
             XCTAssertNotNil(uid);
             [expectation fulfill];
@@ -225,7 +225,7 @@
     NSString *updatedName = @"Playlist 4321";
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist updated"];
     
-    [self.userData.playlists updatePlaylistWithUid:uid name:updatedName completionBlock:^(NSError * _Nullable error) {
+    [self.userData.playlists savePlaylistWithName:updatedName uid:uid completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
@@ -245,7 +245,7 @@
     NSString *updatedName = @"Playlist WL";
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist updated"];
     
-    [self.userData.playlists updatePlaylistWithUid:SRGPlaylistUidWatchLater name:updatedName completionBlock:^(NSError * _Nullable error) {
+    [self.userData.playlists savePlaylistWithName:updatedName uid:SRGPlaylistUidWatchLater completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];

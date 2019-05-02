@@ -31,7 +31,7 @@
         XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
         
         NSString *playlistName = [NSString stringWithFormat:@"%@_%@", name, @(i + 1)];
-        [self.userData.playlists addPlaylistWithName:playlistName completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        [self.userData.playlists savePlaylistWithName:playlistName uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
             [expectation fulfill];
         }];
     }

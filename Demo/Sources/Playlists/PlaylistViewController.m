@@ -38,13 +38,6 @@
     return [storyboard instantiateInitialViewController];
 }
 
-#pragma mark Getters and setters
-
-- (NSString *)title
-{
-    return self.playlist.name;
-}
-
 #pragma mark View lifecycle
 
 - (void)viewDidLoad
@@ -67,6 +60,8 @@
                                                                                                target:self
                                                                                                action:@selector(updatePlaylist:)];
     }
+    
+    [self reloadData];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -110,6 +105,12 @@
         [request resume];
         self.request = request;
     }];
+}
+
+- (void)reloadData
+{
+    NSString *title = self.playlist.name;
+    self.title = title;
 }
 
 #pragma mark UITableViewDataSource protocol
@@ -184,14 +185,12 @@
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Update", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         NSString *name = [alertController.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
         if (name.length > 0) {
-            [SRGUserData.currentUserData.playlists updatePlaylistWithUid:self.playlist.uid name:name completionBlock:^(NSError * _Nullable error) {
-                if (! error) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        self.playlist = [SRGUserData.currentUserData.playlists playlistWithUid:self.playlist.uid];
-                        self.navigationItem.title = self.playlist.name;
-                        [self refresh];
-                    });
-                }
+            [SRGUserData.currentUserData.playlists savePlaylistWithName:name uid:self.playlist.uid completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (! error) {
+                        [self reloadData];
+                    }
+                });
             }];
         }
     }]];

@@ -41,7 +41,9 @@ static SRGPlaylistType SRGPlaylistTypeForPlaylistWithUid(NSString *uid)
     dispatch_once(&s_onceToken, ^{
         s_types = @{ SRGPlaylistUidWatchLater : @(SRGPlaylistTypeWatchLater) };
     });
-    return [s_types[uid] integerValue];
+    
+    NSNumber *typeNumber = s_types[uid];
+    return typeNumber ? typeNumber.integerValue : SRGPlaylistTypeStandard;
 }
 
 SRGPlaylistUid const SRGPlaylistUidWatchLater = @"watch_later";
@@ -69,6 +71,13 @@ NSString * const SRGPlaylistEntryUidsSubKey = @"SRGPlaylistEntryUids";
 
 @implementation SRGPlaylists
 
+#pragma mark Class methods
+
++ (NSArray<NSString *> *)defaultPlaylistUids
+{
+    return @[ SRGPlaylistUidWatchLater ];
+}
+
 #pragma mark Object lifecycle
 
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
@@ -87,9 +96,9 @@ NSString * const SRGPlaylistEntryUidsSubKey = @"SRGPlaylistEntryUids";
 // TODO: Move as service subclassing hook
 - (void)insertDefaultData
 {
-    NSArray<NSString *> *defaultPlaylistUids = @[ SRGPlaylistUidWatchLater ];
+    NSArray<NSString *> *defaultPlaylistUids = [SRGPlaylists defaultPlaylistUids];
     for (NSString *uid in defaultPlaylistUids) {
-        [self addPlaylistWithName:SRGPlaylistNameForPlaylistWithUid(uid) uid:uid type:SRGPlaylistTypeForPlaylistWithUid(uid) completionBlock:nil];
+        [self savePlaylistWithName:@"" /* overridden */ uid:uid completionBlock:nil];
     }
 }
 
@@ -544,15 +553,22 @@ NSString * const SRGPlaylistEntryUidsSubKey = @"SRGPlaylistEntryUids";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
-- (NSString *)addPlaylistWithName:(NSString *)name completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
+- (NSString *)savePlaylistWithName:(NSString *)name uid:(NSString *)uid completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
 {
-    return [self addPlaylistWithName:name uid:NSUUID.UUID.UUIDString type:SRGPlaylistTypeStandard completionBlock:completionBlock];
+    SRGPlaylistType type = SRGPlaylistTypeForPlaylistWithUid(uid);
+    if (type != SRGPlaylistTypeStandard) {
+        name = SRGPlaylistNameForPlaylistWithUid(uid);
+    }
+    return [self savePlaylistWithName:name uid:uid type:type completionBlock:completionBlock];
 }
 
-- (NSString *)addPlaylistWithName:(NSString *)name uid:(NSString *)uid type:(SRGPlaylistType)type completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
+- (NSString *)savePlaylistWithName:(NSString *)name uid:(NSString *)uid type:(SRGPlaylistType)type completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
 {
     NSParameterAssert(name);
-    NSParameterAssert(uid);
+    
+    if (! uid) {
+        uid = NSUUID.UUID.UUIDString;
+    }
     
     __block NSArray<NSString *> *previousUids = nil;
     
@@ -577,43 +593,6 @@ NSString * const SRGPlaylistEntryUidsSubKey = @"SRGPlaylistEntryUids";
             });
         }
         completionBlock ? completionBlock(uid, error) : nil;
-    }];
-}
-
-- (NSString *)updatePlaylistWithUid:(NSString *)uid name:(NSString *)name completionBlock:(void (^)(NSError * _Nullable))completionBlock
-{
-    __block NSArray<NSString *> *uids = nil;
-    
-    return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGPlaylist *playlist = [SRGPlaylist objectWithUid:uid inManagedObjectContext:managedObjectContext];
-        if (! playlist) {
-            return;
-        }
-        
-        NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        uids = [previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]];
-        
-        if (playlist.synchronizable) {
-            playlist.name = name;
-            playlist.dirty = YES;
-        }
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (! error && ! uids) {
-            error = [NSError errorWithDomain:SRGUserDataErrorDomain
-                                        code:SRGUserDataErrorNotFound
-                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when updating an unknown playlist.") }];
-        }
-        
-        if (! error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
-                                                                  object:self
-                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : @[uid],
-                                                                            SRGPlaylistsPreviousUidsKey : uids,
-                                                                            SRGPlaylistsUidsKey : uids }];
-            });
-        }
-        completionBlock ? completionBlock(error) : nil;
     }];
 }
 
