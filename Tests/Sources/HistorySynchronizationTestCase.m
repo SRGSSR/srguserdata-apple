@@ -295,7 +295,7 @@
 - (void)testSynchronizationWithUnavailableService
 {
     [self setupForUnavailableService];
-    [self login];
+    [self loginAndWaitForInitialSynchronization];
     
     [self expectationForSingleNotification:SRGUserDataDidStartSynchronizationNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);

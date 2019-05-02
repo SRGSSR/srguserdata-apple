@@ -269,4 +269,81 @@
     [self assertRemotePlaylistCount:201];
 }
 
+- (void)testAfterLogout
+{
+    // TODO: Fix -testSystemPlaylistAvailabilityAfterLogout first
+#if 0
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self insertLocalTestPlaylistsWithName:@"b" count:10 entryCount:9];
+    
+    [self assertLocalPlaylistCount:11];
+    
+    [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        return [notification.userInfo[SRGHistoryUidsKey] count] == 1;
+    }];
+    
+    [self.identityService logout];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self assertLocalPlaylistCount:1];
+#endif
+}
+
+- (void)testSynchronizationAfterLogoutDuringSynchronization
+{
+    XCTFail(@"Implement");
+}
+
+- (void)testSynchronizationWithoutLoggedInUser
+{
+    [self setupForAvailableService];
+    
+    id startObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGUserDataDidStartSynchronizationNotification object:self.userData queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No start notification is expected");
+    }];
+    id finishObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGUserDataDidFinishSynchronizationNotification object:self.userData queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No finish notification is expected");
+    }];
+    
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqual([notification.userInfo[SRGPlaylistsUidsKey] count], 1);
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:startObserver];
+        [NSNotificationCenter.defaultCenter removeObserver:finishObserver];
+    }];
+}
+
+- (void)testSynchronizationWithUnavailableService
+{
+    [self setupForUnavailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self expectationForSingleNotification:SRGUserDataDidStartSynchronizationNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
+    }];
+    [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
+    }];
+    
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqual([notification.userInfo[SRGPlaylistsUidsKey] count], 1);
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
 @end

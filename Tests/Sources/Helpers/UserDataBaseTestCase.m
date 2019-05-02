@@ -378,15 +378,26 @@ NSURL *TestPlaylistsServiceURL(void)
 {
     XCTAssertNotNil(self.sessionToken);
     
-    // FIXME: Insert entries (attention: dates!)
     for (NSUInteger i = 0; i < count; ++i) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Remote playlist creation finished"];
         
-        NSDictionary *JSONDictionary = @{ @"businessId" : [NSString stringWithFormat:@"%@_%@", name, @(i + 1)],
-                                          @"name" : [NSString stringWithFormat:@"%@ %@", name, @(i + 1)] };
-        [[SRGPlaylistsRequest postPlaylistDictionary:JSONDictionary toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        NSDictionary *playlistDictionary = @{ @"businessId" : [NSString stringWithFormat:@"%@_%@", name, @(i + 1)],
+                                              @"name" : [NSString stringWithFormat:@"%@ %@", name, @(i + 1)] };
+        [[SRGPlaylistsRequest postPlaylistDictionary:playlistDictionary toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
             XCTAssertNil(error);
-            [expectation fulfill];
+            
+            NSMutableArray<NSDictionary *> *playlistEntryDictionaries = [NSMutableArray array];
+            for (NSUInteger j = 0; i < entryCount; ++j) {
+                NSDictionary *playlistEntryDictionary = @{ @"itemId" : [NSString stringWithFormat:@"%@_%@_%@", name, @(i + 1), @(j + 1)],
+                                                           @"date" : @(round(NSDate.date.timeIntervalSince1970 * 1000.)) };
+                [playlistEntryDictionaries addObject:playlistEntryDictionary];
+            }
+            
+            NSString *uid = playlistDictionary[@"businessId"];
+            [[SRGPlaylistsRequest putPlaylistEntryDictionaries:[playlistEntryDictionaries copy] forPlaylistWithUid:uid toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                XCTAssertNil(error);
+                [expectation fulfill];
+            }] resume];
         }] resume];
     }
     
