@@ -24,9 +24,8 @@
 
 NSString * const SRGHistoryDidChangeNotification = @"SRGHistoryDidChangeNotification";
 
-NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
-NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
 NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
+NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
 
 @interface SRGHistory ()
 
@@ -59,7 +58,7 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
         return;
     }
     
-    NSMutableArray<NSString *> *changedUids = [NSMutableArray array];
+    __block BOOL uidsChanged = NO;
     
     __block NSArray<NSString *> *previousUids = nil;
     __block NSArray<NSString *> *currentUids = nil;
@@ -72,7 +71,7 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
         for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
             SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
             if (historyEntry) {
-                [changedUids addObject:historyEntry.uid];
+                uidsChanged = YES;
                 
                 if (historyEntry.inserted) {
                     [uids addObject:historyEntry.uid];
@@ -84,13 +83,15 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
         }
         currentUids = [uids copy];
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-        if (! error && changedUids.count > 0) {
+        if (! error && uidsChanged) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                NSMutableDictionary<NSString *, NSArray<NSString *> *> *userInfo = @{ SRGHistoryUidsKey : currentUids }.mutableCopy;
+                if (currentUids.count != previousUids.count) {
+                    userInfo[SRGHistoryPreviousUidsKey] = previousUids;
+                }
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : [changedUids copy],
-                                                                            SRGHistoryPreviousUidsKey : previousUids,
-                                                                            SRGHistoryUidsKey : currentUids }];
+                                                                userInfo:userInfo.copy];
             });
         }
         completionBlock(error);
@@ -259,9 +260,8 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
             if (previousUids.count > 0) {
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : previousUids,
-                                                                            SRGHistoryPreviousUidsKey : previousUids,
-                                                                            SRGHistoryUidsKey : @[] }];
+                                                                userInfo:@{ SRGHistoryUidsKey : @[],
+                                                                            SRGHistoryPreviousUidsKey : previousUids }];
             }
         });
     }];
@@ -318,11 +318,13 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                NSMutableDictionary<NSString *, NSArray<NSString *> *> *userInfo = @{ SRGHistoryUidsKey : currentUids }.mutableCopy;
+                if (currentUids.count != previousUids.count) {
+                    userInfo[SRGHistoryPreviousUidsKey] = previousUids;
+                }
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : @[uid],
-                                                                            SRGHistoryPreviousUidsKey : previousUids,
-                                                                            SRGHistoryUidsKey : currentUids }];
+                                                                userInfo:userInfo.copy];
             });
         }
         completionBlock ? completionBlock(error) : nil;
@@ -346,11 +348,13 @@ NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                NSMutableDictionary<NSString *, NSArray<NSString *> *> *userInfo = @{ SRGHistoryUidsKey : currentUids }.mutableCopy;
+                if (currentUids.count != previousUids.count) {
+                    userInfo[SRGHistoryPreviousUidsKey] = previousUids;
+                }
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : changedUids,
-                                                                            SRGHistoryPreviousUidsKey : previousUids,
-                                                                            SRGHistoryUidsKey : currentUids }];
+                                                                userInfo:userInfo.copy];
             });
         }
         completionBlock ? completionBlock(error) : nil;

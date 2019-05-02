@@ -16,14 +16,19 @@
 
 #pragma mark Helpers
 
-- (void)saveUids:(NSArray<NSString *> *)uids
+- (void)addUids:(NSArray<NSString *> *)uids
 {
     NSMutableArray<NSString *> *expectedSavedNotifications = uids.mutableCopy;
     
     [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
-        [expectedSavedNotifications removeObjectsInArray:uids];
+        XCTAssertNotNil(notification.userInfo[SRGHistoryUidsKey]);
+        if (notification.userInfo[SRGHistoryPreviousUidsKey]) {
+            NSMutableArray<NSString *> *uids = [notification.userInfo[SRGHistoryUidsKey] mutableCopy];
+            NSArray<NSString *> *previousUids = notification.userInfo[SRGHistoryPreviousUidsKey];
+            [uids removeObjectsInArray:previousUids];
+            [expectedSavedNotifications removeObjectsInArray:uids];
+        }
         return (expectedSavedNotifications.count == 0);
     }];
     
@@ -69,9 +74,8 @@
     
     [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects(notification.userInfo[SRGHistoryChangedUidsKey], @[uid]);
-        XCTAssertEqualObjects(notification.userInfo[SRGHistoryPreviousUidsKey], @[]);
         XCTAssertEqualObjects(notification.userInfo[SRGHistoryUidsKey], @[uid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryPreviousUidsKey], @[]);
         return YES;
     }];
     
@@ -94,8 +98,13 @@
     
     [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
-        [expectedSavedNotifications removeObjectsInArray:uids];
+        XCTAssertNotNil(notification.userInfo[SRGHistoryUidsKey]);
+        if (notification.userInfo[SRGHistoryPreviousUidsKey]) {
+            NSMutableArray<NSString *> *uids = [notification.userInfo[SRGHistoryUidsKey] mutableCopy];
+            NSArray<NSString *> *previousUids = notification.userInfo[SRGHistoryPreviousUidsKey];
+            [uids removeObjectsInArray:previousUids];
+            [expectedSavedNotifications removeObjectsInArray:uids];
+        }
         return (expectedSavedNotifications.count == 0);
     }];
     
@@ -132,8 +141,14 @@
     
     [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryChangedUidsKey];
-        expectedSavedNotifications -= uids.count;
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryUidsKey], @[uid]);
+        if (expectedSavedNotifications == numberOfSaves) {
+            XCTAssertEqualObjects(notification.userInfo[SRGHistoryPreviousUidsKey], @[]);
+        }
+        else {
+            XCTAssertNil(notification.userInfo[SRGHistoryPreviousUidsKey]);
+        }
+        expectedSavedNotifications -= 1;
         return (expectedSavedNotifications == 0);
     }];
     
@@ -234,7 +249,7 @@
     XCTAssertEqual(historyEntries1.count, 0);
     
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    [self saveUids:uids];
+    [self addUids:uids];
     
     NSArray<SRGHistoryEntry *> *historyEntries2 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
     
@@ -258,7 +273,7 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    [self saveUids:uids];
+    [self addUids:uids];
     
     XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entries fetched"];
     
@@ -277,7 +292,7 @@
 - (void)testHistoryEntriesMatchingPredicatesOrSortDescriptors
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    [self saveUids:uids];
+    [self addUids:uids];
     
     NSSortDescriptor *sortDescriptor1 = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:YES];
     NSArray<SRGHistoryEntry *> *historyEntries1 = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor1]];
@@ -340,7 +355,7 @@
 - (void)testHistoryEntriesMatchingPredicatesOrSortDescriptorsAsynchronously
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    [self saveUids:uids];
+    [self addUids:uids];
     
     XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entries fetched"];
     
@@ -445,16 +460,15 @@
 - (void)testDiscardHistoryEntries
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    [self saveUids:uids];
+    [self addUids:uids];
     
     NSArray<NSString *> *discardedUids = @[@"12", @"90"];
     NSArray<NSString *> *remainingUids = @[@"34", @"56", @"78"];
     
     [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryChangedUidsKey]], [NSSet setWithArray:discardedUids]);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryPreviousUidsKey]], [NSSet setWithArray:uids]);
         XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryUidsKey]], [NSSet setWithArray:remainingUids]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryPreviousUidsKey]], [NSSet setWithArray:uids]);
         return YES;
     }];
     
@@ -485,13 +499,12 @@
 - (void)testDiscardAllHistoryEntries
 {
     NSArray<NSString *> *uids = @[@"12", @"34", @"56", @"78", @"90"];
-    [self saveUids:uids];
+    [self addUids:uids];
     
     [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryChangedUidsKey]], [NSSet setWithArray:uids]);
-        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryPreviousUidsKey]], [NSSet setWithArray:uids]);
         XCTAssertEqualObjects(notification.userInfo[SRGHistoryUidsKey], @[]);
+        XCTAssertEqualObjects([NSSet setWithArray:notification.userInfo[SRGHistoryPreviousUidsKey]], [NSSet setWithArray:uids]);
         return YES;
     }];
     

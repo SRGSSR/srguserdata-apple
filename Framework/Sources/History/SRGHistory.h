@@ -15,9 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 OBJC_EXPORT NSString * const SRGHistoryDidChangeNotification;                    // Notification name.
 
-OBJC_EXPORT NSString * const SRGHistoryChangedUidsKey;                           // Key to access the list of uids which have changed as an `NSArray` of `NSString` objects.
-OBJC_EXPORT NSString * const SRGHistoryPreviousUidsKey;                          // Key to access the previous uid list as an `NSArray` of `NSString` objects.
 OBJC_EXPORT NSString * const SRGHistoryUidsKey;                                  // Key to access the current uid list as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGHistoryPreviousUidsKey;                          // Optional key to access the previous uid list as an `NSArray` of `NSString` objects, if the list changed.
 
 /**
  *  Manages a local cache for history entries. History entries are characterized by an identifier and an associated
