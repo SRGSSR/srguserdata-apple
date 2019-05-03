@@ -123,7 +123,7 @@ OBJC_EXPORT NSString * const SRGPlaylistEntryUidsSubKey;                        
  *
  *  @discussion This method can only be called from the main thread. Reads on other threads must occur asynchronously
  *              with `-entriesFromPlaylistWithUid:matchingPredicate:sortedWithDescriptors:completionBlock:`.
- *              This method returns `nil` if the playlist identifier does not exist.
+ *              This method returns `nil` if no playlist exists for the specified identifier.
  */
 - (nullable NSArray<SRGPlaylistEntry *> *)entriesFromPlaylistWithUid:(NSString *)playlistUid
                                           matchingPredicate:(nullable NSPredicate *)predicate
@@ -138,7 +138,7 @@ OBJC_EXPORT NSString * const SRGPlaylistEntryUidsSubKey;                        
  *                     will be called with an error.
  *
  *  @discussion The completion block is called on a background thread. You can only use the returned object on this
- *              thread. This method returns `nil` if the playlist identifier does not exist.
+ *              thread. This method returns `nil` if no playlist exists for the specified identifier.
  */
 - (NSString *)entriesFromPlaylistWithUid:(NSString *)playlistUid
                        matchingPredicate:(nullable NSPredicate *)predicate

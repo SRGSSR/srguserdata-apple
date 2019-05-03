@@ -420,11 +420,24 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)assertRemotePlaylistCount:(NSUInteger)count
 {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
     [[SRGPlaylistsRequest playlistsFromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertEqual(playlistDictionaries.count, count);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)assertRemoteEntryCount:(NSUInteger)count forPlaylistWithUid:(NSString *)playlistUid
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
+    
+    [[SRGPlaylistsRequest entriesForPlaylistWithUid:playlistUid fromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual(playlistEntryDictionaries.count, count);
         [expectation fulfill];
     }] resume];
     

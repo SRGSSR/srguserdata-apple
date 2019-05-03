@@ -186,6 +186,11 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
  */
 - (void)assertRemotePlaylistCount:(NSUInteger)count;
 
+/**
+ *  Assert that the number of remote entries for a playlist matches and expected value.
+ */
+- (void)assertRemoteEntryCount:(NSUInteger)count forPlaylistWithUid:(NSString *)playlistUid;
+
 @end
 
 NS_ASSUME_NONNULL_END

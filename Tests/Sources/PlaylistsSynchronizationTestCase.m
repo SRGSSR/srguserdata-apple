@@ -45,6 +45,13 @@
     XCTAssertEqual(playlists.count, count);
 }
 
+- (void)assertLocalEntryCount:(NSUInteger)count forPlaylistWithUid:(NSString *)playlistUid
+{
+    NSArray<SRGPlaylistEntry *> *entries = [self.userData.playlists entriesFromPlaylistWithUid:playlistUid matchingPredicate:nil sortedWithDescriptors:nil];
+    XCTAssertNotNil(entries);
+    XCTAssertEqual(entries.count, count);
+}
+
 #pragma mark Setup and teardown
 
 - (void)setUp
@@ -182,7 +189,7 @@
     [self assertRemotePlaylistCount:17];
 }
 
-- (void)testSynchronizationWithDeletedLocalEntries
+- (void)testSynchronizationWithDeletedLocalPlaylists
 {
     [self insertRemoteTestPlaylistsWithName:@"a" count:7 entryCount:10];
     
@@ -205,7 +212,7 @@
     [self assertRemotePlaylistCount:6];
 }
 
-- (void)testSynchronizationWithDeletedRemoteEntries
+- (void)testSynchronizationWithDeletedRemotePlaylists
 {
     [self insertRemoteTestPlaylistsWithName:@"a" count:7 entryCount:10];
     
@@ -225,7 +232,7 @@
     [self assertRemotePlaylistCount:6];
 }
 
-- (void)testSynchronizationWithDeletedRemoteAndLocalEntries
+- (void)testSynchronizationWithDeletedRemoteAndLocalPlaylists
 {
     [self insertRemoteTestPlaylistsWithName:@"a" count:7 entryCount:10];
     
@@ -250,6 +257,50 @@
     
     [self assertLocalPlaylistCount:4];
     [self assertRemotePlaylistCount:4];
+}
+
+- (void)testPlaylistSynchronizationWithoutEntryChanges
+{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalEntryCount:0 forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryCount:0 forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalEntryCount:0 forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryCount:0 forPlaylistWithUid:SRGPlaylistUidWatchLater];
+}
+
+- (void)testPlaylistSynchronizationWithAddedRemoteEntries
+{
+    
+}
+
+- (void)testPlaylistSynchronizationWithAddedLocalEntries
+{
+    
+}
+
+- (void)testPlaylistSynchronizationWithAddedRemoteAndLocalEntries
+{
+    
+}
+
+- (void)testPlaylistSynchronizationWithDeletedRemoteEntries
+{
+    
+}
+
+- (void)testPlaylistSynchronizationWithDeletedLocalEntries
+{
+    
+}
+
+- (void)testPlaylistSynchronizationWithDeletedRemoteAndLocalEntries
+{
+    
 }
 
 - (void)testLargePlaylists
