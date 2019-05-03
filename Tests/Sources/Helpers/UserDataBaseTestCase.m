@@ -27,7 +27,7 @@
 
 static NSURL *TestServiceURL(void)
 {
-    return [NSURL URLWithString:@"https://stage-profil.rts.ch/api"];
+    return [NSURL URLWithString:@"https://profil.rts.ch/api"];
 }
 
 static NSURL *TestWebserviceURL(void)

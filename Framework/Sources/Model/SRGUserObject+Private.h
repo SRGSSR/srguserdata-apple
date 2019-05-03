@@ -33,12 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  Synchronize the receiver with the information from the provided dictionary. The entry might be created, updated
- *  or deleted automatically, in which case it is returned by the method. If the dictionary data is invalid, the method
- *  returns `nil`.
+ *  or deleted automatically, in which case it is returned by the method.
  *
  *  @discussion To persist changes, the Core Data managed object context needs to be saved.
  */
-+ (nullable __kindof SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (__kindof SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Return the list of dictionaries which would need to be saved in order to replace a list of objects with a list of

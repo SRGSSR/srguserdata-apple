@@ -123,6 +123,8 @@
 		6F8A93FE20FDCAA800AA6434 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8A93F620FDCAA800AA6434 /* AppDelegate.m */; };
 		6F8A940320FDD01B00AA6434 /* SRGUserData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; };
 		6F8A940420FDD01B00AA6434 /* SRGUserData.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F938024227C0CE600315A83 /* NSSet+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F938022227C0CE600315A83 /* NSSet+SRGUserData.h */; };
+		6F938025227C0CE600315A83 /* NSSet+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F938023227C0CE600315A83 /* NSSet+SRGUserData.m */; };
 		6F9E50772272DF8900CB7F56 /* SRGUserDataError+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F9E50762272DF8800CB7F56 /* SRGUserDataError+Private.h */; };
 		6FA1D10D220C7A21003976D9 /* SRGUserObject+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */; };
 		6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */; };
@@ -365,6 +367,8 @@
 		6F8A93F520FDCAA800AA6434 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6F8A93F620FDCAA800AA6434 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		6F8A93FA20FDCAA800AA6434 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6F938022227C0CE600315A83 /* NSSet+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSSet+SRGUserData.h"; sourceTree = "<group>"; };
+		6F938023227C0CE600315A83 /* NSSet+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSSet+SRGUserData.m"; sourceTree = "<group>"; };
 		6F9E50762272DF8800CB7F56 /* SRGUserDataError+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataError+Private.h"; sourceTree = "<group>"; };
 		6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserObject+Subclassing.h"; sourceTree = "<group>"; };
 		6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataService+Subclassing.h"; sourceTree = "<group>"; };
@@ -626,6 +630,8 @@
 				6FC44DE5227349CC0022DC99 /* NSArray+SRGUserData.m */,
 				6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */,
 				6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */,
+				6F938022227C0CE600315A83 /* NSSet+SRGUserData.h */,
+				6F938023227C0CE600315A83 /* NSSet+SRGUserData.m */,
 				6F0178CA2208192B00B4BCD9 /* NSTimer+SRGUserData.h */,
 				6F0178C92208192B00B4BCD9 /* NSTimer+SRGUserData.m */,
 			);
@@ -858,6 +864,7 @@
 				6F0178CC2208192B00B4BCD9 /* NSTimer+SRGUserData.h in Headers */,
 				6FFB34812209B0DC00E76E6D /* SRGUserObject.h in Headers */,
 				08280F1C2259406C00AC978D /* SRGPlaylists+Private.h in Headers */,
+				6F938024227C0CE600315A83 /* NSSet+SRGUserData.h in Headers */,
 				6F0EB54020FC7FA9009C02CF /* SRGUserData.h in Headers */,
 				08280F0D2258DEBD00AC978D /* SRGPlaylists.h in Headers */,
 				6FA1D10D220C7A21003976D9 /* SRGUserObject+Subclassing.h in Headers */,
@@ -1106,6 +1113,7 @@
 				6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */,
 				6FC44DE7227349CC0022DC99 /* NSArray+SRGUserData.m in Sources */,
 				6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */,
+				6F938025227C0CE600315A83 /* NSSet+SRGUserData.m in Sources */,
 				08C991A92254B97E003E7816 /* SRGPlaylistEntry.m in Sources */,
 				08280F0C2258DEBD00AC978D /* SRGPlaylists.m in Sources */,
 				6F0178B222080FEC00B4BCD9 /* SRGHistoryEntry.m in Sources */,
