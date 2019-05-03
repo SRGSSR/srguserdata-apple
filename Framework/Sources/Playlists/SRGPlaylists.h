@@ -103,7 +103,7 @@ OBJC_EXPORT NSString * const SRGPlaylistEntryUidsSubKey;                        
  */
 - (NSString *)savePlaylistWithName:(NSString *)name
                                uid:(nullable NSString *)uid
-                  completionBlock:(nullable void (^)(NSString * _Nullable uid, NSError * _Nullable error))completionBlock;
+                   completionBlock:(nullable void (^)(NSString * _Nullable uid, NSError * _Nullable error))completionBlock;
 
 /**
  *  Asynchronously discard playlists matching an identifier in the list, calling the provided block on completion. If no
@@ -122,12 +122,12 @@ OBJC_EXPORT NSString * const SRGPlaylistEntryUidsSubKey;                        
  *  descriptors. If no sort descriptors are provided, entries are still returned in a stable order.
  *
  *  @discussion This method can only be called from the main thread. Reads on other threads must occur asynchronously
- *              with `-entriesFromPlaylistWithUid:matchingPredicate:sortedWithDescriptors:completionBlock:`.
+ *              with `-entriesInPlaylistWithUid:matchingPredicate:sortedWithDescriptors:completionBlock:`.
  *              This method returns `nil` if no playlist exists for the specified identifier.
  */
-- (nullable NSArray<SRGPlaylistEntry *> *)entriesFromPlaylistWithUid:(NSString *)playlistUid
-                                          matchingPredicate:(nullable NSPredicate *)predicate
-                                      sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
+- (nullable NSArray<SRGPlaylistEntry *> *)entriesInPlaylistWithUid:(NSString *)playlistUid
+                                                 matchingPredicate:(nullable NSPredicate *)predicate
+                                             sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
 
 /**
  *  Return playlist entries for a given playlist identifier, optionally matching a specific predicate and / or sorted
@@ -140,10 +140,10 @@ OBJC_EXPORT NSString * const SRGPlaylistEntryUidsSubKey;                        
  *  @discussion The completion block is called on a background thread. You can only use the returned object on this
  *              thread. This method returns `nil` if no playlist exists for the specified identifier.
  */
-- (NSString *)entriesFromPlaylistWithUid:(NSString *)playlistUid
-                       matchingPredicate:(nullable NSPredicate *)predicate
-                   sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
-                         completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error))completionBlock;
+- (NSString *)entriesInPlaylistWithUid:(NSString *)playlistUid
+                     matchingPredicate:(nullable NSPredicate *)predicate
+                 sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
+                       completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error))completionBlock;
 
 /**
  *  Asynchronously add a playlist entry with a given identifier to the specified playlist, calling the provided block on
@@ -156,10 +156,9 @@ OBJC_EXPORT NSString * const SRGPlaylistEntryUidsSubKey;                        
  *              update its date but does not duplicate it. This method returns an error and adds nothing if the playlist
  *              does not exist.
  */
-// TODO: No duplicates => rename as saveEntryWithUid:inPlaylist...
-- (NSString *)addEntryWithUid:(NSString *)uid
-            toPlaylistWithUid:(NSString *)playlistUid
-              completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
+- (NSString *)saveEntryWithUid:(NSString *)uid
+             inPlaylistWithUid:(NSString *)playlistUid
+               completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
  *  Asynchronously remove playlist entries matching an identifier in the list, calling the provided block on completion.
@@ -171,9 +170,9 @@ OBJC_EXPORT NSString * const SRGPlaylistEntryUidsSubKey;                        
  *  @discussion The completion block is called on a background thread. This method removes nothing and returns an error
  *              if the playlist does not exist.
  */
-- (NSString *)removeEntriesWithUids:(nullable NSArray<NSString *> *)uids
-                fromPlaylistWithUid:(NSString *)playlistUid
-                    completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
+- (NSString *)discardEntriesWithUids:(nullable NSArray<NSString *> *)uids
+                 fromPlaylistWithUid:(NSString *)playlistUid
+                     completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
  *  Cancel the task having the specified handle.

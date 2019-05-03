@@ -80,10 +80,10 @@ OBJC_EXPORT NSString * const SRGHistoryPreviousUidsKey;                         
  *
  *  @discussion The completion block is called on a background thread.
  */
-- (NSString *)saveHistoryEntryForUid:(NSString *)uid
-                withLastPlaybackTime:(CMTime)lastPlaybackTime
-                           deviceUid:(nullable NSString *)deviceUid
-                     completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
+- (NSString *)saveHistoryEntryWithUid:(NSString *)uid
+                     lastPlaybackTime:(CMTime)lastPlaybackTime
+                            deviceUid:(nullable NSString *)deviceUid
+                      completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
  *  Asynchronously discard history entries matching an identifier list, calling the provided block on completion. If no

@@ -30,7 +30,7 @@
         XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
         
         NSString *uid = [NSString stringWithFormat:@"%@_%@", name, @(i + 1)];
-        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
+        [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
             [expectation fulfill];
         }];
     }
@@ -195,7 +195,7 @@
     [self deleteRemoteHistoryEntriesWithUids:@[ @"a_2", @"a_3" ]];
     
     [self assertRemoteHistoryEntryCount:3];
-
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
     
     [self.userData.history discardHistoryEntriesWithUids:@[@"a_1", @"a_4"] completionBlock:^(NSError * _Nonnull error) {

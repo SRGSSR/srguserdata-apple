@@ -50,7 +50,7 @@
             @strongify(self)
             
             if (self.URN) {
-                [SRGUserData.currentUserData.history saveHistoryEntryForUid:self.URN withLastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+                [SRGUserData.currentUserData.history saveHistoryEntryWithUid:self.URN lastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
             }
         }];
     }
@@ -101,9 +101,7 @@
     
     for (SRGPlaylist *playlist in playlists) {
         UIAlertAction *action = [UIAlertAction actionWithTitle:playlist.name style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [SRGUserData.currentUserData.playlists addEntryWithUid:media.URN
-                                                 toPlaylistWithUid:playlist.uid
-                                                   completionBlock:nil];
+            [SRGUserData.currentUserData.playlists saveEntryWithUid:media.URN inPlaylistWithUid:playlist.uid completionBlock:nil];
         }];
         [alertController addAction:action];
         

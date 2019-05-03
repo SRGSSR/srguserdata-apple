@@ -297,7 +297,7 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
-- (NSString *)saveHistoryEntryForUid:(NSString *)uid withLastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
+- (NSString *)saveHistoryEntryWithUid:(NSString *)uid lastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
     __block NSArray<NSString *> *previousUids = nil;
     __block NSArray<NSString *> *currentUids = nil;

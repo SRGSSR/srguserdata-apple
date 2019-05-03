@@ -100,7 +100,7 @@
         return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryForUid:uid2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -158,7 +158,7 @@
         return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryForUid:uid2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -217,7 +217,7 @@
         return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryForUid:uid2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -276,7 +276,7 @@
         return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryForUid:uid2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -334,7 +334,7 @@
         return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryForUid:uid2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -392,7 +392,7 @@
         return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryForUid:uid2 withLastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     

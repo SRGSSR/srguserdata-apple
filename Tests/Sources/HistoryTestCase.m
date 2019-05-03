@@ -36,7 +36,7 @@
         CMTime time = CMTimeMakeWithSeconds(uid.integerValue, NSEC_PER_SEC);
         XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
         
-        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:time deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+        [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:time deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
@@ -81,7 +81,7 @@
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
     
-    [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
+    [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
@@ -112,7 +112,7 @@
         CMTime time = CMTimeMakeWithSeconds(uid.integerValue, NSEC_PER_SEC);
         XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
         
-        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
+        [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
@@ -155,7 +155,7 @@
     for (NSUInteger i = 0; i < numberOfSaves; i++) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
         
-        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
+        [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
@@ -183,7 +183,7 @@
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
     
-    [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
+    [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
@@ -211,7 +211,7 @@
     
     XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entry saved"];
     
-    [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
+    [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:time deviceUid:deviceUid completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
         [expectation1 fulfill];
     }];

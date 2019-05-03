@@ -47,7 +47,7 @@
 
 - (void)assertLocalEntryCount:(NSUInteger)count forPlaylistWithUid:(NSString *)playlistUid
 {
-    NSArray<SRGPlaylistEntry *> *entries = [self.userData.playlists entriesFromPlaylistWithUid:playlistUid matchingPredicate:nil sortedWithDescriptors:nil];
+    NSArray<SRGPlaylistEntry *> *entries = [self.userData.playlists entriesInPlaylistWithUid:playlistUid matchingPredicate:nil sortedWithDescriptors:nil];
     XCTAssertNotNil(entries);
     XCTAssertEqual(entries.count, count);
 }

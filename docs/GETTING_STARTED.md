@@ -54,7 +54,7 @@ NSArray<SRGHistoryEntry *> *historyEntries = [SRGUserData.currentUserData.histor
 or to save / update an entry:
 
 ```objective-c
-[SRGUserData.currentUserData.history saveHistoryEntryForUid:@"media_id" withLastPlaybackTime:CMTimeMakeWithSeconds(100., NSEC_PER_SEC) deviceUid:@"My device" completionBlock:nil];
+[SRGUserData.currentUserData.history saveHistoryEntryWithUid:@"media_id" lastPlaybackTime:CMTimeMakeWithSeconds(100., NSEC_PER_SEC) deviceUid:@"My device" completionBlock:nil];
 ```
 
 For performance reasons writes are always made asynchronously, calling a block on completion. Reads can be made synchronously or asynchronously depending on your needs.
@@ -63,7 +63,7 @@ For performance reasons writes are always made asynchronously, calling a block o
 
 History changes are notified through `SRGHistoryDidChangeNotification`, whether a user is logged in or not. This ensures any part of your application can stay informed about changes and respond accordingly.
 
-Once a user has logged in with an associated `SRGIdentityService` instance, history data will stay automatically synchronized. Your application can register to the `SRGHistoryDidStartSynchronizationNotification` and `SRGHistoryDidFinishSynchronizationNotification` notifications to detect when history synchronization starts or ends. For information purposes, the last synchronization date can also be retrieved from the `SRGUserData` `user` information.
+Once a user has logged in with an associated `SRGIdentityService` instance, history data will stay automatically synchronized. Your application can register to the `SRGUserDataDidStartSynchronizationNotification` and `SRGUserDataDidFinishSynchronizationNotification` notifications to detect when global synchronization starts or ends. For information purposes, the last synchronization date can also be retrieved from the `SRGUserData` `user` information.
 
 ### Thread-safety considerations
 
