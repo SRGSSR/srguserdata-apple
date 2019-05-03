@@ -25,6 +25,7 @@
 
 NSString * const SRGHistoryDidChangeNotification = @"SRGHistoryDidChangeNotification";
 
+NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
 NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
 NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
 
@@ -59,6 +60,7 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
         return;
     }
     
+    __block NSSet<NSString *> *changedUids = nil;
     __block NSSet<NSString *> *currentUids = nil;
     __block NSSet<NSString *> *previousUids = nil;
     
@@ -67,27 +69,29 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
         NSString *keyPath = [NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)];
         previousUids = [NSSet setWithArray:[previousHistoryEntries valueForKeyPath:keyPath]];
         
-        NSMutableSet<NSString *> *uids = [previousUids mutableCopy];
+        NSMutableSet<NSString *> *mutableChangedUids = [NSMutableSet set];
+        NSMutableSet<NSString *> *mutableCurrentUids = [previousUids mutableCopy];
         for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
             SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
+            [mutableChangedUids addObject:historyEntry.uid];
+            
             if (historyEntry.inserted) {
-                [uids addObject:historyEntry.uid];
+                [mutableCurrentUids addObject:historyEntry.uid];
             }
             else if (historyEntry.deleted) {
-                [uids removeObject:historyEntry.uid];
+                [mutableCurrentUids removeObject:historyEntry.uid];
             }
         }
-        currentUids = [uids copy];
+        changedUids = [mutableChangedUids copy];
+        currentUids = [mutableCurrentUids copy];
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-        if (! error && currentUids) {
+        if (! error && changedUids.count > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableDictionary<NSString *, NSSet<NSString *> *> *userInfo = @{ SRGHistoryUidsKey : currentUids }.mutableCopy;
-                if (! [previousUids isEqualToSet:currentUids]) {
-                    userInfo[SRGHistoryPreviousUidsKey] = previousUids;
-                }
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:userInfo.copy];
+                                                                userInfo:@{ SRGHistoryChangedUidsKey : changedUids,
+                                                                            SRGHistoryUidsKey : currentUids,
+                                                                            SRGHistoryPreviousUidsKey : previousUids }];
             });
         }
         completionBlock(error);
@@ -257,7 +261,8 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
             if (previousUids.count > 0) {
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryUidsKey : @[],
+                                                                userInfo:@{ SRGHistoryChangedUidsKey : previousUids,
+                                                                            SRGHistoryUidsKey : @[],
                                                                             SRGHistoryPreviousUidsKey : previousUids }];
             }
         });
@@ -296,6 +301,7 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
 
 - (NSString *)saveHistoryEntryWithUid:(NSString *)uid lastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
+    __block NSSet<NSString *> *changedUids = nil;
     __block NSSet<NSString *> *currentUids = nil;
     __block NSSet<NSString *> *previousUids = nil;
     
@@ -307,21 +313,20 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
         historyEntry.lastPlaybackTime = lastPlaybackTime;
         historyEntry.deviceUid = deviceUid;
         
-        NSMutableArray<NSString *> *uids = [previousUids mutableCopy];
+        NSMutableSet<NSString *> *mutableCurrentUids = [previousUids mutableCopy];
         if (historyEntry.inserted) {
-            [uids addObject:uid];
+            [mutableCurrentUids addObject:uid];
         }
-        currentUids = [uids copy];
+        currentUids = [mutableCurrentUids copy];
+        changedUids = [NSSet setWithObject:uid];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableDictionary<NSString *, NSSet<NSString *> *> *userInfo = @{ SRGHistoryUidsKey : currentUids }.mutableCopy;
-                if (! [previousUids isEqualToSet:currentUids]) {
-                    userInfo[SRGHistoryPreviousUidsKey] = previousUids;
-                }
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:userInfo.copy];
+                                                                userInfo:@{ SRGHistoryChangedUidsKey : changedUids,
+                                                                            SRGHistoryUidsKey : currentUids,
+                                                                            SRGHistoryPreviousUidsKey : previousUids }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
@@ -330,8 +335,9 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
 
 - (NSString *)discardHistoryEntriesWithUids:(NSArray<NSString *> *)uids completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
-    __block NSSet<NSString *> *previousUids = nil;
+    __block NSSet<NSString *> *changedUids = nil;
     __block NSSet<NSString *> *currentUids = nil;
+    __block NSSet<NSString *> *previousUids = nil;
     
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGHistoryEntry *> *previousHistoryEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
@@ -339,17 +345,17 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
         previousUids = [NSSet setWithArray:[previousHistoryEntries valueForKeyPath:keyPath]];
         
         NSArray<NSString *> *discardedUids = [SRGHistoryEntry discardObjectsWithUids:uids inManagedObjectContext:managedObjectContext];
+        
         currentUids = [previousUids srguserdata_setByRemovingObjectsInArray:discardedUids];
+        changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableDictionary<NSString *, NSSet<NSString *> *> *userInfo = @{ SRGHistoryUidsKey : currentUids }.mutableCopy;
-                if (! [previousUids isEqualToSet:currentUids]) {
-                    userInfo[SRGHistoryPreviousUidsKey] = previousUids;
-                }
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
                                                                   object:self
-                                                                userInfo:userInfo.copy];
+                                                                userInfo:@{ SRGHistoryChangedUidsKey : changedUids,
+                                                                            SRGHistoryPreviousUidsKey : previousUids,
+                                                                            SRGHistoryUidsKey : currentUids }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
