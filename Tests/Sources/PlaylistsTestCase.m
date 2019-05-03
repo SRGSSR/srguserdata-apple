@@ -84,9 +84,6 @@
 
 - (void)waitForDefaultPlaylistInsertion
 {
-    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
-    XCTAssertEqual(playlists.count, 0);
-    
     // Automatically inserted after initialization
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsPreviousUidsKey], NSSet.set);
