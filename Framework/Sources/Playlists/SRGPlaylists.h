@@ -23,8 +23,9 @@ OBJC_EXPORT SRGPlaylistUid const SRGPlaylistUidWatchLater;                      
  */
 OBJC_EXPORT NSString * const SRGPlaylistsDidChangeNotification;                   // Notification name.
 
+OBJC_EXPORT NSString * const SRGPlaylistsChangedUidsKey;                          // Key to access the list of uids which have changed as an `NSSet` of `NSString` objects.
 OBJC_EXPORT NSString * const SRGPlaylistsUidsKey;                                 // Key to access the current uid list as an `NSSet` of `NSString` objects.
-OBJC_EXPORT NSString * const SRGPlaylistsPreviousUidsKey;                         // Optional key to access the previous uid list as an `NSSet` of `NSString` objects, if the list changed.
+OBJC_EXPORT NSString * const SRGPlaylistsPreviousUidsKey;                         // Key to access the previous uid list as an `NSSet` of `NSString` objects.
 
 /**
  *  Notification sent when one or more playlist entries change. Use the keys below to retrieve detailed information from the notification
@@ -34,8 +35,9 @@ OBJC_EXPORT NSString * const SRGPlaylistsPreviousUidsKey;                       
  */
 OBJC_EXPORT NSString * const SRGPlaylistEntriesDidChangeNotification;             // Notification name.
 
+OBJC_EXPORT NSString * const SRGPlaylistEntriesChangedUidsKey;                    // Key to access the list of uids which have changed as an `NSSet` of `NSString` objects.
 OBJC_EXPORT NSString * const SRGPlaylistEntriesUidsKey;                           // Key to access the current uid list as an `NSSet` of `NSString` objects.
-OBJC_EXPORT NSString * const SRGPlaylistEntriesPreviousUidsKey;                   // Optional key to access the previous uid list as an `NSSet` of `NSString` objects, if the list changed.
+OBJC_EXPORT NSString * const SRGPlaylistEntriesPreviousUidsKey;                   // Key to access the previous uid list as an `NSSet` of `NSString` objects.
 
 /**
  *  Manages a local cache for playlists. Playlists are characterized by an identifier, a system flag and a name. Based
