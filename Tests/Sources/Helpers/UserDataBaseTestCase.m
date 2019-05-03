@@ -313,17 +313,17 @@ NSURL *TestPlaylistsServiceURL(void)
 
 #pragma mark History remote data management
 
-- (void)insertRemoteHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count
+- (void)insertRemoteHistoryEntriesWithUids:(NSArray<NSString *> *)uids
 {
     XCTAssertNotNil(self.sessionToken);
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Remote history entry creation finished"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
     
     NSMutableArray<NSDictionary *> *JSONDictionaries = [NSMutableArray array];
-    for (NSUInteger i = 0; i < count; ++i) {
-        NSDictionary *JSONDictionary = @{ @"item_id" : [NSString stringWithFormat:@"%@_%@", name, @(i + 1)],
+    for (NSString *uid in uids) {
+        NSDictionary *JSONDictionary = @{ @"item_id" : uid,
                                           @"device_id" : @"test suite",
-                                          @"lastPlaybackPosition" : @(i * 1000.),
+                                          @"lastPlaybackPosition" : @([uids indexOfObject:uid] * 1000.),
                                           @"date" : @(round(NSDate.date.timeIntervalSince1970 * 1000.)) };
         [JSONDictionaries addObject:JSONDictionary];
     }
@@ -336,11 +336,11 @@ NSURL *TestPlaylistsServiceURL(void)
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)deleteRemoteHistoryEntriesWithUids:(NSArray<NSString *> *)uids
+- (void)discardRemoteHistoryEntriesWithUids:(NSArray<NSString *> *)uids
 {
     XCTAssertNotNil(self.sessionToken);
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Remote history entry deleted"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
     
     NSMutableArray<NSDictionary *> *dictionaries = [NSMutableArray array];
     for (NSString *uid in uids) {
@@ -359,13 +359,13 @@ NSURL *TestPlaylistsServiceURL(void)
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)assertRemoteHistoryEntryCount:(NSUInteger)count
+- (void)assertRemoteHistoryUids:(NSArray<NSString *> *)uids
 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
     
     [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        XCTAssertEqual(historyEntryDictionaries.count, count);
+        NSArray<NSString *> *remoteUids = [historyEntryDictionaries valueForKeyPath:@"item_id"];
+        XCTAssertEqualObjects([NSSet setWithArray:uids], [NSSet setWithArray:remoteUids]);
         [expectation fulfill];
     }] resume];
     
@@ -381,7 +381,7 @@ NSURL *TestPlaylistsServiceURL(void)
     NSDictionary *playlistDictionary = @{ @"businessId" : uid,
                                           @"name" : [NSString stringWithFormat:@"%@ (remote)", uid] };
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Remote playlist creation finished"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
     [[SRGPlaylistsRequest postPlaylistDictionary:playlistDictionary toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -393,6 +393,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)insertRemotePlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     NSMutableArray<NSDictionary *> *playlistEntryDictionaries = [NSMutableArray array];
     for (NSString *uid in uids) {
         NSDictionary *playlistEntryDictionary = @{ @"itemId" : uid,
@@ -400,7 +402,7 @@ NSURL *TestPlaylistsServiceURL(void)
         [playlistEntryDictionaries addObject:playlistEntryDictionary];
     }
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Remote playlist creation finished"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
     [[SRGPlaylistsRequest putPlaylistEntryDictionaries:[playlistEntryDictionaries copy] forPlaylistWithUid:playlistUid toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -412,6 +414,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)discardRemotePlaylistsWithUids:(NSArray<NSString *> *)uids
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     for (NSString *uid in uids) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
         
@@ -426,6 +430,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)discardRemoteEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
     [[SRGPlaylistsRequest deletePlaylistEntriesWithUids:uids forPlaylistWithUid:playlistUid fromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
@@ -438,6 +444,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)assertRemotePlaylistUids:(NSArray<NSString *> *)uids
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
     [[SRGPlaylistsRequest playlistsFromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
@@ -451,6 +459,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)assertRemoteEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
+    XCTAssertNotNil(self.sessionToken);
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
     [[SRGPlaylistsRequest entriesForPlaylistWithUid:playlistUid fromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {

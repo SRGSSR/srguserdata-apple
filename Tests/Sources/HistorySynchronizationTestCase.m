@@ -8,6 +8,8 @@
 
 #import "SRGHistoryRequest.h"
 
+#import <libextobjc/libextobjc.h>
+
 @interface HistorySynchronizationTestCase : UserDataBaseTestCase
 
 @end
@@ -24,13 +26,11 @@
 
 #pragma mark Helpers
 
-- (void)insertLocalHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count
+- (void)insertLocalHistoryEntriesWithUids:(NSArray<NSString *> *)uids
 {
-    for (NSUInteger i = 0; i < count; ++i) {
+    for (NSString *uid in uids) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
-        
-        NSString *uid = [NSString stringWithFormat:@"%@_%@", name, @(i + 1)];
-        [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
+        [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:CMTimeMakeWithSeconds([uids indexOfObject:uid], NSEC_PER_SEC) deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
             [expectation fulfill];
         }];
     }
@@ -38,10 +38,24 @@
     [self waitForExpectationsWithTimeout:100. handler:nil];
 }
 
-- (void)assertLocalHistoryEntryCount:(NSUInteger)count
+- (void)discardLocalHistoryEntriesWithUids:(NSArray<NSString *> *)uids
 {
-    NSArray<SRGHistoryEntry *> *historyEntries = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
-    XCTAssertEqual(historyEntries.count, count);
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
+    
+    [self.userData.history discardHistoryEntriesWithUids:uids completionBlock:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)assertLocalHistoryUids:(NSArray<NSString *> *)uids
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
+    NSArray<SRGHistoryEntry *> *historyEntries = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil];
+    NSArray<NSString *> *localUids = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
+    XCTAssertEqualObjects([NSSet setWithArray:uids], [NSSet setWithArray:localUids]);
 }
 
 #pragma mark Setup and teardown
@@ -61,19 +75,19 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalHistoryEntryCount:0];
-    [self assertRemoteHistoryEntryCount:0];
+    [self assertLocalHistoryUids:@[]];
+    [self assertRemoteHistoryUids:@[]];
 }
 
 - (void)testInitialSynchronizationWithExistingRemoteEntries
 {
-    [self insertRemoteHistoryEntriesWithName:@"a" count:2];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b" ]];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalHistoryEntryCount:2];
-    [self assertRemoteHistoryEntryCount:2];
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b" ]];
 }
 
 - (void)testSynchronizationWithoutEntryChanges
@@ -81,13 +95,13 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalHistoryEntryCount:0];
-    [self assertRemoteHistoryEntryCount:0];
+    [self assertLocalHistoryUids:@[]];
+    [self assertRemoteHistoryUids:@[]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalHistoryEntryCount:0];
-    [self assertRemoteHistoryEntryCount:0];
+    [self assertLocalHistoryUids:@[]];
+    [self assertRemoteHistoryUids:@[]];
 }
 
 - (void)testSynchronizationWithAddedRemoteEntries
@@ -95,15 +109,15 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertRemoteHistoryEntriesWithName:@"a" count:4];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b" ]];
     
-    [self assertLocalHistoryEntryCount:0];
-    [self assertRemoteHistoryEntryCount:4];
+    [self assertLocalHistoryUids:@[]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b" ]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalHistoryEntryCount:4];
-    [self assertRemoteHistoryEntryCount:4];
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b" ]];
 }
 
 - (void)testSynchronizationWithAddedLocalEntries
@@ -111,15 +125,15 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertLocalHistoryEntriesWithName:@"a" count:3];
+    [self insertLocalHistoryEntriesWithUids:@[ @"a", @"b" ]];
     
-    [self assertLocalHistoryEntryCount:3];
-    [self assertRemoteHistoryEntryCount:0];
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalHistoryEntryCount:3];
-    [self assertRemoteHistoryEntryCount:3];
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b" ]];
 }
 
 - (void)testSynchronizationWithAddedRemoteAndLocalEntries
@@ -127,86 +141,80 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertLocalHistoryEntriesWithName:@"a" count:3];
-    [self insertRemoteHistoryEntriesWithName:@"b" count:5];
+    [self insertLocalHistoryEntriesWithUids:@[ @"a", @"b" ]];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"b", @"c" ]];
     
-    [self assertLocalHistoryEntryCount:3];
-    [self assertRemoteHistoryEntryCount:5];
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"c" ]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalHistoryEntryCount:8];
-    [self assertRemoteHistoryEntryCount:8];
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"c" ]];
 }
 
-- (void)testSynchronizationWithDeletedLocalEntries
+- (void)testSynchronizationWithDiscardedLocalEntries
 {
-    [self insertRemoteHistoryEntriesWithName:@"a" count:3];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalHistoryEntryCount:3];
-    [self assertRemoteHistoryEntryCount:3];
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
+    [self discardLocalHistoryEntriesWithUids:@[ @"a", @"c" ]];
     
-    [self.userData.history discardHistoryEntriesWithUids:@[@"a_1", @"a_3"] completionBlock:^(NSError * _Nonnull error) {
-        XCTAssertNil(error);
-        [expectation fulfill];
-    }];
+    [self assertLocalHistoryUids:@[ @"b", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalHistoryEntryCount:1];
-    [self assertRemoteHistoryEntryCount:1];
+    [self assertLocalHistoryUids:@[ @"b", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
 }
 
-- (void)testSynchronizationWithDeletedRemoteEntries
+- (void)testSynchronizationWithDiscardedRemoteEntries
 {
-    [self insertRemoteHistoryEntriesWithName:@"a" count:3];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalHistoryEntryCount:3];
-    [self assertRemoteHistoryEntryCount:3];
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
     
-    [self deleteRemoteHistoryEntriesWithUids:@[ @"a_2", @"a_3" ]];
+    [self discardRemoteHistoryEntriesWithUids:@[ @"a", @"c" ]];
     
-    [self assertRemoteHistoryEntryCount:1];
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalHistoryEntryCount:1];
-    [self assertRemoteHistoryEntryCount:1];
+    [self assertLocalHistoryUids:@[ @"b", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
 }
 
-- (void)testSynchronizationWithDeletedRemoteAndLocalEntries
+- (void)testSynchronizationWithDiscardedRemoteAndLocalEntries
 {
-    [self insertRemoteHistoryEntriesWithName:@"a" count:5];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d", @"e" ]];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalHistoryEntryCount:5];
-    [self assertRemoteHistoryEntryCount:5];
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c", @"d", @"e" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"c", @"d", @"e" ]];
     
-    [self deleteRemoteHistoryEntriesWithUids:@[ @"a_2", @"a_3" ]];
+    [self discardLocalHistoryEntriesWithUids:@[ @"b", @"c" ]];
+    [self discardRemoteHistoryEntriesWithUids:@[ @"c", @"d" ]];
     
-    [self assertRemoteHistoryEntryCount:3];
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
-    
-    [self.userData.history discardHistoryEntriesWithUids:@[@"a_1", @"a_4"] completionBlock:^(NSError * _Nonnull error) {
-        XCTAssertNil(error);
-        [expectation fulfill];
-    }];
+    [self assertLocalHistoryUids:@[ @"a", @"d", @"e" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"e" ]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalHistoryEntryCount:1];
-    [self assertRemoteHistoryEntryCount:1];
+    [self assertLocalHistoryUids:@[ @"a", @"e" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"e" ]];
 }
 
 - (void)testLargeHistory
@@ -214,16 +222,24 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertRemoteHistoryEntriesWithName:@"a" count:1000];
-    [self insertLocalHistoryEntriesWithName:@"b" count:2000];
+    NSArray<NSString *> *(^uidsBuilder)(NSUInteger, NSUInteger) = ^(NSUInteger start, NSUInteger end) {
+        NSMutableArray<NSString *> *uids = [NSMutableArray array];
+        for (NSUInteger i = start; i < end; i++) {
+            [uids addObject:@(i).stringValue];
+        }
+        return [uids copy];
+    };
     
-    [self assertRemoteHistoryEntryCount:1000];
-    [self assertLocalHistoryEntryCount:2000];
+    [self insertLocalHistoryEntriesWithUids:uidsBuilder(0, 1000)];
+    [self insertRemoteHistoryEntriesWithUids:uidsBuilder(900, 3000)];
+    
+    [self assertLocalHistoryUids:uidsBuilder(0, 1000)];
+    [self assertRemoteHistoryUids:uidsBuilder(900, 3000)];
     
     [self synchronizeAndWait];
     
-    [self assertLocalHistoryEntryCount:3000];
-    [self assertRemoteHistoryEntryCount:3000];
+    [self assertLocalHistoryUids:uidsBuilder(0, 3000)];
+    [self assertRemoteHistoryUids:uidsBuilder(0, 3000)];
 }
 
 - (void)testAfterLogout
@@ -231,9 +247,9 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertLocalHistoryEntriesWithName:@"a" count:10];
+    [self insertLocalHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
     
-    [self assertLocalHistoryEntryCount:10];
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
     
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
     [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
@@ -244,7 +260,7 @@
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
-    [self assertLocalHistoryEntryCount:0];
+    [self assertLocalHistoryUids:@[]];
 }
 
 - (void)testSynchronizationAfterLogoutDuringSynchronization
@@ -252,8 +268,8 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertRemoteHistoryEntriesWithName:@"a" count:2];
-    [self insertLocalHistoryEntriesWithName:@"b" count:3];
+    [self insertLocalHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"d", @"e", @"f", @"g" ]];
     
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
     [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:nil];
@@ -262,6 +278,8 @@
     [self logout];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self assertLocalHistoryUids:@[]];
     
     // Login again and check that synchronization still works
     [self loginAndWaitForInitialSynchronization];
