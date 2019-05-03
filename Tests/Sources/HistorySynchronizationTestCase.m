@@ -67,7 +67,7 @@
 
 - (void)testInitialSynchronizationWithExistingRemoteEntries
 {
-    [self insertRemoteTestHistoryEntriesWithName:@"a" count:2];
+    [self insertRemoteHistoryEntriesWithName:@"a" count:2];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
@@ -95,7 +95,7 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertRemoteTestHistoryEntriesWithName:@"a" count:4];
+    [self insertRemoteHistoryEntriesWithName:@"a" count:4];
     
     [self assertLocalHistoryEntryCount:0];
     [self assertRemoteHistoryEntryCount:4];
@@ -128,7 +128,7 @@
     [self loginAndWaitForInitialSynchronization];
     
     [self insertLocalHistoryEntriesWithName:@"a" count:3];
-    [self insertRemoteTestHistoryEntriesWithName:@"b" count:5];
+    [self insertRemoteHistoryEntriesWithName:@"b" count:5];
     
     [self assertLocalHistoryEntryCount:3];
     [self assertRemoteHistoryEntryCount:5];
@@ -141,7 +141,7 @@
 
 - (void)testSynchronizationWithDeletedLocalEntries
 {
-    [self insertRemoteTestHistoryEntriesWithName:@"a" count:3];
+    [self insertRemoteHistoryEntriesWithName:@"a" count:3];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
@@ -164,7 +164,7 @@
 
 - (void)testSynchronizationWithDeletedRemoteEntries
 {
-    [self insertRemoteTestHistoryEntriesWithName:@"a" count:3];
+    [self insertRemoteHistoryEntriesWithName:@"a" count:3];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
@@ -184,7 +184,7 @@
 
 - (void)testSynchronizationWithDeletedRemoteAndLocalEntries
 {
-    [self insertRemoteTestHistoryEntriesWithName:@"a" count:5];
+    [self insertRemoteHistoryEntriesWithName:@"a" count:5];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
@@ -214,7 +214,7 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertRemoteTestHistoryEntriesWithName:@"a" count:1000];
+    [self insertRemoteHistoryEntriesWithName:@"a" count:1000];
     [self insertLocalHistoryEntriesWithName:@"b" count:2000];
     
     [self assertRemoteHistoryEntryCount:1000];
@@ -252,7 +252,7 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertRemoteTestHistoryEntriesWithName:@"a" count:2];
+    [self insertRemoteHistoryEntriesWithName:@"a" count:2];
     [self insertLocalHistoryEntriesWithName:@"b" count:3];
     
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];

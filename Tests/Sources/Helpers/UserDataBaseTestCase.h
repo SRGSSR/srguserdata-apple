@@ -151,7 +151,7 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 /**
  *  Insert a number of test history entries with name `<name>_<index>`. Wait until all have been inserted.
  */
-- (void)insertRemoteTestHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count;
+- (void)insertRemoteHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count;
 
 /**
  *  Delete the remote history entries having the specified identifiers. Wait until deletion is successful.
@@ -171,25 +171,35 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 @interface UserDataBaseTestCase (PlaylistTestData)
 
 /**
- *  Insert a number of remote playlists with name `<name>_<index>`. For each playlist, inserts a number of entries named
- *  `entry_<index>`. Wait until all have been inserted
+ *  Insert a remote playlist with the specified identifier. Wait until operation is successful.
  */
-- (void)insertRemoteTestPlaylistsWithName:(NSString *)name count:(NSUInteger)count entryCount:(NSUInteger)entryCount;
+- (void)insertRemotePlaylistWithUid:(NSString *)uid;
 
 /**
- *  Delete the remote playlists having the specified identifiers. Wait until deletion is successful.
+ *  Insert a remote playlist entry for a specific playlist.
  */
-- (void)deleteRemotePlaylistWithUids:(NSArray<NSString *> *)uids;
+- (void)insertRemotePlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
 
 /**
- *  Assert that the number of remote playlists matches an expected value.
+ *  Discard the remote playlists having the specified identifiers. Wait until operation is successful.
  */
-- (void)assertRemotePlaylistCount:(NSUInteger)count;
+- (void)discardRemotePlaylistsWithUids:(NSArray<NSString *> *)uids;
 
 /**
- *  Assert that the number of remote entries for a playlist matches and expected value.
+ *  Discard remote entries for a specific playlist identifier. Wait until the operation is successful:
  */
-- (void)assertRemoteEntryCount:(NSUInteger)count forPlaylistWithUid:(NSString *)playlistUid;
+- (void)discardRemoteEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
+
+/**
+ *  Assert that the the current remote playlist identifiers match a specific list (order is ignored). System playlists
+ *  are checked automatically.
+ */
+- (void)assertRemotePlaylistUids:(NSArray<NSString *> *)uids;
+
+/**
+ *  Assert that the remote entry identifiers for a specific playlist match a specific list (order is ignored).
+ */
+- (void)assertRemoteEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
 
 @end
 

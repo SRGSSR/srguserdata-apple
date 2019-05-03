@@ -313,7 +313,7 @@ NSURL *TestPlaylistsServiceURL(void)
 
 #pragma mark History remote data management
 
-- (void)insertRemoteTestHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count
+- (void)insertRemoteHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count
 {
     XCTAssertNotNil(self.sessionToken);
     
@@ -374,37 +374,43 @@ NSURL *TestPlaylistsServiceURL(void)
 
 #pragma mark Playlist remote data management
 
-- (void)insertRemoteTestPlaylistsWithName:(NSString *)name count:(NSUInteger)count entryCount:(NSUInteger)entryCount
+- (void)insertRemotePlaylistWithUid:(NSString *)uid
 {
     XCTAssertNotNil(self.sessionToken);
     
-    for (NSUInteger i = 0; i < count; ++i) {
-        XCTestExpectation *expectation = [self expectationWithDescription:@"Remote playlist creation finished"];
-        
-        NSDictionary *playlistDictionary = @{ @"businessId" : [NSString stringWithFormat:@"%@_%@", name, @(i + 1)],
-                                              @"name" : [NSString stringWithFormat:@"%@ %@", name, @(i + 1)] };
-        [[SRGPlaylistsRequest postPlaylistDictionary:playlistDictionary toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-            XCTAssertNil(error);
-            
-            NSMutableArray<NSDictionary *> *playlistEntryDictionaries = [NSMutableArray array];
-            for (NSUInteger j = 0; i < entryCount; ++j) {
-                NSDictionary *playlistEntryDictionary = @{ @"itemId" : [NSString stringWithFormat:@"%@_%@_%@", name, @(i + 1), @(j + 1)],
-                                                           @"date" : @(round(NSDate.date.timeIntervalSince1970 * 1000.)) };
-                [playlistEntryDictionaries addObject:playlistEntryDictionary];
-            }
-            
-            NSString *uid = playlistDictionary[@"businessId"];
-            [[SRGPlaylistsRequest putPlaylistEntryDictionaries:[playlistEntryDictionaries copy] forPlaylistWithUid:uid toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-                XCTAssertNil(error);
-                [expectation fulfill];
-            }] resume];
-        }] resume];
-    }
+    NSDictionary *playlistDictionary = @{ @"businessId" : uid,
+                                          @"name" : [NSString stringWithFormat:@"%@ (remote)", uid] };
     
-    [self waitForExpectationsWithTimeout:100. handler:nil];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Remote playlist creation finished"];
+    
+    [[SRGPlaylistsRequest postPlaylistDictionary:playlistDictionary toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)deleteRemotePlaylistWithUids:(NSArray<NSString *> *)uids
+- (void)insertRemotePlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+{
+    NSMutableArray<NSDictionary *> *playlistEntryDictionaries = [NSMutableArray array];
+    for (NSString *uid in uids) {
+        NSDictionary *playlistEntryDictionary = @{ @"itemId" : uid,
+                                                   @"date" : @(round(NSDate.date.timeIntervalSince1970 * 1000.)) };
+        [playlistEntryDictionaries addObject:playlistEntryDictionary];
+    }
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Remote playlist creation finished"];
+    
+    [[SRGPlaylistsRequest putPlaylistEntryDictionaries:[playlistEntryDictionaries copy] forPlaylistWithUid:playlistUid toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)discardRemotePlaylistsWithUids:(NSArray<NSString *> *)uids
 {
     for (NSString *uid in uids) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
@@ -418,30 +424,42 @@ NSURL *TestPlaylistsServiceURL(void)
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)assertRemotePlaylistCount:(NSUInteger)count
+- (void)discardRemoteEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
-    [[SRGPlaylistsRequest playlistsFromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGPlaylistsRequest deletePlaylistEntriesWithUids:uids forPlaylistWithUid:playlistUid fromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
-        XCTAssertEqual(playlistDictionaries.count, count);
         [expectation fulfill];
     }] resume];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)assertRemoteEntryCount:(NSUInteger)count forPlaylistWithUid:(NSString *)playlistUid
+- (void)assertRemotePlaylistUids:(NSArray<NSString *> *)uids
 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
-    [[SRGPlaylistsRequest entriesForPlaylistWithUid:playlistUid fromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        XCTAssertEqual(playlistEntryDictionaries.count, count);
+    [[SRGPlaylistsRequest playlistsFromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        NSArray<NSString *> *remoteUids = [playlistDictionaries valueForKeyPath:@"businessId"];
+        XCTAssertEqualObjects([[NSSet setWithArray:uids] setByAddingObjectsFromArray:@[ SRGPlaylistUidWatchLater ]], [NSSet setWithArray:remoteUids]);
         [expectation fulfill];
     }] resume];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)assertRemoteEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
+    
+    [[SRGPlaylistsRequest entriesForPlaylistWithUid:playlistUid fromServiceURL:TestPlaylistsServiceURL() forSessionToken:self.identityService.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        NSArray<NSString *> *remoteUids = [playlistEntryDictionaries valueForKeyPath:@"itemId"];
+        XCTAssertEqualObjects([NSSet setWithArray:uids], [NSSet setWithArray:remoteUids]);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:100. handler:nil];
 }
 
 @end

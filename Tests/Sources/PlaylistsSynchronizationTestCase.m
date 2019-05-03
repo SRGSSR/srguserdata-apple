@@ -8,6 +8,8 @@
 
 #import "SRGPlaylistsRequest.h"
 
+#import <libextobjc/libextobjc.h>
+
 @interface PlaylistsSynchronizationTestCase : UserDataBaseTestCase
 
 @end
@@ -24,14 +26,26 @@
 
 #pragma mark Helpers
 
-- (void)insertLocalTestPlaylistsWithName:(NSString *)name count:(NSUInteger)count entryCount:(NSUInteger)entryCount
+- (void)insertLocalPlaylistWithUid:(NSString *)uid
 {
-    // TODO: Insert entries
-    for (NSUInteger i = 0; i < count; ++i) {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
+    
+    NSString *name = [NSString stringWithFormat:@"%@ (local)", uid];
+    [self.userData.playlists savePlaylistWithName:name uid:uid completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:NULL];
+}
+
+- (void)insertLocalPlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+{
+    for (NSString *uid in uids) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
         
-        NSString *playlistName = [NSString stringWithFormat:@"%@_%@", name, @(i + 1)];
-        [self.userData.playlists savePlaylistWithName:playlistName uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        [self.userData.playlists saveEntryWithUid:uid inPlaylistWithUid:playlistUid completionBlock:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
             [expectation fulfill];
         }];
     }
@@ -39,17 +53,44 @@
     [self waitForExpectationsWithTimeout:100. handler:NULL];
 }
 
-- (void)assertLocalPlaylistCount:(NSUInteger)count
+- (void)discardLocalPlaylistsWithUids:(NSArray<NSString *> *)uids
 {
-    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
-    XCTAssertEqual(playlists.count, count);
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
+    
+    [self.userData.playlists discardPlaylistsWithUids:uids completionBlock:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)assertLocalEntryCount:(NSUInteger)count forPlaylistWithUid:(NSString *)playlistUid
+- (void)discardLocalEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
-    NSArray<SRGPlaylistEntry *> *entries = [self.userData.playlists entriesInPlaylistWithUid:playlistUid matchingPredicate:nil sortedWithDescriptors:nil];
-    XCTAssertNotNil(entries);
-    XCTAssertEqual(entries.count, count);
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
+    
+    [self.userData.playlists discardEntriesWithUids:uids fromPlaylistWithUid:playlistUid completionBlock:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)assertLocalPlaylistUids:(NSArray<NSString *> *)uids
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylist.new, discarded)];
+    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:nil];
+    NSArray<NSString *> *localUids = [playlists valueForKeyPath:@keypath(SRGPlaylist.new, uid)];
+    XCTAssertEqualObjects([[NSSet setWithArray:uids] setByAddingObjectsFromArray:@[ SRGPlaylistUidWatchLater ]], [NSSet setWithArray:localUids]);
+}
+
+- (void)assertLocalEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylistEntry.new, discarded)];
+    NSArray<SRGPlaylistEntry *> *entries = [self.userData.playlists entriesInPlaylistWithUid:playlistUid matchingPredicate:predicate sortedWithDescriptors:nil];
+    NSArray<NSString *> *localUids = [entries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
+    XCTAssertEqualObjects([NSSet setWithArray:uids], [NSSet setWithArray:localUids]);
 }
 
 #pragma mark Setup and teardown
@@ -67,7 +108,7 @@
 - (void)testSystemPlaylistAvailability
 {
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
-        return [notification.userInfo[SRGPlaylistsUidsKey] count] == 1;
+        return [notification.userInfo[SRGPlaylistsUidsKey] containsObject:SRGPlaylistUidWatchLater];
     }];
     
     [self setupForOfflineOnly];
@@ -84,26 +125,7 @@
 
 - (void)testSystemPlaylistAvailabilityAfterLogout
 {
-    // TODO: Not entirely trivial
-#if 0
-    [self setupForAvailableService];
-    [self loginAndWaitForInitialSynchronization];
-    
-    [self assertLocalPlaylistCount:1];
-    
-    [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
-    
-    [self logout];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-    
-    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
-    XCTAssertEqual(playlists.count, 1);
-    
-    SRGPlaylist *playlist = playlists.firstObject;
-    XCTAssertEqual(playlist.type, SRGPlaylistTypeWatchLater);
-    XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
-#endif
+    XCTFail(@"Implement");
 }
 
 - (void)testInitialSynchronizationWithoutRemotePlaylists
@@ -111,19 +133,20 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalPlaylistCount:1];
-    [self assertRemotePlaylistCount:1];
+    [self assertLocalPlaylistUids:@[]];
+    [self assertRemotePlaylistUids:@[]];
 }
 
 - (void)testInitialSynchronizationWithExistingRemotePlaylists
 {
-    [self insertRemoteTestPlaylistsWithName:@"a" count:4 entryCount:10];
+    [self insertRemotePlaylistWithUid:@"a"];
+    [self insertRemotePlaylistWithUid:@"b"];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalPlaylistCount:5];
-    [self assertRemotePlaylistCount:5];
+    [self assertLocalPlaylistUids:@[ @"a", @"b" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b" ]];
 }
 
 - (void)testSynchronizationWithoutPlaylistChanges
@@ -131,13 +154,13 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalPlaylistCount:1];
-    [self assertRemotePlaylistCount:1];
+    [self assertLocalPlaylistUids:@[]];
+    [self assertRemotePlaylistUids:@[]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalPlaylistCount:1];
-    [self assertRemotePlaylistCount:1];
+    [self assertLocalPlaylistUids:@[]];
+    [self assertRemotePlaylistUids:@[]];
 }
 
 - (void)testSynchronizationWithAddedRemotePlaylists
@@ -145,15 +168,16 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertRemoteTestPlaylistsWithName:@"a" count:4 entryCount:10];
+    [self insertRemotePlaylistWithUid:@"a"];
+    [self insertRemotePlaylistWithUid:@"b"];
     
-    [self assertLocalPlaylistCount:1];
-    [self assertRemotePlaylistCount:5];
+    [self assertLocalPlaylistUids:@[]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b" ]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalPlaylistCount:5];
-    [self assertRemotePlaylistCount:5];
+    [self assertLocalPlaylistUids:@[ @"a", @"b" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b" ]];
 }
 
 - (void)testSynchronizationWithAddedLocalPlaylists
@@ -161,15 +185,16 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertLocalTestPlaylistsWithName:@"a" count:3 entryCount:9];
+    [self insertLocalPlaylistWithUid:@"a"];
+    [self insertLocalPlaylistWithUid:@"b"];
     
-    [self assertLocalPlaylistCount:4];
-    [self assertRemotePlaylistCount:1];
+    [self assertLocalPlaylistUids:@[ @"a", @"b" ]];
+    [self assertRemotePlaylistUids:@[]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalPlaylistCount:4];
-    [self assertRemotePlaylistCount:4];
+    [self assertLocalPlaylistUids:@[ @"a", @"b" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b" ]];
 }
 
 - (void)testSynchronizationWithAddedRemoteAndLocalPlaylists
@@ -177,86 +202,94 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertLocalTestPlaylistsWithName:@"a" count:7 entryCount:8];
-    [self insertRemoteTestPlaylistsWithName:@"b" count:9 entryCount:5];
+    [self insertLocalPlaylistWithUid:@"a"];
+    [self insertLocalPlaylistWithUid:@"b"];
     
-    [self assertLocalPlaylistCount:8];
-    [self assertRemotePlaylistCount:10];
+    [self insertRemotePlaylistWithUid:@"b"];
+    [self insertRemotePlaylistWithUid:@"c"];
+    
+    [self assertLocalPlaylistUids:@[ @"a", @"b" ]];
+    [self assertRemotePlaylistUids:@[ @"b", @"c" ]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalPlaylistCount:17];
-    [self assertRemotePlaylistCount:17];
+    [self assertLocalPlaylistUids:@[ @"a", @"b", @"c" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b", @"c" ]];
 }
 
-- (void)testSynchronizationWithDeletedLocalPlaylists
+- (void)testSynchronizationWithDiscardedLocalPlaylists
 {
-    [self insertRemoteTestPlaylistsWithName:@"a" count:7 entryCount:10];
+    [self insertRemotePlaylistWithUid:@"a"];
+    [self insertRemotePlaylistWithUid:@"b"];
+    [self insertRemotePlaylistWithUid:@"c"];
+    [self insertRemotePlaylistWithUid:@"d"];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalPlaylistCount:8];
-    [self assertRemotePlaylistCount:8];
+    [self assertLocalPlaylistUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b", @"c", @"d" ]];
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
+    [self discardLocalPlaylistsWithUids:@[ @"a", @"c" ]];
     
-    [self.userData.playlists discardPlaylistsWithUids:@[@"a_1", @"a_3"] completionBlock:^(NSError * _Nonnull error) {
-        XCTAssertNil(error);
-        [expectation fulfill];
-    }];
+    [self assertLocalPlaylistUids:@[ @"b", @"d" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b", @"c", @"d" ]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalPlaylistCount:6];
-    [self assertRemotePlaylistCount:6];
+    [self assertLocalPlaylistUids:@[ @"b", @"d" ]];
+    [self assertRemotePlaylistUids:@[ @"b", @"d" ]];
 }
 
-- (void)testSynchronizationWithDeletedRemotePlaylists
+- (void)testSynchronizationWithDiscardedRemotePlaylists
 {
-    [self insertRemoteTestPlaylistsWithName:@"a" count:7 entryCount:10];
+    [self insertRemotePlaylistWithUid:@"a"];
+    [self insertRemotePlaylistWithUid:@"b"];
+    [self insertRemotePlaylistWithUid:@"c"];
+    [self insertRemotePlaylistWithUid:@"d"];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalPlaylistCount:8];
-    [self assertRemotePlaylistCount:8];
+    [self assertLocalPlaylistUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b", @"c", @"d" ]];
     
-    [self deleteRemotePlaylistWithUids:@[ @"a_2", @"a_3" ]];
+    [self discardRemotePlaylistsWithUids:@[ @"a", @"c" ]];
     
-    [self assertRemotePlaylistCount:6];
+    [self assertLocalPlaylistUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self assertRemotePlaylistUids:@[ @"b", @"d" ]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalPlaylistCount:6];
-    [self assertRemotePlaylistCount:6];
+    [self assertLocalPlaylistUids:@[ @"b", @"d" ]];
+    [self assertRemotePlaylistUids:@[ @"b", @"d" ]];
 }
 
-- (void)testSynchronizationWithDeletedRemoteAndLocalPlaylists
+- (void)testSynchronizationWithDiscardedRemoteAndLocalPlaylists
 {
-    [self insertRemoteTestPlaylistsWithName:@"a" count:7 entryCount:10];
+    [self insertRemotePlaylistWithUid:@"a"];
+    [self insertRemotePlaylistWithUid:@"b"];
+    [self insertRemotePlaylistWithUid:@"c"];
+    [self insertRemotePlaylistWithUid:@"d"];
+    [self insertRemotePlaylistWithUid:@"e"];
+    [self insertRemotePlaylistWithUid:@"f"];
     
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalPlaylistCount:8];
-    [self assertRemotePlaylistCount:8];
+    [self assertLocalPlaylistUids:@[ @"a", @"b", @"c", @"d", @"e", @"f" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b", @"c", @"d", @"e", @"f" ]];
     
-    [self deleteRemotePlaylistWithUids:@[ @"a_2", @"a_3" ]];
+    [self discardLocalPlaylistsWithUids:@[ @"b", @"c" ]];
+    [self discardRemotePlaylistsWithUids:@[ @"c", @"d", @"e" ]];
     
-    [self assertRemotePlaylistCount:6];
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
-    
-    [self.userData.playlists discardPlaylistsWithUids:@[@"a_1", @"a_4"] completionBlock:^(NSError * _Nonnull error) {
-        XCTAssertNil(error);
-        [expectation fulfill];
-    }];
+    [self assertLocalPlaylistUids:@[ @"a", @"d", @"e", @"f" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b", @"f" ]];
     
     [self synchronizeAndWait];
     
-    [self assertLocalPlaylistCount:4];
-    [self assertRemotePlaylistCount:4];
+    [self assertLocalPlaylistUids:@[ @"a", @"f" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"f" ]];
 }
 
 - (void)testPlaylistSynchronizationWithoutEntryChanges
@@ -264,43 +297,126 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocalEntryCount:0 forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryCount:0 forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalEntryUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
     [self synchronizeAndWait];
     
-    [self assertLocalEntryCount:0 forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryCount:0 forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalEntryUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testPlaylistSynchronizationWithAddedRemoteEntries
 {
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
+    [self insertRemotePlaylistEntriesWithUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self assertLocalEntryUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalEntryUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testPlaylistSynchronizationWithAddedLocalEntries
 {
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
+    [self insertLocalPlaylistEntriesWithUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self assertLocalEntryUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalEntryUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testPlaylistSynchronizationWithAddedRemoteAndLocalEntries
 {
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
+    [self insertLocalPlaylistEntriesWithUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self insertRemotePlaylistEntriesWithUids:@[ @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self assertLocalEntryUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalEntryUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
-- (void)testPlaylistSynchronizationWithDeletedRemoteEntries
+- (void)testPlaylistSynchronizationWithDiscardedRemoteEntries
 {
+    [self insertRemotePlaylistEntriesWithUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+        
+    [self assertLocalEntryUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
+    [self discardRemoteEntriesWithUids:@[ @"a", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self assertLocalEntryUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalEntryUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
-- (void)testPlaylistSynchronizationWithDeletedLocalEntries
+- (void)testPlaylistSynchronizationWithDiscardedLocalEntries
 {
+    [self insertRemotePlaylistEntriesWithUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalEntryUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self discardLocalEntriesWithUids:@[ @"a", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self assertLocalEntryUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalEntryUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
-- (void)testPlaylistSynchronizationWithDeletedRemoteAndLocalEntries
+- (void)testPlaylistSynchronizationWithDiscardedRemoteAndLocalEntries
 {
+    [self insertRemotePlaylistEntriesWithUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalEntryUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self discardLocalEntriesWithUids:@[ @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self discardRemoteEntriesWithUids:@[ @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self assertLocalEntryUids:@[ @"a", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"a", @"b", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalEntryUids:@[ @"a", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemoteEntryUids:@[ @"a", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testLargePlaylists
@@ -308,40 +424,34 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self insertLocalTestPlaylistsWithName:@"b" count:80 entryCount:100];
-    [self insertRemoteTestPlaylistsWithName:@"a" count:120 entryCount:100];
+    NSArray<NSString *> *(^uidsBuilder)(NSUInteger, NSUInteger) = ^(NSUInteger start, NSUInteger end) {
+        NSMutableArray<NSString *> *uids = [NSMutableArray array];
+        for (NSUInteger i = start; i < end; i++) {
+            [uids addObject:@(i).stringValue];
+        }
+        return [uids copy];
+    };
     
-    [self assertLocalPlaylistCount:81];
-    [self assertRemotePlaylistCount:121];
+    for (NSUInteger i = 0; i < 100; ++i) {
+        [self insertLocalPlaylistWithUid:@(i).stringValue];
+    }
+    
+    for (NSUInteger i = 50; i < 150; ++i) {
+        [self insertRemotePlaylistWithUid:@(i).stringValue];
+    }
+    
+    [self assertLocalPlaylistUids:uidsBuilder(0, 100)];
+    [self assertRemotePlaylistUids:uidsBuilder(50, 150)];
     
     [self synchronizeAndWait];
     
-    [self assertLocalPlaylistCount:201];
-    [self assertRemotePlaylistCount:201];
+    [self assertLocalPlaylistUids:uidsBuilder(0, 150)];
+    [self assertRemotePlaylistUids:uidsBuilder(0, 150)];
 }
 
 - (void)testAfterLogout
 {
-    // TODO: Fix -testSystemPlaylistAvailabilityAfterLogout first
-#if 0
-    [self setupForAvailableService];
-    [self loginAndWaitForInitialSynchronization];
-    
-    [self insertLocalTestPlaylistsWithName:@"b" count:10 entryCount:9];
-    
-    [self assertLocalPlaylistCount:11];
-    
-    [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
-    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
-        return [notification.userInfo[SRGHistoryUidsKey] count] == 1;
-    }];
-    
-    [self.identityService logout];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-    
-    [self assertLocalPlaylistCount:1];
-#endif
+    XCTFail(@"Implement");
 }
 
 - (void)testSynchronizationAfterLogoutDuringSynchronization
