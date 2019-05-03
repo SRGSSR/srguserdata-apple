@@ -79,7 +79,7 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
         }
         currentUids = [uids copy];
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-        if (! error) {
+        if (! error && currentUids) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSMutableDictionary<NSString *, NSSet<NSString *> *> *userInfo = @{ SRGHistoryUidsKey : currentUids }.mutableCopy;
                 if (! [previousUids isEqualToSet:currentUids]) {

@@ -49,9 +49,9 @@
     self.refreshControl = refreshControl;
     
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(playlistsDidChange:)
-                                               name:SRGPlaylistsDidChangeNotification
-                                             object:SRGUserData.currentUserData.playlists];
+                                           selector:@selector(playlistEntriesDidChange:)
+                                               name:SRGPlaylistEntriesDidChangeNotification
+                                             object:self.playlist];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     
@@ -199,16 +199,13 @@
 
 #pragma mark Notifications
 
-- (void)playlistsDidChange:(NSNotification *)notification
+- (void)playlistEntriesDidChange:(NSNotification *)notification
 {
-    if ([notification.userInfo[SRGPlaylistsChangedUidsKey] containsObject:self.playlist.uid]) {
-        NSDictionary<NSString *, NSArray<NSString *> *> *playlistEntryChanges = notification.userInfo[SRGPlaylistEntryChangesKey][self.playlist.uid];
-        if (playlistEntryChanges) {
-            NSArray<NSString *> *previousURNs = playlistEntryChanges[SRGPlaylistEntryPreviousUidsSubKey];
-            NSArray<NSString *> *URNs = playlistEntryChanges[SRGPlaylistEntryUidsSubKey];
-            if (URNs.count == 0 || previousURNs.count == 0) {
-                [self refresh];
-            }
+    if (notification.userInfo[SRGPlaylistEntriesPreviousUidsKey]) {
+        NSSet<NSString *> *previousURNs = notification.userInfo[SRGPlaylistEntriesPreviousUidsKey];
+        NSSet<NSString *> *URNs = notification.userInfo[SRGPlaylistEntriesUidsKey];
+        if (URNs.count == 0 || previousURNs.count == 0) {
+            [self refresh];
         }
     }
 }
