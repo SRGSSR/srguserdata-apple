@@ -56,8 +56,8 @@ NSString * const SRGPlaylistsPreviousUidsKey = @"SRGPlaylistPreviousUids";
 
 NSString * const SRGPlaylistEntriesDidChangeNotification = @"SRGPlaylistEntriesDidChangeNotification";
 
-NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUidsKey";
-NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviousUidsKey";
+NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
+NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviousUids";
 
 @interface SRGPlaylists ()
 
