@@ -57,7 +57,7 @@
                                              object:SRGIdentityService.currentIdentityService];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidChange:)
-                                               name:SRGHistoryDidChangeNotification
+                                               name:SRGHistoryEntriesDidChangeNotification
                                              object:SRGUserData.currentUserData.history];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
@@ -208,11 +208,14 @@
 
 - (void)historyDidChange:(NSNotification *)notification
 {
+// FIXME:
+#if 0
     NSArray<NSString *> *previousURNs = notification.userInfo[SRGHistoryPreviousUidsKey];
     NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
     if (URNs.count == 0 || previousURNs.count == 0) {
         [self refresh];
     }
+#endif
 }
 
 @end

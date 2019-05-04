@@ -9,6 +9,7 @@
 #import "SRGHistoryRequest.h"
 #import "SRGPlaylistsRequest.h"
 
+#import <libextobjc/libextobjc.h>
 #import <OHHTTPStubs/OHHTTPStubs.h>
 
 @interface SRGUserData (TestsPrivate)
@@ -372,6 +373,40 @@ NSURL *TestPlaylistsServiceURL(void)
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
+#pragma mark History local data management
+
+- (void)insertLocalHistoryEntriesWithUids:(NSArray<NSString *> *)uids
+{
+    for (NSString *uid in uids) {
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
+        [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:CMTimeMakeWithSeconds([uids indexOfObject:uid], NSEC_PER_SEC) deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
+            [expectation fulfill];
+        }];
+    }
+    
+    [self waitForExpectationsWithTimeout:100. handler:nil];
+}
+
+- (void)discardLocalHistoryEntriesWithUids:(NSArray<NSString *> *)uids
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
+    
+    [self.userData.history discardHistoryEntriesWithUids:uids completionBlock:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)assertLocalHistoryUids:(NSArray<NSString *> *)uids
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
+    NSArray<SRGHistoryEntry *> *historyEntries = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil];
+    NSArray<NSString *> *localUids = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
+    XCTAssertEqualObjects([NSSet setWithArray:uids], [NSSet setWithArray:localUids]);
+}
+
 #pragma mark Playlist remote data management
 
 - (void)insertRemotePlaylistWithUid:(NSString *)uid
@@ -470,6 +505,75 @@ NSURL *TestPlaylistsServiceURL(void)
     }] resume];
     
     [self waitForExpectationsWithTimeout:100. handler:nil];
+}
+
+#pragma mark Playlist local data management
+
+- (void)insertLocalPlaylistWithUid:(NSString *)uid
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
+    
+    NSString *name = [NSString stringWithFormat:@"%@ (local)", uid];
+    [self.userData.playlists savePlaylistWithName:name uid:uid completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:NULL];
+}
+
+- (void)insertLocalPlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+{
+    for (NSString *uid in uids) {
+        XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
+        
+        [self.userData.playlists saveEntryWithUid:uid inPlaylistWithUid:playlistUid completionBlock:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [expectation fulfill];
+        }];
+    }
+    
+    [self waitForExpectationsWithTimeout:100. handler:NULL];
+}
+
+- (void)discardLocalPlaylistsWithUids:(NSArray<NSString *> *)uids
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
+    
+    [self.userData.playlists discardPlaylistsWithUids:uids completionBlock:^(NSError * _Nonnull error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)discardLocalEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+{
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
+    
+    [self.userData.playlists discardEntriesWithUids:uids fromPlaylistWithUid:playlistUid completionBlock:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)assertLocalPlaylistUids:(NSArray<NSString *> *)uids
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylist.new, discarded)];
+    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:nil];
+    NSArray<NSString *> *localUids = [playlists valueForKeyPath:@keypath(SRGPlaylist.new, uid)];
+    XCTAssertEqualObjects([[NSSet setWithArray:uids] setByAddingObjectsFromArray:@[ SRGPlaylistUidWatchLater ]], [NSSet setWithArray:localUids]);
+}
+
+- (void)assertLocalEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylistEntry.new, discarded)];
+    NSArray<SRGPlaylistEntry *> *entries = [self.userData.playlists entriesInPlaylistWithUid:playlistUid matchingPredicate:predicate sortedWithDescriptors:nil];
+    NSArray<NSString *> *localUids = [entries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
+    XCTAssertEqualObjects([NSSet setWithArray:uids], [NSSet setWithArray:localUids]);
 }
 
 @end

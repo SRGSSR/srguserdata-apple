@@ -50,16 +50,10 @@ static SRGPlaylistType SRGPlaylistTypeForPlaylistWithUid(NSString *uid)
 SRGPlaylistUid const SRGPlaylistUidWatchLater = @"watch_later";
 
 NSString * const SRGPlaylistsDidChangeNotification = @"SRGPlaylistsDidChangeNotification";
-
 NSString * const SRGPlaylistsChangedUidsKey = @"SRGPlaylistsChangedUids";
-NSString * const SRGPlaylistsUidsKey = @"SRGPlaylistUids";
-NSString * const SRGPlaylistsPreviousUidsKey = @"SRGPlaylistPreviousUids";
 
 NSString * const SRGPlaylistEntriesDidChangeNotification = @"SRGPlaylistEntriesDidChangeNotification";
-
 NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedUids";
-NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
-NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviousUids";
 
 @interface SRGPlaylists ()
 
@@ -110,9 +104,7 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
         return;
     }
     
-    __block NSSet<NSString *> *changedUids = nil;
-    __block NSSet<NSString *> *currentUids = nil;
-    __block NSSet<NSString *> *previousUids = nil;
+    __block NSMutableSet<NSString *> *changedUids = nil;
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
@@ -122,33 +114,18 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
             return;
         }
         
-        previousUids = [NSSet setWithArray:[previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]]];
-        
-        NSMutableSet<NSString *> *mutableChangedUids = [NSMutableSet set];
-        NSMutableSet<NSString *> *mutableCurrentUids = [previousUids mutableCopy];
         for (NSDictionary *playlistDictionary in replacementPlaylistDictionaries) {
             SRGPlaylist *playlist = [SRGPlaylist synchronizeWithDictionary:playlistDictionary inManagedObjectContext:managedObjectContext];
             if (playlist) {
-                [mutableChangedUids addObject:playlist.uid];
-                
-                if (playlist.inserted) {
-                    [mutableCurrentUids addObject:playlist.uid];
-                }
-                else if (playlist.deleted) {
-                    [mutableCurrentUids removeObject:playlist.uid];
-                }
+                [changedUids addObject:playlist.uid];
             }
         }
-        changedUids = [mutableChangedUids copy];
-        currentUids = [mutableCurrentUids copy];
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
         if (! error && changedUids.count > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : changedUids,
-                                                                            SRGPlaylistsUidsKey : currentUids,
-                                                                            SRGPlaylistsPreviousUidsKey : previousUids }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : [changedUids copy] }];
             });
         }
         completionBlock(error);
@@ -158,10 +135,7 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
 - (void)saveEntryDictionaries:(NSArray<NSDictionary *> *)playlistEntryDictionaries toPlaylistUid:(NSString *)playlistUid withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
     __block BOOL playlistFound = NO;
-    
-    __block NSSet<NSString *> *changedUids = nil;
-    __block NSSet<NSString *> *currentUids = nil;
-    __block NSSet<NSString *> *previousUids = nil;
+    __block NSMutableSet<NSString *> *changedUids = [NSMutableSet set];
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
@@ -177,27 +151,14 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
             return;
         }
         
-        previousUids = [NSSet setWithArray:[previousPlaylistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)]];
-        
-        NSMutableSet<NSString *> *mutableChangedUids = [NSMutableSet set];
-        NSMutableSet<NSString *> *mutableCurrentUids = [previousUids mutableCopy];
         for (NSDictionary *playlistEntryDictionary in replacementPlaylistEntryDictionaries) {
             SRGPlaylistEntry *playlistEntry = [SRGPlaylistEntry synchronizeWithDictionary:playlistEntryDictionary playlist:playlist inManagedObjectContext:managedObjectContext];
             if (playlistEntry) {
-                [mutableChangedUids addObject:playlistEntry.uid];
-
-                if (playlistEntry.inserted) {
-                    [mutableCurrentUids addObject:playlistEntry.uid];
-                }
-                else if (playlistEntry.deleted) {
-                    [mutableCurrentUids removeObject:playlistEntry.uid];
-                }
+                [changedUids addObject:playlistEntry.uid];
             }
         }
-        changedUids = [mutableChangedUids copy];
-        currentUids = [mutableCurrentUids copy];
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-        if (! error && ! playlistFound) {
+        if (! error && ! playlistFound && changedUids) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                         code:SRGUserDataErrorNotFound
                                     userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
@@ -209,9 +170,7 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
                     SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
                     [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
                                                                       object:playlist
-                                                                    userInfo:@{ SRGPlaylistEntriesChangedUidsKey : changedUids,
-                                                                                SRGPlaylistEntriesUidsKey : currentUids,
-                                                                                SRGPlaylistEntriesPreviousUidsKey : previousUids }];
+                                                                    userInfo:@{ SRGPlaylistEntriesChangedUidsKey : changedUids }];
                     return nil;
                 }];
             });
@@ -251,9 +210,8 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-    // Only standard playlists can be updated (entries can be edited for any kind of playlist, though)
     // TODO: Is an abstraction possible? (filtering out non-synchronizable objects)
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard)];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGPlaylist.new, uid), [SRGPlaylists defaultPlaylistUids]];
     playlists = [playlists filteredArrayUsingPredicate:predicate];
     
     if (playlists.count == 0) {
@@ -499,7 +457,7 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
 - (NSArray<SRGUserObject *> *)userObjectsInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
     // TODO: Is an abstraction possible? (filtering out non-synchronizable objects)
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard)];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGPlaylist.new, type), [SRGPlaylists defaultPlaylistUids]];
     NSArray<SRGUserObject *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     // TODO: <SRGPlaylistEntry *>, no cast
     NSArray<SRGUserObject *> *playlistEntries = (NSArray<SRGUserObject *> *)[SRGPlaylistEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
@@ -508,20 +466,18 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
 
 - (void)clearData
 {
-    __block NSSet<NSString *> *previousUids = nil;
+    __block NSSet<NSString *> *changedUids = nil;
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        previousUids = [NSSet setWithArray:[playlists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]]];
+        changedUids = [NSSet setWithArray:[playlists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]]];
         [SRGPlaylist deleteAllInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (previousUids.count > 0) {
+            if (changedUids.count > 0) {
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : previousUids,
-                                                                            SRGPlaylistsUidsKey : @[],
-                                                                            SRGPlaylistsPreviousUidsKey : previousUids }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : changedUids }];
             }
             
             // TODO: Move to parent class
@@ -577,34 +533,16 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
         uid = NSUUID.UUID.UUIDString;
     }
     
-    __block NSSet<NSString *> *changedUids = nil;
-    __block NSSet<NSString *> *currentUids = nil;
-    __block NSSet<NSString *> *previousUids = nil;
-    
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        previousUids = [NSSet setWithArray:[previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]]];
-        
         SRGPlaylist *playlist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
-        // TODO Don't allow to edit non standard playlist?
         playlist.name = name;
         playlist.type = type;
-        
-        NSMutableSet<NSString *> *mutableCurrentUids = [previousUids mutableCopy];
-        if (playlist.inserted) {
-            [mutableCurrentUids addObject:playlist.uid];
-        }
-        currentUids = [mutableCurrentUids copy];
-        changedUids = [NSSet setWithObject:uid];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableDictionary<NSString *, NSSet<NSString *> *> *userInfo = @{ SRGPlaylistsUidsKey : currentUids }.mutableCopy;
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : changedUids,
-                                                                            SRGPlaylistsUidsKey : currentUids,
-                                                                            SRGPlaylistsPreviousUidsKey : previousUids }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : [NSSet setWithObject:uid] }];
             });
         }
         completionBlock ? completionBlock(uid, error) : nil;
@@ -614,37 +552,17 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
 - (NSString *)discardPlaylistsWithUids:(NSArray<NSString *> *)uids completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
     __block NSSet<NSString *> *changedUids = nil;
-    __block NSSet<NSString *> *currentUids = nil;
-    __block NSSet<NSString *> *previousUids = nil;
     
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        previousUids = [NSSet setWithArray:[previousPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]]];
-        
-        NSSet<NSString *> *toDiscardedUids = uids ? [NSSet setWithArray:uids] : previousUids;
-        
-        // TODO: Is an abstraction possible? (filtering out non-synchronizable objects)
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K != %@ AND %K IN %@", @keypath(SRGPlaylist.new, type), @(SRGPlaylistTypeStandard), @keypath(SRGPlaylist.new, uid), toDiscardedUids];
-        NSArray<SRGPlaylist *> *excludedPlaylists = [previousPlaylists filteredArrayUsingPredicate:predicate];
-        if (excludedPlaylists.count > 0) {
-            NSSet<NSString *> *excludedUids = [NSSet setWithArray:[excludedPlaylists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]]];
-            NSMutableSet<NSString *> *mutableUids = toDiscardedUids.mutableCopy;
-            [mutableUids minusSet:excludedUids];
-            toDiscardedUids = mutableUids.copy;
-        }
-        
-        NSArray<NSString *> *discardedUids = [SRGPlaylist discardObjectsWithUids:toDiscardedUids.allObjects inManagedObjectContext:managedObjectContext];
-        
-        currentUids = [previousUids srguserdata_setByRemovingObjectsInArray:discardedUids];
+        NSArray<NSString *> *discardableUids = [uids srguserdata_arrayByRemovingObjectsInArray:[SRGPlaylists defaultPlaylistUids]];
+        NSArray<NSString *> *discardedUids = [SRGPlaylist discardObjectsWithUids:discardableUids inManagedObjectContext:managedObjectContext];
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (! error) {
+        if (! error && changedUids.count > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : changedUids,
-                                                                            SRGPlaylistsUidsKey : currentUids,
-                                                                            SRGPlaylistsPreviousUidsKey : previousUids }];
+                                                                userInfo:@{ SRGPlaylistsChangedUidsKey : changedUids }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
@@ -699,10 +617,6 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
 {
     __block BOOL playlistFound = NO;
     
-    __block NSSet<NSString *> *changedUids = nil;
-    __block NSSet<NSString *> *currentUids = nil;
-    __block NSSet<NSString *> *previousUids = nil;
-    
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
         if (! playlist) {
@@ -711,16 +625,7 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
         
         playlistFound = YES;
         
-        previousUids = [playlist.entries.set valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
-        
-        SRGPlaylistEntry *playlistEntry = [SRGPlaylistEntry upsertWithUid:uid playlist:playlist inManagedObjectContext:managedObjectContext];
-        
-        NSMutableSet<NSString *> *mutableCurrentUids = [previousUids mutableCopy];
-        if (playlistEntry.inserted) {
-            [mutableCurrentUids addObject:uid];
-        }
-        currentUids = [mutableCurrentUids copy];
-        changedUids = [NSSet setWithObject:uid];
+        [SRGPlaylistEntry upsertWithUid:uid playlist:playlist inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error && ! playlistFound) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
@@ -734,9 +639,7 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
                     SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
                     [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
                                                                       object:playlist
-                                                                    userInfo:@{ SRGPlaylistEntriesChangedUidsKey : changedUids,
-                                                                                SRGPlaylistEntriesUidsKey : currentUids,
-                                                                                SRGPlaylistEntriesPreviousUidsKey : previousUids }];
+                                                                    userInfo:@{ SRGPlaylistEntriesChangedUidsKey : [NSSet setWithObject:uid] }];
                     return nil;
                 }];
             });
@@ -748,10 +651,7 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
 - (NSString *)discardEntriesWithUids:(NSArray<NSString *> *)uids fromPlaylistWithUid:(NSString *)playlistUid completionBlock:(void (^)(NSError * _Nullable error))completionBlock
 {
     __block BOOL playlistFound = NO;
-    
     __block NSSet<NSString *> *changedUids = nil;
-    __block NSSet<NSString *> *currentUids = nil;
-    __block NSSet<NSString *> *previousUids = nil;
     
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
@@ -761,11 +661,7 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
         
         playlistFound = YES;
         
-        previousUids = [playlist.entries.set valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
-        
         NSArray<NSString *> *discardedUids = [SRGPlaylistEntry discardObjectsWithUids:uids playlist:playlist inManagedObjectContext:managedObjectContext];
-        
-        currentUids = [previousUids srguserdata_setByRemovingObjectsInArray:discardedUids];
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error && ! playlistFound) {
@@ -780,9 +676,7 @@ NSString * const SRGPlaylistEntriesPreviousUidsKey = @"SRGPlaylistEntriesPreviou
                     SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
                     [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
                                                                       object:playlist
-                                                                    userInfo:@{ SRGPlaylistEntriesChangedUidsKey : changedUids,
-                                                                                SRGPlaylistEntriesUidsKey : currentUids,
-                                                                                SRGPlaylistEntriesPreviousUidsKey : previousUids }];
+                                                                    userInfo:@{ SRGPlaylistEntriesChangedUidsKey : changedUids }];
                     return nil;
                 }];
             });

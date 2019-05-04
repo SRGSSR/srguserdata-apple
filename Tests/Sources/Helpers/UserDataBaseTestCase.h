@@ -146,15 +146,15 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 /**
  *  History test data creation on the remote user data service.
  */
-@interface UserDataBaseTestCase (HistoryTestData)
+@interface UserDataBaseTestCase (HistoryRemoteTestData)
 
 /**
- *  Insert remote history entries with the specified uids. Wait until operation finishes.
+ *  Insert remote history entries with the specified uids. Wait until the operation finishes.
  */
 - (void)insertRemoteHistoryEntriesWithUids:(NSArray<NSString *> *)uids;
 
 /**
- *  Delete the remote history entries having the specified identifiers. Wait until deletion is successful.
+ *  Discard the remote history entries having the specified identifiers. Wait until deletion is successful.
  */
 - (void)discardRemoteHistoryEntriesWithUids:(NSArray<NSString *> *)uids;
 
@@ -166,27 +166,49 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 @end
 
 /**
- *  Playlist test data creation on the remote user data service.
+ *  History test data creation on the local device.
  */
-@interface UserDataBaseTestCase (PlaylistTestData)
+@interface UserDataBaseTestCase (HistoryLocalTestData)
 
 /**
- *  Insert a remote playlist with the specified identifier. Wait until operation finishes.
+ *  Insert local history entries with the specified uids. Wait until the operation finishes.
+ */
+- (void)insertLocalHistoryEntriesWithUids:(NSArray<NSString *> *)uids;
+
+/**
+ *  Discard the local history entries having the specified identifiers. Wait until deletion is successful.
+ */
+- (void)discardLocalHistoryEntriesWithUids:(NSArray<NSString *> *)uids;
+
+/**
+ *  Assert that the local history entries match a specific list (order is ignored).
+ */
+- (void)assertLocalHistoryUids:(NSArray<NSString *> *)uids;
+
+@end
+
+/**
+ *  Playlist test data creation on the remote user data service.
+ */
+@interface UserDataBaseTestCase (PlaylistRemoteTestData)
+
+/**
+ *  Insert a remote playlist with the specified identifier. Wait until the operation finishes.
  */
 - (void)insertRemotePlaylistWithUid:(NSString *)uid;
 
 /**
- *  Insert a remote playlist entry for a specific playlist. Wait until operation finishes.
+ *  Insert a remote playlist entry for a specific playlist. Wait until the operation finishes.
  */
 - (void)insertRemotePlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
 
 /**
- *  Discard the remote playlists having the specified identifiers. Wait until operation finishes.
+ *  Discard the remote playlists having the specified identifiers. Wait until the operation finishes.
  */
 - (void)discardRemotePlaylistsWithUids:(NSArray<NSString *> *)uids;
 
 /**
- *  Discard remote entries for a specific playlist identifier. Wait until operation finishes.
+ *  Discard remote entries for a specific playlist identifier. Wait until the operation finishes.
  */
 - (void)discardRemoteEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
 
@@ -200,6 +222,41 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
  *  Assert that the remote entry identifiers for a specific playlist match a specific list (order is ignored).
  */
 - (void)assertRemoteEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
+
+@end
+
+@interface UserDataBaseTestCase (PlaylistLocalTestData)
+
+/**
+ *  Insert a local playlist with the specified identifier. Wait until the operation finishes.
+ */
+- (void)insertLocalPlaylistWithUid:(NSString *)uid;
+
+/**
+ *  Insert a local playlist entry for a specific playlist. Wait until the operation finishes.
+ */
+- (void)insertLocalPlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
+
+/**
+ *  Discard the local playlists having the specified identifiers. Wait until the operation finishes.
+ */
+- (void)discardLocalPlaylistsWithUids:(NSArray<NSString *> *)uids;
+
+/**
+ *  Discard local entries for a specific playlist identifier. Wait until the operation finishes.
+ */
+- (void)discardLocalEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
+
+/**
+ *  Assert that the the current local playlist identifiers match a specific list (order is ignored). System playlists
+ *  are added automatically to the list of uids.
+ */
+- (void)assertLocalPlaylistUids:(NSArray<NSString *> *)uids;
+
+/**
+ *  Assert that the local entry identifiers for a specific playlist match a specific list (order is ignored).
+ */
+- (void)assertLocalEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
 
 @end
 

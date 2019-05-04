@@ -23,11 +23,9 @@
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGNetwork/SRGNetwork.h>
 
-NSString * const SRGHistoryDidChangeNotification = @"SRGHistoryDidChangeNotification";
+NSString * const SRGHistoryEntriesDidChangeNotification = @"SRGHistoryEntriesDidChangeNotification";
 
 NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
-NSString * const SRGHistoryUidsKey = @"SRGHistoryUids";
-NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
 
 @interface SRGHistory ()
 
@@ -60,38 +58,21 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
         return;
     }
     
-    __block NSSet<NSString *> *changedUids = nil;
-    __block NSSet<NSString *> *currentUids = nil;
-    __block NSSet<NSString *> *previousUids = nil;
+    __block NSMutableSet<NSString *> *changedUids = [NSMutableSet set];
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGHistoryEntry *> *previousHistoryEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        NSString *keyPath = [NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)];
-        previousUids = [NSSet setWithArray:[previousHistoryEntries valueForKeyPath:keyPath]];
-        
-        NSMutableSet<NSString *> *mutableChangedUids = [NSMutableSet set];
-        NSMutableSet<NSString *> *mutableCurrentUids = [previousUids mutableCopy];
         for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
             SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
-            [mutableChangedUids addObject:historyEntry.uid];
-            
-            if (historyEntry.inserted) {
-                [mutableCurrentUids addObject:historyEntry.uid];
-            }
-            else if (historyEntry.deleted) {
-                [mutableCurrentUids removeObject:historyEntry.uid];
+            if (historyEntry) {
+                [changedUids addObject:historyEntry.uid];
             }
         }
-        changedUids = [mutableChangedUids copy];
-        currentUids = [mutableCurrentUids copy];
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
         if (! error && changedUids.count > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : changedUids,
-                                                                            SRGHistoryUidsKey : currentUids,
-                                                                            SRGHistoryPreviousUidsKey : previousUids }];
+                                                                userInfo:@{ SRGHistoryChangedUidsKey : [changedUids copy] }];
             });
         }
         completionBlock(error);
@@ -259,11 +240,9 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (previousUids.count > 0) {
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : previousUids,
-                                                                            SRGHistoryUidsKey : @[],
-                                                                            SRGHistoryPreviousUidsKey : previousUids }];
+                                                                userInfo:@{ SRGHistoryChangedUidsKey : previousUids }];
             }
         });
     }];
@@ -301,32 +280,16 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
 
 - (NSString *)saveHistoryEntryWithUid:(NSString *)uid lastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
-    __block NSSet<NSString *> *changedUids = nil;
-    __block NSSet<NSString *> *currentUids = nil;
-    __block NSSet<NSString *> *previousUids = nil;
-    
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGHistoryEntry *> *previousHistoryEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        previousUids = [NSSet setWithArray:[previousHistoryEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)]]];
-        
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithUid:uid inManagedObjectContext:managedObjectContext];
         historyEntry.lastPlaybackTime = lastPlaybackTime;
         historyEntry.deviceUid = deviceUid;
-        
-        NSMutableSet<NSString *> *mutableCurrentUids = [previousUids mutableCopy];
-        if (historyEntry.inserted) {
-            [mutableCurrentUids addObject:uid];
-        }
-        currentUids = [mutableCurrentUids copy];
-        changedUids = [NSSet setWithObject:uid];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : changedUids,
-                                                                            SRGHistoryUidsKey : currentUids,
-                                                                            SRGHistoryPreviousUidsKey : previousUids }];
+                                                                userInfo:@{ SRGHistoryChangedUidsKey : [NSSet setWithObject:uid] }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
@@ -336,26 +299,16 @@ NSString * const SRGHistoryPreviousUidsKey = @"SRGHistoryPreviousUids";
 - (NSString *)discardHistoryEntriesWithUids:(NSArray<NSString *> *)uids completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
     __block NSSet<NSString *> *changedUids = nil;
-    __block NSSet<NSString *> *currentUids = nil;
-    __block NSSet<NSString *> *previousUids = nil;
     
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGHistoryEntry *> *previousHistoryEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-        NSString *keyPath = [NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)];
-        previousUids = [NSSet setWithArray:[previousHistoryEntries valueForKeyPath:keyPath]];
-        
         NSArray<NSString *> *discardedUids = [SRGHistoryEntry discardObjectsWithUids:uids inManagedObjectContext:managedObjectContext];
-        
-        currentUids = [previousUids srguserdata_setByRemovingObjectsInArray:discardedUids];
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryDidChangeNotification
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : changedUids,
-                                                                            SRGHistoryPreviousUidsKey : previousUids,
-                                                                            SRGHistoryUidsKey : currentUids }];
+                                                                userInfo:@{ SRGHistoryChangedUidsKey : changedUids }];
             });
         }
         completionBlock ? completionBlock(error) : nil;

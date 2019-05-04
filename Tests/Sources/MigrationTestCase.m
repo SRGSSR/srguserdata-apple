@@ -92,16 +92,14 @@
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
-        NSArray<NSString *> *previousUids = notification.userInfo[SRGHistoryPreviousUidsKey];
-        XCTAssertNotNil(previousUids);
-        return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
+        return [notification.userInfo[SRGHistoryChangedUidsKey] containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
+        
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
@@ -150,15 +148,12 @@
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
-        NSArray<NSString *> *previousUids = notification.userInfo[SRGHistoryPreviousUidsKey];
-        XCTAssertNotNil(previousUids);
-        return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
+        return [notification.userInfo[SRGHistoryChangedUidsKey] containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -209,15 +204,12 @@
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
-        NSArray<NSString *> *previousUids = notification.userInfo[SRGHistoryPreviousUidsKey];
-        XCTAssertNotNil(previousUids);
-        return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
+        return [notification.userInfo[SRGHistoryChangedUidsKey] containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -268,15 +260,12 @@
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
-        NSArray<NSString *> *previousUids = notification.userInfo[SRGHistoryPreviousUidsKey];
-        XCTAssertNotNil(previousUids);
-        return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
+        return [notification.userInfo[SRGHistoryChangedUidsKey] containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -326,15 +315,12 @@
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
-        NSArray<NSString *> *previousUids = notification.userInfo[SRGHistoryPreviousUidsKey];
-        XCTAssertNotNil(previousUids);
-        return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
+        return [notification.userInfo[SRGHistoryChangedUidsKey] containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     
@@ -384,15 +370,12 @@
     
     // Database is writable.
     NSString *uid2 = @"urn:rts:video:1234567890";
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        NSArray<NSString *> *uids = notification.userInfo[SRGHistoryUidsKey];
-        NSArray<NSString *> *previousUids = notification.userInfo[SRGHistoryPreviousUidsKey];
-        XCTAssertNotNil(previousUids);
-        return [uids containsObject:uid2] && ![previousUids containsObject:uid2];
+        return [notification.userInfo[SRGHistoryChangedUidsKey] containsObject:uid2];
     }];
     
-    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"Test device" completionBlock:^(NSError * _Nonnull error) {
+    [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
     }];
     

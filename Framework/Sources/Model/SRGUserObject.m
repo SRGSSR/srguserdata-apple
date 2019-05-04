@@ -76,7 +76,9 @@
 + (SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
     NSString *uid = dictionary[self.uidKey];
-    NSAssert(uid, @"A unique identifier is required");
+    if (! uid) {
+        return nil;
+    }
     
     // If the local entry is dirty and more recent than the server version, keep the local version as is.
     NSNumber *timestamp = dictionary[@"date"];

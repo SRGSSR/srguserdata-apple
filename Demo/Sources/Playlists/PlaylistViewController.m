@@ -201,11 +201,14 @@
 
 - (void)playlistEntriesDidChange:(NSNotification *)notification
 {
+    // FIXME:
+#if 0
     NSSet<NSString *> *previousURNs = notification.userInfo[SRGPlaylistEntriesPreviousUidsKey];
     NSSet<NSString *> *URNs = notification.userInfo[SRGPlaylistEntriesUidsKey];
     if (URNs.count == 0 || previousURNs.count == 0) {
         [self refresh];
     }
+#endif
 }
 
 @end
