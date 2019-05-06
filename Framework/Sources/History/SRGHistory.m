@@ -25,7 +25,7 @@
 
 NSString * const SRGHistoryEntriesDidChangeNotification = @"SRGHistoryEntriesDidChangeNotification";
 
-NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
+NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryChangedUids";
 
 @interface SRGHistory ()
 
@@ -72,7 +72,7 @@ NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : [changedUids copy] }];
+                                                                userInfo:@{ SRGHistoryEntriesUidsKey : [changedUids copy] }];
             });
         }
         completionBlock(error);
@@ -242,7 +242,7 @@ NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
             if (previousUids.count > 0) {
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : previousUids }];
+                                                                userInfo:@{ SRGHistoryEntriesUidsKey : previousUids }];
             }
         });
     }];
@@ -289,7 +289,7 @@ NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : [NSSet setWithObject:uid] }];
+                                                                userInfo:@{ SRGHistoryEntriesUidsKey : [NSSet setWithObject:uid] }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
@@ -308,7 +308,7 @@ NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryChangedUidsKey : changedUids }];
+                                                                userInfo:@{ SRGHistoryEntriesUidsKey : changedUids }];
             });
         }
         completionBlock ? completionBlock(error) : nil;

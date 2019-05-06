@@ -22,7 +22,7 @@
 {
     // Automatically inserted after initialization
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], [NSSet setWithObject:SRGPlaylistUidWatchLater]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], [NSSet setWithObject:SRGPlaylistUidWatchLater]);
         return YES;
     }];
     
@@ -57,8 +57,8 @@
     // Insertion, no uid specified (a new uid is generated)
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqual([notification.userInfo[SRGPlaylistsChangedUidsKey] count], 1);
-        generatedUid = [notification.userInfo[SRGPlaylistsChangedUidsKey] anyObject];
+        XCTAssertEqual([notification.userInfo[SRGPlaylistsUidsKey] count], 1);
+        generatedUid = [notification.userInfo[SRGPlaylistsUidsKey] anyObject];
         XCTAssertNotNil(generatedUid);
         return YES;
     }];
@@ -80,7 +80,7 @@
     // Update of existing entry
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], [NSSet setWithObject:generatedUid]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], [NSSet setWithObject:generatedUid]);
         XCTAssertNotNil(generatedUid);
         return YES;
     }];
@@ -100,7 +100,7 @@
     // New entry with assigned uid
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], [NSSet setWithObject:@"b"]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], [NSSet setWithObject:@"b"]);
         XCTAssertNotNil(generatedUid);
         return YES;
     }];
@@ -279,7 +279,7 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", nil]));
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", nil]));
         return YES;
     }];
     
@@ -353,7 +353,7 @@
     
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", @"d", nil]));
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", @"d", nil]));
         return YES;
     }];
     
@@ -381,7 +381,7 @@
         SRGPlaylist *playlist = notification.object;
         XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
         
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesChangedUidsKey], [NSSet setWithObject:@"1"]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], [NSSet setWithObject:@"1"]);
         return YES;
     }];
     
@@ -537,7 +537,7 @@
         SRGPlaylist *playlist = notification.object;
         XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
         
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesChangedUidsKey], ([NSSet setWithObjects:@"3", @"4", nil]));
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], ([NSSet setWithObjects:@"3", @"4", nil]));
         return YES;
     }];
     
@@ -589,7 +589,7 @@
         SRGPlaylist *playlist = notification.object;
         XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
         
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesChangedUidsKey], ([NSSet setWithObjects:@"1", @"2", @"3", @"4", @"5", nil]));
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], ([NSSet setWithObjects:@"1", @"2", @"3", @"4", @"5", nil]));
         return YES;
     }];
     
