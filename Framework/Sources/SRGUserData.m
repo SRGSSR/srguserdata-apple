@@ -314,9 +314,8 @@ NSString *SRGUserDataMarketingVersion(void)
     
     SRGUserDataLogInfo(@"user_data", @"Started synchronization");
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:SRGUserDataDidStartSynchronizationNotification object:self];
-    });
+    NSAssert(NSThread.isMainThread, @"Expected to be called on the main thread");
+    [NSNotificationCenter.defaultCenter postNotificationName:SRGUserDataDidStartSynchronizationNotification object:self];
     
     __block NSUInteger remainingServiceCount = self.services.count;
     [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
@@ -333,7 +332,7 @@ NSString *SRGUserDataMarketingVersion(void)
                 } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
                     self.synchronizing = NO;
                     
-                    dispatch_async(dispatch_get_main_queue(), ^{
+                    dispatch_sync(dispatch_get_main_queue(), ^{
                         [NSNotificationCenter.defaultCenter postNotificationName:SRGUserDataDidFinishSynchronizationNotification object:self];
                     });
                     
@@ -358,7 +357,7 @@ NSString *SRGUserDataMarketingVersion(void)
             }
         }];
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             [self synchronize];
         });
     }];
