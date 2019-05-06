@@ -47,8 +47,6 @@ static SRGPlaylistType SRGPlaylistTypeForPlaylistWithUid(NSString *uid)
     return typeNumber ? typeNumber.integerValue : SRGPlaylistTypeStandard;
 }
 
-SRGPlaylistUid const SRGPlaylistUidWatchLater = @"watch_later";
-
 NSString * const SRGPlaylistsDidChangeNotification = @"SRGPlaylistsDidChangeNotification";
 NSString * const SRGPlaylistsChangedUidsKey = @"SRGPlaylistsChangedUids";
 
@@ -566,8 +564,7 @@ NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedU
     __block NSSet<NSString *> *changedUids = nil;
     
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<NSString *> *discardableUids = [uids srguserdata_arrayByRemovingObjectsInArray:[SRGPlaylists defaultPlaylistUids]];
-        NSArray<NSString *> *discardedUids = [SRGPlaylist discardObjectsWithUids:discardableUids inManagedObjectContext:managedObjectContext];
+        NSArray<NSString *> *discardedUids = [SRGPlaylist discardObjectsWithUids:uids inManagedObjectContext:managedObjectContext];
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error && changedUids.count > 0) {

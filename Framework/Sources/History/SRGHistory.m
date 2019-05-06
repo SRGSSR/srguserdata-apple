@@ -304,7 +304,7 @@ NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
         NSArray<NSString *> *discardedUids = [SRGHistoryEntry discardObjectsWithUids:uids inManagedObjectContext:managedObjectContext];
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (! error) {
+        if (! error && changedUids.count > 0) {
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self

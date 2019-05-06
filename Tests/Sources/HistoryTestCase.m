@@ -154,7 +154,7 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
-- (void)testHistoryEntriesMatchingSortDescriptor
+- (void)testHistoryEntriesWithSortDescriptor
 {
     [self insertLocalHistoryEntriesWithUids:@[@"a", @"b", @"c", @"d", @"e"]];
     
@@ -202,6 +202,27 @@
     NSArray<SRGHistoryEntry *> *historyEntries = [self.userData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
     NSArray<NSString *> *uids = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
     XCTAssertEqualObjects(uids, (@[ @"e", @"d", @"a" ]));
+}
+
+- (void)testDiscardNonExistingHistoryEntry
+{
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryEntriesDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        XCTFail(@"No change must be received");
+    }];
+    
+    [self expectationForElapsedTimeInterval:4. withHandler:nil];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History discarded"];
+    
+    [self.userData.history discardHistoryEntriesWithUids:@[ @"k" ] completionBlock:^(NSError * _Nonnull error) {
+        XCTAssertFalse(NSThread.isMainThread);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
 }
 
 - (void)testDiscardAllHistoryEntries

@@ -23,11 +23,18 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Subclasses must implement this method to provide the JSON key which is used to identity the item in a unique way.
  */
-@property (class, nonatomic) NSString *uidKey;
+@property (class, nonatomic, readonly) NSString *uidKey;
 
 /**
- *  Subclasses must return `YES`iff the object is synchronizable. The default implementation returns `YES`.
+ *  Return the list of identifiers whose entries cannot be discarded. The default implementation returns an empty list.
  */
+// TODO: Maybe should have a subclassing hook for standard entry insertion, returning those ids
+@property (class, nonatomic, readonly) NSArray<NSString *> *undiscardableUids;
+
+/**
+ *  Subclasses must return `YES` iff the object is synchronizable. The default implementation returns `YES`.
+ */
+// TODO: Replace with list above
 @property (nonatomic, readonly, getter=isSynchronizable) BOOL synchronizable;
 
 /**

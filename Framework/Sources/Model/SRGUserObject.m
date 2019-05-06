@@ -6,6 +6,7 @@
 
 #import "SRGUserObject.h"
 
+#import "NSArray+SRGUserData.h"
 #import "SRGUser+Private.h"
 #import "SRGUserObject+Private.h"
 #import "SRGUserObject+Subclassing.h"
@@ -143,7 +144,15 @@
 
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 {
-    NSPredicate *predicate = uids ? [NSPredicate predicateWithFormat:@"%K IN %@ AND discarded == NO", @keypath(SRGUserObject.new, uid), uids] : nil;
+    NSPredicate *predicate = nil;
+    if (uids) {
+        NSArray<NSString *> *discardableUids = [uids srguserdata_arrayByRemovingObjectsInArray:self.undiscardableUids];
+        predicate = [NSPredicate predicateWithFormat:@"%K IN %@", @keypath(SRGUserObject.new, uid), discardableUids];
+    }
+    else {
+        predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGUserObject.new, uid), self.undiscardableUids];
+    }
+    
     NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
     
@@ -188,6 +197,11 @@
     self.date = dateString ? [NSDate dateWithTimeIntervalSince1970:dateString.doubleValue / 1000.] : NSDate.date;
     
     self.discarded = [dictionary[@"deleted"] boolValue];
+}
+
++ (NSArray<NSString *> *)undiscardableUids
+{
+    return @[];
 }
 
 - (BOOL)isSynchronizable

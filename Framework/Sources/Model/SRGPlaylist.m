@@ -5,8 +5,8 @@
 //
 
 #import "SRGPlaylist.h"
-#import "SRGPlaylistEntry.h"
 
+#import "SRGPlaylistEntry.h"
 #import "SRGUserObject+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
@@ -24,6 +24,8 @@ static NSValueTransformer *SRGPlaylistTypeJSONTransformer(void)
     });
     return s_transformer;
 }
+
+SRGPlaylistUid const SRGPlaylistUidWatchLater = @"watch_later";
 
 @interface SRGPlaylist ()
 
@@ -48,17 +50,10 @@ static NSValueTransformer *SRGPlaylistTypeJSONTransformer(void)
     return @"businessId";
 }
 
-#pragma mark Getters and Setters
-
-- (NSDictionary *)dictionary
++ (NSArray<NSString *> *)undiscardableUids
 {
-    NSMutableDictionary *JSONDictionary = [[super dictionary] mutableCopy];
-    JSONDictionary[@"name"] = self.name;
-    JSONDictionary[@"type"] = [SRGPlaylistTypeJSONTransformer() reverseTransformedValue:@(self.type)];
-    return [JSONDictionary copy];
+    return @[ SRGPlaylistUidWatchLater ];
 }
-
-#pragma mark Overrides
 
 + (BOOL)isSynchronizableWithDictionary:(NSDictionary *)dictionary
 {
@@ -77,6 +72,14 @@ static NSValueTransformer *SRGPlaylistTypeJSONTransformer(void)
 - (BOOL)isSynchronizable
 {
     return self.type == SRGPlaylistTypeStandard;
+}
+
+- (NSDictionary *)dictionary
+{
+    NSMutableDictionary *JSONDictionary = [[super dictionary] mutableCopy];
+    JSONDictionary[@"name"] = self.name;
+    JSONDictionary[@"type"] = [SRGPlaylistTypeJSONTransformer() reverseTransformedValue:@(self.type)];
+    return [JSONDictionary copy];
 }
 
 @end

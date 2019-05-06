@@ -23,6 +23,13 @@ typedef NS_ENUM(NSInteger, SRGPlaylistType) {
 };
 
 /**
+ *  Default playlist identifiers. Use to access system playlists widely available.
+ */
+typedef NSString * SRGPlaylistUid NS_TYPED_ENUM;
+
+OBJC_EXPORT SRGPlaylistUid const SRGPlaylistUidWatchLater;                          // Watch later playlist
+
+/**
  *  Entry in the playlist service.
  *
  *  @discussion Instances must not be shared among threads.

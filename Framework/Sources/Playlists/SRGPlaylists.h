@@ -11,13 +11,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- *  Default playlist identifiers. Use to access system playlists widely available.
- */
-typedef NSString * SRGPlaylistUid NS_TYPED_ENUM;
-
-OBJC_EXPORT SRGPlaylistUid const SRGPlaylistUidWatchLater;                          // Watch later playlist
-
-/**
  *  Notification sent when one or more playlists change. Use the keys below to retrieve detailed information from the notification
  *  `userInfo` dictionary.
  */
@@ -111,8 +104,8 @@ OBJC_EXPORT NSString * const SRGPlaylistEntriesChangedUidsKey;                  
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error and the corresponding transaction rollbacked.
  *
- *  @discussion The completion block is called on a background thread. Attempting to discard a default playlist fails with
- *              an error.
+ *  @discussion The completion block is called on a background thread. Attempting to discard a default playlist has no
+ *              effect.
  */
 - (NSString *)discardPlaylistsWithUids:(nullable NSArray<NSString *> *)uids
                        completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
