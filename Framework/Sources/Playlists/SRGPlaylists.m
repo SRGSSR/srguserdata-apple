@@ -93,7 +93,7 @@ NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedU
 {
     NSArray<NSString *> *defaultPlaylistUids = [SRGPlaylists defaultPlaylistUids];
     for (NSString *uid in defaultPlaylistUids) {
-        [self savePlaylistWithName:@"" /* overridden */ uid:uid completionBlock:nil];
+        [self saveDefaultPlaylistWithUid:uid completionBlock:nil];
     }
 }
 
@@ -122,7 +122,7 @@ NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedU
         }
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
         if (! error && changedUids.count > 0) {
-            dispatch_async(dispatch_get_main_queue(), ^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGPlaylistsChangedUidsKey : [changedUids copy] }];
@@ -158,13 +158,12 @@ NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedU
             }
         }
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-        if (! error && ! playlistFound && changedUids) {
+        if (! playlistFound) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                         code:SRGUserDataErrorNotFound
                                     userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
         }
-        
-        if (! error && changedUids.count > 0) {
+        else if (! error && changedUids.count > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
                     SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
@@ -473,7 +472,7 @@ NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedU
         changedUids = [NSSet setWithArray:[playlists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]]];
         [SRGPlaylist deleteAllInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             if (changedUids.count > 0) {
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
@@ -518,11 +517,12 @@ NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedU
 
 - (NSString *)savePlaylistWithName:(NSString *)name uid:(NSString *)uid completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
 {
-    SRGPlaylistType type = SRGPlaylistTypeForPlaylistWithUid(uid);
-    if (type != SRGPlaylistTypeStandard) {
-        name = SRGPlaylistNameForPlaylistWithUid(uid);
-    }
-    return [self savePlaylistWithName:name uid:uid type:type completionBlock:completionBlock];
+    return [self savePlaylistWithName:name uid:uid type:SRGPlaylistTypeStandard completionBlock:completionBlock];
+}
+
+- (void)saveDefaultPlaylistWithUid:(NSString *)uid completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
+{
+    [self savePlaylistWithName:SRGPlaylistNameForPlaylistWithUid(uid) uid:uid type:SRGPlaylistTypeForPlaylistWithUid(uid) completionBlock:completionBlock];
 }
 
 - (NSString *)savePlaylistWithName:(NSString *)name uid:(NSString *)uid type:(SRGPlaylistType)type completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
@@ -533,13 +533,25 @@ NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedU
         uid = NSUUID.UUID.UUIDString;
     }
     
+    __block BOOL forbidden = NO;
+    
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        if (type != SRGPlaylistTypeForPlaylistWithUid(uid)) {
+            forbidden = YES;
+            return;
+        }
+        
         SRGPlaylist *playlist = [SRGPlaylist upsertWithUid:uid inManagedObjectContext:managedObjectContext];
         playlist.name = name;
         playlist.type = type;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (! error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
+        if (forbidden) {
+            error = [NSError errorWithDomain:SRGUserDataErrorDomain
+                                        code:SRGUserDataErrorForbidden
+                                    userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist cannot be edited", @"Error message returned when attempting to edit a default read-only playlist") }];
+        }
+        else if (! error) {
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGPlaylistsChangedUidsKey : [NSSet setWithObject:uid] }];
@@ -559,7 +571,7 @@ NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedU
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error && changedUids.count > 0) {
-            dispatch_async(dispatch_get_main_queue(), ^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGPlaylistsChangedUidsKey : changedUids }];
@@ -627,13 +639,12 @@ NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedU
         
         [SRGPlaylistEntry upsertWithUid:uid playlist:playlist inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (! error && ! playlistFound) {
+        if (! playlistFound) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                         code:SRGUserDataErrorNotFound
                                     userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when adding an entry to an unknown playlist.") }];
         }
-        
-        if (! error) {
+        else if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
                     SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
@@ -664,13 +675,12 @@ NSString * const SRGPlaylistEntriesChangedUidsKey = @"SRGPlaylistEntriesChangedU
         NSArray<NSString *> *discardedUids = [SRGPlaylistEntry discardObjectsWithUids:uids playlist:playlist inManagedObjectContext:managedObjectContext];
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
-        if (! error && ! playlistFound) {
+        if (! playlistFound) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
                                         code:SRGUserDataErrorNotFound
                                     userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The playlist does not exist.", @"Error message returned when removing some entries from an unknown playlist.") }];
         }
-        
-        if (! error) {
+        else if (! error && changedUids.count > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
                     SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];

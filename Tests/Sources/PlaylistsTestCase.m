@@ -41,8 +41,6 @@
 
 #pragma mark Tests
 
-#if 0
-
 - (void)testDefaultPlaylists
 {
     SRGPlaylist *playlist = [self.userData.playlists playlistWithUid:SRGPlaylistUidWatchLater];
@@ -52,164 +50,82 @@
     XCTAssertFalse(playlist.discarded);
 }
 
-- (void)testAddPlaylist
+- (void)testSavePlaylist
 {
-    __block NSString *addedUid = nil;
-    NSString *name = @"Playlist 1234";
-    
+    __block NSString *generatedUid = nil;
+ 
+    // Insertion, no uid specified (a new uid is generated)
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey],  [NSSet setWithObject:addedUid]);
-        NSSet<NSString *> *uids = [NSSet setWithObjects:SRGPlaylistUidWatchLater, addedUid, nil];
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], uids);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsPreviousUidsKey], [NSSet setWithObject:SRGPlaylistUidWatchLater]);
+        XCTAssertEqual([notification.userInfo[SRGPlaylistsChangedUidsKey] count], 1);
+        generatedUid = [notification.userInfo[SRGPlaylistsChangedUidsKey] anyObject];
+        XCTAssertNotNil(generatedUid);
         return YES;
     }];
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
-    
-    [self.userData.playlists savePlaylistWithName:name uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist saved"];
+ 
+    [self.userData.playlists savePlaylistWithName:@"A" uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
         XCTAssertNil(error);
-        XCTAssertNotNil(uid);
-        addedUid = uid;
-        [expectation fulfill];
+        XCTAssertEqualObjects(uid, generatedUid);
+        [expectation1 fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
+    SRGPlaylist *playlist1 = [self.userData.playlists playlistWithUid:generatedUid];
+    XCTAssertEqualObjects(playlist1.name, @"A");
     
-    XCTAssertEqual(playlists.count, 2);
-}
-
-- (void)testAddPlaylists
-{
-    NSArray<NSString *> *names = @[@"Playlist 12", @"Playlist 34", @"Playlist 56", @"Playlist 78", @"Playlist 90"];
-    
-    __block NSInteger expectedSavedNotifications = names.count;
-    
+    // Update of existing entry
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertNotNil(notification.userInfo[SRGPlaylistsUidsKey]);
-        NSMutableSet<NSString *> *uids = [notification.userInfo[SRGPlaylistsUidsKey] mutableCopy];
-        NSSet<NSString *> *previousUids = notification.userInfo[SRGPlaylistsPreviousUidsKey];
-        [uids minusSet:previousUids];
-        expectedSavedNotifications -= uids.count;
-        
-        return (expectedSavedNotifications == 0);
-    }];
-    
-    for (NSString *name in names) {
-        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
-        
-        [self.userData.playlists savePlaylistWithName:name uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
-            XCTAssertNil(error);
-            XCTAssertNotNil(uid);
-            [expectation fulfill];
-        }];
-    }
-    
-    [self waitForExpectationsWithTimeout:30. handler:nil];
-    
-    id playlistDidChangeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistsDidChangeNotification object:self.userData.playlists queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
-        XCTFail(@"Playlist must not send more did change notifications.");
-    }];
-    
-    [self expectationForElapsedTimeInterval:2. withHandler:nil];
-    
-    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
-        [NSNotificationCenter.defaultCenter removeObserver:playlistDidChangeObserver];
-    }];
-    
-    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
-    
-    XCTAssertEqual(playlists.count, 6);
-}
-
-- (void)testAddPlaylistWithSameName
-{
-    NSString *name = @"Playlist 1234";
-    
-    NSUInteger numberOfAdditions = 5;
-    __block NSUInteger expectedSavedNotifications = numberOfAdditions;
-    
-    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertNotNil(notification.userInfo[SRGPlaylistsUidsKey]);
-        NSMutableSet<NSString *> *uids = [notification.userInfo[SRGPlaylistsUidsKey] mutableCopy];
-        NSSet<NSString *> *previousUids = notification.userInfo[SRGPlaylistsPreviousUidsKey];
-        [uids minusSet:previousUids];
-        expectedSavedNotifications -= uids.count;
-        
-        return (expectedSavedNotifications == 0);
-    }];
-    
-    for (NSUInteger i = 0; i < numberOfAdditions; i++) {
-        XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist saved"];
-        
-        [self.userData.playlists savePlaylistWithName:name uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
-            XCTAssertNil(error);
-            XCTAssertNotNil(uid);
-            [expectation fulfill];
-        }];
-    }
-    
-    [self waitForExpectationsWithTimeout:30. handler:nil];
-    
-    id playlistDidChangeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistsDidChangeNotification object:self.userData.playlists queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
-        XCTFail(@"Playlist must not send more did change notifications.");
-    }];
-    
-    [self expectationForElapsedTimeInterval:2. withHandler:nil];
-    
-    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
-        [NSNotificationCenter.defaultCenter removeObserver:playlistDidChangeObserver];
-    }];
-    
-    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
-    
-    XCTAssertEqual(playlists.count, 6);
-}
-
-- (void)testUpdatePlaylist
-{
-    NSString *name = @"Playlist 1234";
-    NSString *uid = [self addPlaylistNames:@[name]].firstObject;
-    
-    NSString *updatedName = @"Playlist 4321";
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist updated"];
-    
-    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], [NSSet setWithObject:uid]);
-        XCTAssertNotNil(notification.userInfo[SRGPlaylistsUidsKey]);
-        XCTAssertNotNil(notification.userInfo[SRGPlaylistsPreviousUidsKey]);
-        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], notification.userInfo[SRGPlaylistsPreviousUidsKey]);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], [NSSet setWithObject:generatedUid]);
+        XCTAssertNotNil(generatedUid);
         return YES;
     }];
     
-    [self.userData.playlists savePlaylistWithName:updatedName uid:uid completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlist saved"];
+    
+    [self.userData.playlists savePlaylistWithName:@"AA" uid:generatedUid completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
         XCTAssertNil(error);
-        [expectation fulfill];
+        [expectation2 fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    SRGPlaylist *playlist = [self.userData.playlists playlistWithUid:uid];
+    XCTAssertEqualObjects(playlist1.name, @"AA");
     
-    XCTAssertEqualObjects(playlist.uid, uid);
-    XCTAssertEqual(playlist.type, SRGPlaylistTypeStandard);
-    XCTAssertEqualObjects(playlist.name, updatedName);
-    XCTAssertFalse(playlist.discarded);
+    // New entry with assigned uid
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsChangedUidsKey], [NSSet setWithObject:@"b"]);
+        XCTAssertNotNil(generatedUid);
+        return YES;
+    }];
+    
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Playlist saved"];
+    
+    [self.userData.playlists savePlaylistWithName:@"B" uid:@"b" completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqualObjects(uid, @"b");
+        [expectation3 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
 - (void)testUpdateWatchLaterPlaylist
 {
-    NSString *updatedName = @"Playlist WL";
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist updated"];
     
-    [self.userData.playlists savePlaylistWithName:updatedName uid:SRGPlaylistUidWatchLater completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
-        XCTAssertNil(error);
+    NSString *name = @"New name";
+    
+    [self.userData.playlists savePlaylistWithName:name uid:SRGPlaylistUidWatchLater completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
+        XCTAssertEqualObjects(error.domain, SRGUserDataErrorDomain);
+        XCTAssertEqual(error.code, SRGUserDataErrorForbidden);
         [expectation fulfill];
     }];
     
@@ -219,105 +135,86 @@
     
     XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
     XCTAssertEqual(playlist.type, SRGPlaylistTypeWatchLater);
-    XCTAssertNotEqualObjects(playlist.name, updatedName);
+    XCTAssertNotEqualObjects(playlist.name, name);
     XCTAssertFalse(playlist.discarded);
 }
 
 - (void)testPlaylistWithUid
 {
-    NSString *name = @"Playlist 1234";
-    NSString *uid = [self addPlaylistNames:@[name]].firstObject;
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist inserted"];
     
-    SRGPlaylist *playlist1 = [self.userData.playlists playlistWithUid:uid];
+    [self.userData.playlists savePlaylistWithName:@"A" uid:@"a" completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
+        XCTAssertNil(error);
+        [expectation1 fulfill];
+    }];
     
-    XCTAssertEqualObjects(playlist1.uid, uid);
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    // Synchronous
+    SRGPlaylist *playlist1 = [self.userData.playlists playlistWithUid:@"a"];
+    
+    XCTAssertEqualObjects(playlist1.uid, @"a");
     XCTAssertEqual(playlist1.type, SRGPlaylistTypeStandard);
-    XCTAssertEqualObjects(playlist1.name, name);
+    XCTAssertEqualObjects(playlist1.name, @"A");
     XCTAssertFalse(playlist1.discarded);
     
-    SRGPlaylist *playlist2 = [self.userData.playlists playlistWithUid:@"notFound"];
-    
+    SRGPlaylist *playlist2 = [self.userData.playlists playlistWithUid:@"b"];
     XCTAssertNil(playlist2);
-}
-
-- (void)testPlaylistWithUidAsynchronously
-{
-    NSString *name = @"Playlist 1234";
-    NSString *addedUid = [self addPlaylistNames:@[name]].firstObject;
     
-    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist fetched"];
-    
-    [self.userData.playlists playlistWithUid:addedUid completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
-        XCTAssertFalse(NSThread.isMainThread);
-        XCTAssertEqualObjects(playlist.uid, addedUid);
-        XCTAssertEqual(playlist.type, SRGPlaylistTypeStandard);
-        XCTAssertEqualObjects(playlist.name, name);
-        XCTAssertFalse(playlist.discarded);
-        [expectation1 fulfill];
-    }];
-    
-    [self waitForExpectationsWithTimeout:30. handler:nil];
-    
+    // Asynchronous
     XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlist fetched"];
     
-    [self.userData.playlists playlistWithUid:@"notFound" completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
+    [self.userData.playlists playlistWithUid:@"a" completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
+        XCTAssertNil(error);
+        XCTAssertEqualObjects(playlist.uid, @"a");
+        XCTAssertEqual(playlist.type, SRGPlaylistTypeStandard);
+        XCTAssertEqualObjects(playlist.name, @"A");
+        XCTAssertFalse(playlist.discarded);
+        [expectation2 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Playlist fetched"];
+    
+    [self.userData.playlists playlistWithUid:@"b" completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
         XCTAssertNil(playlist);
         XCTAssertNil(error);
-        [expectation2 fulfill];
+        [expectation3 fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
-- (void)testPlaylistsMatchingEmptyPredicateEmptySortDescriptor
+- (void)testPlaylists
 {
-    NSArray<SRGPlaylist *> *playlists1 = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
+    [self insertLocalPlaylistWithUid:@"a"];
+    [self insertLocalPlaylistWithUid:@"b"];
+    [self insertLocalPlaylistWithUid:@"c"];
     
-    XCTAssertNotNil(playlists1);
-    XCTAssertEqual(playlists1.count, 1);
+    // Synchronous
+    NSArray<SRGPlaylist *> *playlists = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
+    NSArray<NSString *> *uids = [playlists valueForKeyPath:@keypath(SRGPlaylist.new, uid)];
+    XCTAssertEqualObjects(uids, (@[ SRGPlaylistUidWatchLater, @"c", @"b", @"a" ]));
     
-    NSArray<NSString *> *names = @[@"Playlist 12", @"Playlist 34", @"Playlist 56", @"Playlist 78", @"Playlist 90"];
-    NSArray<NSString *> *uids = [[self addPlaylistNames:names] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-    NSArray<NSString *> *resultUids = [uids arrayByAddingObject:SRGPlaylistUidWatchLater];
+    // Asynchronous
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlists fetched"];
     
-    NSArray<SRGPlaylist *> *playlists2 = [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
-    
-    XCTAssertEqual(playlists2.count, resultUids.count);
-    
-    NSArray<NSString *> *queryUids2 = [playlists2 valueForKeyPath:@keypath(SRGPlaylist.new, uid)];
-    XCTAssertEqualObjects(queryUids2, [[resultUids reverseObjectEnumerator] allObjects]);
-}
-
-- (void)testPlaylistsMatchingEmptyPredicateEmptySortDescriptorAsynchronously
-{
-    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlists fetched"];
-    
-    [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylist *> * _Nonnull playlists1, NSError * _Nullable error) {
+    [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylist *> * _Nullable playlists, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
-        XCTAssertNotNil(playlists1);
-        XCTAssertEqual(playlists1.count, 1);
-        [expectation1 fulfill];
-    }];
-    
-    [self waitForExpectationsWithTimeout:30. handler:nil];
-    
-    NSArray<NSString *> *names = @[@"Playlist 12", @"Playlist 34", @"Playlist 56", @"Playlist 78", @"Playlist 90"];
-    NSArray<NSString *> *uids = [[self addPlaylistNames:names] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-    NSArray<NSString *> *resultUids = [uids arrayByAddingObject:SRGPlaylistUidWatchLater];
-    
-    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlists fetched"];
-    
-    [self.userData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylist *> * _Nonnull playlists2, NSError * _Nullable error) {
-        XCTAssertFalse(NSThread.isMainThread);
-        XCTAssertEqual(playlists2.count, resultUids.count);
         
-        NSArray<NSString *> *queryUids2 = [playlists2 valueForKeyPath:@keypath(SRGPlaylist.new, uid)];
-        XCTAssertEqualObjects(queryUids2, [[resultUids reverseObjectEnumerator] allObjects]);
-        [expectation2 fulfill];
+        NSArray<NSString *> *uids = [playlists valueForKeyPath:@keypath(SRGPlaylist.new, uid)];
+        XCTAssertEqualObjects(uids, (@[ SRGPlaylistUidWatchLater, @"c", @"b", @"a" ]));
+        
+        [expectation fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
+
+#if 0
 
 - (void)testPlaylistsMatchingPredicatesOrSortDescriptors
 {

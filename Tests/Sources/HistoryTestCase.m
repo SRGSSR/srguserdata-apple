@@ -44,20 +44,26 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
     
     [self.userData.history saveHistoryEntryWithUid:@"a" lastPlaybackTime:CMTimeMakeWithSeconds(10., NSEC_PER_SEC) deviceUid:@"device" completionBlock:^(NSError * _Nonnull error) {
+        XCTAssertFalse(NSThread.isMainThread);
         XCTAssertNil(error);
         [expectation fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    SRGHistoryEntry *historyEntry = [self.userData.history historyEntryWithUid:@"a"];
+    XCTAssertEqualObjects(historyEntry.uid, @"a");
+    XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, CMTimeMakeWithSeconds(10., NSEC_PER_SEC)));
+    XCTAssertEqualObjects(historyEntry.deviceUid, @"device");
 }
 
 - (void)testHistoryEntryWithUid
 {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History entry saved"];
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entry saved"];
     
     [self.userData.history saveHistoryEntryWithUid:@"a" lastPlaybackTime:CMTimeMakeWithSeconds(10., NSEC_PER_SEC) deviceUid:@"device" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
-        [expectation fulfill];
+        [expectation1 fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
@@ -74,24 +80,26 @@
     XCTAssertNil(historyEntry2);
     
     // Asynchronous
-    XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entry fetched"];
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entry fetched"];
     
     [self.userData.history historyEntryWithUid:@"a" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
         XCTAssertFalse(NSThread.isMainThread);
+        XCTAssertNil(error);
         XCTAssertEqualObjects(historyEntry.uid, @"a");
         XCTAssertTrue(CMTIME_COMPARE_INLINE(historyEntry.lastPlaybackTime, ==, CMTimeMakeWithSeconds(10., NSEC_PER_SEC)));
         XCTAssertEqualObjects(historyEntry.deviceUid, @"device");
         XCTAssertFalse(historyEntry.discarded);
-        [expectation1 fulfill];
+        [expectation2 fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entry fetched"];
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"History entry fetched"];
     
     [self.userData.history historyEntryWithUid:@"b" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
         XCTAssertNil(historyEntry);
-        [expectation2 fulfill];
+        XCTAssertNil(error);
+        [expectation3 fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];

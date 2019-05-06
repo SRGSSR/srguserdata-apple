@@ -15,13 +15,13 @@ typedef NS_ENUM(NSInteger, SRGUserDataErrorCode) {
      */
     SRGUserDataErrorCancelled,
     /**
-     *  An operation has failed.
+     *  An operation is forbidden.
      */
-    SRGUserDataErrorFailed,
+    SRGUserDataErrorForbidden,
     /**
      *  The data has not been found.
      */
-    SRGUserDataErrorNotFound
+    SRGUserDataErrorNotFound,
 };
 
 /**
