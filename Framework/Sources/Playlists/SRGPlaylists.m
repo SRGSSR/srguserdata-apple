@@ -163,13 +163,11 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         }
         else if (! error && changedUids.count > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                    SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
-                    [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
-                                                                      object:playlist
-                                                                    userInfo:@{ SRGPlaylistEntriesUidsKey : changedUids }];
-                    return nil;
-                }];
+                SRGPlaylist *playlist = [self playlistWithUid:playlistUid];
+                NSCAssert(playlist != nil, @"The playlist must exist by construction");
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
+                                                                  object:playlist
+                                                                userInfo:@{ SRGPlaylistEntriesUidsKey : changedUids }];
             });
         }
         completionBlock(error);
@@ -643,13 +641,11 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         }
         else if (! error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                    SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
-                    [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
-                                                                      object:playlist
-                                                                    userInfo:@{ SRGPlaylistEntriesUidsKey : [NSSet setWithObject:uid] }];
-                    return nil;
-                }];
+                SRGPlaylist *playlist = [self playlistWithUid:playlistUid];
+                NSCAssert(playlist != nil, @"The playlist must exist by construction");
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
+                                                                  object:playlist
+                                                                userInfo:@{ SRGPlaylistEntriesUidsKey : [NSSet setWithObject:uid] }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
@@ -679,13 +675,11 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         }
         else if (! error && changedUids.count > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                    SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
-                    [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
-                                                                      object:playlist
-                                                                    userInfo:@{ SRGPlaylistEntriesUidsKey : changedUids }];
-                    return nil;
-                }];
+                SRGPlaylist *playlist = [self playlistWithUid:playlistUid];
+                NSCAssert(playlist != nil, @"The playlist must exist by construction");
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
+                                                                  object:playlist
+                                                                userInfo:@{ SRGPlaylistEntriesUidsKey : changedUids }];
             });
         }
         completionBlock ? completionBlock(error) : nil;
