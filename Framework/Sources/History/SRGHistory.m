@@ -69,7 +69,7 @@ NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
         }
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
         if (! error && changedUids.count > 0) {
-            dispatch_async(dispatch_get_main_queue(), ^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGHistoryChangedUidsKey : [changedUids copy] }];
@@ -238,7 +238,7 @@ NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
         previousUids = [NSSet setWithArray:[historyEntries valueForKeyPath:keyPath]];
         [SRGHistoryEntry deleteAllInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             if (previousUids.count > 0) {
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
@@ -286,7 +286,7 @@ NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
         historyEntry.deviceUid = deviceUid;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGHistoryChangedUidsKey : [NSSet setWithObject:uid] }];
@@ -305,7 +305,7 @@ NSString * const SRGHistoryChangedUidsKey = @"SRGHistoryChangedUids";
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGHistoryChangedUidsKey : changedUids }];

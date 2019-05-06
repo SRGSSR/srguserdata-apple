@@ -175,6 +175,12 @@
 {
     [self insertLocalHistoryEntriesWithUids:@[@"a", @"b", @"c", @"d", @"e"]];
     
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryChangedUidsKey], ([NSSet setWithObjects:@"b", @"c", nil]));
+        return YES;
+    }];
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"History discarded"];
     
     [self.userData.history discardHistoryEntriesWithUids:@[ @"b", @"c" ] completionBlock:^(NSError * _Nonnull error) {
@@ -193,6 +199,12 @@
 - (void)testDiscardAllHistoryEntries
 {
     [self insertLocalHistoryEntriesWithUids:@[@"a", @"b", @"c", @"d", @"e"]];
+    
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryChangedUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", @"d", @"e", nil]));
+        return YES;
+    }];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"History discarded"];
     
