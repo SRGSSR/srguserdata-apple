@@ -62,6 +62,7 @@
     XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entry saved"];
     
     [self.userData.history saveHistoryEntryWithUid:@"a" lastPlaybackTime:CMTimeMakeWithSeconds(10., NSEC_PER_SEC) deviceUid:@"device" completionBlock:^(NSError * _Nonnull error) {
+        XCTAssertFalse(NSThread.isMainThread);
         XCTAssertNil(error);
         [expectation1 fulfill];
     }];
@@ -97,6 +98,7 @@
     XCTestExpectation *expectation3 = [self expectationWithDescription:@"History entry fetched"];
     
     [self.userData.history historyEntryWithUid:@"b" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
         XCTAssertNil(historyEntry);
         XCTAssertNil(error);
         [expectation3 fulfill];
