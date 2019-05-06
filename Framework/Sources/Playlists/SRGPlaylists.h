@@ -19,23 +19,23 @@ OBJC_EXPORT NSString * const SRGPlaylistsDidChangeNotification;                 
 /**
  *  Information available for `SRGPlaylistsDidChangeNotification`.
  */
-OBJC_EXPORT NSString * const SRGPlaylistsUidsKey;                                 // Key to access the list of uids which have changed as an `NSSet` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPlaylistsUidsKey;                                 // Key to access the list of uids which have changed (inserted, updated or deleted) as an `NSSet` of `NSString` objects.
 
 /**
  *  Notification sent when one or more playlist entries change. Use the keys below to retrieve detailed information from the notification
  *  `userInfo` dictionary.
  *
- *  @discussion Those notificaitons are broadcasted with the playlist object, getted on the main thread.
+ *  @discussion Notifications are sent by the playlist object on the main thread.
  */
 OBJC_EXPORT NSString * const SRGPlaylistEntriesDidChangeNotification;             // Notification name.
 
 /**
  *  Information available for `SRGPlaylistEntriesDidChangeNotification`.
  */
-OBJC_EXPORT NSString * const SRGPlaylistEntriesUidsKey;                           // Key to access the list of uids which have changed as an `NSSet` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPlaylistEntriesUidsKey;                           // Key to access the list of uids which have changed (inserted, updated or deleted) as an `NSSet` of `NSString` objects.
 
 /**
- *  Manages a local cache for playlists. Playlists are characterized by an identifier, a system flag and a name. Based
+ *  Manages a local cache for playlists. Playlists are characterized by an identifier, a name and a type. Based
  *  on a local cache, this class ensures efficient playlist retrieval from a webservice and keeps local and distant
  *  playlists in sync.
  *
@@ -45,8 +45,8 @@ OBJC_EXPORT NSString * const SRGPlaylistEntriesUidsKey;                         
 @interface SRGPlaylists : SRGUserDataService
 
 /**
- *  Return playlists, optionally matching a specific predicate and / or sorted with descriptors. If no sort
- *  descriptors are provided, entries are still returned in a stable order.
+ *  Return playlists, optionally matching a specific predicate and / or sorted with descriptors. If no sort descriptors
+ *  are provided, entries are still returned in a stable order.
  *
  *  @discussion This method can only be called from the main thread. Reads on other threads must occur asynchronously
  *              with `-playlistsMatchingPredicate:sortedWithDescriptors:completionBlock:`.
@@ -55,9 +55,9 @@ OBJC_EXPORT NSString * const SRGPlaylistEntriesUidsKey;                         
                                  sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
 
 /**
- *  Return playlists, optionally matching a specific predicate and / or sorted with descriptors. If no sort
- *  descriptors are provided, entries are still returned in a stable order. The read occurs asynchronously, calling
- *  the provided block on completion.
+ *  Return playlists, optionally matching a specific predicate and / or sorted with descriptors. If no sort descriptors
+ *  are provided, entries are still returned in a stable order. The read occurs asynchronously, calling the provided block
+ *  on completion.
  *
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error.
@@ -77,8 +77,8 @@ OBJC_EXPORT NSString * const SRGPlaylistEntriesUidsKey;                         
 - (nullable SRGPlaylist *)playlistWithUid:(NSString *)uid;
 
 /**
- *  Return the playlist matching the specified identifier, if any. The read occurs asynchronously, calling the
- *  provided block on completion.
+ *  Return the playlist matching the specified identifier, if any. The read occurs asynchronously, calling the provided
+ *  block on completion.
  *
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error.
@@ -90,14 +90,14 @@ OBJC_EXPORT NSString * const SRGPlaylistEntriesUidsKey;                         
 
 /**
  *  Asynchronously save a playlist for a given identifier and name, calling the specified block on completion. If no
- *  identifier is specified, a new playlists with a generated identifier will be created. If an existing identifier
- *  is specified, the playlist name will be updated.
+ *  identifier is specified, a new playlist with a generated identifier will be created. If an existing identifier
+ *  is specified, the corresponding playlist name will be updated.
  *
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error and the corresponding transaction rollbacked.
  *
- *  @discussion The completion block is called on a background thread. Attempting to update a default playlist fails with
- *              an error.
+ *  @discussion The completion block is called on a background thread. Attempting to update a default playlist (@see
+ *              `SRGPlaylistUid`) fails with an error.
  */
 - (NSString *)savePlaylistWithName:(NSString *)name
                                uid:(nullable NSString *)uid
@@ -105,13 +105,13 @@ OBJC_EXPORT NSString * const SRGPlaylistEntriesUidsKey;                         
 
 /**
  *  Asynchronously discard playlists matching an identifier in the list, calling the provided block on completion. If no
- *  list is provided, all playlists are discarded, system playlists excepted.
+ *  list is provided, all playlists are discarded (except default playlists).
  *
  *  @return `NSString` An opaque task handle which can be used to cancel it. For cancelled tasks, the completion block
  *                     will be called with an error and the corresponding transaction rollbacked.
  *
- *  @discussion The completion block is called on a background thread. Attempting to discard a default playlist has no
- *              effect.
+ *  @discussion The completion block is called on a background thread. Attempting to discard a default playlist (@see
+ *              `SRGPlaylistUid`) has no effect.
  */
 - (NSString *)discardPlaylistsWithUids:(nullable NSArray<NSString *> *)uids
                        completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;

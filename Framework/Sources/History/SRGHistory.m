@@ -24,8 +24,7 @@
 #import <SRGNetwork/SRGNetwork.h>
 
 NSString * const SRGHistoryEntriesDidChangeNotification = @"SRGHistoryEntriesDidChangeNotification";
-
-NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryChangedUids";
+NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
 
 @interface SRGHistory ()
 
@@ -163,9 +162,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryChangedUids";
                     historyEntry.dirty = NO;
                 }
             }
-        } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
-            completionBlock(error);
-        }];
+        } withPriority:NSOperationQueuePriorityLow completionBlock:completionBlock];
     }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
     [pushRequest resume];
     self.pushRequest = pushRequest;

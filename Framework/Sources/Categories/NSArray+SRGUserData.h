@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSArray (SRGUserData)
 
 /**
- *  Return the receiver, to which objects from the specified array have been removed.
+ *  Return the receiver, from which objects from the specified array have been removed.
  */
 - (NSArray *)srguserdata_arrayByRemovingObjectsInArray:(NSArray *)array;
 

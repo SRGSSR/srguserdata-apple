@@ -15,14 +15,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 OBJC_EXPORT NSString * const SRGHistoryEntriesDidChangeNotification;             // Notification name.
 
-OBJC_EXPORT NSString * const SRGHistoryEntriesUidsKey;                           // Key to access the list of uids which have changed as an `NSSet` of `NSString` objects.
+/**
+ *  Information available for `SRGHistoryEntriesDidChangeNotification`.
+ */
+OBJC_EXPORT NSString * const SRGHistoryEntriesUidsKey;                           // Key to access the list of uids which have changed (inserted, updated or deleted) as an `NSSet` of `NSString` objects.
 
 /**
  *  Manages a local cache for history entries. History entries are characterized by an identifier and an associated
  *  playback position. Based on a local cache, this class ensures efficient history retrieval from a webservice and
  *  keeps local and distant histories in sync.
  *
- *  You can register for history update notifications, see above. These will be sent by the `SRGHistory` instance
+ *  You can register for history change notifications, see above. These will be sent by the `SRGHistory` instance
  *  itself.
  */
 @interface SRGHistory : SRGUserDataService
@@ -95,7 +98,6 @@ OBJC_EXPORT NSString * const SRGHistoryEntriesUidsKey;                          
  */
 - (NSString *)discardHistoryEntriesWithUids:(nullable NSArray<NSString *> *)uids
                             completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
-
 
 /**
  *  Cancel the task having the specified handle.

@@ -48,10 +48,10 @@ static SRGPlaylistType SRGPlaylistTypeForPlaylistWithUid(NSString *uid)
 }
 
 NSString * const SRGPlaylistsDidChangeNotification = @"SRGPlaylistsDidChangeNotification";
-NSString * const SRGPlaylistsUidsKey = @"SRGPlaylistsChangedUids";
+NSString * const SRGPlaylistsUidsKey = @"SRGPlaylistsUids";
 
 NSString * const SRGPlaylistEntriesDidChangeNotification = @"SRGPlaylistEntriesDidChangeNotification";
-NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesChangedUids";
+NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 
 @interface SRGPlaylists ()
 
@@ -102,7 +102,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesChangedUids";
         return;
     }
     
-    __block NSMutableSet<NSString *> *changedUids = nil;
+    __block NSMutableSet<NSString *> *changedUids = [NSMutableSet set];
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
@@ -471,7 +471,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesChangedUids";
         [SRGPlaylist deleteAllInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
         dispatch_sync(dispatch_get_main_queue(), ^{
-            if (changedUids.count > 0) {
+            if (! error && changedUids.count > 0) {
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGPlaylistsUidsKey : changedUids }];

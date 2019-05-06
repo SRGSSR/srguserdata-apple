@@ -8,6 +8,8 @@
 
 @implementation NSSet (SRGUserData)
 
+#pragma mark Public methods
+
 - (NSSet *)srguserdata_setByRemovingObjectsInArray:(NSArray *)array
 {
     NSMutableSet *mutableSet = [self mutableCopy];

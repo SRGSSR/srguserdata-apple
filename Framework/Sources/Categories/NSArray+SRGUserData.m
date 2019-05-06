@@ -8,6 +8,8 @@
 
 @implementation NSArray (SRGUserData)
 
+#pragma mark Public methods
+
 - (NSArray *)srguserdata_arrayByRemovingObjectsInArray:(NSArray *)array
 {
     NSMutableArray *mutableArray = [self mutableCopy];
