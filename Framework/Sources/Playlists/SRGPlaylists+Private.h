@@ -15,13 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)savePlaylistEntryDictionaries:(NSArray<NSDictionary *> *)playlistEntryDictionaries toPlaylistWithUid:(NSString *)playlistUid completionBlock:(void (^)(NSError * _Nullable error))completionBlock;
 
-- (nullable NSArray<SRGPlaylistEntry *> *)playlistEntriesMatchingPredicate:(nullable NSPredicate *)predicate
-                                                     sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
-
-- (NSString *)playlistEntriesMatchingPredicate:(nullable NSPredicate *)predicate
-                         sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
-                               completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error))completionBlock;
-
 @end
 
 NS_ASSUME_NONNULL_END

@@ -46,7 +46,6 @@
 		08C9919D22538379003E7816 /* PlaylistsTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 08C9919C22538379003E7816 /* PlaylistsTestCase.m */; };
 		08C991A82254B97E003E7816 /* SRGPlaylistEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = 08C991A62254B97E003E7816 /* SRGPlaylistEntry.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		08C991A92254B97E003E7816 /* SRGPlaylistEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 08C991A72254B97E003E7816 /* SRGPlaylistEntry.m */; };
-		08C991AB2254CCAF003E7816 /* SRGPlaylistEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 08C991AA2254CCAE003E7816 /* SRGPlaylistEntry+Private.h */; };
 		08E9CC122230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08E9CC112230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel */; };
 		08E9CC142230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08E9CC132230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel */; };
 		08E9CC1622308CD70039A875 /* UserData_DB_v2 in Resources */ = {isa = PBXBuildFile; fileRef = 08E9CC1522308CD70039A875 /* UserData_DB_v2 */; };
@@ -70,7 +69,6 @@
 		6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54220FC7FF4009C02CF /* SRGUserData.m */; };
 		6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */; };
 		6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */; };
-		6F1747F322735B6800CC9C39 /* SRGUserData_v6_v7.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 6F1747F222735B6800CC9C39 /* SRGUserData_v6_v7.xcmappingmodel */; };
 		6F1747F62274855800CC9C39 /* PlaylistsSynchronizationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F1747F52274855700CC9C39 /* PlaylistsSynchronizationTestCase.m */; };
 		6F19DA8B221ED8A300085C7D /* Masonry.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F19DAA6221FF61800085C7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAA3221FF61800085C7D /* main.m */; };
@@ -118,6 +116,7 @@
 		6F46DD76221429110013C10A /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F46DD75221429100013C10A /* Person.m */; };
 		6F478B2B22818A6100CDC022 /* NSDateFormatter+Demo.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */; };
 		6F64BDF02274E19F00ED0DFE /* MigrationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FCCE4802212BFD600423EFF /* MigrationTestCase.m */; };
+		6F687FC62281FE9800E6AE2C /* SRGPlaylistEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
 		6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F120FDCAA800AA6434 /* Images.xcassets */; };
 		6F8A93FD20FDCAA800AA6434 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8A93F520FDCAA800AA6434 /* main.m */; };
@@ -160,6 +159,7 @@
 		6FB74D7B2101D69F00E2D365 /* SRGNetwork.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6FC44DE7227349CC0022DC99 /* NSArray+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FC44DE5227349CC0022DC99 /* NSArray+SRGUserData.m */; };
 		6FC44DE8227349CC0022DC99 /* NSArray+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FC44DE6227349CC0022DC99 /* NSArray+SRGUserData.h */; };
+		6FE8A62422821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 6FE8A62322821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel */; };
 		6FE91E7B2108A36A001B5E8F /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6FFB346522088BA200E76E6D /* SRGDataProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFB346422088BA200E76E6D /* SRGDataProvider.framework */; };
 		6FFB346622088BA200E76E6D /* SRGDataProvider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFB346422088BA200E76E6D /* SRGDataProvider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -303,7 +303,6 @@
 		08C9919C22538379003E7816 /* PlaylistsTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaylistsTestCase.m; sourceTree = "<group>"; };
 		08C991A62254B97E003E7816 /* SRGPlaylistEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPlaylistEntry.h; sourceTree = "<group>"; };
 		08C991A72254B97E003E7816 /* SRGPlaylistEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylistEntry.m; sourceTree = "<group>"; };
-		08C991AA2254CCAE003E7816 /* SRGPlaylistEntry+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylistEntry+Private.h"; sourceTree = "<group>"; };
 		08E9CC112230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v1_v2.xcmappingmodel; sourceTree = "<group>"; };
 		08E9CC132230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v2_v3.xcmappingmodel; sourceTree = "<group>"; };
 		08E9CC1522308CD70039A875 /* UserData_DB_v2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v2; sourceTree = "<group>"; };
@@ -326,7 +325,6 @@
 		6F0EB54220FC7FF4009C02CF /* SRGUserData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGUserData.m; sourceTree = "<group>"; };
 		6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+SRGUserData.m"; sourceTree = "<group>"; };
 		6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+SRGUserData.h"; sourceTree = "<group>"; };
-		6F1747F222735B6800CC9C39 /* SRGUserData_v6_v7.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v6_v7.xcmappingmodel; sourceTree = "<group>"; };
 		6F1747F52274855700CC9C39 /* PlaylistsSynchronizationTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlaylistsSynchronizationTestCase.m; sourceTree = "<group>"; };
 		6F19DA90221FF5F800085C7D /* SRGUserData-testapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-testapp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F19DAA3221FF61800085C7D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -363,6 +361,7 @@
 		6F46DD75221429100013C10A /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		6F478B2922818A6100CDC022 /* NSDateFormatter+Demo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+Demo.h"; sourceTree = "<group>"; };
 		6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+Demo.m"; sourceTree = "<group>"; };
+		6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylistEntry+Private.h"; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6F8A93F120FDCAA800AA6434 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -397,6 +396,7 @@
 		6FCBFEFD210B57BE006BC355 /* rm */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = rm; path = rm.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCCE4802212BFD600423EFF /* MigrationTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MigrationTestCase.m; sourceTree = "<group>"; };
 		6FE6E5E32148DC1D00228573 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6FE8A62322821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v6_v7.xcmappingmodel; sourceTree = "<group>"; };
 		6FFB346422088BA200E76E6D /* SRGDataProvider.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGDataProvider.framework; path = Carthage/Build/iOS/SRGDataProvider.framework; sourceTree = "<group>"; };
 		6FFB346922089A5E00E76E6D /* SRGHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGHistory.h; sourceTree = "<group>"; };
 		6FFB346A22089A5E00E76E6D /* SRGHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGHistory.m; sourceTree = "<group>"; };
@@ -548,7 +548,7 @@
 				08C9919A22537833003E7816 /* SRGPlaylist+Private.h */,
 				08C991A62254B97E003E7816 /* SRGPlaylistEntry.h */,
 				08C991A72254B97E003E7816 /* SRGPlaylistEntry.m */,
-				08C991AA2254CCAE003E7816 /* SRGPlaylistEntry+Private.h */,
+				6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */,
 				6F0178AD22080FEC00B4BCD9 /* SRGUser.h */,
 				6F0178AC22080FEC00B4BCD9 /* SRGUser.m */,
 				6F0178D722086F6D00B4BCD9 /* SRGUser+Private.h */,
@@ -787,7 +787,7 @@
 				08624E62223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel */,
 				08624E64223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel */,
 				082442A7220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel */,
-				6F1747F222735B6800CC9C39 /* SRGUserData_v6_v7.xcmappingmodel */,
+				6FE8A62322821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel */,
 				6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */,
 			);
 			path = Data;
@@ -867,6 +867,7 @@
 				6F9E50772272DF8900CB7F56 /* SRGUserDataError+Private.h in Headers */,
 				6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */,
 				6FC44DE8227349CC0022DC99 /* NSArray+SRGUserData.h in Headers */,
+				6F687FC62281FE9800E6AE2C /* SRGPlaylistEntry+Private.h in Headers */,
 				6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */,
 				084ACC2E22535F48008ACBD0 /* SRGPlaylist.h in Headers */,
 				6FFB347322089A5E00E76E6D /* SRGDataStore.h in Headers */,
@@ -887,7 +888,6 @@
 				08083BD922639F8B00BE9F19 /* SRGPlaylistsRequest.h in Headers */,
 				6FFB347422089A5E00E76E6D /* SRGPersistentContainer.h in Headers */,
 				6F0178D822086F6D00B4BCD9 /* SRGUser+Private.h in Headers */,
-				08C991AB2254CCAF003E7816 /* SRGPlaylistEntry+Private.h in Headers */,
 				6FFB348E2209D57400E76E6D /* SRGHistoryEntry+Private.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1103,7 +1103,7 @@
 			files = (
 				08E9CC122230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel in Sources */,
 				082442A8220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel in Sources */,
-				6F1747F322735B6800CC9C39 /* SRGUserData_v6_v7.xcmappingmodel in Sources */,
+				6FE8A62422821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel in Sources */,
 				6FB521C02208838E0042FCC3 /* SRGUserData.xcdatamodeld in Sources */,
 				08624E63223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel in Sources */,
 				08624E65223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel in Sources */,

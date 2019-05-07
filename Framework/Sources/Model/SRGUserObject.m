@@ -44,12 +44,12 @@
     fetchRequest.predicate = predicate;
     
     // Ensure stable sorting using the identifier as fallback (same criterium applied by the history service)
-    NSMutableArray<NSSortDescriptor *> *allSortDescriptors = [NSMutableArray array];
+    NSMutableArray<NSSortDescriptor *> *objectsSortDescriptor = [NSMutableArray array];
     if (sortDescriptors) {
-        [allSortDescriptors addObjectsFromArray:sortDescriptors];
+        [objectsSortDescriptor addObjectsFromArray:sortDescriptors];
     }
-    [allSortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGUserObject.new, uid) ascending:NO]];
-    fetchRequest.sortDescriptors = [allSortDescriptors copy];
+    [objectsSortDescriptor addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGUserObject.new, uid) ascending:NO]];
+    fetchRequest.sortDescriptors = [objectsSortDescriptor copy];
     
     fetchRequest.fetchBatchSize = 100;
     return [managedObjectContext executeFetchRequest:fetchRequest error:NULL];
@@ -142,34 +142,49 @@
     return [mergedDictionaries copy];
 }
 
-+ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids
+                              matchingPredicate:(NSPredicate *)predicate
+                         inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSPredicate *predicate = nil;
+    NSPredicate *discardPredicate = nil;
     if (uids) {
         NSArray<NSString *> *discardableUids = [uids srguserdata_arrayByRemovingObjectsInArray:self.undiscardableUids];
-        predicate = [NSPredicate predicateWithFormat:@"%K IN %@", @keypath(SRGUserObject.new, uid), discardableUids];
+        discardPredicate = [NSPredicate predicateWithFormat:@"%K IN %@", @keypath(SRGUserObject.new, uid), discardableUids];
     }
     else {
-        predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGUserObject.new, uid), self.undiscardableUids];
+        discardPredicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGUserObject.new, uid), self.undiscardableUids];
     }
     
-    NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+    if (predicate) {
+        discardPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[discardPredicate, predicate]];
+    }
+    
+    NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:discardPredicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
     
     if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
         NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
-        fetchRequest.predicate = predicate;
+        fetchRequest.predicate = discardPredicate;
         
         NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
         [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
     }
-    else {
+    // In the context of this framework, predicates are be used for joining tables, in which case batch updates cannot be used
+    // (Core Data limitation).
+    else if ([predicate isKindOfClass:NSCompoundPredicate.class]) {
         NSBatchUpdateRequest *batchUpdateRequest = [[NSBatchUpdateRequest alloc] initWithEntityName:NSStringFromClass(self)];
-        batchUpdateRequest.predicate = predicate;
+        batchUpdateRequest.predicate = discardPredicate;
         batchUpdateRequest.propertiesToUpdate = @{ @keypath(SRGUserObject.new, discarded) : @YES,
                                                    @keypath(SRGUserObject.new, dirty) : @YES,
                                                    @keypath(SRGUserObject.new, date) : NSDate.date };
         [managedObjectContext executeRequest:batchUpdateRequest error:NULL];
+    }
+    else {
+        [objects enumerateObjectsUsingBlock:^(SRGUserObject * _Nonnull object, NSUInteger idx, BOOL * _Nonnull stop) {
+            object.discarded = YES;
+            object.dirty = YES;
+            object.date = NSDate.date;
+        }];
     }
     
     return discardedUids;

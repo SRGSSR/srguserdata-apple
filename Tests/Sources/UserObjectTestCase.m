@@ -204,12 +204,12 @@
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
         // Does not exist
-        NSArray<NSString *> *discardedUids1 = [SRGHistoryEntry discardObjectsWithUids:@[@"123456"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids1 = [SRGHistoryEntry discardObjectsWithUids:@[@"123456"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(discardedUids1, @[]);
         
         // Exist
         NSArray<NSString *> *expectedUids2 = @[@"urn:rts:video:9992865", @"urn:rts:video:9910664"];
-        NSArray<NSString *> *discardedUids2 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992865", @"urn:rts:video:9910664"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids2 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992865", @"urn:rts:video:9910664"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects([NSSet setWithArray:discardedUids2], [NSSet setWithArray:expectedUids2]);
         
         // Objects are immediately erased
@@ -218,7 +218,7 @@
         
         // Mixed
         NSArray<NSString *> *expectedUids3 = @[@"urn:rts:video:9992229", @"urn:rts:video:9996461"];
-        NSArray<NSString *> *discardedUids3 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992229", @"45678", @"urn:rts:video:9996461", @"urn:rts:video:9910664"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids3 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992229", @"45678", @"urn:rts:video:9996461", @"urn:rts:video:9910664"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects([NSSet setWithArray:discardedUids3], [NSSet setWithArray:expectedUids3]);
     }];
 }
@@ -230,12 +230,12 @@
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
         // Does not exist
-        NSArray<NSString *> *discardedUids1 = [SRGHistoryEntry discardObjectsWithUids:@[@"123456"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids1 = [SRGHistoryEntry discardObjectsWithUids:@[@"123456"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(discardedUids1, @[]);
         
         // Exist
         NSArray<NSString *> *expectedUids2 = @[@"urn:rts:video:9992865", @"urn:rts:video:9910664"];
-        NSArray<NSString *> *discardedUids2 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992865", @"urn:rts:video:9910664"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids2 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992865", @"urn:rts:video:9910664"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects([NSSet setWithArray:discardedUids2], [NSSet setWithArray:expectedUids2]);
         
         // Objects still exist, they are only marked for later synchronization
@@ -244,7 +244,7 @@
         
         // Mixed
         NSArray<NSString *> *expectedUids3 = @[@"urn:rts:video:9992229", @"urn:rts:video:9996461"];
-        NSArray<NSString *> *discardedUids3 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992229", @"45678", @"urn:rts:video:9996461"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids3 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992229", @"45678", @"urn:rts:video:9996461"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects([NSSet setWithArray:discardedUids3], [NSSet setWithArray:expectedUids3]);
     }];
 }

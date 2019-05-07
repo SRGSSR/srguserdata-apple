@@ -4,9 +4,8 @@
 //  License information is available from the LICENSE file.
 //
 
-#import <CoreData/CoreData.h>
-
 #import "SRGPlaylist.h"
+#import "SRGUserObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,22 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @discussion Instances must not be shared among threads.
  */
-@interface SRGPlaylistEntry : NSManagedObject
-
-/**
- *  The entry unique identifier.
- */
-@property (nonatomic, readonly, copy, nullable) NSString *uid;
-
-/**
- *  The date at which the entry was updated for the last time.
- */
-@property (nonatomic, readonly, nullable) NSDate *date;
-
-/**
- *  `YES` iff the entry has been marked as discarded.
- */
-@property (nonatomic, readonly) BOOL discarded;
+@interface SRGPlaylistEntry : SRGUserObject
 
 /**
  *  The related playlist.

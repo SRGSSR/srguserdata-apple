@@ -22,13 +22,6 @@
 @dynamic lastPlaybackPosition;
 @dynamic deviceUid;
 
-#pragma mark Overrides
-
-+ (NSString *)uidKey
-{
-    return @"item_id";
-}
-
 #pragma mark Getters and Setters
 
 - (CMTime)lastPlaybackTime
@@ -41,15 +34,12 @@
     self.lastPlaybackPosition = CMTimeGetSeconds(resumeTime);
 }
 
-- (NSDictionary *)dictionary
-{
-    NSMutableDictionary *JSONDictionary = [[super dictionary] mutableCopy];
-    JSONDictionary[@"device_id"] = self.deviceUid;
-    JSONDictionary[@"last_playback_position"] = @(self.lastPlaybackPosition);
-    return [JSONDictionary copy];
-}
+#pragma mark Overrides
 
-#pragma mark Updates
++ (NSString *)uidKey
+{
+    return @"item_id";
+}
 
 - (void)updateWithDictionary:(NSDictionary *)dictionary
 {
@@ -57,6 +47,14 @@
     
     self.deviceUid = dictionary[@"device_id"];
     self.lastPlaybackPosition = [dictionary[@"last_playback_position"] doubleValue];
+}
+
+- (NSDictionary *)dictionary
+{
+    NSMutableDictionary *JSONDictionary = [[super dictionary] mutableCopy];
+    JSONDictionary[@"device_id"] = self.deviceUid;
+    JSONDictionary[@"last_playback_position"] = @(self.lastPlaybackPosition);
+    return [JSONDictionary copy];
 }
 
 @end

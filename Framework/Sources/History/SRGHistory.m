@@ -298,7 +298,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
     __block NSSet<NSString *> *changedUids = nil;
     
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<NSString *> *discardedUids = [SRGHistoryEntry discardObjectsWithUids:uids inManagedObjectContext:managedObjectContext];
+        NSArray<NSString *> *discardedUids = [SRGHistoryEntry discardObjectsWithUids:uids matchingPredicate:nil inManagedObjectContext:managedObjectContext];
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error && changedUids.count > 0) {

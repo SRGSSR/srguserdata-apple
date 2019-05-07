@@ -53,7 +53,9 @@ NS_ASSUME_NONNULL_BEGIN
  *  @discussion Order is not preserved in the rerturned list (in comparison to the original list). Already discarded objects
  *              are omitted.
  */
-+ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (NSArray<NSString *> *)discardObjectsWithUids:(nullable NSArray<NSString *> *)uids
+                              matchingPredicate:(nullable NSPredicate *)predicate
+                         inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Delete all objects, removing them from the database directly. No synchronization will be triggered for logged in users.

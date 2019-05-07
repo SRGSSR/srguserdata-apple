@@ -165,8 +165,11 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         }
         
         for (NSDictionary *playlistEntryDictionary in replacementPlaylistEntryDictionaries) {
-            SRGPlaylistEntry *playlistEntry = [SRGPlaylistEntry synchronizeWithDictionary:playlistEntryDictionary playlist:playlist inManagedObjectContext:managedObjectContext];
+            SRGPlaylistEntry *playlistEntry = [SRGPlaylistEntry synchronizeWithDictionary:playlistEntryDictionary inManagedObjectContext:managedObjectContext];
             if (playlistEntry) {
+                if (playlistEntry.inserted) {
+                    playlistEntry.playlist = playlist;
+                }
                 [changedUids addObject:playlistEntry.uid];
             }
         }
@@ -468,8 +471,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     // TODO: Is an abstraction possible? (filtering out non-synchronizable objects)
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGPlaylist.new, type), [SRGPlaylists defaultPlaylistUids]];
     NSArray<SRGUserObject *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-    // TODO: <SRGPlaylistEntry *>, no cast
-    NSArray<SRGUserObject *> *playlistEntries = (NSArray<SRGUserObject *> *)[SRGPlaylistEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+    NSArray<SRGUserObject *> *playlistEntries = [SRGPlaylistEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     return [playlists arrayByAddingObjectsFromArray:playlistEntries];
 }
 
@@ -583,13 +585,14 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                 continue;
             }
             
-            NSArray<NSString *> *discardedEntriesUids = [SRGPlaylistEntry discardObjectsWithUids:nil playlist:playlist inManagedObjectContext:managedObjectContext];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid];
+            NSArray<NSString *> *discardedEntriesUids = [SRGPlaylistEntry discardObjectsWithUids:nil matchingPredicate:predicate inManagedObjectContext:managedObjectContext];
             if (discardedEntriesUids.count > 0) {
                 playlistEntriesUidsIndex[uid] = [NSSet setWithArray:discardedEntriesUids];
             }
         }
         
-        NSArray<NSString *> *discardedUids = [SRGPlaylist discardObjectsWithUids:uids inManagedObjectContext:managedObjectContext];
+        NSArray<NSString *> *discardedUids = [SRGPlaylist discardObjectsWithUids:uids matchingPredicate:nil inManagedObjectContext:managedObjectContext];
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! error && changedUids.count > 0) {
@@ -610,47 +613,40 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     }];
 }
 
-- (NSArray<SRGPlaylistEntry *> *)playlistEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
+- (NSArray<SRGPlaylistEntry *> *)playlistEntriesInPlaylistWithUid:(NSString *)playlistUid
+                                                matchingPredicate:(NSPredicate *)predicate
+                                            sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
+                                           inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGPlaylistEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
-    }];
+    SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
+    if (! playlist) {
+        return nil;
+    }
+    NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlistUid];
+    if (predicate) {
+        fetchPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[fetchPredicate, predicate]];
+    }
+    
+    NSMutableArray<NSSortDescriptor *> *playlistEntriesSortDescriptor = [NSMutableArray array];
+    if (sortDescriptors) {
+        [playlistEntriesSortDescriptor addObjectsFromArray:sortDescriptors];
+    }
+    [playlistEntriesSortDescriptor addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylistEntry.new, date) ascending:YES]];
+    
+    return [SRGPlaylistEntry objectsMatchingPredicate:fetchPredicate sortedWithDescriptors:[playlistEntriesSortDescriptor copy] inManagedObjectContext:managedObjectContext];
 }
 
 - (NSArray<SRGPlaylistEntry *> *)playlistEntriesInPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
 {
     return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
-        if (! playlist) {
-            return nil;
-        }
-        NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlistUid];
-        if (predicate) {
-            fetchPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[fetchPredicate, predicate]];
-        }
-        return [SRGPlaylistEntry objectsMatchingPredicate:fetchPredicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+        return [self playlistEntriesInPlaylistWithUid:playlistUid matchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     }];
-}
-
-- (NSString *)playlistEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable, NSError * _Nullable))completionBlock
-{
-    return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGPlaylistEntry objectsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
 - (NSString *)playlistEntriesInPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable, NSError * _Nullable))completionBlock
 {
     return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid inManagedObjectContext:managedObjectContext];
-        if (! playlist) {
-            return nil;
-        }
-        NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlistUid];
-        if (predicate) {
-            fetchPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[fetchPredicate, predicate]];
-        }
-        return [SRGPlaylistEntry objectsMatchingPredicate:fetchPredicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+        return [self playlistEntriesInPlaylistWithUid:playlistUid matchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
@@ -666,7 +662,10 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         
         playlistFound = YES;
         
-        [SRGPlaylistEntry upsertWithUid:uid playlist:playlist inManagedObjectContext:managedObjectContext];
+        SRGPlaylistEntry *playlistEntry = [SRGPlaylistEntry upsertWithUid:uid inManagedObjectContext:managedObjectContext];
+        if (playlistEntry.inserted) {
+            playlistEntry.playlist = playlist;
+        }
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! playlistFound) {
             error = [NSError errorWithDomain:SRGUserDataErrorDomain
@@ -698,7 +697,8 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         
         playlistFound = YES;
         
-        NSArray<NSString *> *discardedUids = [SRGPlaylistEntry discardObjectsWithUids:uids playlist:playlist inManagedObjectContext:managedObjectContext];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlistUid];
+        NSArray<NSString *> *discardedUids = [SRGPlaylistEntry discardObjectsWithUids:uids matchingPredicate:predicate inManagedObjectContext:managedObjectContext];
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
         if (! playlistFound) {
