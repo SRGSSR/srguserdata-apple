@@ -377,6 +377,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)insertLocalHistoryEntriesWithUids:(NSArray<NSString *> *)uids
 {
+    XCTAssertNotNil(self.userData);
+    
     for (NSString *uid in uids) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
         [self.userData.history saveHistoryEntryWithUid:uid lastPlaybackTime:CMTimeMakeWithSeconds([uids indexOfObject:uid], NSEC_PER_SEC) deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
@@ -511,6 +513,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)insertLocalPlaylistWithUid:(NSString *)uid
 {
+    XCTAssertNotNil(self.userData);
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
     
     NSString *name = [NSString stringWithFormat:@"%@ (local)", uid];
@@ -524,6 +528,8 @@ NSURL *TestPlaylistsServiceURL(void)
 
 - (void)insertLocalPlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
+    XCTAssertNotNil(self.userData);
+    
     for (NSString *uid in uids) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
         

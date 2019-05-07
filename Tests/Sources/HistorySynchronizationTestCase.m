@@ -304,4 +304,40 @@
     }];
 }
 
+- (void)testChangeNotificationsWithDiscardedLocalEntries
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    // Changes are notified when entries are marked as being discarded
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"a", @"c", nil]));
+        return YES;
+    }];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Discard"];
+    
+    [self.userData.history discardHistoryEntriesWithUids:@[ @"a", @"c" ] completionBlock:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    // No more changes must be received for the discarded entries when deleted during synchronization
+    [self expectationForNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"b", @"d", nil]));
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalHistoryUids:@[ @"b", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
+}
+
 @end

@@ -448,4 +448,43 @@
 #endif
 }
 
+- (void)testChangeNotificationsWithDiscardedLocalPlaylists
+{
+    [self insertRemotePlaylistWithUid:@"a"];
+    [self insertRemotePlaylistWithUid:@"b"];
+    [self insertRemotePlaylistWithUid:@"c"];
+    [self insertRemotePlaylistWithUid:@"d"];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    // Changes are notified when playlists are marked as being discarded
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", @"c", nil]));
+        return YES;
+    }];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Discard"];
+    
+    [self.userData.playlists discardPlaylistsWithUids:@[ @"a", @"c" ] completionBlock:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    // No more changes must be received for the discarded playlists when deleted during synchronization
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"b", @"d", nil]));
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalPlaylistUids:@[ @"b", @"d" ]];
+    [self assertRemotePlaylistUids:@[ @"b", @"d" ]];
+}
+
 @end
