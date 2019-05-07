@@ -229,7 +229,7 @@ static NSUInteger HistoryPageSize = 50;
 - (void)historyDidChange:(NSNotification *)notification
 {
     [self updateMediaURNsWithCompletionBlock:^(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs) {
-        if (! [previousURNs isEqual:self.mediaURNs] && (previousURNs.count < HistoryPageSize || self.mediaURNs.count < HistoryPageSize)) {
+        if (! [previousURNs isEqual:self.mediaURNs] && (previousURNs.count <= HistoryPageSize || self.mediaURNs.count <= HistoryPageSize)) {
             [self refresh];
         }
     }];

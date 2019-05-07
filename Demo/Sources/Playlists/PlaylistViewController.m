@@ -223,7 +223,7 @@ static NSUInteger PlaylistPageSize = 50;
 - (void)playlistEntriesDidChange:(NSNotification *)notification
 {
     [self updateMediaURNsWithCompletionBlock:^(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs) {
-        if (! [previousURNs isEqual:self.mediaURNs] && (previousURNs.count < PlaylistPageSize || self.mediaURNs.count < PlaylistPageSize)) {
+        if (! [previousURNs isEqual:self.mediaURNs] && (previousURNs.count <= PlaylistPageSize || self.mediaURNs.count <= PlaylistPageSize)) {
             [self refresh];
         }
     }];
