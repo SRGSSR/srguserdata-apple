@@ -104,6 +104,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     }
     
     NSMutableSet<NSString *> *changedUids = [NSMutableSet set];
+    NSMutableDictionary<NSString *, NSSet<NSString *> *> *playlistEntriesUidsIndex = [NSMutableDictionary dictionary];
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
@@ -116,12 +117,25 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         for (NSDictionary *playlistDictionary in replacementPlaylistDictionaries) {
             SRGPlaylist *playlist = [SRGPlaylist synchronizeWithDictionary:playlistDictionary inManagedObjectContext:managedObjectContext];
             if (playlist) {
+                if (playlist.deleted) {
+                    NSArray<NSString *> *discardedEntriesUids = [playlist.entries.array valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
+                    if (discardedEntriesUids.count > 0) {
+                        playlistEntriesUidsIndex[playlist.uid] = [NSSet setWithArray:discardedEntriesUids];
+                    }
+                }
                 [changedUids addObject:playlist.uid];
             }
         }
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
         if (! error && changedUids.count > 0) {
             dispatch_sync(dispatch_get_main_queue(), ^{
+                [playlistEntriesUidsIndex enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull playlistUid, NSSet<NSString *> * _Nonnull playlistEntriesUids, BOOL * _Nonnull stop) {
+                    [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
+                                                                      object:self
+                                                                    userInfo:@{ SRGPlaylistUidKey : playlistUid,
+                                                                                SRGPlaylistEntriesUidsKey : playlistEntriesUids }];
+                }];
+                
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGPlaylistsUidsKey : [changedUids copy] }];
