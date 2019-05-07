@@ -57,7 +57,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
         return;
     }
     
-    __block NSMutableSet<NSString *> *changedUids = [NSMutableSet set];
+    NSMutableSet<NSString *> *changedUids = [NSMutableSet set];
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {

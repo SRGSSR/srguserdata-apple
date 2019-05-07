@@ -137,8 +137,8 @@
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 {
     NSPredicate *predicate = uids ? [NSPredicate predicateWithFormat:@"%K IN %@ AND discarded == NO AND %K == %@", @keypath(SRGPlaylistEntry.new, uid), uids, @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid] : [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylistEntry.new, playlist.uid), playlist.uid];
-    NSArray<SRGPlaylistEntry *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
-    NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, uid)]];
+    NSArray<SRGPlaylistEntry *> *playlistEntries = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+    NSArray<NSString *> *discardedUids = [playlistEntries valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylistEntry.new, uid)]];
     
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
     fetchRequest.predicate = predicate;
@@ -150,7 +150,6 @@
     else {
         // TODO: Predicates which lead to two tables being joined (here playlist entry / playlist) are not supported
         //       by batch update requests. Check if we can still do something to use them anyway.
-        NSArray<SRGPlaylistEntry *> *playlistEntries = [managedObjectContext executeFetchRequest:fetchRequest error:NULL];
         [playlistEntries enumerateObjectsUsingBlock:^(SRGPlaylistEntry * _Nonnull playlistEntry, NSUInteger idx, BOOL * _Nonnull stop) {
             playlistEntry.discarded = YES;
             playlistEntry.dirty = YES;

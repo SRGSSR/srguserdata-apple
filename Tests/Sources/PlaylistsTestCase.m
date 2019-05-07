@@ -456,7 +456,7 @@
     }];
 }
 
-- (void)testEntriesInPlaylist
+- (void)testPlaylistEntriesInPlaylist
 {
     [self insertLocalPlaylistEntriesWithUids:@[ @"1", @"2", @"3", @"4" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
@@ -481,7 +481,7 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
-- (void)testEntriesInPlaylistMatchingPredicate
+- (void)testPlaylistEntriesInPlaylistMatchingPredicate
 {
     [self insertLocalPlaylistEntriesWithUids:@[ @"1", @"2", @"3", @"4" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
@@ -507,7 +507,7 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
-- (void)testEntriesInPlaylistWithSortDescriptor
+- (void)testPlaylistEntriesInPlaylistWithSortDescriptor
 {
     [self insertLocalPlaylistEntriesWithUids:@[ @"1", @"2", @"3", @"4" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
