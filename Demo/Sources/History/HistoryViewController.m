@@ -13,8 +13,6 @@
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGUserData/SRGUserData.h>
 
-static NSUInteger HistoryPageSize = 50;
-
 @interface HistoryViewController ()
 
 @property (nonatomic) NSArray<NSString *> *mediaURNs;
@@ -229,7 +227,7 @@ static NSUInteger HistoryPageSize = 50;
 - (void)historyDidChange:(NSNotification *)notification
 {
     [self updateMediaURNsWithCompletionBlock:^(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs) {
-        if (! [previousURNs isEqual:self.mediaURNs] && (previousURNs.count <= HistoryPageSize || self.mediaURNs.count <= HistoryPageSize)) {
+        if (! [previousURNs isEqual:self.mediaURNs]) {
             [self refresh];
         }
     }];

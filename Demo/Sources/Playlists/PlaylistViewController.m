@@ -11,8 +11,6 @@
 #import <libextobjc/libextobjc.h>
 #import <SRGDataProvider/SRGDataProvider.h>
 
-static NSUInteger PlaylistPageSize = 50;
-
 @interface PlaylistViewController ()
 
 @property (nonatomic) SRGPlaylist *playlist;
@@ -102,7 +100,7 @@ static NSUInteger PlaylistPageSize = 50;
             
             self.medias = medias;
             [self.tableView reloadData];
-        }] requestWithPageSize:PlaylistPageSize];
+        }] requestWithPageSize:50];
         [request resume];
         self.request = request;
     }];
@@ -223,7 +221,7 @@ static NSUInteger PlaylistPageSize = 50;
 - (void)playlistEntriesDidChange:(NSNotification *)notification
 {
     [self updateMediaURNsWithCompletionBlock:^(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs) {
-        if (! [previousURNs isEqual:self.mediaURNs] && (previousURNs.count <= PlaylistPageSize || self.mediaURNs.count <= PlaylistPageSize)) {
+        if (! [previousURNs isEqual:self.mediaURNs]) {
             [self refresh];
         }
     }];
