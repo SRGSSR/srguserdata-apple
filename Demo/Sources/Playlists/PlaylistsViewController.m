@@ -222,14 +222,7 @@
 
 - (void)playlistsDidChange:(NSNotification *)notification
 {
-    // FIXME:
-#if 0
-    NSArray<NSString *> *previousUids = notification.userInfo[SRGPlaylistsPreviousUidsKey];
-    NSArray<NSString *> *uids = notification.userInfo[SRGPlaylistsUidsKey];
-    if (uids.count == 0 || previousUids.count == 0) {
-        [self refresh];
-    }
-#endif
+    [self refresh];
 }
 
 @end
