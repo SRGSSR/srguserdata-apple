@@ -340,4 +340,27 @@
     [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
 }
 
+- (void)testChangeNotificationsWithDiscardedRemoteEntries
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self discardRemoteHistoryEntriesWithUids:@[ @"a", @"c" ]];
+    
+    // Changes are notified when synchronization occurs with the remote changes
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"a", @"c", @"b", @"d", nil]));
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalHistoryUids:@[ @"b", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
+}
+
 @end

@@ -523,4 +523,67 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
+- (void)testChangeNotificationsWithDiscardedRemoteEmptyPlaylists
+{
+    [self insertRemotePlaylistWithUid:@"a"];
+    [self insertRemotePlaylistWithUid:@"b"];
+    [self insertRemotePlaylistWithUid:@"c"];
+    [self insertRemotePlaylistWithUid:@"d"];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self discardRemotePlaylistsWithUids:@[ @"a", @"c" ]];
+    
+    // Changes are notified when synchronization occurs with the remote changes
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", @"d", nil]));
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalPlaylistUids:@[ @"b", @"d" ]];
+    [self assertRemotePlaylistUids:@[ @"b", @"d" ]];
+}
+
+- (void)testChangeNotificationsWithDiscardedRemotePlaylistsWithEntries
+{
+    [self insertRemotePlaylistWithUid:@"a"];
+    [self insertRemotePlaylistWithUid:@"b"];
+    [self insertRemotePlaylistWithUid:@"c"];
+    [self insertRemotePlaylistWithUid:@"d"];
+    
+    [self insertRemotePlaylistEntriesWithUids:@[ @"1", @"2", @"3", @"4", @"5" ] forPlaylistWithUid:@"a"];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self discardRemotePlaylistsWithUids:@[ @"a" ]];
+    
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", @"d", nil]));
+        return YES;
+    }];
+    
+    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidKey], @"a");
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], ([NSSet setWithObjects:@"1", @"2", @"3", @"4", @"5", nil]));
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalPlaylistUids:@[ @"b", @"c", @"d" ]];
+    [self assertRemotePlaylistUids:@[ @"b", @"c", @"d" ]];
+}
+
+// TODO: Check notifications with discarded playlist entries only (not playlists themselves)
+
 @end
