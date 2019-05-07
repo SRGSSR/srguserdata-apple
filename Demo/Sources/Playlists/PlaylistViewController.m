@@ -6,6 +6,7 @@
 
 #import "PlaylistViewController.h"
 
+#import "NSDateFormatter+Demo.h"
 #import "PlayerViewController.h"
 
 #import <libextobjc/libextobjc.h>
@@ -54,6 +55,10 @@
                                            selector:@selector(playlistEntriesDidChange:)
                                                name:SRGPlaylistEntriesDidChangeNotification
                                              object:SRGUserData.currentUserData.playlists];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(didFinishSynchronization:)
+                                               name:SRGUserDataDidFinishSynchronizationNotification
+                                             object:SRGUserData.currentUserData];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     
@@ -144,6 +149,18 @@
     return [tableView dequeueReusableCellWithIdentifier:@"MediaCell"];
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    if (SRGIdentityService.currentIdentityService.loggedIn) {
+        NSDate *synchronizationDate = SRGUserData.currentUserData.user.synchronizationDate;
+        NSString *synchronizationDateString = synchronizationDate ? [NSDateFormatter.demo_relativeDateAndTimeFormatter stringFromDate:synchronizationDate] : NSLocalizedString(@"Never", nil);
+        return [NSString stringWithFormat:NSLocalizedString(@"Last synchronization: %@", nil), synchronizationDateString];
+    }
+    else {
+        return nil;
+    }
+}
+
 #pragma mark UITableViewDelegate protocol
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -225,6 +242,11 @@
             [self refresh];
         }
     }];
+}
+
+- (void)didFinishSynchronization:(NSNotification *)notification
+{
+    [self.tableView reloadData];
 }
 
 @end

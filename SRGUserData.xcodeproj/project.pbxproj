@@ -116,6 +116,7 @@
 		6F41C9AB2216C3CC003F434A /* PlayerViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F41C9A82216C3CB003F434A /* PlayerViewController.storyboard */; };
 		6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F41C9AA2216C3CB003F434A /* PlayerViewController.m */; };
 		6F46DD76221429110013C10A /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F46DD75221429100013C10A /* Person.m */; };
+		6F478B2B22818A6100CDC022 /* NSDateFormatter+Demo.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */; };
 		6F64BDF02274E19F00ED0DFE /* MigrationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FCCE4802212BFD600423EFF /* MigrationTestCase.m */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
 		6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F120FDCAA800AA6434 /* Images.xcassets */; };
@@ -360,6 +361,8 @@
 		6F41C9AA2216C3CB003F434A /* PlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerViewController.m; sourceTree = "<group>"; };
 		6F46DD74221429100013C10A /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 		6F46DD75221429100013C10A /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+		6F478B2922818A6100CDC022 /* NSDateFormatter+Demo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+Demo.h"; sourceTree = "<group>"; };
+		6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+Demo.m"; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6F8A93F120FDCAA800AA6434 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -695,6 +698,15 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		6F478B28228189CD00CDC022 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				6F478B2922818A6100CDC022 /* NSDateFormatter+Demo.h */,
+				6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		6F8A93EE20FDCAA800AA6434 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
@@ -718,6 +730,7 @@
 			isa = PBXGroup;
 			children = (
 				6F8A93F320FDCAA800AA6434 /* Application */,
+				6F478B28228189CD00CDC022 /* Helpers */,
 				6F41C9732216A9C1003F434A /* History */,
 				6F41C9792216A9F9003F434A /* Medias */,
 				6F41C9A72216C3CB003F434A /* Player */,
@@ -1141,6 +1154,7 @@
 				086320EF2257FDB300C719A6 /* PlaylistViewController.m in Sources */,
 				086320E92257F05200C719A6 /* PlaylistsViewController.m in Sources */,
 				6F41C9772216A9C1003F434A /* HistoryViewController.m in Sources */,
+				6F478B2B22818A6100CDC022 /* NSDateFormatter+Demo.m in Sources */,
 				6F41C97C2216AA0D003F434A /* MediasViewController.m in Sources */,
 				6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */,
 			);
