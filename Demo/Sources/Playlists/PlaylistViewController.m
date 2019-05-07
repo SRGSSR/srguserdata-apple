@@ -51,7 +51,7 @@
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(playlistEntriesDidChange:)
                                                name:SRGPlaylistEntriesDidChangeNotification
-                                             object:self.playlist];
+                                             object:SRGUserData.currentUserData.playlists];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     

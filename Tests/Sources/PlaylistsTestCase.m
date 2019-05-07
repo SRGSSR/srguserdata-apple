@@ -379,13 +379,9 @@
 
 - (void)testSaveNewEntryInPlaylist
 {
-    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:nil handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertTrue([notification.object isKindOfClass:SRGPlaylist.class]);
-        
-        SRGPlaylist *playlist = notification.object;
-        XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
-        
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidKey], SRGPlaylistUidWatchLater);
         XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], [NSSet setWithObject:@"1"]);
         return YES;
     }];
@@ -442,7 +438,7 @@
 
 - (void)testSaveEntryInNonExistingPlaylist
 {
-    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistEntriesDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists queue:nil usingBlock:^(NSNotification * _Nonnull note) {
         XCTFail(@"No change must be received");
     }];
     
@@ -541,14 +537,9 @@
 {
     [self insertLocalPlaylistEntriesWithUids:@[ @"1", @"2", @"3", @"4", @"5" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:nil handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        
-        XCTAssertTrue([notification.object isKindOfClass:SRGPlaylist.class]);
-        
-        SRGPlaylist *playlist = notification.object;
-        XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
-        
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidKey], SRGPlaylistUidWatchLater);
         XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], ([NSSet setWithObjects:@"3", @"4", nil]));
         return YES;
     }];
@@ -570,7 +561,7 @@
 
 - (void)testDiscardNonExistingPlaylistEntryInPlaylist
 {
-    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistEntriesDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists queue:nil usingBlock:^(NSNotification * _Nonnull note) {
         XCTFail(@"No change must be received");
     }];
     
@@ -593,14 +584,9 @@
 {
     [self insertLocalPlaylistEntriesWithUids:@[ @"1", @"2", @"3", @"4", @"5" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:nil handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
-        
-        XCTAssertTrue([notification.object isKindOfClass:SRGPlaylist.class]);
-        
-        SRGPlaylist *playlist = notification.object;
-        XCTAssertEqualObjects(playlist.uid, SRGPlaylistUidWatchLater);
-        
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidKey], SRGPlaylistUidWatchLater);
         XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], ([NSSet setWithObjects:@"1", @"2", @"3", @"4", @"5", nil]));
         return YES;
     }];
