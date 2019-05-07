@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  @discussion Order is not preserved in the returned list (in comparison to the original list). Already discarded objects
  *              are omitted.
  */
-+ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (NSArray<NSString *> *)discardObjectsWithUids:(nullable NSArray<NSString *> *)uids playlist:(SRGPlaylist *)playlist inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Set to `YES` to flag the object as requiring a synchronization for the currently logged in user.
