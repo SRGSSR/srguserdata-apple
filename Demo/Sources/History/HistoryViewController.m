@@ -13,9 +13,13 @@
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGUserData/SRGUserData.h>
 
+static NSUInteger HistoryPageSize = 50;
+
 @interface HistoryViewController ()
 
+@property (nonatomic) NSArray<NSString *> *mediaURNs;
 @property (nonatomic) NSArray<SRGMedia *> *medias;
+
 @property (nonatomic, weak) SRGBaseRequest *request;
 
 @end
@@ -105,11 +109,8 @@
 {
     [self.request cancel];
     
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
-    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
-    [SRGUserData.currentUserData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
-        NSArray<NSString *> *mediaURNs = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
-        SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:mediaURNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [self updateMediaURNsWithCompletionBlock:^(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs) {
+        SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:URNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
             if (self.refreshControl.refreshing) {
                 [self.refreshControl endRefreshing];
             }
@@ -123,6 +124,25 @@
         }] requestWithPageSize:50];
         [request resume];
         self.request = request;
+    }];
+}
+
+- (void)updateMediaURNsWithCompletionBlock:(void (^)(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs))completionBlock
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
+    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
+    
+    [SRGUserData.currentUserData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+        if (error) {
+            return;
+        }
+        
+        NSArray<NSString *> *mediaURNs = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSArray<NSString *> *previousMediaURNs = self.mediaURNs;
+            self.mediaURNs = mediaURNs;
+            completionBlock(mediaURNs, previousMediaURNs);
+        });
     }];
 }
 
@@ -208,14 +228,11 @@
 
 - (void)historyDidChange:(NSNotification *)notification
 {
-// FIXME:
-#if 0
-    NSArray<NSString *> *previousURNs = notification.userInfo[SRGHistoryPreviousUidsKey];
-    NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
-    if (URNs.count == 0 || previousURNs.count == 0) {
-        [self refresh];
-    }
-#endif
+    [self updateMediaURNsWithCompletionBlock:^(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs) {
+        if (! [previousURNs isEqual:self.mediaURNs] && (previousURNs.count < HistoryPageSize || self.mediaURNs.count < HistoryPageSize)) {
+            [self refresh];
+        }
+    }];
 }
 
 @end
