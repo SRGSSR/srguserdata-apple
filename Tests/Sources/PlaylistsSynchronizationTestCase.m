@@ -448,7 +448,7 @@
 #endif
 }
 
-- (void)testChangeNotificationsWithDiscardedLocalPlaylists
+- (void)testChangeNotificationsWithDiscardedLocalEmptyPlaylists
 {
     [self insertRemotePlaylistWithUid:@"a"];
     [self insertRemotePlaylistWithUid:@"b"];
@@ -485,6 +485,42 @@
     
     [self assertLocalPlaylistUids:@[ @"b", @"d" ]];
     [self assertRemotePlaylistUids:@[ @"b", @"d" ]];
+}
+
+- (void)testChangeNotificationsWithDiscardedLocalPlaylistsWithEntries
+{
+    [self insertRemotePlaylistWithUid:@"a"];
+    [self insertRemotePlaylistWithUid:@"b"];
+    [self insertRemotePlaylistWithUid:@"c"];
+    [self insertRemotePlaylistWithUid:@"d"];
+    
+    [self insertRemotePlaylistEntriesWithUids:@[ @"1", @"2", @"3", @"4", @"5" ] forPlaylistWithUid:@"a"];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", nil]));
+        return YES;
+    }];
+    
+    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidKey], @"a");
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], ([NSSet setWithObjects:@"1", @"2", @"3", @"4", @"5", nil]));
+        return YES;
+    }];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist discarded"];
+    
+    [self.userData.playlists discardPlaylistsWithUids:@[ @"a" ] completionBlock:^(NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
 @end
