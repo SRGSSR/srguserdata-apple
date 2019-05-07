@@ -61,7 +61,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
-            SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary inManagedObjectContext:managedObjectContext];
+            SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary matchingPredicate:nil inManagedObjectContext:managedObjectContext];
             if (historyEntry) {
                 [changedUids addObject:historyEntry.uid];
             }
@@ -264,21 +264,21 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
 - (SRGHistoryEntry *)historyEntryWithUid:(NSString *)uid
 {
     return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:managedObjectContext];
+        return [SRGHistoryEntry objectWithUid:uid matchingPredicate:nil inManagedObjectContext:managedObjectContext];
     }];
 }
 
 - (NSString *)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable, NSError * _Nullable))completionBlock
 {
     return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGHistoryEntry objectWithUid:uid inManagedObjectContext:managedObjectContext];
+        return [SRGHistoryEntry objectWithUid:uid matchingPredicate:nil inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
 - (NSString *)saveHistoryEntryWithUid:(NSString *)uid lastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
     return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithUid:uid inManagedObjectContext:managedObjectContext];
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithUid:uid matchingPredicate:nil inManagedObjectContext:managedObjectContext];
         historyEntry.lastPlaybackTime = lastPlaybackTime;
         historyEntry.deviceUid = deviceUid;
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {

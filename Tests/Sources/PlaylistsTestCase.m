@@ -397,6 +397,33 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
+- (void)testSaveEntryInSeveralPlaylists
+{
+    [self insertLocalPlaylistWithUid:@"a"];
+    [self insertLocalPlaylistWithUid:@"b"];
+    
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Insert"];
+    
+    [self.userData.playlists savePlaylistEntryWithUid:@"1" inPlaylistWithUid:@"a" completionBlock:^(NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
+        XCTAssertNil(error);
+        [expectation1 fulfill];
+    }];
+    
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Insert"];
+    
+    [self.userData.playlists savePlaylistEntryWithUid:@"1" inPlaylistWithUid:@"b" completionBlock:^(NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
+        XCTAssertNil(error);
+        [expectation2 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalEntryUids:@[@"1"] forPlaylistWithUid:@"a"];
+    [self assertLocalEntryUids:@[@"1"] forPlaylistWithUid:@"b"];
+}
+
 - (void)testSaveExistingEntryInPlaylist
 {
     [self insertLocalPlaylistWithUid:@"a"];

@@ -55,15 +55,18 @@
     return [managedObjectContext executeFetchRequest:fetchRequest error:NULL];
 }
 
-+ (SRGUserObject *)objectWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)objectWithUid:(NSString *)uid matchingPredicate:(NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGUserObject.new, uid), uid];
-    return [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext].firstObject;
+    NSPredicate *objectPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGUserObject.new, uid), uid];
+    if (predicate) {
+        objectPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[objectPredicate, predicate]];
+    }
+    return [self objectsMatchingPredicate:objectPredicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext].firstObject;
 }
 
-+ (SRGUserObject *)upsertWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)upsertWithUid:(NSString *)uid matchingPredicate:(NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
+    SRGUserObject *object = [self objectWithUid:uid matchingPredicate:predicate inManagedObjectContext:managedObjectContext];
     if (! object) {
         object = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(self) inManagedObjectContext:managedObjectContext];
         object.uid = uid;
@@ -74,7 +77,7 @@
     return object;
 }
 
-+ (SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary matchingPredicate:(NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
     NSString *uid = dictionary[self.uidKey];
     if (! uid) {
@@ -84,7 +87,7 @@
     // If the local entry is dirty and more recent than the server version, keep the local version as is.
     NSNumber *timestamp = dictionary[@"date"];
     NSDate *date = timestamp ? [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.] : NSDate.date;
-    SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
+    SRGUserObject *object = [self objectWithUid:uid matchingPredicate:predicate inManagedObjectContext:managedObjectContext];
     if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
         return object;
     }

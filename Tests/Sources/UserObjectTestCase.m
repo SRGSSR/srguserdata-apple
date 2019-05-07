@@ -70,11 +70,11 @@
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
         // Does not exist
-        SRGHistoryEntry *historyEntry1 = [SRGHistoryEntry objectWithUid:@"123456" inManagedObjectContext:viewContext];
+        SRGHistoryEntry *historyEntry1 = [SRGHistoryEntry objectWithUid:@"123456" matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertNil(historyEntry1);
         
         // Exists
-        SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry upsertWithUid:@"urn:rts:video:9992865" inManagedObjectContext:viewContext];
+        SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry upsertWithUid:@"urn:rts:video:9992865" matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry2.uid, @"urn:rts:video:9992865");
     }];
 }
@@ -86,11 +86,11 @@
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
         // Does not exist
-        SRGHistoryEntry *historyEntry1 = [SRGHistoryEntry upsertWithUid:@"123456" inManagedObjectContext:viewContext];
+        SRGHistoryEntry *historyEntry1 = [SRGHistoryEntry upsertWithUid:@"123456" matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry1.uid, @"123456");
         
         // Exists
-        SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry upsertWithUid:@"urn:rts:video:9992865" inManagedObjectContext:viewContext];
+        SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry upsertWithUid:@"urn:rts:video:9992865" matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry2.uid, @"urn:rts:video:9992865");
     }];
 }
@@ -101,7 +101,7 @@
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
-        SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{} inManagedObjectContext:viewContext];
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{} matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertNil(historyEntry);
     }];
 }
@@ -114,7 +114,7 @@
     [viewContext performBlockAndWait:^{
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"123456",
                                                                                       @"date" : @1550134222000,
-                                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+                                                                                      @"device_id" : @"other_device" } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"123456");
         XCTAssertEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1550134222]);
         XCTAssertEqualObjects(historyEntry.deviceUid, @"other_device");
@@ -129,7 +129,7 @@
     [viewContext performBlockAndWait:^{
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:video:9992865",
                                                                                       @"date" : @1550134222000,
-                                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+                                                                                      @"device_id" : @"other_device" } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:video:9992865");
         XCTAssertEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1550134222]);
         XCTAssertEqualObjects(historyEntry.deviceUid, @"other_device");
@@ -144,7 +144,7 @@
     [viewContext performBlockAndWait:^{
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:audio:10110418",
                                                                                       @"date" : @1550134222000,
-                                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+                                                                                      @"device_id" : @"other_device" } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:audio:10110418");
         XCTAssertEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1550134222]);
         XCTAssertEqualObjects(historyEntry.deviceUid, @"other_device");
@@ -159,7 +159,7 @@
     [viewContext performBlockAndWait:^{
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:audio:10110418",
                                                                                       @"date" : @1266137422000,
-                                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+                                                                                      @"device_id" : @"other_device" } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:audio:10110418");
         XCTAssertNotEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1266137422]);
         XCTAssertNotEqualObjects(historyEntry.deviceUid, @"other_device");
@@ -175,7 +175,7 @@
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:video:9992865",
                                                                                       @"date" : @1266137422000,
                                                                                       @"device_id" : @"other_device",
-                                                                                      @"deleted" : @YES } inManagedObjectContext:viewContext];
+                                                                                      @"deleted" : @YES } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:video:9992865");
         XCTAssertTrue(historyEntry.deleted);
     }];
@@ -190,7 +190,7 @@
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:audio:10110418",
                                                                                       @"date" : @1266137422000,
                                                                                       @"device_id" : @"other_device",
-                                                                                      @"deleted" : @YES } inManagedObjectContext:viewContext];
+                                                                                      @"deleted" : @YES } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:audio:10110418");
         XCTAssertNotEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1266137422]);
         XCTAssertNotEqualObjects(historyEntry.deviceUid, @"other_device");

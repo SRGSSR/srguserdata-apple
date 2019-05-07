@@ -24,12 +24,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Return an existing object for the specified identifier, `nil` if none is found.
  */
-+ (nullable __kindof SRGUserObject *)objectWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (nullable __kindof SRGUserObject *)objectWithUid:(NSString *)uid matchingPredicate:(nullable NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Create an entry with the specified identifier, or return an existing one for update purposes.
  */
-+ (__kindof SRGUserObject *)upsertWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (__kindof SRGUserObject *)upsertWithUid:(NSString *)uid matchingPredicate:(nullable NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Synchronize the receiver with the information from the provided dictionary. The entry might be created, updated
@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @discussion To persist changes, the Core Data managed object context needs to be saved.
  */
-+ (nullable __kindof SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (nullable __kindof SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary matchingPredicate:(nullable NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Return the list of dictionaries which would need to be saved in order to replace a list of objects with a list of
