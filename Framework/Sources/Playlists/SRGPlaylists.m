@@ -631,7 +631,9 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     if (sortDescriptors) {
         [playlistEntriesSortDescriptor addObjectsFromArray:sortDescriptors];
     }
-    [playlistEntriesSortDescriptor addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylistEntry.new, date) ascending:YES]];
+    else {
+        [playlistEntriesSortDescriptor addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylistEntry.new, date) ascending:YES]];
+    }
     
     return [SRGPlaylistEntry objectsMatchingPredicate:fetchPredicate sortedWithDescriptors:[playlistEntriesSortDescriptor copy] inManagedObjectContext:managedObjectContext];
 }
