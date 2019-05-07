@@ -13,14 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface SRGPlaylists (Private)
 
-- (void)saveEntryDictionaries:(NSArray<NSDictionary *> *)playlistEntryDictionaries toPlaylistUid:(NSString *)playlistUid withCompletionBlock:(void (^)(NSError * _Nullable error))completionBlock;
+- (void)savePlaylistEntryDictionaries:(NSArray<NSDictionary *> *)playlistEntryDictionaries toPlaylistWithUid:(NSString *)playlistUid completionBlock:(void (^)(NSError * _Nullable error))completionBlock;
 
-- (nullable NSArray<SRGPlaylistEntry *> *)entriesMatchingPredicate:(nullable NSPredicate *)predicate
-                                             sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
+- (nullable NSArray<SRGPlaylistEntry *> *)playlistEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                                                     sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors;
 
-- (NSString *)entriesMatchingPredicate:(nullable NSPredicate *)predicate
-                 sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
-                       completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error))completionBlock;
+- (NSString *)playlistEntriesMatchingPredicate:(nullable NSPredicate *)predicate
+                         sortedWithDescriptors:(nullable NSArray<NSSortDescriptor *> *)sortDescriptors
+                               completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error))completionBlock;
 
 @end
 

@@ -117,7 +117,7 @@
     BOOL ascending = ! [self.playlist.uid isEqualToString:SRGPlaylistUidWatchLater];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylistEntry.new, date) ascending:ascending];
     
-    [SRGUserData.currentUserData.playlists entriesInPlaylistWithUid:self.playlist.uid matchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
+    [SRGUserData.currentUserData.playlists playlistEntriesInPlaylistWithUid:self.playlist.uid matchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
         if (error) {
             return;
         }
@@ -188,7 +188,7 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         SRGMedia *media = self.medias[indexPath.row];
-        [SRGUserData.currentUserData.playlists discardEntriesWithUids:@[media.URN] fromPlaylistWithUid:self.playlist.uid completionBlock:^(NSError * _Nonnull error) {
+        [SRGUserData.currentUserData.playlists discardPlaylistEntriesWithUids:@[media.URN] fromPlaylistWithUid:self.playlist.uid completionBlock:^(NSError * _Nonnull error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSMutableArray<SRGMedia *> *medias = [self.medias mutableCopy];
                 [medias removeObjectAtIndex:indexPath.row];

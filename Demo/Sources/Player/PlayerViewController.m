@@ -101,7 +101,7 @@
     
     for (SRGPlaylist *playlist in playlists) {
         UIAlertAction *action = [UIAlertAction actionWithTitle:playlist.name style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [SRGUserData.currentUserData.playlists saveEntryWithUid:media.URN inPlaylistWithUid:playlist.uid completionBlock:nil];
+            [SRGUserData.currentUserData.playlists savePlaylistEntryWithUid:media.URN inPlaylistWithUid:playlist.uid completionBlock:nil];
         }];
         [alertController addAction:action];
         

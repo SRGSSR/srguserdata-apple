@@ -527,7 +527,7 @@ NSURL *TestPlaylistsServiceURL(void)
     for (NSString *uid in uids) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
         
-        [self.userData.playlists saveEntryWithUid:uid inPlaylistWithUid:playlistUid completionBlock:^(NSError * _Nullable error) {
+        [self.userData.playlists savePlaylistEntryWithUid:uid inPlaylistWithUid:playlistUid completionBlock:^(NSError * _Nullable error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
@@ -552,7 +552,7 @@ NSURL *TestPlaylistsServiceURL(void)
 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
     
-    [self.userData.playlists discardEntriesWithUids:uids fromPlaylistWithUid:playlistUid completionBlock:^(NSError * _Nullable error) {
+    [self.userData.playlists discardPlaylistEntriesWithUids:uids fromPlaylistWithUid:playlistUid completionBlock:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
@@ -571,8 +571,8 @@ NSURL *TestPlaylistsServiceURL(void)
 - (void)assertLocalEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylistEntry.new, discarded)];
-    NSArray<SRGPlaylistEntry *> *entries = [self.userData.playlists entriesInPlaylistWithUid:playlistUid matchingPredicate:predicate sortedWithDescriptors:nil];
-    NSArray<NSString *> *localUids = [entries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
+    NSArray<SRGPlaylistEntry *> *playlistEntries = [self.userData.playlists playlistEntriesInPlaylistWithUid:playlistUid matchingPredicate:predicate sortedWithDescriptors:nil];
+    NSArray<NSString *> *localUids = [playlistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
     XCTAssertEqualObjects([NSSet setWithArray:uids], [NSSet setWithArray:localUids]);
 }
 
