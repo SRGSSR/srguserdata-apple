@@ -28,7 +28,7 @@
 {
     [super setUp];
     
-    [self eraseDataAndWait];
+    [self eraseRemoteDataAndWait];
     [self logout];
 }
 

@@ -139,7 +139,7 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 /**
  *  Remotely all data associated with the user whose session token is provided.
  */
-- (void)eraseDataAndWait;
+- (void)eraseRemoteDataAndWait;
 
 @end
 

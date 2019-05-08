@@ -65,13 +65,6 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 
 @implementation SRGPlaylists
 
-#pragma mark Class methods
-
-+ (NSArray<NSString *> *)defaultPlaylistUids
-{
-    return @[ SRGPlaylistUidWatchLater ];
-}
-
 #pragma mark Object lifecycle
 
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
@@ -80,21 +73,16 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
         self.session = [NSURLSession sessionWithConfiguration:sessionConfiguration];
         
-        [self insertDefaultData];
+        // Insert local objects for non-synchronizable default playlists (whose entries can be synchronized, though)
+        NSArray<NSString *> *reservedUIds = SRGPlaylist.reservedUids;
+        for (NSString *uid in reservedUIds) {
+            [self saveSystemPlaylistWithUid:uid completionBlock:nil];
+        }
     }
     return self;
 }
 
 #pragma mark Data
-
-// TODO: Move as service subclassing hook
-- (void)insertDefaultData
-{
-    NSArray<NSString *> *defaultPlaylistUids = [SRGPlaylists defaultPlaylistUids];
-    for (NSString *uid in defaultPlaylistUids) {
-        [self saveDefaultPlaylistWithUid:uid completionBlock:nil];
-    }
-}
 
 - (void)savePlaylistDictionaries:(NSArray<NSDictionary *> *)playlistDictionaries withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
@@ -223,8 +211,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-    // TODO: Is an abstraction possible? (filtering out non-synchronizable objects)
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGPlaylist.new, uid), [SRGPlaylists defaultPlaylistUids]];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGPlaylist.new, uid), SRGPlaylist.reservedUids];
     playlists = [playlists filteredArrayUsingPredicate:predicate];
     
     if (playlists.count == 0) {
@@ -466,8 +453,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 
 - (NSArray<SRGUserObject *> *)userObjectsInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    // TODO: Is an abstraction possible? (filtering out non-synchronizable objects)
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGPlaylist.new, type), [SRGPlaylists defaultPlaylistUids]];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGPlaylist.new, uid), SRGPlaylist.reservedUids];
     NSArray<SRGUserObject *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     NSArray<SRGUserObject *> *playlistEntries = [SRGPlaylistEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     return [playlists arrayByAddingObjectsFromArray:playlistEntries];
@@ -476,21 +462,37 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 - (void)clearData
 {
     __block NSSet<NSString *> *changedUids = nil;
+    NSMutableDictionary<NSString *, NSSet<NSString *> *> *playlistEntriesUidsIndex = [NSMutableDictionary dictionary];
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGPlaylist.new, uid), SRGPlaylist.reservedUids];
+        
+        NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        for (SRGPlaylist *playlist in playlists) {
+            NSArray<NSString *> *playlistEntriesUids = [playlist.entries.array valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
+            if (playlistEntriesUids.count > 0) {
+                playlistEntriesUidsIndex[playlist.uid] = [NSSet setWithArray:playlistEntriesUids];
+            }
+        }
+        
         changedUids = [NSSet setWithArray:[playlists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]]];
-        [SRGPlaylist deleteAllInManagedObjectContext:managedObjectContext];
+        
+        [SRGPlaylist deleteAllObjectsMatchingPredicate:predicate inManagedObjectContext:managedObjectContext];
+        [SRGPlaylistEntry deleteAllObjectsMatchingPredicate:nil inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
         dispatch_sync(dispatch_get_main_queue(), ^{
             if (! error && changedUids.count > 0) {
+                [playlistEntriesUidsIndex enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull playlistUid, NSSet<NSString *> * _Nonnull playlistEntriesUids, BOOL * _Nonnull stop) {
+                    [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
+                                                                      object:self
+                                                                    userInfo:@{ SRGPlaylistUidKey : playlistUid,
+                                                                                SRGPlaylistEntriesUidsKey : playlistEntriesUids }];
+                }];
+                
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
                                                                 userInfo:@{ SRGPlaylistsUidsKey : changedUids }];
             }
-            
-            // TODO: Move to parent class
-            [self insertDefaultData];
         });
     }];
 }
@@ -530,7 +532,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     return [self savePlaylistWithName:name uid:uid type:SRGPlaylistTypeStandard completionBlock:completionBlock];
 }
 
-- (void)saveDefaultPlaylistWithUid:(NSString *)uid completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
+- (void)saveSystemPlaylistWithUid:(NSString *)uid completionBlock:(void (^)(NSString * _Nullable, NSError * _Nullable))completionBlock
 {
     [self savePlaylistWithName:SRGPlaylistNameForPlaylistWithUid(uid) uid:uid type:SRGPlaylistTypeForPlaylistWithUid(uid) completionBlock:completionBlock];
 }

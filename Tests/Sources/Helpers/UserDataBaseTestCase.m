@@ -227,7 +227,7 @@ NSURL *TestPlaylistsServiceURL(void)
 
 // GDPR special endpoint which erases all user data, returning the account to a pristine state. This endpoin is undocumented
 // but publicly available.
-- (void)eraseDataAndWait
+- (void)eraseRemoteDataAndWait
 {
     XCTAssertNotNil(self.sessionToken);
     

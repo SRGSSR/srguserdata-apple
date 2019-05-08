@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Delete all objects, removing them from the database directly. No synchronization will be triggered for logged in users.
  */
-+ (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (void)deleteAllObjectsMatchingPredicate:(nullable NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Set to `YES` to flag the object as requiring a synchronization for the currently logged in user.

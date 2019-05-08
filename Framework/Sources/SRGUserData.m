@@ -366,6 +366,9 @@ NSString *SRGUserDataMarketingVersion(void)
 - (void)userDidLogout:(NSNotification *)notification
 {
     [self.dataStore cancelAllBackgroundTasks];
+    [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
+        [service cancelSynchronization];
+    }];
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGUser *mainUser = [SRGUser userInManagedObjectContext:managedObjectContext];
@@ -373,8 +376,6 @@ NSString *SRGUserDataMarketingVersion(void)
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
         BOOL unexpectedLogout = [notification.userInfo[SRGIdentityServiceUnauthorizedKey] boolValue];
         [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
-            [service cancelSynchronization];
-            
             if (! unexpectedLogout) {
                 [service clearData];
             }

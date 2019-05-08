@@ -193,9 +193,11 @@
     return discardedUids;
 }
 
-+ (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (void)deleteAllObjectsMatchingPredicate:(NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
+    fetchRequest.predicate = predicate;
+    
     NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
     [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
 }

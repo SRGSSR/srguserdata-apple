@@ -233,7 +233,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
         NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         NSString *keyPath = [NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)];
         previousUids = [NSSet setWithArray:[historyEntries valueForKeyPath:keyPath]];
-        [SRGHistoryEntry deleteAllInManagedObjectContext:managedObjectContext];
+        [SRGHistoryEntry deleteAllObjectsMatchingPredicate:nil inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
         dispatch_sync(dispatch_get_main_queue(), ^{
             if (previousUids.count > 0) {
