@@ -181,6 +181,7 @@
     [self assertRemoteHistoryUids:@[ @"a", @"e" ]];
 }
 
+#if 0
 - (void)testLargeHistory
 {
     [self setupForAvailableService];
@@ -205,6 +206,7 @@
     [self assertLocalHistoryUids:uidsBuilder(0, 3000)];
     [self assertRemoteHistoryUids:uidsBuilder(0, 3000)];
 }
+#endif
 
 - (void)testAfterLogout
 {

@@ -57,7 +57,7 @@ SRGPlaylistUid const SRGPlaylistUidWatchLater = @"watch_later";
 
 + (BOOL)isSynchronizableWithDictionary:(NSDictionary *)dictionary
 {
-    SRGPlaylistType type = [[SRGPlaylistTypeJSONTransformer() transformedValue:dictionary[@"type"]] integerValue];;
+    SRGPlaylistType type = [[SRGPlaylistTypeJSONTransformer() transformedValue:dictionary[@"type"]] integerValue];
     return type == SRGPlaylistTypeStandard;
 }
 

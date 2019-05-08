@@ -351,6 +351,7 @@
     [self assertRemoteEntryUids:@[ @"a", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
+#if 0
 - (void)testLargePlaylists
 {
     [self setupForAvailableService];
@@ -380,6 +381,7 @@
     [self assertLocalPlaylistUids:uidsBuilder(0, 150)];
     [self assertRemotePlaylistUids:uidsBuilder(0, 150)];
 }
+#endif
 
 - (void)testAfterLogout
 {
