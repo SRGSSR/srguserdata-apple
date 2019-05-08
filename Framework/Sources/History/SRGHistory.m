@@ -247,7 +247,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
 
 #pragma mark Reads and writes
 
-+ (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+- (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
     NSPredicate *historyEntriesPredicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     if (predicate) {
@@ -256,7 +256,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
     return [SRGHistoryEntry objectsMatchingPredicate:historyEntriesPredicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
 }
 
-+ (SRGHistoryEntry *)historyEntryWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+- (SRGHistoryEntry *)historyEntryWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     return [SRGHistoryEntry objectWithUid:uid matchingPredicate:predicate inManagedObjectContext:managedObjectContext];
@@ -265,28 +265,28 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
 - (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
 {
     return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGHistory historyEntriesMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+        return [self historyEntriesMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     }];
 }
 
 - (NSString *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGHistoryEntry *> * _Nullable, NSError * _Nullable))completionBlock
 {
     return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGHistory historyEntriesMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
+        return [self historyEntriesMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
 - (SRGHistoryEntry *)historyEntryWithUid:(NSString *)uid
 {
     return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGHistory historyEntryWithUid:uid inManagedObjectContext:managedObjectContext];
+        return [self historyEntryWithUid:uid inManagedObjectContext:managedObjectContext];
     }];
 }
 
 - (NSString *)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable, NSError * _Nullable))completionBlock
 {
     return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGHistory historyEntryWithUid:uid inManagedObjectContext:managedObjectContext];
+        return [self historyEntryWithUid:uid inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 

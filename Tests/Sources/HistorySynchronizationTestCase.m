@@ -366,7 +366,7 @@
     [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
 }
 
-- (void)testNonReturnedDiscardedEntryWithUid
+- (void)testNonReturnedDiscardedHistoryEntryWithUid
 {
     [self insertRemoteHistoryEntriesWithUids:@[ @"a" ]];
     
@@ -424,7 +424,7 @@
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)testNonReturnedDiscardedEntriesWithPredicate
+- (void)testNonReturnedDiscardedHistoryEntriesWithPredicate
 {
     [self insertRemoteHistoryEntriesWithUids:@[ @"a" ]];
     
@@ -433,7 +433,9 @@
     
     // Synchronous
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), @"a"];
-    SRGHistoryEntry *historyEntry1 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
+    NSArray<SRGHistoryEntry *> *historyEntries1 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil];
+    XCTAssertEqual(historyEntries1.count, 1);
+    SRGHistoryEntry *historyEntry1 = historyEntries1.firstObject;
     XCTAssertNotNil(historyEntry1);
     XCTAssertFalse(historyEntry1.discarded);
     
@@ -456,8 +458,8 @@
     XCTAssertTrue(historyEntry1.discarded);
     
     // Synchronous
-    SRGHistoryEntry *historyEntry2 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
-    XCTAssertNil(historyEntry2);
+    NSArray<SRGHistoryEntry *> *historyEntries2 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil];
+    XCTAssertEqual(historyEntries2.count, 0);
     
     // Asynchronous
     XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entry fetched"];
@@ -472,8 +474,8 @@
     [self synchronizeAndWait];
     
     // Synchronous
-    SRGHistoryEntry *historyEntry3 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
-    XCTAssertNil(historyEntry3);
+    NSArray<SRGHistoryEntry *> *historyEntries3 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil];
+    XCTAssertEqual(historyEntries3.count, 0);
     
     // Asynchronous
     XCTestExpectation *expectation3 = [self expectationWithDescription:@"History entry fetched"];
