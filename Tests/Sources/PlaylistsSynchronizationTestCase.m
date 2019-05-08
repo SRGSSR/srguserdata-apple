@@ -7,6 +7,9 @@
 #import "UserDataBaseTestCase.h"
 
 #import "SRGPlaylistsRequest.h"
+#import "SRGUserObject+Private.h"
+
+#import <libextobjc/libextobjc.h>
 
 @interface PlaylistsSynchronizationTestCase : UserDataBaseTestCase
 
@@ -740,6 +743,126 @@
     
     [self assertLocalPlaylistUids:@[ @"b", @"c", @"d" ]];
     [self assertRemotePlaylistUids:@[ @"b", @"c", @"d" ]];
+}
+
+- (void)testNonReturnedDiscardedPlaylistWithUid
+{
+    [self insertRemotePlaylistWithUid:@"a"];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    // Synchronous
+    SRGPlaylist *playlist1 = [self.userData.playlists playlistWithUid:@"a"];
+    XCTAssertNotNil(playlist1);
+    XCTAssertFalse(playlist1.discarded);
+    
+    // Asynchronous
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist fetched"];
+    
+    [self.userData.playlists playlistWithUid:@"a" completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
+        XCTAssertNotNil(playlist);
+        XCTAssertFalse(playlist.discarded);
+        [expectation1 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self discardLocalPlaylistsWithUids:@[ @"a" ]];
+    
+    XCTAssertTrue(playlist1.discarded);
+    
+    // Synchronous
+    SRGPlaylist *playlist2 = [self.userData.playlists playlistWithUid:@"a"];
+    XCTAssertNil(playlist2);
+    
+    // Asynchronous
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlist fetched"];
+    
+    [self.userData.playlists playlistWithUid:@"a" completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
+        XCTAssertNil(playlist);
+        [expectation2 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self synchronizeAndWait];
+    
+    // Synchronous
+    SRGPlaylist *playlist3 = [self.userData.playlists playlistWithUid:@"a"];
+    XCTAssertNil(playlist3);
+    
+    // Asynchronous
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Playlist fetched"];
+    
+    [self.userData.playlists playlistWithUid:@"a" completionBlock:^(SRGPlaylist * _Nullable playlist, NSError * _Nullable error) {
+        XCTAssertNil(playlist);
+        [expectation3 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)testNonReturnedDiscardedPlaylistsWithPredicate
+{
+    [self insertRemotePlaylistWithUid:@"a"];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    // Synchronous
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGPlaylist.new, uid), @"a"];
+    SRGPlaylist *playlist1 = [self.userData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
+    XCTAssertNotNil(playlist1);
+    XCTAssertFalse(playlist1.discarded);
+    
+    // Asynchronous
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"Playlist fetched"];
+    
+    [self.userData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylist *> * _Nullable playlists, NSError * _Nullable error) {
+        XCTAssertEqual(playlists.count, 1);
+        
+        SRGPlaylist *playlist = playlists.firstObject;
+        XCTAssertNotNil(playlist);
+        XCTAssertFalse(playlist.discarded);
+        [expectation1 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self discardLocalPlaylistsWithUids:@[ @"a" ]];
+    
+    XCTAssertTrue(playlist1.discarded);
+    
+    // Synchronous
+    SRGPlaylist *playlist2 = [self.userData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
+    XCTAssertNil(playlist2);
+    
+    // Asynchronous
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"Playlist fetched"];
+    
+    [self.userData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylist *> * _Nullable playlists, NSError * _Nullable error) {
+        XCTAssertEqual(playlists.count, 0);
+        [expectation2 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self synchronizeAndWait];
+    
+    // Synchronous
+    SRGPlaylist *playlist3 = [self.userData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
+    XCTAssertNil(playlist3);
+    
+    // Asynchronous
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"Playlist fetched"];
+    
+    [self.userData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGPlaylist *> * _Nullable playlists, NSError * _Nullable error) {
+        XCTAssertEqual(playlists.count, 0);
+        [expectation3 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 @end
