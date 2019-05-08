@@ -465,7 +465,7 @@ NSURL *TestPlaylistsServiceURL(void)
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)discardRemoteEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+- (void)discardRemotePlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
     XCTAssertNotNil(self.sessionToken);
     
@@ -494,7 +494,7 @@ NSURL *TestPlaylistsServiceURL(void)
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)assertRemoteEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+- (void)assertRemotePlaylistEntriesUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
     XCTAssertNotNil(self.sessionToken);
     
@@ -554,7 +554,7 @@ NSURL *TestPlaylistsServiceURL(void)
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)discardLocalEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+- (void)discardLocalPlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Local deletion"];
     
@@ -574,7 +574,7 @@ NSURL *TestPlaylistsServiceURL(void)
     XCTAssertEqualObjects([[NSSet setWithArray:uids] setByAddingObjectsFromArray:@[ SRGPlaylistUidWatchLater ]], [NSSet setWithArray:localUids]);
 }
 
-- (void)assertLocaPlaylistEntriesUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
+- (void)assertLocalPlaylistEntriesUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylistEntry.new, discarded)];
     NSArray<SRGPlaylistEntry *> *playlistEntries = [self.userData.playlists playlistEntriesInPlaylistWithUid:playlistUid matchingPredicate:predicate sortedWithDescriptors:nil];

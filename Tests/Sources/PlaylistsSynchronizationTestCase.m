@@ -221,13 +221,13 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocaPlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
     [self synchronizeAndWait];
     
-    [self assertLocaPlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testPlaylistSynchronizationWithAddedRemoteEntries
@@ -237,13 +237,13 @@
     
     [self insertRemotePlaylistEntriesWithUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self assertLocaPlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
     [self synchronizeAndWait];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testPlaylistSynchronizationWithAddedLocalEntries
@@ -253,13 +253,13 @@
     
     [self insertLocalPlaylistEntriesWithUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
     [self synchronizeAndWait];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testPlaylistSynchronizationWithAddedRemoteAndLocalEntries
@@ -270,13 +270,13 @@
     [self insertLocalPlaylistEntriesWithUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     [self insertRemotePlaylistEntriesWithUids:@[ @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
     [self synchronizeAndWait];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testPlaylistSynchronizationWithDiscardedRemoteEntries
@@ -286,18 +286,18 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
         
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self discardRemoteEntriesWithUids:@[ @"a", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self discardRemotePlaylistEntriesWithUids:@[ @"a", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
     [self synchronizeAndWait];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testPlaylistSynchronizationWithDiscardedLocalEntries
@@ -307,18 +307,18 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self discardLocalEntriesWithUids:@[ @"a", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self discardLocalPlaylistEntriesWithUids:@[ @"a", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"a", @"b", @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
     [self synchronizeAndWait];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"b", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testPlaylistSynchronizationWithDiscardedRemoteAndLocalEntries
@@ -328,19 +328,19 @@
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"a", @"b", @"c", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self discardLocalEntriesWithUids:@[ @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self discardRemoteEntriesWithUids:@[ @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self discardLocalPlaylistEntriesWithUids:@[ @"b", @"c" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self discardRemotePlaylistEntriesWithUids:@[ @"c", @"d" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"a", @"b", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"d", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"a", @"b", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
     
     [self synchronizeAndWait];
     
-    [self assertLocaPlaylistEntriesUids:@[ @"a", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
-    [self assertRemoteEntryUids:@[ @"a", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[ @"a", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertRemotePlaylistEntriesUids:@[ @"a", @"e" ] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 // TODO: Disabled. Too intensive for the service.
@@ -429,45 +429,71 @@
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
     [self assertLocalPlaylistUids:@[]];
-    [self assertLocaPlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
+    [self assertLocalPlaylistEntriesUids:@[] forPlaylistWithUid:SRGPlaylistUidWatchLater];
 }
 
 - (void)testSynchronizationAfterLogoutDuringSynchronization
 {
-    XCTFail(@"Implement");
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self insertLocalPlaylistWithUid:@"a"];
+    [self insertLocalPlaylistWithUid:@"b"];
+    [self insertLocalPlaylistWithUid:@"c"];
+    
+    [self insertLocalPlaylistEntriesWithUids:@[ @"1", @"2", @"3", @"4" ] forPlaylistWithUid:@"a"];
+    
+    [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
+    [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:nil];
+    
+    [self synchronize];
+    [self logout];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self assertLocalPlaylistUids:@[]];
+    
+    // Login again and check that synchronization still works
+    [self loginAndWaitForInitialSynchronization];
 }
 
 - (void)testSynchronizationWithoutLoggedInUser
 {
-    // FIXME:
-#if 0
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
+        return [notification.userInfo[SRGPlaylistsUidsKey] containsObject:SRGPlaylistUidWatchLater];
+    }];
+    
     [self setupForAvailableService];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
     
     id startObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGUserDataDidStartSynchronizationNotification object:self.userData queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"No start notification is expected");
+    }];
+    id changeObserver1 = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistsDidChangeNotification object:self.userData.playlists queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No change notification is expected");
+    }];
+    id changeObserver2 = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No change notification is expected");
     }];
     id finishObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGUserDataDidFinishSynchronizationNotification object:self.userData queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"No finish notification is expected");
     }];
     
-    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertEqual([notification.userInfo[SRGPlaylistsUidsKey] count], 1);
-        return YES;
-    }];
+    [self expectationForElapsedTimeInterval:5. withHandler:nil];
     
     [self synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
         [NSNotificationCenter.defaultCenter removeObserver:startObserver];
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver1];
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver2];
         [NSNotificationCenter.defaultCenter removeObserver:finishObserver];
     }];
-#endif
 }
 
 - (void)testSynchronizationWithUnavailableService
 {
-    // FIXME:
-#if 0
     [self setupForUnavailableService];
     [self loginAndWaitForInitialSynchronization];
     
@@ -480,15 +506,21 @@
         return YES;
     }];
     
-    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertEqual([notification.userInfo[SRGPlaylistsUidsKey] count], 1);
-        return YES;
+    id changeObserver1 = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistsDidChangeNotification object:self.userData.playlists queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No change notification is expected");
     }];
+    id changeObserver2 = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No change notification is expected");
+    }];
+    
+    [self expectationForElapsedTimeInterval:5. withHandler:nil];
     
     [self synchronize];
     
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-#endif
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver1];
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver2];
+    }];
 }
 
 - (void)testChangeNotificationsWithDiscardedLocalEmptyPlaylists
@@ -528,6 +560,52 @@
     
     [self assertLocalPlaylistUids:@[ @"b", @"d" ]];
     [self assertRemotePlaylistUids:@[ @"b", @"d" ]];
+}
+
+- (void)testChangeNotificationsWithDiscardedLocalPlaylistEntries
+{
+    [self insertRemotePlaylistWithUid:@"a"];
+    
+    [self insertRemotePlaylistEntriesWithUids:@[ @"1", @"2", @"3", @"4", @"5" ] forPlaylistWithUid:@"a"];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPlaylistsDidChangeNotification object:self.userData.playlists queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No playlist change notification is expected");
+    }];
+    
+    [self expectationForElapsedTimeInterval:5. withHandler:nil];
+    
+    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidKey], @"a");
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], ([NSSet setWithObjects:@"2", @"4", nil]));
+        return YES;
+    }];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entries discarded"];
+    
+    [self.userData.playlists discardPlaylistEntriesWithUids:@[ @"2", @"4" ] fromPlaylistWithUid:@"a" completionBlock:^(NSError * _Nullable error) {
+        XCTAssertFalse(NSThread.isMainThread);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+    
+    [self assertLocalPlaylistUids:@[ @"a" ]];
+    [self assertRemotePlaylistUids:@[ @"a" ]];
+    
+    [self assertLocalPlaylistEntriesUids:@[ @"1", @"3", @"5" ] forPlaylistWithUid:@"a"];
+    [self assertRemotePlaylistEntriesUids:@[ @"1", @"2", @"3", @"4", @"5" ] forPlaylistWithUid:@"a"];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalPlaylistEntriesUids:@[ @"1", @"3", @"5" ] forPlaylistWithUid:@"a"];
+    [self assertLocalPlaylistEntriesUids:@[ @"1", @"3", @"5" ] forPlaylistWithUid:@"a"];
 }
 
 - (void)testChangeNotificationsWithDiscardedLocalPlaylistsWithEntries
@@ -592,6 +670,42 @@
     [self assertRemotePlaylistUids:@[ @"b", @"d" ]];
 }
 
+- (void)testChangeNotificationsWithDiscardedRemotePlaylistEntries
+{
+    [self insertRemotePlaylistWithUid:@"a"];
+    
+    [self insertRemotePlaylistEntriesWithUids:@[ @"1", @"2", @"3", @"4", @"5" ] forPlaylistWithUid:@"a"];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self discardRemotePlaylistEntriesWithUids:@[ @"2", @"4" ] forPlaylistWithUid:@"a"];
+    
+    // Changes are notified when synchronization occurs with the remote changes
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", nil]));
+        return YES;
+    }];
+    
+    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistUidKey], @"a");
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], ([NSSet setWithObjects:@"1", @"2", @"3", @"4", @"5", nil]));
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalPlaylistUids:@[ @"a" ]];
+    [self assertRemotePlaylistUids:@[ @"a" ]];
+    
+    [self assertLocalPlaylistEntriesUids:@[ @"1", @"3", @"5" ] forPlaylistWithUid:@"a"];
+    [self assertLocalPlaylistEntriesUids:@[ @"1", @"3", @"5" ] forPlaylistWithUid:@"a"];
+}
+
 - (void)testChangeNotificationsWithDiscardedRemotePlaylistsWithEntries
 {
     [self insertRemotePlaylistWithUid:@"a"];
@@ -606,6 +720,7 @@
     
     [self discardRemotePlaylistsWithUids:@[ @"a" ]];
     
+    // Changes are notified when synchronization occurs with the remote changes
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
         XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", @"d", nil]));
@@ -626,7 +741,5 @@
     [self assertLocalPlaylistUids:@[ @"b", @"c", @"d" ]];
     [self assertRemotePlaylistUids:@[ @"b", @"c", @"d" ]];
 }
-
-// TODO: Check notifications with discarded playlist entries only (not playlists themselves)
 
 @end

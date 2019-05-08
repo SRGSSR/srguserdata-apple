@@ -210,7 +210,7 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 /**
  *  Discard remote entries for a specific playlist identifier. Wait until the operation finishes.
  */
-- (void)discardRemoteEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
+- (void)discardRemotePlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
 
 /**
  *  Assert that the the current remote playlist identifiers match a specific list (order is ignored). System playlists
@@ -221,7 +221,7 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 /**
  *  Assert that the remote entry identifiers for a specific playlist match a specific list (order is ignored).
  */
-- (void)assertRemoteEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
+- (void)assertRemotePlaylistEntriesUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
 
 @end
 
@@ -245,7 +245,7 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 /**
  *  Discard local entries for a specific playlist identifier. Wait until the operation finishes.
  */
-- (void)discardLocalEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
+- (void)discardLocalPlaylistEntriesWithUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
 
 /**
  *  Assert that the the current local playlist identifiers match a specific list (order is ignored). System playlists
@@ -256,7 +256,7 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 /**
  *  Assert that the local entry identifiers for a specific playlist match a specific list (order is ignored).
  */
-- (void)assertLocaPlaylistEntriesUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
+- (void)assertLocalPlaylistEntriesUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
 
 @end
 
