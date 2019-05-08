@@ -6,6 +6,8 @@
 
 #import "UserDataBaseTestCase.h"
 
+#import "SRGUserObject+Private.h"
+
 #import <libextobjc/libextobjc.h>
 
 @interface HistoryTestCase : UserDataBaseTestCase
@@ -191,7 +193,7 @@
         return YES;
     }];
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History discarded"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History entries discarded"];
     
     [self.userData.history discardHistoryEntriesWithUids:@[ @"b", @"c" ] completionBlock:^(NSError * _Nonnull error) {
         XCTAssertFalse(NSThread.isMainThread);
@@ -214,7 +216,7 @@
     
     [self expectationForElapsedTimeInterval:4. withHandler:nil];
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History discarded"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History entries discarded"];
     
     [self.userData.history discardHistoryEntriesWithUids:@[ @"k" ] completionBlock:^(NSError * _Nonnull error) {
         XCTAssertFalse(NSThread.isMainThread);
@@ -237,7 +239,7 @@
         return YES;
     }];
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History discarded"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"History entries discarded"];
     
     [self.userData.history discardHistoryEntriesWithUids:nil completionBlock:^(NSError * _Nonnull error) {
         XCTAssertFalse(NSThread.isMainThread);

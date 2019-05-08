@@ -7,6 +7,7 @@
 #import "UserDataBaseTestCase.h"
 
 #import "SRGPlaylists+Private.h"
+#import "SRGUserObject+Private.h"
 
 #import <libextobjc/libextobjc.h>
 

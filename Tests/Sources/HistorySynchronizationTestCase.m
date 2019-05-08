@@ -7,6 +7,9 @@
 #import "UserDataBaseTestCase.h"
 
 #import "SRGHistoryRequest.h"
+#import "SRGUserObject+Private.h"
+
+#import <libextobjc/libextobjc.h>
 
 @interface HistorySynchronizationTestCase : UserDataBaseTestCase
 
@@ -361,6 +364,126 @@
     
     [self assertLocalHistoryUids:@[ @"b", @"d" ]];
     [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
+}
+
+- (void)testNonReturnedDiscardedEntryWithUid
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    // Synchronous
+    SRGHistoryEntry *historyEntry1 = [self.userData.history historyEntryWithUid:@"a"];
+    XCTAssertNotNil(historyEntry1);
+    XCTAssertFalse(historyEntry1.discarded);
+    
+    // Asynchronous
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntryWithUid:@"a" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
+        XCTAssertNotNil(historyEntry);
+        XCTAssertFalse(historyEntry.discarded);
+        [expectation1 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self discardLocalHistoryEntriesWithUids:@[ @"a" ]];
+    
+    XCTAssertTrue(historyEntry1.discarded);
+    
+    // Synchronous
+    SRGHistoryEntry *historyEntry2 = [self.userData.history historyEntryWithUid:@"a"];
+    XCTAssertNil(historyEntry2);
+    
+    // Asynchronous
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntryWithUid:@"a" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
+        XCTAssertNil(historyEntry);
+        [expectation2 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self synchronizeAndWait];
+    
+    // Synchronous
+    SRGHistoryEntry *historyEntry3 = [self.userData.history historyEntryWithUid:@"a"];
+    XCTAssertNil(historyEntry3);
+    
+    // Asynchronous
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntryWithUid:@"a" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
+        XCTAssertNil(historyEntry);
+        [expectation3 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)testNonReturnedDiscardedEntriesWithPredicate
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    // Synchronous
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), @"a"];
+    SRGHistoryEntry *historyEntry1 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
+    XCTAssertNotNil(historyEntry1);
+    XCTAssertFalse(historyEntry1.discarded);
+    
+    // Asynchronous
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+        XCTAssertEqual(historyEntries.count, 1);
+        
+        SRGHistoryEntry *historyEntry = historyEntries.firstObject;
+        XCTAssertNotNil(historyEntry);
+        XCTAssertFalse(historyEntry.discarded);
+        [expectation1 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self discardLocalHistoryEntriesWithUids:@[ @"a" ]];
+    
+    XCTAssertTrue(historyEntry1.discarded);
+    
+    // Synchronous
+    SRGHistoryEntry *historyEntry2 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
+    XCTAssertNil(historyEntry2);
+    
+    // Asynchronous
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+        XCTAssertEqual(historyEntries.count, 0);
+        [expectation2 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self synchronizeAndWait];
+    
+    // Synchronous
+    SRGHistoryEntry *historyEntry3 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil].firstObject;
+    XCTAssertNil(historyEntry3);
+    
+    // Asynchronous
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+        XCTAssertEqual(historyEntries.count, 0);
+        [expectation3 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 @end

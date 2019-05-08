@@ -8,6 +8,7 @@
 
 #import "SRGHistoryRequest.h"
 #import "SRGPlaylistsRequest.h"
+#import "SRGUserObject+Private.h"
 
 #import <libextobjc/libextobjc.h>
 #import <OHHTTPStubs/OHHTTPStubs.h>
