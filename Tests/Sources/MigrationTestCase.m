@@ -97,9 +97,11 @@
         return [notification.userInfo[SRGHistoryEntriesUidsKey] containsObject:uid2];
     }];
     
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Save history entry"];
+    
     [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
-        
+        [expectation fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
@@ -153,8 +155,11 @@
         return [notification.userInfo[SRGHistoryEntriesUidsKey] containsObject:uid2];
     }];
     
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Save history entry"];
+    
     [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
+        [expectation fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
@@ -209,8 +214,11 @@
         return [notification.userInfo[SRGHistoryEntriesUidsKey] containsObject:uid2];
     }];
     
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Save history entry"];
+    
     [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
+        [expectation fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
@@ -265,8 +273,11 @@
         return [notification.userInfo[SRGHistoryEntriesUidsKey] containsObject:uid2];
     }];
     
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Save history entry"];
+    
     [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
+        [expectation fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
@@ -320,8 +331,11 @@
         return [notification.userInfo[SRGHistoryEntriesUidsKey] containsObject:uid2];
     }];
     
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Save history entry"];
+    
     [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
+        [expectation fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
@@ -375,8 +389,11 @@
         return [notification.userInfo[SRGHistoryEntriesUidsKey] containsObject:uid2];
     }];
     
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Save history entry"];
+    
     [userData.history saveHistoryEntryWithUid:uid2 lastPlaybackTime:kCMTimeZero deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
         XCTAssertNil(error);
+        [expectation fulfill];
     }];
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
