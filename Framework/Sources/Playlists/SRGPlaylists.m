@@ -188,7 +188,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                                                                             SRGPlaylistEntriesUidsKey : changedUids }];
             });
         }
-        completionBlock(error);
+        completionBlock ? completionBlock(error) : nil;
     }];
 }
 
@@ -303,10 +303,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                 [self.requestQueue reportError:error];
                 
                 if (! error) {
-                    // TODO: Wait for all completion blocks?
-                    [self savePlaylistEntryDictionaries:playlistEntryDictionaries toPlaylistWithUid:playlistUid completionBlock:^(NSError * _Nullable error) {
-                        
-                    }];
+                    [self savePlaylistEntryDictionaries:playlistEntryDictionaries toPlaylistWithUid:playlistUid completionBlock:nil];
                 }
             }];
             [self.requestQueue addRequest:request resume:YES];

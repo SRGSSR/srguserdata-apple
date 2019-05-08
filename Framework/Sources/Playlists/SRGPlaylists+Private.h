@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface SRGPlaylists (Private)
 
-- (void)savePlaylistEntryDictionaries:(NSArray<NSDictionary *> *)playlistEntryDictionaries toPlaylistWithUid:(NSString *)playlistUid completionBlock:(void (^)(NSError * _Nullable error))completionBlock;
+- (void)savePlaylistEntryDictionaries:(NSArray<NSDictionary *> *)playlistEntryDictionaries toPlaylistWithUid:(NSString *)playlistUid completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 @end
 
