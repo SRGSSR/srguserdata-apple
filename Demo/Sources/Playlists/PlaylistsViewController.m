@@ -101,10 +101,9 @@
 
 - (void)refresh
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylist.new, discarded)];
     NSSortDescriptor *typeSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, type) ascending:NO];
     NSSortDescriptor *nameSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, name) ascending:YES];
-    self.playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:predicate sortedWithDescriptors:@[typeSortDescriptor, nameSortDescriptor]];
+    self.playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:@[typeSortDescriptor, nameSortDescriptor]];
     
     if (self.refreshControl.refreshing) {
         [self.refreshControl endRefreshing];
@@ -171,15 +170,7 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete){
         SRGPlaylist *playlist = self.playlists[indexPath.row];
-        [SRGUserData.currentUserData.playlists discardPlaylistsWithUids:@[playlist.uid] completionBlock:^(NSError * _Nonnull error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableArray<SRGPlaylist *> *playlists = [self.playlists mutableCopy];
-                [playlists removeObjectAtIndex:indexPath.row];
-                self.playlists = [playlists copy];
-                
-                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            });
-        }];
+        [SRGUserData.currentUserData.playlists discardPlaylistsWithUids:@[playlist.uid] completionBlock:nil];
     }
 }
 

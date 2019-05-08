@@ -113,11 +113,9 @@
 
 - (void)updateMediaURNsWithCompletionBlock:(void (^)(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs))completionBlock
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGPlaylistEntry.new, discarded)];
     BOOL ascending = ! [self.playlist.uid isEqualToString:SRGPlaylistUidWatchLater];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylistEntry.new, date) ascending:ascending];
-    
-    [SRGUserData.currentUserData.playlists playlistEntriesInPlaylistWithUid:self.playlist.uid matchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
+    [SRGUserData.currentUserData.playlists playlistEntriesInPlaylistWithUid:self.playlist.uid matchingPredicate:nil sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
         if (error) {
             return;
         }
@@ -188,15 +186,7 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         SRGMedia *media = self.medias[indexPath.row];
-        [SRGUserData.currentUserData.playlists discardPlaylistEntriesWithUids:@[media.URN] fromPlaylistWithUid:self.playlist.uid completionBlock:^(NSError * _Nonnull error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableArray<SRGMedia *> *medias = [self.medias mutableCopy];
-                [medias removeObjectAtIndex:indexPath.row];
-                self.medias = [medias copy];
-                
-                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            });
-        }];
+        [SRGUserData.currentUserData.playlists discardPlaylistEntriesWithUids:@[media.URN] fromPlaylistWithUid:self.playlist.uid completionBlock:nil];
     }
 }
 
