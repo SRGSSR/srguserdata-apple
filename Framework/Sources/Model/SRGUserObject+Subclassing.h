@@ -15,27 +15,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SRGUserObject (Subclassing)
 
 /**
- *  Subclasses must return `YES` iff the object described by the dictionary is synchronizable. The default implementation
- *  returns `YES`.
+ *  Subclasses can implement this method to return a list of reserved default uids. Those will never be synchronized.
  */
-+ (BOOL)isSynchronizableWithDictionary:(NSDictionary *)dictionary;
+@property (class, nonatomic, readonly) NSArray<NSString *> *reservedUids;
 
 /**
  *  Subclasses must implement this method to provide the JSON key which is used to identity the item in a unique way.
  */
 @property (class, nonatomic, readonly) NSString *uidKey;
-
-/**
- *  Return the list of identifiers whose entries cannot be discarded. The default implementation returns an empty list.
- */
-// TODO: Maybe should have a subclassing hook for standard entry insertion, returning those ids
-@property (class, nonatomic, readonly) NSArray<NSString *> *undiscardableUids;
-
-/**
- *  Subclasses must return `YES` iff the object is synchronizable. The default implementation returns `YES`.
- */
-// TODO: Replace with list above
-@property (nonatomic, readonly, getter=isSynchronizable) BOOL synchronizable;
 
 /**
  *  Update the current entry using the provided dictionary, in the format delivered by the associated service.

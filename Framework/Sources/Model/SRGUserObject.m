@@ -113,11 +113,11 @@
 {
     NSMutableDictionary<NSString *, NSDictionary *> *dictionaryIndex = [NSMutableDictionary dictionary];
     for (NSDictionary *dictionary in dictionaries) {
-        if (! [self.class isSynchronizableWithDictionary:dictionary]) {
+        NSString *uid = dictionary[self.class.uidKey];
+        if ([self.reservedUids containsObject:uid]) {
             continue;
         }
         
-        NSString *uid = dictionary[self.class.uidKey];
         if (uid) {
             dictionaryIndex[uid] = dictionary;
         }
@@ -125,7 +125,7 @@
     
     NSMutableArray<NSDictionary *> *mergedDictionaries = [NSMutableArray array];
     for (SRGUserObject *object in objects) {
-        if (! object.synchronizable) {
+        if ([self.reservedUids containsObject:object.uid]) {
             continue;
         }
         else if (object.dirty) {
@@ -151,11 +151,11 @@
 {
     NSPredicate *discardPredicate = nil;
     if (uids) {
-        NSArray<NSString *> *discardableUids = [uids srguserdata_arrayByRemovingObjectsInArray:self.undiscardableUids];
+        NSArray<NSString *> *discardableUids = [uids srguserdata_arrayByRemovingObjectsInArray:self.reservedUids];
         discardPredicate = [NSPredicate predicateWithFormat:@"%K IN %@", @keypath(SRGUserObject.new, uid), discardableUids];
     }
     else {
-        discardPredicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGUserObject.new, uid), self.undiscardableUids];
+        discardPredicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGUserObject.new, uid), self.reservedUids];
     }
     
     if (predicate) {
@@ -202,9 +202,9 @@
 
 #pragma mark Default implementations
 
-+ (BOOL)isSynchronizableWithDictionary:(NSDictionary *)dictionary
++ (NSArray<NSString *> *)reservedUids
 {
-    return YES;
+    return @[];
 }
 
 - (void)updateWithDictionary:(NSDictionary *)dictionary
@@ -215,16 +215,6 @@
     self.date = dateString ? [NSDate dateWithTimeIntervalSince1970:dateString.doubleValue / 1000.] : NSDate.date;
     
     self.discarded = [dictionary[@"deleted"] boolValue];
-}
-
-+ (NSArray<NSString *> *)undiscardableUids
-{
-    return @[];
-}
-
-- (BOOL)isSynchronizable
-{
-    return YES;
 }
 
 - (NSDictionary *)dictionary

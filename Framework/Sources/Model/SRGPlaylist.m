@@ -45,20 +45,14 @@ SRGPlaylistUid const SRGPlaylistUidWatchLater = @"watch_later";
 
 #pragma mark Overrides
 
-+ (NSString *)uidKey
-{
-    return @"businessId";
-}
-
-+ (NSArray<NSString *> *)undiscardableUids
++ (NSArray<NSString *> *)reservedUids
 {
     return @[ SRGPlaylistUidWatchLater ];
 }
 
-+ (BOOL)isSynchronizableWithDictionary:(NSDictionary *)dictionary
++ (NSString *)uidKey
 {
-    SRGPlaylistType type = [[SRGPlaylistTypeJSONTransformer() transformedValue:dictionary[@"type"]] integerValue];
-    return type == SRGPlaylistTypeStandard;
+    return @"businessId";
 }
 
 - (void)updateWithDictionary:(NSDictionary *)dictionary
@@ -67,11 +61,6 @@ SRGPlaylistUid const SRGPlaylistUidWatchLater = @"watch_later";
     
     self.name = dictionary[@"name"];
     self.type = [[SRGPlaylistTypeJSONTransformer() transformedValue:dictionary[@"type"]] integerValue];
-}
-
-- (BOOL)isSynchronizable
-{
-    return self.type == SRGPlaylistTypeStandard;
 }
 
 - (NSDictionary *)dictionary
