@@ -461,27 +461,32 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 
 - (void)clearData
 {
-    __block NSSet<NSString *> *changedUids = nil;
+    NSMutableSet<NSString *> *deletedUids = [NSMutableSet set];
     NSMutableDictionary<NSString *, NSSet<NSString *> *> *playlistEntriesUidsIndex = [NSMutableDictionary dictionary];
     
     [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGPlaylist.new, uid), SRGPlaylist.reservedUids];
-        
-        NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+        NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         for (SRGPlaylist *playlist in playlists) {
+            NSString *playlistUid = playlist.uid;
+            
             NSArray<NSString *> *playlistEntriesUids = [playlist.entries.array valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
             if (playlistEntriesUids.count > 0) {
                 playlistEntriesUidsIndex[playlist.uid] = [NSSet setWithArray:playlistEntriesUids];
             }
+            
+            
+            if (! [SRGPlaylist.reservedUids containsObject:playlistUid]) {
+                [deletedUids addObject:playlistUid];
+            }
         }
         
-        changedUids = [NSSet setWithArray:[playlists valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGPlaylist.new, uid)]]];
-        
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K IN %@", @keypath(SRGPlaylist.new, uid), deletedUids];
         [SRGPlaylist deleteAllObjectsMatchingPredicate:predicate inManagedObjectContext:managedObjectContext];
+        
         [SRGPlaylistEntry deleteAllObjectsMatchingPredicate:nil inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
         dispatch_sync(dispatch_get_main_queue(), ^{
-            if (! error && changedUids.count > 0) {
+            if (! error && deletedUids.count > 0) {
                 [playlistEntriesUidsIndex enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull playlistUid, NSSet<NSString *> * _Nonnull playlistEntriesUids, BOOL * _Nonnull stop) {
                     [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistEntriesDidChangeNotification
                                                                       object:self
@@ -491,7 +496,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                 
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistsUidsKey : changedUids }];
+                                                                userInfo:@{ SRGPlaylistsUidsKey : [deletedUids copy] }];
             }
         });
     }];

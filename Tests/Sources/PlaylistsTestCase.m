@@ -420,8 +420,8 @@
     
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
-    [self assertLocalEntryUids:@[@"1"] forPlaylistWithUid:@"a"];
-    [self assertLocalEntryUids:@[@"1"] forPlaylistWithUid:@"b"];
+    [self assertLocaPlaylistEntriesUids:@[@"1"] forPlaylistWithUid:@"a"];
+    [self assertLocaPlaylistEntriesUids:@[@"1"] forPlaylistWithUid:@"b"];
 }
 
 - (void)testSaveExistingEntryInPlaylist

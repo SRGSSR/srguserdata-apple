@@ -214,7 +214,7 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 
 /**
  *  Assert that the the current remote playlist identifiers match a specific list (order is ignored). System playlists
- *  are added automatically to the list of uids.
+ *  are added automatically to the list of uids (and therefore checked as well).
  */
 - (void)assertRemotePlaylistUids:(NSArray<NSString *> *)uids;
 
@@ -249,14 +249,14 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 
 /**
  *  Assert that the the current local playlist identifiers match a specific list (order is ignored). System playlists
- *  are added automatically to the list of uids.
+ *  are added automatically to the list of uids (and therefore checked as well).
  */
 - (void)assertLocalPlaylistUids:(NSArray<NSString *> *)uids;
 
 /**
  *  Assert that the local entry identifiers for a specific playlist match a specific list (order is ignored).
  */
-- (void)assertLocalEntryUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
+- (void)assertLocaPlaylistEntriesUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
 
 @end
 

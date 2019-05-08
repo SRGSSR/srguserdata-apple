@@ -181,6 +181,7 @@
     [self assertRemoteHistoryUids:@[ @"a", @"e" ]];
 }
 
+// TODO: Disabled. Too intensive for the service.
 #if 0
 - (void)testLargeHistory
 {
@@ -208,20 +209,18 @@
 }
 #endif
 
-- (void)testAfterLogout
+- (void)testLogout
 {
-    // FIXME:
-#if 0
     [self setupForAvailableService];
     [self loginAndWaitForInitialSynchronization];
     
     [self insertLocalHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
     
-    [self assertLocalHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
-    
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
+    
     [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        return [notification.userInfo[SRGHistoryUidsKey] count] == 0;
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", @"d", nil]));
+        return YES;
     }];
     
     [self.identityService logout];
@@ -229,7 +228,6 @@
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
     [self assertLocalHistoryUids:@[]];
-#endif
 }
 
 - (void)testSynchronizationAfterLogoutDuringSynchronization
