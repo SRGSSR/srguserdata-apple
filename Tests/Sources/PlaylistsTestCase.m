@@ -6,7 +6,6 @@
 
 #import "UserDataBaseTestCase.h"
 
-#import "SRGPlaylists+Private.h"
 #import "SRGUserObject+Private.h"
 
 #import <libextobjc/libextobjc.h>
@@ -632,35 +631,6 @@
     NSArray<SRGPlaylistEntry *> *playlistEntries = [self.userData.playlists playlistEntriesInPlaylistWithUid:SRGPlaylistUidWatchLater matchingPredicate:nil sortedWithDescriptors:nil];
     NSArray<NSString *> *uids = [playlistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
     XCTAssertEqualObjects(uids, @[]);
-}
-
-- (void)testPlaylistEntriesMigrationToWatchLaterPlaylist
-{
-    NSDate *date = NSDate.date;
-    NSArray<NSDictionary *> *migrations = @[ @{ @"itemId" : @"1",
-                                                @"date" : @(round((date.timeIntervalSince1970 - 2) * 1000.)) },
-                                             @{ @"itemId" : @"2",
-                                                @"date" : @(round((date.timeIntervalSince1970 - 4) * 1000.)) },
-                                             @{ @"itemId" : @"3",
-                                                @"date" : @(round((date.timeIntervalSince1970 - 6) * 1000.)) },
-                                             @{ @"itemId" : @"4",
-                                                @"date" : @(round((date.timeIntervalSince1970 - 8) * 1000.)) },
-                                             @{ @"itemId" : @"5",
-                                                @"date" : @(round((date.timeIntervalSince1970 - 10) * 1000.)) } ];
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist entries added"];
-    
-    [self.userData.playlists savePlaylistEntryDictionaries:migrations toPlaylistWithUid:SRGPlaylistUidWatchLater completionBlock:^(NSError * _Nullable error) {
-        XCTAssertFalse(NSThread.isMainThread);
-        XCTAssertNil(error);
-        [expectation fulfill];
-    }];
-    
-    [self waitForExpectationsWithTimeout:30. handler:nil];
-    
-    NSArray<SRGPlaylistEntry *> *playlistEntries = [self.userData.playlists playlistEntriesInPlaylistWithUid:SRGPlaylistUidWatchLater matchingPredicate:nil sortedWithDescriptors:nil];
-    NSArray<NSString *> *uids = [playlistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
-    XCTAssertEqualObjects(uids, (@[ @"5", @"4", @"3", @"2", @"1" ]));
 }
 
 @end

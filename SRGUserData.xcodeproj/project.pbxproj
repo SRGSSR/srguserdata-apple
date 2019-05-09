@@ -14,7 +14,6 @@
 		082442B0220CB0DD00F39785 /* UserData_DB_v3 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AE220CB0DD00F39785 /* UserData_DB_v3 */; };
 		08280F0C2258DEBD00AC978D /* SRGPlaylists.m in Sources */ = {isa = PBXBuildFile; fileRef = 08280F0A2258DEBD00AC978D /* SRGPlaylists.m */; };
 		08280F0D2258DEBD00AC978D /* SRGPlaylists.h in Headers */ = {isa = PBXBuildFile; fileRef = 08280F0B2258DEBD00AC978D /* SRGPlaylists.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		08280F1C2259406C00AC978D /* SRGPlaylists+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 08280F1B2259406C00AC978D /* SRGPlaylists+Private.h */; };
 		08280F2222596BAD00AC978D /* UserData_DB_v6 in Resources */ = {isa = PBXBuildFile; fileRef = 08280F2122596BAD00AC978D /* UserData_DB_v6 */; };
 		084ACC2D22535F48008ACBD0 /* SRGPlaylist.m in Sources */ = {isa = PBXBuildFile; fileRef = 084ACC2B22535F48008ACBD0 /* SRGPlaylist.m */; };
 		084ACC2E22535F48008ACBD0 /* SRGPlaylist.h in Headers */ = {isa = PBXBuildFile; fileRef = 084ACC2C22535F48008ACBD0 /* SRGPlaylist.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -275,7 +274,6 @@
 		082442AE220CB0DD00F39785 /* UserData_DB_v3 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v3; sourceTree = "<group>"; };
 		08280F0A2258DEBD00AC978D /* SRGPlaylists.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylists.m; sourceTree = "<group>"; };
 		08280F0B2258DEBD00AC978D /* SRGPlaylists.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPlaylists.h; sourceTree = "<group>"; };
-		08280F1B2259406C00AC978D /* SRGPlaylists+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylists+Private.h"; sourceTree = "<group>"; };
 		08280F2122596BAD00AC978D /* UserData_DB_v6 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v6; sourceTree = "<group>"; };
 		084ACC2A22535CA6008ACBD0 /* SRGUserData_v7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v7.xcdatamodel; sourceTree = "<group>"; };
 		084ACC2B22535F48008ACBD0 /* SRGPlaylist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylist.m; sourceTree = "<group>"; };
@@ -517,7 +515,6 @@
 			children = (
 				08280F0B2258DEBD00AC978D /* SRGPlaylists.h */,
 				08280F0A2258DEBD00AC978D /* SRGPlaylists.m */,
-				08280F1B2259406C00AC978D /* SRGPlaylists+Private.h */,
 				08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */,
 				08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */,
 			);
@@ -877,7 +874,6 @@
 				08C991A82254B97E003E7816 /* SRGPlaylistEntry.h in Headers */,
 				6F0178CC2208192B00B4BCD9 /* NSTimer+SRGUserData.h in Headers */,
 				6FFB34812209B0DC00E76E6D /* SRGUserObject.h in Headers */,
-				08280F1C2259406C00AC978D /* SRGPlaylists+Private.h in Headers */,
 				6F938024227C0CE600315A83 /* NSSet+SRGUserData.h in Headers */,
 				6F0EB54020FC7FA9009C02CF /* SRGUserData.h in Headers */,
 				08280F0D2258DEBD00AC978D /* SRGPlaylists.h in Headers */,

@@ -12,7 +12,6 @@
 #import "SRGDataStore.h"
 #import "SRGPlaylist+Private.h"
 #import "SRGPlaylistEntry+Private.h"
-#import "SRGPlaylists+Private.h"
 #import "SRGPlaylistsRequest.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataError+Private.h"
