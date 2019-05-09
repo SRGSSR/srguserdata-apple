@@ -7,6 +7,7 @@
 #import "MediasViewController.h"
 
 #import "PlayerViewController.h"
+#import "SRGUserData_demo-Swift.h"
 
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGUserData/SRGUserData.h>
@@ -81,8 +82,9 @@
             return;
         }
         
-        self.medias = medias;
-        [self.tableView reloadData];
+        [self.tableView deepDiffReloadMediasWithOldMedias:self.medias newMedias:medias section:0 updateData:^{
+            self.medias = medias;
+        }];
     }] requestWithPageSize:50];
     [request resume];
     self.request = request;
