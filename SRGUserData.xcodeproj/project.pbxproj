@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		080491822284BFA200E4CEC2 /* PlayerPlaylist.m in Sources */ = {isa = PBXBuildFile; fileRef = 080491802284BFA200E4CEC2 /* PlayerPlaylist.m */; };
 		08083BD822639F8B00BE9F19 /* SRGPlaylistsRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */; };
 		08083BD922639F8B00BE9F19 /* SRGPlaylistsRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */; };
 		082442A8220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 082442A7220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel */; };
@@ -268,6 +269,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		080491802284BFA200E4CEC2 /* PlayerPlaylist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerPlaylist.m; sourceTree = "<group>"; };
+		080491812284BFA200E4CEC2 /* PlayerPlaylist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerPlaylist.h; sourceTree = "<group>"; };
 		08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylistsRequest.m; sourceTree = "<group>"; };
 		08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPlaylistsRequest.h; sourceTree = "<group>"; };
 		082442A5220C8A8800F39785 /* SRGUserData_v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v2.xcdatamodel; sourceTree = "<group>"; };
@@ -714,6 +717,8 @@
 			children = (
 				6F478B2922818A6100CDC022 /* NSDateFormatter+Demo.h */,
 				6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */,
+				080491812284BFA200E4CEC2 /* PlayerPlaylist.h */,
+				080491802284BFA200E4CEC2 /* PlayerPlaylist.m */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1170,6 +1175,7 @@
 				6F478B2B22818A6100CDC022 /* NSDateFormatter+Demo.m in Sources */,
 				6F41C97C2216AA0D003F434A /* MediasViewController.m in Sources */,
 				6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */,
+				080491822284BFA200E4CEC2 /* PlayerPlaylist.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

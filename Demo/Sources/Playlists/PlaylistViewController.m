@@ -179,7 +179,8 @@
     SRGMedia *media = self.medias[indexPath.row];
     SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
     
-    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime];
+    PlayerPlaylist *playerPlaylist = [[PlayerPlaylist alloc] initWithMedias:self.medias currentIndex:indexPath.row];
+    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime playerPlaylist:playerPlaylist];
     [self presentViewController:playerViewController animated:YES completion:nil];
 }
 

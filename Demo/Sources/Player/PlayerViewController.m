@@ -6,6 +6,8 @@
 
 #import "PlayerViewController.h"
 
+#import "PlayerPlaylist.h"
+
 #import <libextobjc/libextobjc.h>
 #import <SRGLetterbox/SRGLetterbox.h>
 #import <SRGUserData/SRGUserData.h>
@@ -14,6 +16,7 @@
 
 @property (nonatomic, copy) NSString *URN;
 @property (nonatomic) SRGPosition *position;
+@property (nonatomic) PlayerPlaylist *playerPlaylist;
 
 @property (nonatomic, weak) IBOutlet SRGLetterboxView *letterboxView;
 @property (nonatomic) IBOutlet SRGLetterboxController *letterboxController;     // top-level object, retained
@@ -27,12 +30,13 @@
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithURN:(NSString *)URN time:(CMTime)time
+- (instancetype)initWithURN:(nullable NSString *)URN time:(CMTime)time playerPlaylist:(nullable PlayerPlaylist *)playerPlaylist
 {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
     PlayerViewController *viewController = [storyboard instantiateInitialViewController];
     viewController.URN = URN;
     viewController.position = [SRGPosition positionBeforeTime:time];
+    viewController.playerPlaylist = playerPlaylist;
     return viewController;
 }
 
@@ -43,6 +47,7 @@
     [super viewDidLoad];
     
     if (self.URN) {
+        self.letterboxController.playlistDataSource = self.playerPlaylist;
         [self.letterboxController playURN:self.URN atPosition:self.position withPreferredSettings:nil];
         
         @weakify(self)
