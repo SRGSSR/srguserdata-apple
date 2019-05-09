@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Playlist types.
  */
-typedef NS_ENUM(NSInteger, SRGPlaylistType) {
+typedef NS_ENUM(int64_t, SRGPlaylistType) {
     /**
      *  Standard user-generated playlist.
      */
