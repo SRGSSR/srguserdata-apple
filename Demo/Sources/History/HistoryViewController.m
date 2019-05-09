@@ -229,6 +229,7 @@
 
 - (void)didLogin:(NSNotification *)notification
 {
+    [self.tableView reloadData];
     [self updateNavigationBar];
 }
 
