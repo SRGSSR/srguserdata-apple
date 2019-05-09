@@ -13,7 +13,6 @@
 #import "SRGHistoryEntry+Private.h"
 #import "SRGHistoryRequest.h"
 #import "SRGUser+Private.h"
-#import "SRGUserDataError+Private.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserObject+Private.h"
 #import "SRGUserObject+Subclassing.h"
@@ -97,9 +96,6 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
         };
         
         if (error) {
-            if (SRGUserDataIsUnauthorizationError(error)) {
-                [self.identityService reportUnauthorization];
-            }
             pullCompletionBlock(nil, error);
             return;
         }
@@ -144,9 +140,6 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
     
     SRGRequest *pushRequest = [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:historyEntriesMap.allValues toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         if (error) {
-            if (SRGUserDataIsUnauthorizationError(error)) {
-                [self.identityService reportUnauthorization];
-            }
             completionBlock(error);
             return;
         }

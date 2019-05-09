@@ -18,6 +18,7 @@
 
 #import <FXReachability/FXReachability.h>
 #import <libextobjc/libextobjc.h>
+#import <SRGNetwork/SRGNetwork.h>
 
 static NSUInteger s_currentPersistentStoreVersion = 7;
 
@@ -33,6 +34,22 @@ NSString * const SRGUserDataDidFinishSynchronizationNotification = @"SRGUserData
 NSString *SRGUserDataMarketingVersion(void)
 {
     return NSBundle.srg_userDataBundle.infoDictionary[@"CFBundleShortVersionString"];
+}
+
+static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
+{
+    if ([error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorMultiple) {
+        NSArray<NSError *> *errors = error.userInfo[SRGNetworkErrorsKey];
+        for (NSError *error in errors) {
+            if (SRGUserDataIsUnauthorizationError(error)) {
+                return YES;
+            }
+        }
+        return NO;
+    }
+    else {
+        return [error.domain isEqualToString:SRGNetworkErrorDomain] && error.code == SRGNetworkErrorHTTP && [error.userInfo[SRGNetworkHTTPStatusCodeKey] integerValue] == 401;
+    }
 }
 
 @interface SRGUserData ()
@@ -322,6 +339,10 @@ NSString *SRGUserDataMarketingVersion(void)
         SRGUserDataLogInfo(@"user_data", @"Started synchronization for service %@", service);
         
         [service synchronizeWithCompletionBlock:^(NSError * _Nullable error) {
+            if (SRGUserDataIsUnauthorizationError(error)) {
+                [self.identityService reportUnauthorization];
+            }
+            
             NSCAssert(self.synchronizing, @"Must be synchronizing");
             
             --remainingServiceCount;

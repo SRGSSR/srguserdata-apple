@@ -124,7 +124,6 @@
 		6F8A940420FDD01B00AA6434 /* SRGUserData.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F938024227C0CE600315A83 /* NSSet+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F938022227C0CE600315A83 /* NSSet+SRGUserData.h */; };
 		6F938025227C0CE600315A83 /* NSSet+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F938023227C0CE600315A83 /* NSSet+SRGUserData.m */; };
-		6F9E50772272DF8900CB7F56 /* SRGUserDataError+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F9E50762272DF8800CB7F56 /* SRGUserDataError+Private.h */; };
 		6FA1D10D220C7A21003976D9 /* SRGUserObject+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */; };
 		6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */; };
 		6FA62D5F2204389A008569DC /* FXReachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FA62D5C2204389A008569DC /* FXReachability.framework */; };
@@ -369,7 +368,6 @@
 		6F8A93FA20FDCAA800AA6434 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6F938022227C0CE600315A83 /* NSSet+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSSet+SRGUserData.h"; sourceTree = "<group>"; };
 		6F938023227C0CE600315A83 /* NSSet+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSSet+SRGUserData.m"; sourceTree = "<group>"; };
-		6F9E50762272DF8800CB7F56 /* SRGUserDataError+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataError+Private.h"; sourceTree = "<group>"; };
 		6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserObject+Subclassing.h"; sourceTree = "<group>"; };
 		6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataService+Subclassing.h"; sourceTree = "<group>"; };
 		6FA62D5C2204389A008569DC /* FXReachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FXReachability.framework; path = Carthage/Build/iOS/FXReachability.framework; sourceTree = "<group>"; };
@@ -613,7 +611,6 @@
 				6F0EB54220FC7FF4009C02CF /* SRGUserData.m */,
 				6FA9ADFD222C4944007446BD /* SRGUserDataError.h */,
 				6FA9ADFE222C4944007446BD /* SRGUserDataError.m */,
-				6F9E50762272DF8800CB7F56 /* SRGUserDataError+Private.h */,
 				6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */,
 				6FFB347B2209748900E76E6D /* SRGUserDataService.h */,
 				6FFB347D2209773F00E76E6D /* SRGUserDataService.m */,
@@ -861,7 +858,6 @@
 				6F0178AF22080FEC00B4BCD9 /* SRGHistoryEntry.h in Headers */,
 				6FA9ADFF222C4944007446BD /* SRGUserDataError.h in Headers */,
 				6F0178B122080FEC00B4BCD9 /* SRGUser.h in Headers */,
-				6F9E50772272DF8900CB7F56 /* SRGUserDataError+Private.h in Headers */,
 				6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */,
 				6FC44DE8227349CC0022DC99 /* NSArray+SRGUserData.h in Headers */,
 				6F687FC62281FE9800E6AE2C /* SRGPlaylistEntry+Private.h in Headers */,

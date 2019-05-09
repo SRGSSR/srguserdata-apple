@@ -14,7 +14,7 @@
 #import "SRGPlaylistEntry+Private.h"
 #import "SRGPlaylistsRequest.h"
 #import "SRGUser+Private.h"
-#import "SRGUserDataError+Private.h"
+#import "SRGUserDataError.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserObject+Private.h"
 #import "SRGUserObject+Subclassing.h"
@@ -189,9 +189,6 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     
     SRGRequest *request = [[SRGPlaylistsRequest playlistsFromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         if (error) {
-            if (SRGUserDataIsUnauthorizationError(error)) {
-                [self.identityService reportUnauthorization];
-            }
             completionBlock(error);
             return;
         }
@@ -220,9 +217,6 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     
     self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
         if (finished) {
-            if (SRGUserDataIsUnauthorizationError(error)) {
-                [self.identityService reportUnauthorization];
-            }
             completionBlock(error);
         }
     }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
@@ -276,9 +270,6 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         
         self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
             if (finished) {
-                if (SRGUserDataIsUnauthorizationError(error)) {
-                    [self.identityService reportUnauthorization];
-                }
                 completionBlock(error);
             }
         }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
@@ -312,9 +303,6 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     
     self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
         if (finished) {
-            if (SRGUserDataIsUnauthorizationError(error)) {
-                [self.identityService reportUnauthorization];
-            }
             completionBlock(error);
         }
     }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
