@@ -114,7 +114,7 @@
     NSSortDescriptor *nameSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, name) ascending:YES];
     NSArray<SRGPlaylist *> *playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:@[typeSortDescriptor, nameSortDescriptor]];
     
-    [self.tableView deepDiffReloadUserObjectsWithOldObjects:self.playlists newObjects:playlists section:0 updateData:^{
+    [self.tableView reloadDataAnimatedWithOldObjects:self.playlists newObjects:playlists section:0 updateData:^{
         self.playlists = playlists;
     }];
 }

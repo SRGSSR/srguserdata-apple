@@ -82,7 +82,7 @@
             return;
         }
         
-        [self.tableView deepDiffReloadMediasWithOldMedias:self.medias newMedias:medias section:0 updateData:^{
+        [self.tableView reloadDataAnimatedWithOldObjects:self.medias newObjects:medias section:0 updateData:^{
             self.medias = medias;
         }];
     }] requestWithPageSize:50];
