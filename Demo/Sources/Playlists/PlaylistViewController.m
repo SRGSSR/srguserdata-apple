@@ -242,7 +242,7 @@
 
 - (void)didLogout:(NSNotification *)notification
 {
-    [self.tableView reloadData];
+    [self.navigationController popToRootViewControllerAnimated:NO];
 }
 
 - (void)didFinishSynchronization:(NSNotification *)notification
