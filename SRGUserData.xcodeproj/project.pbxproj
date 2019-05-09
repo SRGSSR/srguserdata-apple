@@ -69,6 +69,8 @@
 		6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */; };
 		6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */; };
 		6F1747F62274855800CC9C39 /* PlaylistsSynchronizationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F1747F52274855700CC9C39 /* PlaylistsSynchronizationTestCase.m */; };
+		6F17A48E228498BD001C4CC2 /* DeepDiff.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F17A48D228498BD001C4CC2 /* DeepDiff.framework */; };
+		6F17A48F228498BD001C4CC2 /* DeepDiff.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F17A48D228498BD001C4CC2 /* DeepDiff.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F19DA8B221ED8A300085C7D /* Masonry.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F19DAA6221FF61800085C7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAA3221FF61800085C7D /* main.m */; };
 		6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F19DAA9222005A800085C7D /* SRGHistoryRequest.h */; };
@@ -227,6 +229,7 @@
 				0858B6A222010CD6000F00CF /* libextobjc.framework in Embed Frameworks */,
 				6FA62D6B22043955008569DC /* Mantle.framework in Embed Frameworks */,
 				6F41C9A12216BBB1003F434A /* YYWebImage.framework in Embed Frameworks */,
+				6F17A48F228498BD001C4CC2 /* DeepDiff.framework in Embed Frameworks */,
 				6F41C9A32216BBB1003F434A /* SRGAnalytics_MediaPlayer.framework in Embed Frameworks */,
 				6F41C98D2216B969003F434A /* SRGDiagnostics.framework in Embed Frameworks */,
 				6F8A940420FDD01B00AA6434 /* SRGUserData.framework in Embed Frameworks */,
@@ -323,6 +326,7 @@
 		6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+SRGUserData.m"; sourceTree = "<group>"; };
 		6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+SRGUserData.h"; sourceTree = "<group>"; };
 		6F1747F52274855700CC9C39 /* PlaylistsSynchronizationTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlaylistsSynchronizationTestCase.m; sourceTree = "<group>"; };
+		6F17A48D228498BD001C4CC2 /* DeepDiff.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeepDiff.framework; path = Carthage/Build/iOS/DeepDiff.framework; sourceTree = "<group>"; };
 		6F19DA90221FF5F800085C7D /* SRGUserData-testapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-testapp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F19DAA3221FF61800085C7D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6F19DAA5221FF61800085C7D /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -457,6 +461,7 @@
 				0858B6A522010CD6000F00CF /* SRGLogger.framework in Frameworks */,
 				6FA62D6A22043955008569DC /* Mantle.framework in Frameworks */,
 				6F41C9A02216BBB1003F434A /* YYWebImage.framework in Frameworks */,
+				6F17A48E228498BD001C4CC2 /* DeepDiff.framework in Frameworks */,
 				6F41C9A22216BBB1003F434A /* SRGAnalytics_MediaPlayer.framework in Frameworks */,
 				6F41C98C2216B969003F434A /* SRGDiagnostics.framework in Frameworks */,
 				0858B69C22010C9E000F00CF /* libextobjc.framework in Frameworks */,
@@ -747,6 +752,7 @@
 			isa = PBXGroup;
 			children = (
 				6F41C9942216BA0C003F434A /* ComScore.framework */,
+				6F17A48D228498BD001C4CC2 /* DeepDiff.framework */,
 				6FA62D5C2204389A008569DC /* FXReachability.framework */,
 				0858B69622010C9E000F00CF /* libextobjc.framework */,
 				0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */,
