@@ -9,6 +9,7 @@
 #import "NSDateFormatter+Demo.h"
 #import "PlayerViewController.h"
 #import "PlaylistViewController.h"
+#import "SRGUserData_demo-Swift.h"
 
 #import <libextobjc/libextobjc.h>
 #import <SRGUserData/SRGUserData.h>
@@ -49,6 +50,10 @@
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(didLogin:)
                                                name:SRGIdentityServiceUserDidLoginNotification
+                                             object:SRGIdentityService.currentIdentityService];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(didLogout:)
+                                               name:SRGIdentityServiceUserDidLogoutNotification
                                              object:SRGIdentityService.currentIdentityService];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(didUpdateAccount:)
@@ -101,15 +106,17 @@
 
 - (void)refresh
 {
-    NSSortDescriptor *typeSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, type) ascending:NO];
-    NSSortDescriptor *nameSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, name) ascending:YES];
-    self.playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:@[typeSortDescriptor, nameSortDescriptor]];
-    
     if (self.refreshControl.refreshing) {
         [self.refreshControl endRefreshing];
     }
     
-    [self.tableView reloadData];
+    NSSortDescriptor *typeSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, type) ascending:NO];
+    NSSortDescriptor *nameSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, name) ascending:YES];
+    NSArray<SRGPlaylist *> *playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:@[typeSortDescriptor, nameSortDescriptor]];
+    
+    [self.tableView deepDiffReloadUserObjectsWithOldObjects:self.playlists newObjects:playlists section:0 updateData:^{
+        self.playlists = playlists;
+    }];
 }
 
 #pragma mark UITableViewDataSource protocol
@@ -221,6 +228,11 @@
 - (void)didLogin:(NSNotification *)notification
 {
     [self updateNavigationBar];
+}
+
+- (void)didLogout:(NSNotification *)notification
+{
+    [self.tableView reloadData];
 }
 
 - (void)didUpdateAccount:(NSNotification *)notification
