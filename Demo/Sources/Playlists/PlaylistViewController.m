@@ -8,6 +8,7 @@
 
 #import "NSDateFormatter+Demo.h"
 #import "PlayerViewController.h"
+#import "SRGUserData_demo-Swift.h"
 
 #import <libextobjc/libextobjc.h>
 #import <SRGDataProvider/SRGDataProvider.h>
@@ -56,6 +57,10 @@
                                                name:SRGPlaylistEntriesDidChangeNotification
                                              object:SRGUserData.currentUserData.playlists];
     [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(didLogout:)
+                                               name:SRGIdentityServiceUserDidLogoutNotification
+                                             object:SRGIdentityService.currentIdentityService];
+    [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(didFinishSynchronization:)
                                                name:SRGUserDataDidFinishSynchronizationNotification
                                              object:SRGUserData.currentUserData];
@@ -103,8 +108,9 @@
                 return;
             }
             
-            self.medias = medias;
-            [self.tableView reloadData];
+            [self.tableView deepDiffReloadMediasWithOldMedias:self.medias newMedias:medias section:0 updateData:^{
+                self.medias = medias;
+            }];
         }] requestWithPageSize:50];
         [request resume];
         self.request = request;
@@ -232,6 +238,11 @@
             [self refresh];
         }
     }];
+}
+
+- (void)didLogout:(NSNotification *)notification
+{
+    [self.tableView reloadData];
 }
 
 - (void)didFinishSynchronization:(NSNotification *)notification
