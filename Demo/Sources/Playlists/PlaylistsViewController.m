@@ -102,6 +102,11 @@
     }
 }
 
+- (void)updateTitleSectionHeader
+{
+    [self.tableView reloadData];
+}
+
 #pragma mark Data
 
 - (void)refresh
@@ -227,13 +232,13 @@
 
 - (void)didLogin:(NSNotification *)notification
 {
-    [self.tableView reloadData];
+    [self updateTitleSectionHeader];
     [self updateNavigationBar];
 }
 
 - (void)didLogout:(NSNotification *)notification
 {
-    [self.tableView reloadData];
+    [self updateTitleSectionHeader];
 }
 
 - (void)didUpdateAccount:(NSNotification *)notification
@@ -248,7 +253,7 @@
 
 - (void)didFinishSynchronization:(NSNotification *)notification
 {
-    [self.tableView reloadData];
+    [self updateTitleSectionHeader];
 }
 
 @end
