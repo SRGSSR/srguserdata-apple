@@ -7,478 +7,271 @@
 #import "UserDataBaseTestCase.h"
 
 #import "SRGHistoryRequest.h"
+#import "SRGUserObject+Private.h"
 
-#import <SRGIdentity/SRGIdentity.h>
-#import <SRGNetwork/SRGNetwork.h>
+#import <libextobjc/libextobjc.h>
 
-@interface SRGIdentityService (Private)
-
-- (BOOL)handleCallbackURL:(NSURL *)callbackURL;
-
-@property (nonatomic, readonly, copy) NSString *identifier;
+@interface HistorySynchronizationTestCase : UserDataBaseTestCase
 
 @end
 
-@interface SRGHistory (Private)
+@implementation HistorySynchronizationTestCase
 
-- (void)synchronize;
+#pragma mark Overrides
 
-@end
-
-// Logout with playsrgtests+userdata1@gmail.com
-static NSString * const TestValidToken = @"s%3At9ipSL-EefFt-FJCqj4KgYikQijCk_Sv.ZPHvjSuP6%2FwOhc6wEz005NkAv51RlbANspnT2esz%2FBo";
-
-static NSURL *TestWebserviceURL(void)
+- (NSString *)sessionToken
 {
-    return [NSURL URLWithString:@"https://hummingbird.rts.ch/api/profile"];
+    // For playsrgtests+userdata1@gmail.com
+    return @"s:t9ipSL-EefFt-FJCqj4KgYikQijCk_Sv.ZPHvjSuP6/wOhc6wEz005NkAv51RlbANspnT2esz/Bo";
 }
 
-static NSURL *TestWebsiteURL(void)
+#pragma mark Setup and teardown
+
+- (void)setUp
 {
-    return [NSURL URLWithString:@"https://www.srgssr.local"];
-}
-
-static NSURL *TestServiceURL(void)
-{
-    return [NSURL URLWithString:@"https://profil.rts.ch/api"];
-}
-
-static NSURL *TestHistoryServiceURL(void)
-{
-    return [TestServiceURL() URLByAppendingPathComponent:@"history"];
-}
-
-static NSURL *TestDataServiceURL(void)
-{
-    return [TestServiceURL() URLByAppendingPathComponent:@"data"];
-}
-
-static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString *token)
-{
-    NSString *URLString = [NSString stringWithFormat:@"srguserdata-tests://%@?identity_service=%@&token=%@", @"hummingbird.rts.ch/api/profile", identityService.identifier, token];
-    return [NSURL URLWithString:URLString];
-}
-
-static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSString *token)
-{
-    NSString *URLString = [NSString stringWithFormat:@"srguserdata-tests://%@?identity_service=%@&action=log_out", @"hummingbird.rts.ch/api/profile", identityService.identifier];
-    return [NSURL URLWithString:URLString];
-}
-
-@interface SRGHistorySynchronizationTestCase : UserDataBaseTestCase
-
-@property (nonatomic) SRGIdentityService *identityService;
-@property (nonatomic) SRGUserData *userData;
-
-@end
-
-@implementation SRGHistorySynchronizationTestCase
-
-#pragma mark Helpers
-
-- (void)setupUserDataWithHistoryServiceURL:(NSURL *)historyServiceURL
-{
-    [self eraseRemoteHistory];
+    [super setUp];
     
-    self.identityService = [[SRGIdentityService alloc] initWithWebserviceURL:TestWebserviceURL() websiteURL:TestWebsiteURL()];
+    [self eraseRemoteDataAndWait];
     [self logout];
-    
-    // We could mock history services to implement true unit tests, but to be able to catch their possible issues (!),
-    // we rather want integration tests. We therefore need to use a test user, simulating login by injecting its
-    // session token into the identity service.
-    NSURL *fileURL = [[[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:NSUUID.UUID.UUIDString] URLByAppendingPathExtension:@"sqlite"];
-    self.userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
-                                            historyServiceURL:historyServiceURL
-                                              identityService:self.identityService];
-}
-
-- (void)login
-{
-    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, TestValidToken)];
-    XCTAssertTrue(hasHandledCallbackURL);
-    XCTAssertNotNil(self.identityService.sessionToken);
-}
-
-- (void)loginAndWaitForSynchronization
-{
-    // Wait until the 1st synchronization has been performed (automatic after login)
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
-    [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(SRGUserData * _Nullable userData, NSDictionary<NSString *,id> * _Nullable bindings) {
-        return userData.user.accountUid != nil;
-    }] evaluatedWithObject:self.userData handler:nil];
-    
-    [self login];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-}
-
-- (void)logout
-{
-    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLogoutCallbackURL(self.identityService, TestValidToken)];
-    XCTAssertTrue(hasHandledCallbackURL);
-    XCTAssertNil(self.identityService.sessionToken);
-}
-
-- (void)deleteRemoteHistoryEntryWithUid:(NSString *)uid
-{
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History cleared"];
-    
-    NSDictionary *JSONDictionary = @{ @"item_id" : uid,
-                                      @"device_id" : @"test suite",
-                                      @"deleted": @YES };
-    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:@[JSONDictionary] toServiceURL:TestHistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        [expectation fulfill];
-    }] resume];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-}
-
-- (void)insertRemoteTestHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count
-{
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Remote entry creation finished"];
-    
-    NSMutableArray<NSDictionary *> *JSONDictionaries = [NSMutableArray array];
-    for (NSUInteger i = 0; i < count; ++i) {
-        NSDictionary *JSONDictionary = @{ @"item_id" : [NSString stringWithFormat:@"%@_%@", name, @(i + 1)],
-                                          @"device_id" : @"test suite",
-                                          @"lastPlaybackPosition" : @(i * 1000.) };
-        [JSONDictionaries addObject:JSONDictionary];
-    }
-    
-    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:JSONDictionaries toServiceURL:TestHistoryServiceURL() forSessionToken:TestValidToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        [expectation fulfill];
-    }] resume];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-}
-
-- (void)insertLocalTestHistoryEntriesWithName:(NSString *)name count:(NSUInteger)count
-{
-    for (NSUInteger i = 0; i < count; ++i) {
-        XCTestExpectation *expectation = [self expectationWithDescription:@"Local insertion"];
-        
-        NSString *uid = [NSString stringWithFormat:@"%@_%@", name, @(i)];
-        [self.userData.history saveHistoryEntryForUid:uid withLastPlaybackTime:CMTimeMakeWithSeconds(i, NSEC_PER_SEC) deviceUid:@"User data UT" completionBlock:^(NSError * _Nonnull error) {
-            [expectation fulfill];
-        }];
-    }
-    
-    [self waitForExpectationsWithTimeout:100. handler:nil];
-}
-
-// GDPR special endpoint which erases the entire change history, returning the account to a pristine state. This endpoint
-// is undocumented but publicly available.
-- (void)eraseRemoteHistory
-{
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History cleared"];
-    
-    NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:TestDataServiceURL()];
-    URLRequest.HTTPMethod = @"DELETE";
-    [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", TestValidToken] forHTTPHeaderField:@"Authorization"];
-    [[SRGRequest dataRequestWithURLRequest:URLRequest session:NSURLSession.sharedSession completionBlock:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        [expectation fulfill];
-    }] resume];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 #pragma mark Tests
 
-- (void)testEmptyHistorySynchronization
+- (void)testInitialSynchronizationWithoutRemoteEntries
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndWaitForSynchronization];
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
-    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
-    
-    [self expectationForElapsedTimeInterval:5. withHandler:nil];
-    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
-        XCTFail(@"No change notification is expected. The history was empty and still must be");
-    }];
-    
-    [self.userData.history synchronize];
-    
-    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
-        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
-    }];
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
-    
-    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        XCTAssertEqual(historyEntryDictionaries.count, 0);
-        [expectation fulfill];
-    }] resume];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self assertLocalHistoryUids:@[]];
+    [self assertRemoteHistoryUids:@[]];
 }
 
-- (void)testHistoryInitialSynchronizationWithExistingRemoteEntries
+- (void)testInitialSynchronizationWithExistingRemoteEntries
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndWaitForSynchronization];
-    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b" ]];
     
-    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 0);
-        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 2);
-        return YES;
-    }];
-    
-    [self.userData.history synchronize];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
-    
-    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        XCTAssertEqual(historyEntryDictionaries.count, 2);
-        [expectation fulfill];
-    }] resume];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b" ]];
 }
 
-- (void)testHistoryInitialSynchronizationWithExistingLocalEntries
+- (void)testSynchronizationWithoutEntryChanges
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndWaitForSynchronization];
-    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
-    [self insertLocalTestHistoryEntriesWithName:@"local" count:3];
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
-    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
+    [self assertLocalHistoryUids:@[]];
+    [self assertRemoteHistoryUids:@[]];
     
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 3);
-        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 5);
-        return YES;
-    }];
+    [self synchronizeAndWait];
     
-    [self.userData.history synchronize];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
-    
-    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        XCTAssertEqual(historyEntryDictionaries.count, 5);
-        [expectation fulfill];
-    }] resume];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self assertLocalHistoryUids:@[]];
+    [self assertRemoteHistoryUids:@[]];
 }
 
-- (void)testSynchronizationWithDeletedLocalEntries
+- (void)testSynchronizationWithAddedRemoteEntries
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndWaitForSynchronization];
-    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:3];
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
-    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b" ]];
     
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 0);
-        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 3);
-        return YES;
-    }];
+    [self assertLocalHistoryUids:@[]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b" ]];
     
-    [self.userData.history synchronize];
+    [self synchronizeAndWait];
     
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-    
-    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
-    
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 3);
-        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 2);
-        return YES;
-    }];
-    
-    [self.userData.history discardHistoryEntriesWithUids:@[@"remote_1"] completionBlock:^(NSError * _Nonnull error) {
-        XCTAssertNil(error);
-        [self.userData.history synchronize];
-    }];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
-    
-    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        XCTAssertEqual(historyEntryDictionaries.count, 2);
-        [expectation fulfill];
-    }] resume];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b" ]];
 }
 
-- (void)testSynchronizationWithDeletedRemoteEntries
+- (void)testSynchronizationWithAddedLocalEntries
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndWaitForSynchronization];
-    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:3];
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
-    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
+    [self insertLocalHistoryEntriesWithUids:@[ @"a", @"b" ]];
     
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 0);
-        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 3);
-        return YES;
-    }];
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[]];
     
-    [self.userData.history synchronize];
+    [self synchronizeAndWait];
     
-    [self waitForExpectationsWithTimeout:10. handler:nil];
-    
-    [self deleteRemoteHistoryEntryWithUid:@"remote_2"];
-    
-    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:nil];
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:nil];
-    
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 3);
-        XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], 2);
-        return YES;
-    }];
-    
-    [self.userData.history synchronize];
-    
-    [self waitForExpectationsWithTimeout:10. handler:nil];
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b" ]];
 }
 
+- (void)testSynchronizationWithAddedRemoteAndLocalEntries
+{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self insertLocalHistoryEntriesWithUids:@[ @"a", @"b" ]];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"b", @"c" ]];
+    
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"c" ]];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"c" ]];
+}
+
+- (void)testSynchronizationWithDiscardedLocalEntries
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
+    
+    [self discardLocalHistoryEntriesWithUids:@[ @"a", @"c" ]];
+    
+    [self assertLocalHistoryUids:@[ @"b", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalHistoryUids:@[ @"b", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
+}
+
+- (void)testSynchronizationWithDiscardedRemoteEntries
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
+    
+    [self discardRemoteHistoryEntriesWithUids:@[ @"a", @"c" ]];
+    
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalHistoryUids:@[ @"b", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
+}
+
+- (void)testSynchronizationWithDiscardedRemoteAndLocalEntries
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d", @"e" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self assertLocalHistoryUids:@[ @"a", @"b", @"c", @"d", @"e" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"c", @"d", @"e" ]];
+    
+    [self discardLocalHistoryEntriesWithUids:@[ @"b", @"c" ]];
+    [self discardRemoteHistoryEntriesWithUids:@[ @"c", @"d" ]];
+    
+    [self assertLocalHistoryUids:@[ @"a", @"d", @"e" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b", @"e" ]];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalHistoryUids:@[ @"a", @"e" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"e" ]];
+}
+
+// TODO: Disabled. Too intensive for the service.
+#if 0
 - (void)testLargeHistory
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndWaitForSynchronization];
-    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:1000];
-    [self insertLocalTestHistoryEntriesWithName:@"local" count:2000];
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
-    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
+    NSArray<NSString *> *(^uidsBuilder)(NSUInteger, NSUInteger) = ^(NSUInteger start, NSUInteger end) {
+        NSMutableArray<NSString *> *uids = [NSMutableArray array];
+        for (NSUInteger i = start; i < end; i++) {
+            [uids addObject:@(i).stringValue];
+        }
+        return [uids copy];
+    };
+    
+    [self insertLocalHistoryEntriesWithUids:uidsBuilder(0, 1000)];
+    [self insertRemoteHistoryEntriesWithUids:uidsBuilder(900, 3000)];
+    
+    [self assertLocalHistoryUids:uidsBuilder(0, 1000)];
+    [self assertRemoteHistoryUids:uidsBuilder(900, 3000)];
+    
+    [self synchronizeAndWait];
+    
+    [self assertLocalHistoryUids:uidsBuilder(0, 3000)];
+    [self assertRemoteHistoryUids:uidsBuilder(0, 3000)];
+}
+#endif
+
+- (void)testLogout
+{
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self insertLocalHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
+    
+    [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
+    
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", @"d", nil]));
         return YES;
     }];
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        return YES;
-    }];
     
-    [self expectationForSingleNotification:SRGHistoryDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
-        XCTAssertTrue(NSThread.isMainThread);
-        
-        // The history emits an update after each page insertion. Check that the page size increases with each change
-        // before reaching the maximum value.
-        static NSUInteger kPullPageSize = 500;
-        
-        if ([notification.userInfo[SRGHistoryUidsKey] count] == 3000) {
-            XCTAssertEqual([notification.userInfo[SRGHistoryPreviousUidsKey] count], 3000 - kPullPageSize);
-            return YES;
-        }
-        else {
-            XCTAssertEqual([notification.userInfo[SRGHistoryUidsKey] count], [notification.userInfo[SRGHistoryPreviousUidsKey] count] + kPullPageSize);
-            return NO;
-        }
-    }];
+    [self.identityService logout];
     
-    [self.userData.history synchronize];
+    [self waitForExpectationsWithTimeout:10. handler:nil];
     
-    [self waitForExpectationsWithTimeout:100. handler:nil];
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"History request"];
-    
-    [[SRGHistoryRequest historyUpdatesFromServiceURL:TestHistoryServiceURL() forSessionToken:self.identityService.sessionToken afterDate:nil withDeletedEntries:NO session:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable historyEntryDictionaries, NSDate * _Nullable serverDate, SRGPage * _Nullable page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        XCTAssertEqual(historyEntryDictionaries.count, 3000);
-        [expectation fulfill];
-    }] resume];
-    
-    [self waitForExpectationsWithTimeout:100. handler:nil];
+    [self assertLocalHistoryUids:@[]];
 }
 
 - (void)testSynchronizationAfterLogoutDuringSynchronization
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
-    [self loginAndWaitForSynchronization];
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
     
-    [self insertRemoteTestHistoryEntriesWithName:@"remote" count:2];
-    [self insertLocalTestHistoryEntriesWithName:@"local" count:3];
+    [self insertLocalHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
+    [self insertRemoteHistoryEntriesWithUids:@[ @"d", @"e", @"f", @"g" ]];
     
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLogoutNotification object:self.identityService handler:nil];
+    [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:nil];
     
-    [self.userData.history synchronize];
+    [self synchronize];
     [self logout];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
-    // Login again and check that synchronization is still possible
-    [self loginAndWaitForSynchronization];
+    [self assertLocalHistoryUids:@[]];
+    
+    // Login again and check that synchronization still works
+    [self loginAndWaitForInitialSynchronization];
 }
 
 - (void)testSynchronizationWithoutLoggedInUser
 {
-    [self setupUserDataWithHistoryServiceURL:TestHistoryServiceURL()];
+    [self setupForAvailableService];
     
-    id startObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidStartSynchronizationNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+    id startObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGUserDataDidStartSynchronizationNotification object:self.userData queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"No start notification is expected");
     }];
-    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryEntriesDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"No change notification is expected");
     }];
-    id finishObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+    id finishObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGUserDataDidFinishSynchronizationNotification object:self.userData queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"No finish notification is expected");
     }];
     
     [self expectationForElapsedTimeInterval:5. withHandler:nil];
     
-    [self.userData.history synchronize];
+    [self synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
         [NSNotificationCenter.defaultCenter removeObserver:startObserver];
@@ -489,29 +282,210 @@ static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSStrin
 
 - (void)testSynchronizationWithUnavailableService
 {
-    [self setupUserDataWithHistoryServiceURL:[NSURL URLWithString:@"https://missing.service"]];
-    [self login];
+    [self setupForUnavailableService];
+    [self loginAndWaitForInitialSynchronization];
     
-    [self expectationForSingleNotification:SRGHistoryDidStartSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGUserDataDidStartSynchronizationNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
         return YES;
     }];
-    [self expectationForSingleNotification:SRGHistoryDidFinishSynchronizationNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
         XCTAssertTrue(NSThread.isMainThread);
         return YES;
     }];
     
-    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGHistoryEntriesDidChangeNotification object:self.userData.history queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         XCTFail(@"No change notification is expected");
     }];
     
     [self expectationForElapsedTimeInterval:5. withHandler:nil];
     
-    [self.userData.history synchronize];
+    [self synchronize];
     
     [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
         [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
     }];
+}
+
+- (void)testChangeNotificationsWithDiscardedLocalEntries
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    // Changes are notified when entries are marked as being discarded
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"a", @"c", nil]));
+        return YES;
+    }];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Discard"];
+    
+    [self.userData.history discardHistoryEntriesWithUids:@[ @"a", @"c" ] completionBlock:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    // No more changes must be received for the discarded entries when deleted during synchronization
+    [self expectationForNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"b", @"d", nil]));
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalHistoryUids:@[ @"b", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
+}
+
+- (void)testChangeNotificationsWithDiscardedRemoteEntries
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self discardRemoteHistoryEntriesWithUids:@[ @"a", @"c" ]];
+    
+    // Changes are notified when synchronization occurs with the remote changes
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"a", @"c", @"b", @"d", nil]));
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalHistoryUids:@[ @"b", @"d" ]];
+    [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
+}
+
+- (void)testNonReturnedDiscardedHistoryEntryWithUid
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    // Synchronous
+    SRGHistoryEntry *historyEntry1 = [self.userData.history historyEntryWithUid:@"a"];
+    XCTAssertNotNil(historyEntry1);
+    XCTAssertFalse(historyEntry1.discarded);
+    
+    // Asynchronous
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntryWithUid:@"a" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
+        XCTAssertNotNil(historyEntry);
+        XCTAssertFalse(historyEntry.discarded);
+        [expectation1 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self discardLocalHistoryEntriesWithUids:@[ @"a" ]];
+    
+    XCTAssertTrue(historyEntry1.discarded);
+    
+    // Synchronous
+    SRGHistoryEntry *historyEntry2 = [self.userData.history historyEntryWithUid:@"a"];
+    XCTAssertNil(historyEntry2);
+    
+    // Asynchronous
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntryWithUid:@"a" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
+        XCTAssertNil(historyEntry);
+        [expectation2 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self synchronizeAndWait];
+    
+    // Synchronous
+    SRGHistoryEntry *historyEntry3 = [self.userData.history historyEntryWithUid:@"a"];
+    XCTAssertNil(historyEntry3);
+    
+    // Asynchronous
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntryWithUid:@"a" completionBlock:^(SRGHistoryEntry * _Nullable historyEntry, NSError * _Nullable error) {
+        XCTAssertNil(historyEntry);
+        [expectation3 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)testNonReturnedDiscardedHistoryEntriesWithPredicate
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a" ]];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    // Synchronous
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGHistoryEntry.new, uid), @"a"];
+    NSArray<SRGHistoryEntry *> *historyEntries1 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil];
+    XCTAssertEqual(historyEntries1.count, 1);
+    SRGHistoryEntry *historyEntry1 = historyEntries1.firstObject;
+    XCTAssertNotNil(historyEntry1);
+    XCTAssertFalse(historyEntry1.discarded);
+    
+    // Asynchronous
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+        XCTAssertEqual(historyEntries.count, 1);
+        
+        SRGHistoryEntry *historyEntry = historyEntries.firstObject;
+        XCTAssertNotNil(historyEntry);
+        XCTAssertFalse(historyEntry.discarded);
+        [expectation1 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self discardLocalHistoryEntriesWithUids:@[ @"a" ]];
+    
+    XCTAssertTrue(historyEntry1.discarded);
+    
+    // Synchronous
+    NSArray<SRGHistoryEntry *> *historyEntries2 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil];
+    XCTAssertEqual(historyEntries2.count, 0);
+    
+    // Asynchronous
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+        XCTAssertEqual(historyEntries.count, 0);
+        [expectation2 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+    
+    [self synchronizeAndWait];
+    
+    // Synchronous
+    NSArray<SRGHistoryEntry *> *historyEntries3 = [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil];
+    XCTAssertEqual(historyEntries3.count, 0);
+    
+    // Asynchronous
+    XCTestExpectation *expectation3 = [self expectationWithDescription:@"History entry fetched"];
+    
+    [self.userData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:nil completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+        XCTAssertEqual(historyEntries.count, 0);
+        [expectation3 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
 @end

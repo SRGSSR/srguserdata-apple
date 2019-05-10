@@ -8,17 +8,20 @@
 
 @interface SRGUser ()
 
-@property (nonatomic, copy, nullable) NSString *accountUid;
-@property (nonatomic, nullable) NSDate *historyLocalSynchronizationDate;
-@property (nonatomic, nullable) NSDate *historyServerSynchronizationDate;
+@property (nonatomic, copy) NSString *accountUid;
+
+@property (nonatomic) NSDate *synchronizationDate;
+@property (nonatomic) NSDate *historySynchronizationDate;
+@property (nonatomic) NSDate *playlistsSynchronizationDate;
 
 @end
 
 @implementation SRGUser
 
 @dynamic accountUid;
-@dynamic historyLocalSynchronizationDate;
-@dynamic historyServerSynchronizationDate;
+@dynamic synchronizationDate;
+@dynamic historySynchronizationDate;
+@dynamic playlistsSynchronizationDate;
 
 #pragma mark Class methods
 
@@ -42,8 +45,9 @@
 - (void)attachToAccountUid:(NSString *)accountUid
 {
     if (! [self.accountUid isEqualToString:accountUid]) {
-        self.historyLocalSynchronizationDate = nil;
-        self.historyServerSynchronizationDate = nil;
+        self.synchronizationDate = nil;
+        self.historySynchronizationDate = nil;
+        self.playlistsSynchronizationDate = nil;
     }
     self.accountUid = accountUid;
 }

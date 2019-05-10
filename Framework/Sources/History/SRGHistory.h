@@ -13,28 +13,19 @@ NS_ASSUME_NONNULL_BEGIN
  *  Notification sent when the history changes. Use the keys below to retrieve detailed information from the notification
  *  `userInfo` dictionary.
  */
-OBJC_EXPORT NSString * const SRGHistoryDidChangeNotification;                    // Notification name.
-
-OBJC_EXPORT NSString * const SRGHistoryChangedUidsKey;                           // Key to access the list of uids which have changed as an `NSArray` of `NSString` objects.
-OBJC_EXPORT NSString * const SRGHistoryPreviousUidsKey;                          // Key to access the previous uid list as an `NSArray` of `NSString` objects.
-OBJC_EXPORT NSString * const SRGHistoryUidsKey;                                  // Key to access the current uid list as an `NSArray` of `NSString` objects.
+OBJC_EXPORT NSString * const SRGHistoryEntriesDidChangeNotification;             // Notification name.
 
 /**
- *  Notification sent when history synchronization has started.
+ *  Information available for `SRGHistoryEntriesDidChangeNotification`.
  */
-OBJC_EXPORT NSString * const SRGHistoryDidStartSynchronizationNotification;
-
-/**
- *  Notification sent when history synchronization has finished.
- */
-OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
+OBJC_EXPORT NSString * const SRGHistoryEntriesUidsKey;                           // Key to access the list of uids which have changed (inserted, updated or deleted) as an `NSSet` of `NSString` objects.
 
 /**
  *  Manages a local cache for history entries. History entries are characterized by an identifier and an associated
  *  playback position. Based on a local cache, this class ensures efficient history retrieval from a webservice and
  *  keeps local and distant histories in sync.
  *
- *  You can register for history update notifications, see above. These will be sent by the `SRGHistory` instance
+ *  You can register for history change notifications, see above. These will be sent by the `SRGHistory` instance
  *  itself.
  */
 @interface SRGHistory : SRGUserDataService
@@ -91,10 +82,10 @@ OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
  *
  *  @discussion The completion block is called on a background thread.
  */
-- (NSString *)saveHistoryEntryForUid:(NSString *)Uid
-                withLastPlaybackTime:(CMTime)lastPlaybackTime
-                           deviceUid:(nullable NSString *)deviceUid
-                     completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
+- (NSString *)saveHistoryEntryWithUid:(NSString *)uid
+                     lastPlaybackTime:(CMTime)lastPlaybackTime
+                            deviceUid:(nullable NSString *)deviceUid
+                      completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
 
 /**
  *  Asynchronously discard history entries matching an identifier list, calling the provided block on completion. If no
@@ -107,7 +98,6 @@ OBJC_EXPORT NSString * const SRGHistoryDidFinishSynchronizationNotification;
  */
 - (NSString *)discardHistoryEntriesWithUids:(nullable NSArray<NSString *> *)uids
                             completionBlock:(nullable void (^)(NSError * _Nullable error))completionBlock;
-
 
 /**
  *  Cancel the task having the specified handle.

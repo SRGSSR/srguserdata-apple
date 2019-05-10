@@ -9,6 +9,8 @@
 // Public headers.
 #import "SRGHistory.h"
 #import "SRGHistoryEntry.h"
+#import "SRGPlaylist.h"
+#import "SRGPlaylists.h"
 #import "SRGUser.h"
 #import "SRGUserDataError.h"
 #import "SRGUserDataService.h"
@@ -18,6 +20,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Official version number.
 FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
+
+/**
+ *  Notification sent when global synchronization has started.
+ */
+OBJC_EXPORT NSString * const SRGUserDataDidStartSynchronizationNotification;
+
+/**
+ *  Notification sent when global synchronization has finished.
+ */
+OBJC_EXPORT NSString * const SRGUserDataDidFinishSynchronizationNotification;
 
 /**
  *  Manages data associated with a user. An identity service and service endpoints can be optionally provided, so that
@@ -38,14 +50,14 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
  *  Create a user data repository. The repository can be used to store data on device. Provided it is setup appropriately,
  *  logged in users can keep their data synchronized with their account.
  *
- *  @param storeFileURL      The file URL where the data is locally stored.
- *  @param identityService   The service which identities can be retrieved from. If none, no data synchronization will
- *                           occur.
- *  @param historyServiceURL The URL of the service with which local history information can be synchronized. If none
- *                           is provided, no history data synchronization will occur.
+ *  @param storeFileURL    The file URL where the data is locally stored.
+ *  @param serviceURL      The URL of the service with which user data can be synchronized. If none is provided, no user
+ *                         data synchronization is made.
+ *  @param identityService The service which identities can be retrieved from. If none, no data synchronization will
+ *                         occur.
  */
 - (nullable instancetype)initWithStoreFileURL:(NSURL *)storeFileURL
-                            historyServiceURL:(nullable NSURL *)historyServiceURL
+                                   serviceURL:(nullable NSURL *)serviceURL
                               identityService:(nullable SRGIdentityService *)identityService;
 
 /**
@@ -57,6 +69,11 @@ FOUNDATION_EXPORT NSString *SRGUserDataMarketingVersion(void);
  *  Access to the user playback history.
  */
 @property (nonatomic, readonly) SRGHistory *history;
+
+/**
+ *  Access to the user playlists.
+ */
+@property (nonatomic, readonly) SRGPlaylists *playlists;
 
 @end
 

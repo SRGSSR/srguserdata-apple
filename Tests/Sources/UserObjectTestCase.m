@@ -70,11 +70,11 @@
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
         // Does not exist
-        SRGHistoryEntry *historyEntry1 = [SRGHistoryEntry objectWithUid:@"123456" inManagedObjectContext:viewContext];
+        SRGHistoryEntry *historyEntry1 = [SRGHistoryEntry objectWithUid:@"123456" matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertNil(historyEntry1);
         
         // Exists
-        SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry upsertWithUid:@"urn:rts:video:9992865" inManagedObjectContext:viewContext];
+        SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry upsertWithUid:@"urn:rts:video:9992865" matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry2.uid, @"urn:rts:video:9992865");
     }];
 }
@@ -86,11 +86,11 @@
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
         // Does not exist
-        SRGHistoryEntry *historyEntry1 = [SRGHistoryEntry upsertWithUid:@"123456" inManagedObjectContext:viewContext];
+        SRGHistoryEntry *historyEntry1 = [SRGHistoryEntry upsertWithUid:@"123456" matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry1.uid, @"123456");
         
         // Exists
-        SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry upsertWithUid:@"urn:rts:video:9992865" inManagedObjectContext:viewContext];
+        SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry upsertWithUid:@"urn:rts:video:9992865" matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry2.uid, @"urn:rts:video:9992865");
     }];
 }
@@ -101,11 +101,8 @@
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
-        SRGHistoryEntry *historyEntry1 = [SRGHistoryEntry synchronizeWithDictionary:@{} inManagedObjectContext:viewContext];
-        XCTAssertNil(historyEntry1);
-        
-        SRGHistoryEntry *historyEntry2 = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"123456" } inManagedObjectContext:viewContext];
-        XCTAssertNil(historyEntry2);
+        SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{} matchingPredicate:nil inManagedObjectContext:viewContext];
+        XCTAssertNil(historyEntry);
     }];
 }
 
@@ -117,7 +114,7 @@
     [viewContext performBlockAndWait:^{
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"123456",
                                                                                       @"date" : @1550134222000,
-                                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+                                                                                      @"device_id" : @"other_device" } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"123456");
         XCTAssertEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1550134222]);
         XCTAssertEqualObjects(historyEntry.deviceUid, @"other_device");
@@ -132,7 +129,7 @@
     [viewContext performBlockAndWait:^{
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:video:9992865",
                                                                                       @"date" : @1550134222000,
-                                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+                                                                                      @"device_id" : @"other_device" } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:video:9992865");
         XCTAssertEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1550134222]);
         XCTAssertEqualObjects(historyEntry.deviceUid, @"other_device");
@@ -147,7 +144,7 @@
     [viewContext performBlockAndWait:^{
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:audio:10110418",
                                                                                       @"date" : @1550134222000,
-                                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+                                                                                      @"device_id" : @"other_device" } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:audio:10110418");
         XCTAssertEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1550134222]);
         XCTAssertEqualObjects(historyEntry.deviceUid, @"other_device");
@@ -162,7 +159,7 @@
     [viewContext performBlockAndWait:^{
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:audio:10110418",
                                                                                       @"date" : @1266137422000,
-                                                                                      @"device_id" : @"other_device" } inManagedObjectContext:viewContext];
+                                                                                      @"device_id" : @"other_device" } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:audio:10110418");
         XCTAssertNotEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1266137422]);
         XCTAssertNotEqualObjects(historyEntry.deviceUid, @"other_device");
@@ -178,7 +175,7 @@
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:video:9992865",
                                                                                       @"date" : @1266137422000,
                                                                                       @"device_id" : @"other_device",
-                                                                                      @"deleted" : @YES } inManagedObjectContext:viewContext];
+                                                                                      @"deleted" : @YES } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:video:9992865");
         XCTAssertTrue(historyEntry.deleted);
     }];
@@ -193,7 +190,7 @@
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:@{ @"item_id" : @"urn:rts:audio:10110418",
                                                                                       @"date" : @1266137422000,
                                                                                       @"device_id" : @"other_device",
-                                                                                      @"deleted" : @YES } inManagedObjectContext:viewContext];
+                                                                                      @"deleted" : @YES } matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(historyEntry.uid, @"urn:rts:audio:10110418");
         XCTAssertNotEqualObjects(historyEntry.date, [NSDate dateWithTimeIntervalSince1970:1266137422]);
         XCTAssertNotEqualObjects(historyEntry.deviceUid, @"other_device");
@@ -207,12 +204,12 @@
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
         // Does not exist
-        NSArray<NSString *> *discardedUids1 = [SRGHistoryEntry discardObjectsWithUids:@[@"123456"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids1 = [SRGHistoryEntry discardObjectsWithUids:@[@"123456"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(discardedUids1, @[]);
         
         // Exist
         NSArray<NSString *> *expectedUids2 = @[@"urn:rts:video:9992865", @"urn:rts:video:9910664"];
-        NSArray<NSString *> *discardedUids2 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992865", @"urn:rts:video:9910664"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids2 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992865", @"urn:rts:video:9910664"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects([NSSet setWithArray:discardedUids2], [NSSet setWithArray:expectedUids2]);
         
         // Objects are immediately erased
@@ -221,7 +218,7 @@
         
         // Mixed
         NSArray<NSString *> *expectedUids3 = @[@"urn:rts:video:9992229", @"urn:rts:video:9996461"];
-        NSArray<NSString *> *discardedUids3 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992229", @"45678", @"urn:rts:video:9996461", @"urn:rts:video:9910664"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids3 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992229", @"45678", @"urn:rts:video:9996461", @"urn:rts:video:9910664"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects([NSSet setWithArray:discardedUids3], [NSSet setWithArray:expectedUids3]);
     }];
 }
@@ -233,12 +230,12 @@
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
         // Does not exist
-        NSArray<NSString *> *discardedUids1 = [SRGHistoryEntry discardObjectsWithUids:@[@"123456"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids1 = [SRGHistoryEntry discardObjectsWithUids:@[@"123456"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects(discardedUids1, @[]);
         
         // Exist
         NSArray<NSString *> *expectedUids2 = @[@"urn:rts:video:9992865", @"urn:rts:video:9910664"];
-        NSArray<NSString *> *discardedUids2 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992865", @"urn:rts:video:9910664"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids2 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992865", @"urn:rts:video:9910664"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects([NSSet setWithArray:discardedUids2], [NSSet setWithArray:expectedUids2]);
         
         // Objects still exist, they are only marked for later synchronization
@@ -247,24 +244,10 @@
         
         // Mixed
         NSArray<NSString *> *expectedUids3 = @[@"urn:rts:video:9992229", @"urn:rts:video:9996461"];
-        NSArray<NSString *> *discardedUids3 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992229", @"45678", @"urn:rts:video:9996461", @"urn:rts:video:9910664"] inManagedObjectContext:viewContext];
+        NSArray<NSString *> *discardedUids3 = [SRGHistoryEntry discardObjectsWithUids:@[@"urn:rts:video:9992229", @"45678", @"urn:rts:video:9996461"] matchingPredicate:nil inManagedObjectContext:viewContext];
         XCTAssertEqualObjects([NSSet setWithArray:discardedUids3], [NSSet setWithArray:expectedUids3]);
     }];
 }
-
-#if 0
-
-// TODO: There's something really strange with deletion (here batch deletion, but the same holds if we implement deletion
-//       with a fetch request and a loop over all items). When running the tests altogether, some of them will namely fail,
-//       showing that their database is empty. This is as if the deletion in a test was interfering with other contexts
-//       or stores, though they should be different (we always restart from a test data package, but I gave it a try with
-//       always different database file names and the issue is the same). Not running the deletion tests just make all tests
-//       work reliably.
-//
-//       We should therefore:
-//        1) Create a new sample project with some read tests
-//        2) Add a deletion test
-//        3) Check the result and maybe open an Apple bug report
 
 - (void)testDeleteAllForLoggedInUser
 {
@@ -275,7 +258,7 @@
         NSArray<SRGHistoryEntry *> *historyEntries1 = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:viewContext];
         XCTAssertNotEqual(historyEntries1.count, 0);
         
-        [SRGHistoryEntry deleteAllInManagedObjectContext:viewContext];
+        [SRGHistoryEntry deleteAllObjectsMatchingPredicate:nil inManagedObjectContext:viewContext];
         
         NSArray<SRGHistoryEntry *> *historyEntries2 = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:viewContext];
         XCTAssertEqual(historyEntries2.count, 0);
@@ -291,13 +274,11 @@
         NSArray<SRGHistoryEntry *> *historyEntries1 = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:viewContext];
         XCTAssertNotEqual(historyEntries1.count, 0);
         
-        [SRGHistoryEntry deleteAllInManagedObjectContext:viewContext];
+        [SRGHistoryEntry deleteAllObjectsMatchingPredicate:nil inManagedObjectContext:viewContext];
         
         NSArray<SRGHistoryEntry *> *historyEntries2 = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:viewContext];
         XCTAssertEqual(historyEntries2.count, 0);
     }];
 }
-
-#endif
 
 @end

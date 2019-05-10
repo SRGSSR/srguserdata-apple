@@ -6,7 +6,9 @@
 
 #import "HistoryViewController.h"
 
+#import "NSDateFormatter+Demo.h"
 #import "PlayerViewController.h"
+#import "SRGUserData_demo-Swift.h"
 
 #import <libextobjc/libextobjc.h>
 #import <SRGDataProvider/SRGDataProvider.h>
@@ -16,6 +18,7 @@
 @interface HistoryViewController ()
 
 @property (nonatomic) NSArray<SRGMedia *> *medias;
+
 @property (nonatomic, weak) SRGBaseRequest *request;
 
 @end
@@ -52,13 +55,21 @@
                                                name:SRGIdentityServiceUserDidLoginNotification
                                              object:SRGIdentityService.currentIdentityService];
     [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(didLogout:)
+                                               name:SRGIdentityServiceUserDidLogoutNotification
+                                             object:SRGIdentityService.currentIdentityService];
+    [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(didUpdateAccount:)
                                                name:SRGIdentityServiceDidUpdateAccountNotification
                                              object:SRGIdentityService.currentIdentityService];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidChange:)
-                                               name:SRGHistoryDidChangeNotification
+                                               name:SRGHistoryEntriesDidChangeNotification
                                              object:SRGUserData.currentUserData.history];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(didFinishSynchronization:)
+                                               name:SRGUserDataDidFinishSynchronizationNotification
+                                             object:SRGUserData.currentUserData];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     
@@ -86,19 +97,23 @@
 - (void)updateNavigationBar
 {
     if (! SRGIdentityService.currentIdentityService.loggedIn) {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Login", nil)
-                                                                                  style:UIBarButtonItemStylePlain
-                                                                                 target:self
-                                                                                 action:@selector(login:)];
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Login", nil)
+                                                                                 style:UIBarButtonItemStylePlain
+                                                                                target:self
+                                                                                action:@selector(login:)];
     }
     else {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
-                                                                                  style:UIBarButtonItemStylePlain
-                                                                                 target:self
-                                                                                 action:@selector(showAccount:)];
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
+                                                                                 style:UIBarButtonItemStylePlain
+                                                                                target:self
+                                                                                action:@selector(showAccount:)];
     }
 }
 
+- (void)updateTitleSectionHeader
+{
+    [self.tableView reloadData];
+}
 
 #pragma mark Data
 
@@ -106,9 +121,12 @@
 {
     [self.request cancel];
     
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
-    [SRGUserData.currentUserData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+    [SRGUserData.currentUserData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+        if (error) {
+            return;
+        }
+        
         NSArray<NSString *> *mediaURNs = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
         SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:mediaURNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
             if (self.refreshControl.refreshing) {
@@ -119,11 +137,12 @@
                 return;
             }
             
-            self.medias = medias;
-            [self.tableView reloadData];
+            [self.tableView reloadDataAnimatedWithOldObjects:self.medias newObjects:medias section:0 updateData:^{
+                self.medias = medias;
+            }];
         }] requestWithPageSize:50];
         [request resume];
-        self.request = request;
+        self.request = request;;
     }];
 }
 
@@ -137,6 +156,18 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return [tableView dequeueReusableCellWithIdentifier:@"MediaCell"];
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    if (SRGIdentityService.currentIdentityService.loggedIn) {
+        NSDate *synchronizationDate = SRGUserData.currentUserData.user.synchronizationDate;
+        NSString *synchronizationDateString = synchronizationDate ? [NSDateFormatter.demo_relativeDateAndTimeFormatter stringFromDate:synchronizationDate] : NSLocalizedString(@"Never", nil);
+        return [NSString stringWithFormat:NSLocalizedString(@"Last synchronization: %@", nil), synchronizationDateString];
+    }
+    else {
+        return nil;
+    }
 }
 
 #pragma mark UITableViewDelegate protocol
@@ -153,7 +184,7 @@
     SRGMedia *media = self.medias[indexPath.row];
     SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
     
-    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime];
+    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime playerPlaylist:nil];
     [self presentViewController:playerViewController animated:YES completion:nil];
 }
 
@@ -166,15 +197,7 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete){
         SRGMedia *media = self.medias[indexPath.row];
-        [SRGUserData.currentUserData.history discardHistoryEntriesWithUids:@[media.URN] completionBlock:^(NSError * _Nonnull error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableArray<SRGMedia *> *medias = [self.medias mutableCopy];
-                [medias removeObjectAtIndex:indexPath.row];
-                self.medias = [medias copy];
-                
-                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            });
-        }];
+        [SRGUserData.currentUserData.history discardHistoryEntriesWithUids:@[media.URN] completionBlock:nil];
     }
 }
 
@@ -199,7 +222,13 @@
 
 - (void)didLogin:(NSNotification *)notification
 {
+    [self updateTitleSectionHeader];
     [self updateNavigationBar];
+}
+
+- (void)didLogout:(NSNotification *)notification
+{
+    [self updateTitleSectionHeader];
 }
 
 - (void)didUpdateAccount:(NSNotification *)notification
@@ -209,11 +238,12 @@
 
 - (void)historyDidChange:(NSNotification *)notification
 {
-    NSArray<NSString *> *previousURNs = notification.userInfo[SRGHistoryPreviousUidsKey];
-    NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
-    if (URNs.count == 0 || previousURNs.count == 0) {
-        [self refresh];
-    }
+    [self refresh];
+}
+
+- (void)didFinishSynchronization:(NSNotification *)notification
+{
+    [self updateTitleSectionHeader];
 }
 
 @end

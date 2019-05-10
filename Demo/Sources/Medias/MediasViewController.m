@@ -7,6 +7,7 @@
 #import "MediasViewController.h"
 
 #import "PlayerViewController.h"
+#import "SRGUserData_demo-Swift.h"
 
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGUserData/SRGUserData.h>
@@ -81,8 +82,9 @@
             return;
         }
         
-        self.medias = medias;
-        [self.tableView reloadData];
+        [self.tableView reloadDataAnimatedWithOldObjects:self.medias newObjects:medias section:0 updateData:^{
+            self.medias = medias;
+        }];
     }] requestWithPageSize:50];
     [request resume];
     self.request = request;
@@ -114,7 +116,7 @@
     SRGMedia *media = self.medias[indexPath.row];
     SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
     
-    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime];
+    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime playerPlaylist:nil];
     [self presentViewController:playerViewController animated:YES completion:nil];
 }
 

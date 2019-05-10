@@ -26,8 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @see `SRGUser.h`
  */
-@property (nonatomic, nullable) NSDate *historyLocalSynchronizationDate;
-@property (nonatomic, nullable) NSDate *historyServerSynchronizationDate;
+@property (nonatomic, nullable) NSDate *synchronizationDate;
+@property (nonatomic, nullable) NSDate *historySynchronizationDate;
+@property (nonatomic, nullable) NSDate *playlistsSynchronizationDate;
 
 /**
  *  Bind a user to a given account.

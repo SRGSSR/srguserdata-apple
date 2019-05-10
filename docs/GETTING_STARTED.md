@@ -5,7 +5,7 @@ This getting started guide discusses all concepts required to use the SRG User D
 
 ### Service instantiation
 
-SRG User Data provides an efficient way to save and retrieve user-specific data (currently history data) from local storage. This data can be optionally synchronized with a user account, provided an [identity service](https://github.com/SRGSSR/srgidentity-ios) has bound at instantiation time.
+SRG User Data provides an efficient way to save and retrieve user-specific data from local storage. This data can be optionally and transparently synchronized with a user account, provided an [identity service](https://github.com/SRGSSR/srgidentity-ios) has been bound at instantiation time.
 
 #### Offline user data
 
@@ -13,17 +13,17 @@ To instantiate a purely local user data storage without account synchronization,
 
 ```objective-c
 SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
-                                                historyServiceURL:nil
+                                                       serviceURL:nil
                                                   identityService:nil];
 ```
 
 #### Online user data
 
-To instantiate a user data storage which can synchronized with a user account if a user logs in, you must provide an `SRGIdentityService` at creation time. For history data to be synchronized, an associated service URL is required as well:
+To instantiate a user data storage which can synchronized with a user account if a user logs in, you must provide an `SRGIdentityService` at creation time. For user data to be synchronized, an associated service URL is required:
 
 ```objective-c
 SRGUserData *userData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
-                                                historyServiceURL:historyServiceURL
+                                                       serviceURL:serviceURL
                                                   identityService:identityService];
 ```
 
@@ -33,7 +33,7 @@ You can have several `SRGUserData` instances in an application, though most appl
 
 ```objective-c
 SRGUserData.currentUserData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
-                                                      historyServiceURL:historyServiceURL
+                                                             serviceURL:serviceURL
                                                         identityService:identityService];
 ```
 
@@ -43,27 +43,76 @@ For simplicity, this getting started guide assumes that a shared instance has be
 
 The `SRGUserData` `user` property provides information about the current user. Note that a single user is always available, whether this user is logged in or not.
 
-### Saving and retrieving history data
+### Playback history
 
-To access history data, use `SRGUserData` `history` property. The return `SRGHistory` instance provides several methods to read history entries from the local store, e.g.
+`SRGUserData` provides the `history` property as an entry point to playback history management. The returned `SRGHistory` instance provides methods to add or update entries asynchronously:
+
+```objective-c
+[SRGUserData.currentUserData.history saveHistoryEntryWithUid:@"media_id" lastPlaybackTime:CMTimeMakeWithSeconds(100., NSEC_PER_SEC) deviceUid:@"My device" completionBlock^(NSError * _Nonnull error) {
+    // ...
+}];
+```
+
+and to read history entries from the local store synchronously, e.g.:
 
 ```objective-c
 NSArray<SRGHistoryEntry *> *historyEntries = [SRGUserData.currentUserData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:nil];
+// ...
 ```
 
-or to save / update an entry:
+For performance reasons writes are always made asynchronously, calling a block on completion. An opaque task identifier is returned from all asynchronous operations to let you cancel them if required. Reads can be made synchronously or asynchronously depending on your needs.
+
+#### Change notifications
+
+History changes are notified through `SRGHistoryEntriesDidChangeNotification` notifications, whether a user is logged in or not. This ensures any part of your application can stay informed about changes and respond accordingly.
+
+### Playlists
+
+`SRGUserData` provides the `playlists` property as an entry point to playlist management. There are two major types of playlists:
+
+* User playlists which can be created, edited and deleted.
+* Default playlists, which cannot be edited or deleted (e.g. the _Watcher later_ playlist), but whose items can be managed.
+
+Creating a playlist is straigthforward:
 
 ```objective-c
-[SRGUserData.currentUserData.history saveHistoryEntryForUid:@"media_id" withLastPlaybackTime:CMTimeMakeWithSeconds(100., NSEC_PER_SEC) deviceUid:@"My device" completionBlock:nil];
+[SRGUserData.currentUserData.playlists savePlaylistWithName:@"Sports" uid:nil completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
+    // ...  
+}];
 ```
 
-For performance reasons writes are always made asynchronously, calling a block on completion. Reads can be made synchronously or asynchronously depending on your needs.
+A unique identifier can be specified to update an existing playlist or create one with a specific identifier. If not specified an identifier will be automatically generated and returned to the completion block for information. Default playlists are identified by specific reserved identifiers (for example `SRGPlaylistUidWatchLater` for the _Watch later_ playlist) and cannot be edited or deleted.
 
-### Notifications
+Once you have a playlist with a known identifier, you can add entries to it. For example, here is how you add a new media to the _Watch later_ playlist:
 
-History changes are notified through `SRGHistoryDidChangeNotification`, whether a user is logged in or not. This ensures any part of your application can stay informed about changes and respond accordingly.
+```objective-c
+[SRGUserData.currentUserData.playlists savePlaylistEntryWithUid:@"media_id" inPlaylistWithUid:SRGPlaylistUidWatchLater completionBlock:^(NSError * _Nullable error) {
+    // ...
+}];
+```
 
-Once a user has logged in with an associated `SRGIdentityService` instance, history data will stay automatically synchronized. Your application can register to the `SRGHistoryDidStartSynchronizationNotification` and `SRGHistoryDidFinishSynchronizationNotification` notifications to detect when history synchronization starts or ends. For information purposes, the last synchronization date can also be retrieved from the `SRGUserData` `user` information.
+You can at any time retrieve the list of playlists:
+
+```objective-c
+NSArray<SRGPlaylist *> *playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:nil];
+// ...
+```
+
+or entries for a specific playlist:
+
+```objective-c
+NSArray<SRGPlaylistEntry *> *playlistEntries = [SRGUserData.currentUserData.playlists playlistEntriesInPlaylistWithUid:SRGPlaylistUidWatchLater matchingPredicate:nil sortedWithDescriptors:nil];
+// ...
+```
+Reads can be made synchronously or asynchronously depending on your needs.
+
+#### Change notifications
+
+Playlist changes are notified through `SRGPlaylistsDidChangeNotification` notifications, and playlist entry updates through `SRGPlaylistEntriessDidChangeNotification` notifications, whether a user is logged in or not. This ensures any part of your application can stay informed about changes and respond accordingly.
+
+### Synchronization with a user account
+
+Once a user has logged in with an associated `SRGIdentityService` instance, user data will stay automatically synchronized. Your application can register to the `SRGUserDataDidStartSynchronizationNotification` and `SRGUserDataDidFinishSynchronizationNotification` notifications to detect when global synchronization starts or ends. For information purposes, the last device synchronization date can also be retrieved from the `SRGUserData` `user` information.
 
 ### Thread-safety considerations
 

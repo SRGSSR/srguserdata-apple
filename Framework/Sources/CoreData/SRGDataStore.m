@@ -7,6 +7,7 @@
 #import "SRGDataStore.h"
 
 #import "NSBundle+SRGUserData.h"
+#import "SRGUserDataLogger.h"
 #import "SRGUserDataError.h"
 
 @interface SRGDataStore ()
@@ -30,8 +31,10 @@
 - (instancetype)initWithPersistentContainer:(id<SRGPersistentContainer>)persistentContainer
 {
     if (self = [super init]) {
-        // The main context is for reads only. We must therefore always match what has been persisted to the store,
-        // thus discarding in-memory versions when background contexts are saved and automatically merged.
+        // The main context is for reads only. A merge policy has to be set (default throws errors), here a meaningful
+        // one has been picked (store is the reference). This only merges changes from the store or a parent context
+        // (there is no parent - child relationship in this implementation). To merge changes from sibling contexts,
+        // we still have to register for NSManagedObjectContextDidSaveNotification.
         NSManagedObjectContext *viewContext = persistentContainer.viewContext;
         if (@available(iOS 10, *)) {
             viewContext.automaticallyMergesChangesFromParent = YES;
@@ -82,6 +85,7 @@
         // complexity and not make sense anyway, as tasks should be individually small.
         [managedObjectContext performBlockAndWait:^{
             result = task(managedObjectContext);
+            NSCAssert(! managedObjectContext.hasChanges, @"The managed object context must not be altered");
         }];
         
         __block BOOL cancelled = NO;
@@ -124,14 +128,19 @@
     NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
         // If clients use the API as expected (i.e. do not perform changes in `-performMainThreadReadTask:`, which should
         // be enforced during development), merging behavior setup is not really required for background contexts, as
-        // transactions can never be made in parallel. But if this happens for some reason, ignore those changes and keep
-        // the in-memory ones.
+        // transactions can never be made in parallel. But if this happens for some reason, provide a meaningful
+        // setup (context is the reference).
         NSManagedObjectContext *managedObjectContext = self.persistentContainer.newBackgroundContext;
         if (@available(iOS 10, *)) {
             managedObjectContext.automaticallyMergesChangesFromParent = YES;
         }
         managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
         managedObjectContext.undoManager = nil;
+        
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(backgroundManagedObjectContextDidSave:)
+                                                   name:NSManagedObjectContextDidSaveNotification
+                                                 object:managedObjectContext];
         
         __block NSError *error = nil;
         __block BOOL cancelled = NO;
@@ -163,6 +172,10 @@
                                              userInfo:@{ NSLocalizedDescriptionKey : SRGUserDataLocalizedString(@"The operation has been cancelled", @"Error message returned when an operation has been cancelled") }];
             completionBlock ? completionBlock(error) : nil;
         }
+        
+        [NSNotificationCenter.defaultCenter removeObserver:self
+                                                      name:NSManagedObjectContextDidSaveNotification
+                                                    object:managedObjectContext];
         
         dispatch_barrier_async(self.concurrentQueue, ^{
             [self.operations removeObjectForKey:handle];
@@ -215,6 +228,25 @@
     for (NSString *handle in [[self.operations copy] keyEnumerator]) {
         [self cancelBackgroundTaskWithHandle:handle];
     }
+}
+
+#pragma mark Notifications
+
+- (void)backgroundManagedObjectContextDidSave:(NSNotification *)notification
+{
+    NSAssert(! NSThread.isMainThread, @"Saves are only made on background contexts and thus notified on background threads");
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSManagedObjectContext *viewContext = self.persistentContainer.viewContext;
+        if (notification.object != viewContext) {
+            [viewContext mergeChangesFromContextDidSaveNotification:notification];
+            
+            NSError *error = nil;
+            if (! [viewContext save:&error]) {
+                SRGUserDataLogError(@"store", @"Could not save merged changes into the main context. Reason: %@", error);
+            }
+        }
+    });
 }
 
 @end

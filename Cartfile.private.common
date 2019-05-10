@@ -1,1 +1,4 @@
+github "onmyway133/DeepDiff" "2.2.0" 
+# Fork from AliSoftware/OHHTTPStubs to support Xcode 9.x and Swift 4.
+github "rckoenes/OHHTTPStubs" ~> 6.1.1
 github "SRGSSR/srgletterbox-ios" "f8b454e4082dd7898e12286b546925bbab92c66d"

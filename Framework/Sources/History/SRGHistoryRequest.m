@@ -57,7 +57,7 @@
     } completionBlock:^(NSDictionary * _Nullable JSONDictionary, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         NSHTTPURLResponse *HTTPResponse = [response isKindOfClass:NSHTTPURLResponse.class] ? (NSHTTPURLResponse *)response : nil;
         NSNumber *serverTimestamp = JSONDictionary[@"last_update"];
-        NSDate *serverDate = serverTimestamp ? [NSDate dateWithTimeIntervalSince1970:serverTimestamp.doubleValue / 1000.] : nil;
+        NSDate *serverDate = (serverTimestamp != nil) ? [NSDate dateWithTimeIntervalSince1970:serverTimestamp.doubleValue / 1000.] : nil;
         completionBlock(JSONDictionary[@"data"], serverDate, page, nextPage, HTTPResponse, error);
     }];
 }

@@ -11,9 +11,17 @@
  */
 typedef NS_ENUM(NSInteger, SRGUserDataErrorCode) {
     /**
-     *  An operation has been cancelled
+     *  An operation has been cancelled.
      */
-    SRGUserDataErrorCancelled
+    SRGUserDataErrorCancelled,
+    /**
+     *  An operation is forbidden.
+     */
+    SRGUserDataErrorForbidden,
+    /**
+     *  The data has not been found.
+     */
+    SRGUserDataErrorNotFound,
 };
 
 /**

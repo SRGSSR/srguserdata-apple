@@ -6,8 +6,10 @@
 
 #import "SRGUserObject.h"
 
+#import "NSArray+SRGUserData.h"
 #import "SRGUser+Private.h"
 #import "SRGUserObject+Private.h"
+#import "SRGUserObject+Subclassing.h"
 
 #import <libextobjc/libextobjc.h>
 
@@ -29,6 +31,11 @@
 
 #pragma mark Class methods
 
++ (NSString *)uidKey
+{
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"Subclasses of 'SRGUserObject' must provide a uidKey" userInfo:nil];
+}
+
 + (NSArray<SRGUserObject *> *)objectsMatchingPredicate:(NSPredicate *)predicate
                                  sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
                                 inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
@@ -37,26 +44,29 @@
     fetchRequest.predicate = predicate;
     
     // Ensure stable sorting using the identifier as fallback (same criterium applied by the history service)
-    NSMutableArray<NSSortDescriptor *> *allSortDescriptors = [NSMutableArray array];
+    NSMutableArray<NSSortDescriptor *> *objectsSortDescriptor = [NSMutableArray array];
     if (sortDescriptors) {
-        [allSortDescriptors addObjectsFromArray:sortDescriptors];
+        [objectsSortDescriptor addObjectsFromArray:sortDescriptors];
     }
-    [allSortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGUserObject.new, uid) ascending:NO]];
-    fetchRequest.sortDescriptors = [allSortDescriptors copy];
+    [objectsSortDescriptor addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGUserObject.new, uid) ascending:NO]];
+    fetchRequest.sortDescriptors = [objectsSortDescriptor copy];
     
     fetchRequest.fetchBatchSize = 100;
     return [managedObjectContext executeFetchRequest:fetchRequest error:NULL];
 }
 
-+ (SRGUserObject *)objectWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)objectWithUid:(NSString *)uid matchingPredicate:(NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGUserObject.new, uid), uid];
-    return [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext].firstObject;
+    NSPredicate *objectPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @keypath(SRGUserObject.new, uid), uid];
+    if (predicate) {
+        objectPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[objectPredicate, predicate]];
+    }
+    return [self objectsMatchingPredicate:objectPredicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext].firstObject;
 }
 
-+ (SRGUserObject *)upsertWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)upsertWithUid:(NSString *)uid matchingPredicate:(NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
+    SRGUserObject *object = [self objectWithUid:uid matchingPredicate:predicate inManagedObjectContext:managedObjectContext];
     if (! object) {
         object = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass(self) inManagedObjectContext:managedObjectContext];
         object.uid = uid;
@@ -67,21 +77,17 @@
     return object;
 }
 
-+ (SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary matchingPredicate:(NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-    NSString *uid = dictionary[@"item_id"];
+    NSString *uid = dictionary[self.uidKey];
     if (! uid) {
         return nil;
     }
     
-    NSNumber *timestamp = dictionary[@"date"];
-    if (! timestamp) {
-        return nil;
-    }
-    
     // If the local entry is dirty and more recent than the server version, keep the local version as is.
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.];
-    SRGUserObject *object = [self objectWithUid:uid inManagedObjectContext:managedObjectContext];
+    NSNumber *timestamp = dictionary[@"date"];
+    NSDate *date = timestamp ? [NSDate dateWithTimeIntervalSince1970:timestamp.doubleValue / 1000.] : NSDate.date;
+    SRGUserObject *object = [self objectWithUid:uid matchingPredicate:predicate inManagedObjectContext:managedObjectContext];
     if (object.dirty && [object.date compare:date] == NSOrderedDescending) {
         return object;
     }
@@ -103,53 +109,131 @@
     return object;
 }
 
-+ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (NSArray<NSDictionary *> *)dictionariesForObjects:(NSArray<SRGUserObject *> *)objects replacedWithDictionaries:(NSArray<NSDictionary *> *)dictionaries
 {
-    NSPredicate *predicate = uids ? [NSPredicate predicateWithFormat:@"%K IN %@ AND discarded == NO", @keypath(SRGUserObject.new, uid), uids] : nil;
-    NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
+    NSMutableDictionary<NSString *, NSDictionary *> *dictionaryIndex = [NSMutableDictionary dictionary];
+    for (NSDictionary *dictionary in dictionaries) {
+        NSString *uid = dictionary[self.class.uidKey];
+        if ([self.reservedUids containsObject:uid]) {
+            continue;
+        }
+        
+        if (uid) {
+            dictionaryIndex[uid] = dictionary;
+        }
+    }
+    
+    NSMutableArray<NSDictionary *> *mergedDictionaries = [NSMutableArray array];
+    for (SRGUserObject *object in objects) {
+        if ([self.reservedUids containsObject:object.uid]) {
+            continue;
+        }
+        else if (object.dirty) {
+            [mergedDictionaries addObject:object.dictionary];
+        }
+        else if ([dictionaryIndex.allKeys containsObject:object.uid]) {
+            [mergedDictionaries addObject:dictionaryIndex[object.uid]];
+        }
+        else {
+            [mergedDictionaries addObject:object.deletedDictionary];
+        }
+        
+        dictionaryIndex[object.uid] = nil;
+    }
+    
+    [mergedDictionaries addObjectsFromArray:dictionaryIndex.allValues];
+    return [mergedDictionaries copy];
+}
+
++ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids
+                              matchingPredicate:(NSPredicate *)predicate
+                         inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
+{
+    NSPredicate *discardPredicate = nil;
+    if (uids) {
+        NSArray<NSString *> *discardableUids = [uids srguserdata_arrayByRemovingObjectsInArray:self.reservedUids];
+        discardPredicate = [NSPredicate predicateWithFormat:@"%K IN %@", @keypath(SRGUserObject.new, uid), discardableUids];
+    }
+    else {
+        discardPredicate = [NSPredicate predicateWithFormat:@"NOT (%K IN %@)", @keypath(SRGUserObject.new, uid), self.reservedUids];
+    }
+    
+    if (predicate) {
+        discardPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[discardPredicate, predicate]];
+    }
+    
+    NSArray<SRGUserObject *> *objects = [self objectsMatchingPredicate:discardPredicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     NSArray<NSString *> *discardedUids = [objects valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGUserObject.new, uid)]];
     
     if (! [SRGUser userInManagedObjectContext:managedObjectContext].accountUid) {
         NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
-        fetchRequest.predicate = predicate;
+        fetchRequest.predicate = discardPredicate;
         
         NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
         [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
     }
-    else {
+    // In the context of this framework, predicates are be used for joining tables, in which case batch updates cannot be used
+    // (Core Data limitation).
+    else if ([predicate isKindOfClass:NSCompoundPredicate.class]) {
         NSBatchUpdateRequest *batchUpdateRequest = [[NSBatchUpdateRequest alloc] initWithEntityName:NSStringFromClass(self)];
-        batchUpdateRequest.predicate = predicate;
+        batchUpdateRequest.predicate = discardPredicate;
         batchUpdateRequest.propertiesToUpdate = @{ @keypath(SRGUserObject.new, discarded) : @YES,
                                                    @keypath(SRGUserObject.new, dirty) : @YES,
                                                    @keypath(SRGUserObject.new, date) : NSDate.date };
         [managedObjectContext executeRequest:batchUpdateRequest error:NULL];
     }
+    else {
+        [objects enumerateObjectsUsingBlock:^(SRGUserObject * _Nonnull object, NSUInteger idx, BOOL * _Nonnull stop) {
+            object.discarded = YES;
+            object.dirty = YES;
+            object.date = NSDate.date;
+        }];
+    }
     
     return discardedUids;
 }
 
-+ (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (void)deleteAllObjectsMatchingPredicate:(NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:NSStringFromClass(self)];
+    fetchRequest.predicate = predicate;
+    
     NSBatchDeleteRequest *batchDeleteRequest = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
     [managedObjectContext executeRequest:batchDeleteRequest error:NULL];
 }
 
 #pragma mark Default implementations
 
++ (NSArray<NSString *> *)reservedUids
+{
+    return @[];
+}
+
 - (void)updateWithDictionary:(NSDictionary *)dictionary
 {
-    self.uid = dictionary[@"item_id"];
-    self.date = [NSDate dateWithTimeIntervalSince1970:[dictionary[@"date"] doubleValue] / 1000.];
+    self.uid = dictionary[self.class.uidKey];
+    
+    NSString *dateString = dictionary[@"date"];
+    self.date = dateString ? [NSDate dateWithTimeIntervalSince1970:dateString.doubleValue / 1000.] : NSDate.date;
+    
     self.discarded = [dictionary[@"deleted"] boolValue];
 }
 
 - (NSDictionary *)dictionary
 {
     NSMutableDictionary *JSONDictionary = [NSMutableDictionary dictionary];
-    JSONDictionary[@"item_id"] = self.uid;
+    JSONDictionary[self.class.uidKey] = self.uid;
     JSONDictionary[@"date"] = @(round(self.date.timeIntervalSince1970 * 1000.));
     JSONDictionary[@"deleted"] = @(self.discarded);
+    return [JSONDictionary copy];
+}
+
+#pragma mark Helpers
+
+- (NSDictionary *)deletedDictionary
+{
+    NSMutableDictionary *JSONDictionary = [self.dictionary mutableCopy];
+    JSONDictionary[@"deleted"] = @YES;
     return [JSONDictionary copy];
 }
 
