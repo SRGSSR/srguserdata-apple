@@ -42,10 +42,10 @@
 
 - (NSTimeInterval)continuousPlaybackTransitionDurationForController:(SRGLetterboxController *)controller
 {
-    return 5.f;
+    return 5.;
 }
 
-- (nullable SRGPosition *)controller:(SRGLetterboxController *)controller startPositionForMedia:(SRGMedia *)media
+- (SRGPosition *)controller:(SRGLetterboxController *)controller startPositionForMedia:(SRGMedia *)media
 {
     SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
     if (historyEntry) {
