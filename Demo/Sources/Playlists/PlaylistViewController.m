@@ -17,7 +17,6 @@
 
 @property (nonatomic) SRGPlaylist *playlist;
 
-@property (nonatomic) NSArray<NSString *> *mediaURNs;
 @property (nonatomic) NSArray<SRGMedia *> *medias;
 
 @property (nonatomic, weak) SRGBaseRequest *request;
@@ -98,8 +97,15 @@
 {
     [self.request cancel];
     
-    [self updateMediaURNsWithCompletionBlock:^(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs) {
-        SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:URNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    BOOL ascending = ! [self.playlist.uid isEqualToString:SRGPlaylistUidWatchLater];
+    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylistEntry.new, date) ascending:ascending];
+    [SRGUserData.currentUserData.playlists playlistEntriesInPlaylistWithUid:self.playlist.uid matchingPredicate:nil sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
+        if (error) {
+            return;
+        }
+        
+        NSArray<NSString *> *mediaURNs = [playlistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
+        SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:mediaURNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
             if (self.refreshControl.refreshing) {
                 [self.refreshControl endRefreshing];
             }
@@ -114,24 +120,6 @@
         }] requestWithPageSize:50];
         [request resume];
         self.request = request;
-    }];
-}
-
-- (void)updateMediaURNsWithCompletionBlock:(void (^)(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs))completionBlock
-{
-    BOOL ascending = ! [self.playlist.uid isEqualToString:SRGPlaylistUidWatchLater];
-    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylistEntry.new, date) ascending:ascending];
-    [SRGUserData.currentUserData.playlists playlistEntriesInPlaylistWithUid:self.playlist.uid matchingPredicate:nil sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
-        if (error) {
-            return;
-        }
-        
-        NSArray<NSString *> *mediaURNs = [playlistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSArray<NSString *> *previousMediaURNs = self.mediaURNs;
-            self.mediaURNs = mediaURNs;
-            completionBlock(mediaURNs, previousMediaURNs);
-        });
     }];
 }
 
@@ -234,11 +222,7 @@
 
 - (void)playlistEntriesDidChange:(NSNotification *)notification
 {
-    [self updateMediaURNsWithCompletionBlock:^(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs) {
-        if (! [previousURNs isEqual:self.mediaURNs]) {
-            [self refresh];
-        }
-    }];
+    [self refresh];
 }
 
 - (void)didLogout:(NSNotification *)notification

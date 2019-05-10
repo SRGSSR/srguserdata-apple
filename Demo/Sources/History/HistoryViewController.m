@@ -17,7 +17,6 @@
 
 @interface HistoryViewController ()
 
-@property (nonatomic) NSArray<NSString *> *mediaURNs;
 @property (nonatomic) NSArray<SRGMedia *> *medias;
 
 @property (nonatomic, weak) SRGBaseRequest *request;
@@ -117,8 +116,14 @@
 {
     [self.request cancel];
     
-    [self updateMediaURNsWithCompletionBlock:^(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs) {
-        SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:URNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
+    [SRGUserData.currentUserData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+        if (error) {
+            return;
+        }
+        
+        NSArray<NSString *> *mediaURNs = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
+        SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:mediaURNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
             if (self.refreshControl.refreshing) {
                 [self.refreshControl endRefreshing];
             }
@@ -132,24 +137,7 @@
             }];
         }] requestWithPageSize:50];
         [request resume];
-        self.request = request;
-    }];
-}
-
-- (void)updateMediaURNsWithCompletionBlock:(void (^)(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs))completionBlock
-{
-    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
-    [SRGUserData.currentUserData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
-        if (error) {
-            return;
-        }
-        
-        NSArray<NSString *> *mediaURNs = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSArray<NSString *> *previousMediaURNs = self.mediaURNs;
-            self.mediaURNs = mediaURNs;
-            completionBlock(mediaURNs, previousMediaURNs);
-        });
+        self.request = request;;
     }];
 }
 
@@ -245,11 +233,7 @@
 
 - (void)historyDidChange:(NSNotification *)notification
 {
-    [self updateMediaURNsWithCompletionBlock:^(NSArray<NSString *> *URNs, NSArray<NSString *> *previousURNs) {
-        if (! [previousURNs isEqual:self.mediaURNs]) {
-            [self refresh];
-        }
-    }];
+    [self refresh];
 }
 
 - (void)didFinishSynchronization:(NSNotification *)notification
