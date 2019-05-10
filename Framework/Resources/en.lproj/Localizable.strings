@@ -1,2 +1,12 @@
 /* Error message returned when an operation has been cancelled */
 "The operation has been cancelled" = "The operation has been cancelled";
+
+/* Error message returned when attempting to edit a default read-only playlist */
+"The playlist cannot be edited" = "The playlist cannot be edited";
+
+/* Error message returned when adding an entry to an unknown playlist.
+   Error message returned when removing some entries from an unknown playlist. */
+"The playlist does not exist" = "The playlist does not exist";
+
+/* Default Watch later playlist name */
+"Watch later" = "Watch later";
