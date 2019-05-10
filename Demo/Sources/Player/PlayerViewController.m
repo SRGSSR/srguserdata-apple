@@ -46,18 +46,20 @@
 {
     [super viewDidLoad];
     
-    if (self.URN) {
-        self.letterboxController.playlistDataSource = self.playerPlaylist;
-        [self.letterboxController playURN:self.URN atPosition:self.position withPreferredSettings:nil];
+    self.letterboxController.playlistDataSource = self.playerPlaylist;
+    
+    @weakify(self)
+    [self.letterboxController addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1., NSEC_PER_SEC) queue:NULL usingBlock:^(CMTime time) {
+        @strongify(self)
         
-        @weakify(self)
-        [self.letterboxController addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1., NSEC_PER_SEC) queue:NULL usingBlock:^(CMTime time) {
-            @strongify(self)
-            
-            if (self.URN) {
-                [SRGUserData.currentUserData.history saveHistoryEntryWithUid:self.URN lastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
-            }
-        }];
+        NSString *URN = self.letterboxController.URN;
+        if (URN) {
+            [SRGUserData.currentUserData.history saveHistoryEntryWithUid:URN lastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+        }
+    }];
+    
+    if (self.URN) {
+        [self.letterboxController playURN:self.URN atPosition:self.position withPreferredSettings:nil];
     }
 }
 
