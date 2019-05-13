@@ -22,10 +22,39 @@
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
 {
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
-        // TODO: Store locally when offline. One file per data store.
-        self.dictionary = [NSMutableDictionary dictionary];
+        self.dictionary = [self dictionaryFromFile] ?: [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+#pragma mark Serialization
+
+- (void)saveFileFromDictionary:(NSDictionary *)dictionary
+{
+    NSURL *folderURL = [self.dataStore.persistentContainer.srg_fileURL URLByDeletingPathExtension];
+    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.absoluteString]) {
+        [NSFileManager.defaultManager createDirectoryAtURL:folderURL withIntermediateDirectories:YES attributes:nil error:NULL];
+    }
+    
+    NSData *data = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:NULL];
+    NSURL *fileURL = [folderURL URLByAppendingPathComponent:@"preferences.json"];
+    [data writeToURL:fileURL atomically:YES];
+}
+
+- (NSMutableDictionary *)dictionaryFromFile
+{
+    NSURL *folderURL = [self.dataStore.persistentContainer.srg_fileURL URLByDeletingPathExtension];
+    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.absoluteString]) {
+        return nil;
+    }
+    
+    NSURL *fileURL = [folderURL URLByAppendingPathComponent:@"preferences.json"];
+    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.absoluteString]) {
+        return nil;
+    }
+    
+    NSData *data = [NSData dataWithContentsOfURL:fileURL];
+    return [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
 }
 
 #pragma mark Preference management
@@ -50,6 +79,7 @@
             dictionary = dictionary[pathComponent];
         }
     }
+    [self saveFileFromDictionary:self.dictionary];
 }
 
 - (id)objectForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain withClass:(Class)cls
@@ -76,6 +106,7 @@
         }
         dictionary = dictionary[pathComponent];
     }
+    [self saveFileFromDictionary:self.dictionary];
 }
 
 - (void)setString:(NSString *)string forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
@@ -141,7 +172,6 @@
 - (float)floatForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
 {
     return [self numberForKeyPath:keyPath inDomain:domain].floatValue;
-    
 }
 
 - (double)doubleForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
@@ -163,6 +193,18 @@
 
 - (void)clearData
 {
+    NSURL *folderURL = [self.dataStore.persistentContainer.srg_fileURL URLByDeletingPathExtension];
+    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.absoluteString]) {
+        return;
+    }
+    
+    NSURL *fileURL = [folderURL URLByAppendingPathComponent:@"preferences.json"];
+    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.absoluteString]) {
+        return;
+    }
+    
+    [NSFileManager.defaultManager removeItemAtURL:fileURL error:NULL];
+    
     [self.dictionary removeAllObjects];
 }
 
