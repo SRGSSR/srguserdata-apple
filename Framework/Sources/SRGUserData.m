@@ -23,8 +23,10 @@
 static NSUInteger s_currentPersistentStoreVersion = 7;
 
 typedef NSString * SRGUserDataServiceType NS_TYPED_ENUM;
+
 static SRGUserDataServiceType const SRGUserDataServiceTypeHistory = @"History";
 static SRGUserDataServiceType const SRGUserDataServiceTypePlaylists = @"Playlists";
+static SRGUserDataServiceType const SRGUserDataServiceTypePreferences = @"Preferences";
 
 static SRGUserData *s_currentUserData = nil;
 
@@ -170,6 +172,9 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
         NSURL *playlistsServiceURL = [serviceURL URLByAppendingPathComponent:@"playlist"];
         services[SRGUserDataServiceTypePlaylists] = [[SRGPlaylists alloc] initWithServiceURL:playlistsServiceURL identityService:identityService dataStore:self.dataStore];
         
+        NSURL *preferencesServiceURL = [serviceURL URLByAppendingPathComponent:@"preference"];
+        services[SRGUserDataServiceTypePreferences] = [[SRGPreferences alloc] initWithServiceURL:preferencesServiceURL identityService:identityService dataStore:self.dataStore];
+        
         self.services = [services copy];
         
         if (serviceURL && identityService) {
@@ -225,16 +230,17 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
 
 - (SRGHistory *)history
 {
-    SRGUserDataService *history = self.services[SRGUserDataServiceTypeHistory];
-    NSAssert([history isKindOfClass:SRGHistory.class], @"History service expected");
-    return (SRGHistory *)history;
+    return (SRGHistory *)self.services[SRGUserDataServiceTypeHistory];
 }
 
 - (SRGPlaylists *)playlists
 {
-    SRGUserDataService *playlist = self.services[SRGUserDataServiceTypePlaylists];
-    NSAssert([playlist isKindOfClass:SRGPlaylists.class], @"Playlist service expected");
-    return (SRGPlaylists *)playlist;
+    return (SRGPlaylists *)self.services[SRGUserDataServiceTypePlaylists];
+}
+
+- (SRGPreferences *)preferences
+{
+    return (SRGPreferences *)self.services[SRGUserDataServiceTypePreferences];
 }
 
 - (void)setSynchronizationTimer:(NSTimer *)synchronizationTimer

@@ -11,6 +11,7 @@
 #import "SRGHistoryEntry.h"
 #import "SRGPlaylist.h"
 #import "SRGPlaylists.h"
+#import "SRGPreferences.h"
 #import "SRGUser.h"
 #import "SRGUserDataError.h"
 #import "SRGUserDataService.h"
@@ -74,6 +75,11 @@ OBJC_EXPORT NSString * const SRGUserDataDidFinishSynchronizationNotification;
  *  Access to the user playlists.
  */
 @property (nonatomic, readonly) SRGPlaylists *playlists;
+
+/**
+ *  Access to user preferences.
+ */
+@property (nonatomic, readonly) SRGPreferences *preferences;
 
 @end
 

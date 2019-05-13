@@ -118,6 +118,8 @@
 		6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F41C9AA2216C3CB003F434A /* PlayerViewController.m */; };
 		6F46DD76221429110013C10A /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F46DD75221429100013C10A /* Person.m */; };
 		6F478B2B22818A6100CDC022 /* NSDateFormatter+Demo.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */; };
+		6F6359F82289584600E7F697 /* SRGPreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F6359F62289584600E7F697 /* SRGPreferences.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6F6359F92289584600E7F697 /* SRGPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359F72289584600E7F697 /* SRGPreferences.m */; };
 		6F64BDF02274E19F00ED0DFE /* MigrationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FCCE4802212BFD600423EFF /* MigrationTestCase.m */; };
 		6F687FC62281FE9800E6AE2C /* SRGPlaylistEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
@@ -368,6 +370,8 @@
 		6F46DD75221429100013C10A /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		6F478B2922818A6100CDC022 /* NSDateFormatter+Demo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+Demo.h"; sourceTree = "<group>"; };
 		6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+Demo.m"; sourceTree = "<group>"; };
+		6F6359F62289584600E7F697 /* SRGPreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferences.h; sourceTree = "<group>"; };
+		6F6359F72289584600E7F697 /* SRGPreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferences.m; sourceTree = "<group>"; };
 		6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylistEntry+Private.h"; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -618,6 +622,7 @@
 				6FFB346722089A5E00E76E6D /* History */,
 				6F0178AA22080FEC00B4BCD9 /* Model */,
 				08280F092258DEBD00AC978D /* Playlists */,
+				6F6359F52289581300E7F697 /* Preferences */,
 				6F0EB53E20FC7FA9009C02CF /* SRGUserData.h */,
 				6F0EB54220FC7FF4009C02CF /* SRGUserData.m */,
 				6FA9ADFD222C4944007446BD /* SRGUserDataError.h */,
@@ -721,6 +726,15 @@
 				080491802284BFA200E4CEC2 /* PlayerPlaylist.m */,
 			);
 			path = Helpers;
+			sourceTree = "<group>";
+		};
+		6F6359F52289581300E7F697 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				6F6359F62289584600E7F697 /* SRGPreferences.h */,
+				6F6359F72289584600E7F697 /* SRGPreferences.m */,
+			);
+			path = Preferences;
 			sourceTree = "<group>";
 		};
 		6F8A93EE20FDCAA800AA6434 /* Demo */ = {
@@ -899,6 +913,7 @@
 				08280F0D2258DEBD00AC978D /* SRGPlaylists.h in Headers */,
 				6FA1D10D220C7A21003976D9 /* SRGUserObject+Subclassing.h in Headers */,
 				6FFB34892209C10800E76E6D /* SRGUserDataService+Private.h in Headers */,
+				6F6359F82289584600E7F697 /* SRGPreferences.h in Headers */,
 				6FFB34852209BF8D00E76E6D /* SRGUserObject+Private.h in Headers */,
 				6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */,
 				08083BD922639F8B00BE9F19 /* SRGPlaylistsRequest.h in Headers */,
@@ -1141,6 +1156,7 @@
 				6FFB347622089A5E00E76E6D /* SRGPersistentContainer.m in Sources */,
 				6F0178B022080FEC00B4BCD9 /* SRGUser.m in Sources */,
 				6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */,
+				6F6359F92289584600E7F697 /* SRGPreferences.m in Sources */,
 				6FC44DE7227349CC0022DC99 /* NSArray+SRGUserData.m in Sources */,
 				6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */,
 				6F938025227C0CE600315A83 /* NSSet+SRGUserData.m in Sources */,
