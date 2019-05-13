@@ -35,7 +35,7 @@ typedef void (^SRGPreferencesDeleteCompletionBlock)(NSHTTPURLResponse * _Nullabl
                             withSession:(NSURLSession *)session
                         completionBlock:(SRGPreferencesPutCompletionBlock)completionBlock;
 
-+ (SRGRequest *)deletePreferenceAtKeyPath:(NSString *)keyPath
++ (SRGRequest *)deletePreferenceAtKeyPath:(nullable NSString *)keyPath
                                  inDomain:(NSString *)domain
                            fromServiceURL:(NSURL *)serviceURL
                           forSessionToken:(NSString *)sessionToken

@@ -6,6 +6,9 @@
 
 #import "UserDataBaseTestCase.h"
 
+// Private headers
+#import "SRGPreferenceChangeLogEntry.h"
+
 @interface PreferencesTestCase : UserDataBaseTestCase
 
 @end
@@ -42,6 +45,24 @@
     
     [self.userData.preferences removeObjectForKeyPath:@"a.b.c" inDomain:@"test"];
     XCTAssertNil([self.userData.preferences stringForKeyPath:@"a.b.c" inDomain:@"test"]);
+}
+
+- (void)testMigrationToChangeLog
+{
+    // TODO: Should be turned into proper tests
+    NSArray<SRGPreferenceChangeLogEntry *> *entries1 = [SRGPreferenceChangeLogEntry changeLogEntriesForDictionary:@{} inDomain:@"domain"];
+    NSLog(@"%@", entries1);
+    
+    NSArray<SRGPreferenceChangeLogEntry *> *entries2 = [SRGPreferenceChangeLogEntry changeLogEntriesForDictionary:@{ @"n" : @1,
+                                                                                                                     @"s" : @"hello" } inDomain:@"domain"];
+    NSLog(@"%@", entries2);
+    
+    NSArray<SRGPreferenceChangeLogEntry *> *entries3 = [SRGPreferenceChangeLogEntry changeLogEntriesForDictionary:@{ @"n" : @1,
+                                                                                                                     @"s" : @"lev1",
+                                                                                                                     @"d" : @{ @"n" : @2,
+                                                                                                                               @"s" : @"lev2" }
+                                                                                                                     } inDomain:@"domain"];
+    NSLog(@"%@", entries3);
 }
 
 @end

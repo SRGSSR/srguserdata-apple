@@ -73,7 +73,7 @@
                               withSession:(NSURLSession *)session
                           completionBlock:(SRGPreferencesDeleteCompletionBlock)completionBlock
 {
-    NSString *fullPath = [domain stringByAppendingPathComponent:keyPath];
+    NSString *fullPath = keyPath ? [domain stringByAppendingPathComponent:keyPath] : domain;
     NSURL *URL = [serviceURL URLByAppendingPathComponent:fullPath];
     
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URL];
