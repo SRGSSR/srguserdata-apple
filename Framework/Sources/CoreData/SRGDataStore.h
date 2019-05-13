@@ -37,6 +37,11 @@ typedef void (^SRGDataStoreWriteCompletionBlock)(NSError * _Nullable error);
 - (instancetype)initWithPersistentContainer:(id<SRGPersistentContainer>)persistentContainer;
 
 /**
+ *  The persistent container used by the data store.
+ */
+@property (nonatomic, readonly) id<SRGPersistentContainer> persistentContainer;
+
+/**
  *  Perform a read operation on the main thread. The read should be efficient since slow operations might block the main
  *  thread while performed.
  *

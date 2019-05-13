@@ -54,6 +54,11 @@
     }
 }
 
+- (NSURL *)srg_fileURL
+{
+    return self.fileURL;
+}
+
 - (NSManagedObjectContext *)newBackgroundContext
 {
     return [self managedObjectContextForPersistentStoreCoordinator:self.persistentStoreCoordinator];
@@ -77,6 +82,11 @@
     [self loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription * _Nonnull persistentStoreDescription, NSError * _Nullable error) {
         completionHandler(error);
     }];
+}
+
+- (NSURL *)srg_fileURL
+{
+    return self.persistentStoreDescriptions.firstObject.URL;
 }
 
 @end
