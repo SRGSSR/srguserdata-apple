@@ -13,7 +13,7 @@
 + (SRGRequest *)playlistsFromServiceURL:(NSURL *)serviceURL
                         forSessionToken:(NSString *)sessionToken
                             withSession:(NSURLSession *)session
-                        completionBlock:(SRGSRGPlaylistsCompletionBlock)completionBlock
+                        completionBlock:(SRGPlaylistsCompletionBlock)completionBlock
 {
     NSURL *URL = [serviceURL URLByAppendingPathComponent:@"v3"];
     
@@ -30,7 +30,7 @@
                           toServiceURL:(NSURL *)serviceURL
                        forSessionToken:(NSString *)sessionToken
                            withSession:(NSURLSession *)session
-                       completionBlock:(SRGSRGPlaylistPostCompletionBlock)completionBlock
+                       completionBlock:(SRGPlaylistPostCompletionBlock)completionBlock
 {
     NSString *businessUid = dictionary[@"businessId"];
     NSAssert(businessUid != nil, @"A business identifier is required");
@@ -53,7 +53,7 @@
                        fromServiceURL:(NSURL *)serviceURL
                       forSessionToken:(NSString *)sessionToken
                           withSession:(NSURLSession *)session
-                      completionBlock:(SRGSRGPlaylistDeleteCompletionBlock)completionBlock
+                      completionBlock:(SRGPlaylistDeleteCompletionBlock)completionBlock
 {
     NSURL *URL = [[serviceURL URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:uid];
     
@@ -71,7 +71,7 @@
                            fromServiceURL:(NSURL *)serviceURL
                           forSessionToken:(NSString *)sessionToken
                               withSession:(NSURLSession *)session
-                          completionBlock:(SRGSRGPlaylistEntriesCompletionBlock)completionBlock
+                          completionBlock:(SRGPlaylistEntriesCompletionBlock)completionBlock
 {
     NSURL *URL = [[serviceURL URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:playlistUid];
     
@@ -89,7 +89,7 @@
                                 toServiceURL:(NSURL *)serviceURL
                              forSessionToken:(NSString *)sessionToken
                                  withSession:(NSURLSession *)session
-                             completionBlock:(SRGSRGPlaylistEntriesCompletionBlock)completionBlock
+                             completionBlock:(SRGPlaylistEntriesCompletionBlock)completionBlock
 {
     NSURL *URL = [[[serviceURL URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:playlistUid] URLByAppendingPathComponent:@"bookmarks"];
     
@@ -110,7 +110,7 @@
                                fromServiceURL:(NSURL *)serviceURL
                               forSessionToken:(NSString *)sessionToken
                                   withSession:(NSURLSession *)session
-                              completionBlock:(SRGSRGPlaylistDeleteCompletionBlock)completionBlock
+                              completionBlock:(SRGPlaylistDeleteCompletionBlock)completionBlock
 {
     NSURL *URL = [[[serviceURL URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:playlistUid] URLByAppendingPathComponent:@"bookmarks"];
     NSURLComponents *URLComponents = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:NO];

@@ -9,10 +9,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // Block signatures.
-typedef void (^SRGSRGPlaylistsCompletionBlock)(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
-typedef void (^SRGSRGPlaylistPostCompletionBlock)(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
-typedef void (^SRGSRGPlaylistEntriesCompletionBlock)(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
-typedef void (^SRGSRGPlaylistDeleteCompletionBlock)(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
+typedef void (^SRGPlaylistsCompletionBlock)(NSArray<NSDictionary *> * _Nullable playlistDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
+typedef void (^SRGPlaylistPostCompletionBlock)(NSDictionary * _Nullable playlistDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
+typedef void (^SRGPlaylistEntriesCompletionBlock)(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
+typedef void (^SRGPlaylistDeleteCompletionBlock)(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error);
 
 /**
  *  Low-level requests of the playlists service.
@@ -25,7 +25,7 @@ typedef void (^SRGSRGPlaylistDeleteCompletionBlock)(NSHTTPURLResponse * _Nullabl
 + (SRGRequest *)playlistsFromServiceURL:(NSURL *)serviceURL
                         forSessionToken:(NSString *)sessionToken
                             withSession:(NSURLSession *)session
-                        completionBlock:(SRGSRGPlaylistsCompletionBlock)completionBlock;
+                        completionBlock:(SRGPlaylistsCompletionBlock)completionBlock;
 
 /**
  *  Submit a playlist.
@@ -34,7 +34,7 @@ typedef void (^SRGSRGPlaylistDeleteCompletionBlock)(NSHTTPURLResponse * _Nullabl
                           toServiceURL:(NSURL *)serviceURL
                        forSessionToken:(NSString *)sessionToken
                            withSession:(NSURLSession *)session
-                       completionBlock:(SRGSRGPlaylistPostCompletionBlock)completionBlock;
+                       completionBlock:(SRGPlaylistPostCompletionBlock)completionBlock;
 
 /**
  *  Delete a playlist.
@@ -43,7 +43,7 @@ typedef void (^SRGSRGPlaylistDeleteCompletionBlock)(NSHTTPURLResponse * _Nullabl
                        fromServiceURL:(NSURL *)serviceURL
                       forSessionToken:(NSString *)sessionToken
                           withSession:(NSURLSession *)session
-                      completionBlock:(SRGSRGPlaylistDeleteCompletionBlock)completionBlock;
+                      completionBlock:(SRGPlaylistDeleteCompletionBlock)completionBlock;
 
 /**
  *  Retrieve entries for the specified playlist.
@@ -52,7 +52,7 @@ typedef void (^SRGSRGPlaylistDeleteCompletionBlock)(NSHTTPURLResponse * _Nullabl
                            fromServiceURL:(NSURL *)serviceURL
                           forSessionToken:(NSString *)sessionToken
                               withSession:(NSURLSession *)session
-                          completionBlock:(SRGSRGPlaylistEntriesCompletionBlock)completionBlock;
+                          completionBlock:(SRGPlaylistEntriesCompletionBlock)completionBlock;
 
 /**
  *  Update entries for the specified playlist.
@@ -62,7 +62,7 @@ typedef void (^SRGSRGPlaylistDeleteCompletionBlock)(NSHTTPURLResponse * _Nullabl
                                 toServiceURL:(NSURL *)serviceURL
                              forSessionToken:(NSString *)sessionToken
                                  withSession:(NSURLSession *)session
-                             completionBlock:(SRGSRGPlaylistEntriesCompletionBlock)completionBlock;
+                             completionBlock:(SRGPlaylistEntriesCompletionBlock)completionBlock;
 
 /**
  *  Update entries for the specified playlist.
@@ -72,7 +72,7 @@ typedef void (^SRGSRGPlaylistDeleteCompletionBlock)(NSHTTPURLResponse * _Nullabl
                                fromServiceURL:(NSURL *)serviceURL
                               forSessionToken:(NSString *)sessionToken
                                   withSession:(NSURLSession *)session
-                              completionBlock:(SRGSRGPlaylistDeleteCompletionBlock)completionBlock;
+                              completionBlock:(SRGPlaylistDeleteCompletionBlock)completionBlock;
 
 @end
 
