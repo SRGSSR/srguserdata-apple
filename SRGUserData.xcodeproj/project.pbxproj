@@ -121,6 +121,8 @@
 		6F6359F82289584600E7F697 /* SRGPreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F6359F62289584600E7F697 /* SRGPreferences.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6F6359F92289584600E7F697 /* SRGPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359F72289584600E7F697 /* SRGPreferences.m */; };
 		6F6359FC2289896A00E7F697 /* PreferencesTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */; };
+		6F6359FF2289AEC500E7F697 /* SRGPreferencesRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F6359FD2289AEC500E7F697 /* SRGPreferencesRequest.h */; };
+		6F635A002289AEC500E7F697 /* SRGPreferencesRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359FE2289AEC500E7F697 /* SRGPreferencesRequest.m */; };
 		6F64BDF02274E19F00ED0DFE /* MigrationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FCCE4802212BFD600423EFF /* MigrationTestCase.m */; };
 		6F687FC62281FE9800E6AE2C /* SRGPlaylistEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
@@ -374,6 +376,8 @@
 		6F6359F62289584600E7F697 /* SRGPreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferences.h; sourceTree = "<group>"; };
 		6F6359F72289584600E7F697 /* SRGPreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferences.m; sourceTree = "<group>"; };
 		6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesTestCase.m; sourceTree = "<group>"; };
+		6F6359FD2289AEC500E7F697 /* SRGPreferencesRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferencesRequest.h; sourceTree = "<group>"; };
+		6F6359FE2289AEC500E7F697 /* SRGPreferencesRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferencesRequest.m; sourceTree = "<group>"; };
 		6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylistEntry+Private.h"; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -735,6 +739,8 @@
 			children = (
 				6F6359F62289584600E7F697 /* SRGPreferences.h */,
 				6F6359F72289584600E7F697 /* SRGPreferences.m */,
+				6F6359FD2289AEC500E7F697 /* SRGPreferencesRequest.h */,
+				6F6359FE2289AEC500E7F697 /* SRGPreferencesRequest.m */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
@@ -896,6 +902,7 @@
 			files = (
 				6FFB347C2209759000E76E6D /* SRGUserDataService.h in Headers */,
 				6FFB347122089A5E00E76E6D /* SRGHistory.h in Headers */,
+				6F6359FF2289AEC500E7F697 /* SRGPreferencesRequest.h in Headers */,
 				6F0178AF22080FEC00B4BCD9 /* SRGHistoryEntry.h in Headers */,
 				6FA9ADFF222C4944007446BD /* SRGUserDataError.h in Headers */,
 				6F0178B122080FEC00B4BCD9 /* SRGUser.h in Headers */,
@@ -1161,6 +1168,7 @@
 				6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */,
 				6F6359F92289584600E7F697 /* SRGPreferences.m in Sources */,
 				6FC44DE7227349CC0022DC99 /* NSArray+SRGUserData.m in Sources */,
+				6F635A002289AEC500E7F697 /* SRGPreferencesRequest.m in Sources */,
 				6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */,
 				6F938025227C0CE600315A83 /* NSSet+SRGUserData.m in Sources */,
 				08C991A92254B97E003E7816 /* SRGPlaylistEntry.m in Sources */,
