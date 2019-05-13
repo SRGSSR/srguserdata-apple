@@ -28,7 +28,7 @@
     return self;
 }
 
-#pragma mark Getters and setters
+#pragma mark Preference management
 
 - (void)setObject:(id)object forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
 {
@@ -49,6 +49,32 @@
             }
             dictionary = dictionary[pathComponent];
         }
+    }
+}
+
+- (id)objectForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain withClass:(Class)cls
+{
+    NSString *fullKeyPath = [[domain stringByAppendingString:@"."] stringByAppendingString:keyPath];
+    id object = [self.dictionary valueForKeyPath:fullKeyPath];
+    return [object isKindOfClass:cls] ? object : nil;
+}
+
+- (void)removeObjectForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+{
+    NSArray<NSString *> *pathComponents = [@[domain] arrayByAddingObjectsFromArray:[keyPath componentsSeparatedByString:@"."]];
+    
+    NSMutableDictionary *dictionary = self.dictionary;
+    for (NSString *pathComponent in pathComponents) {
+        if (pathComponent == pathComponents.lastObject) {
+            [dictionary removeObjectForKey:pathComponent];
+        }
+        else {
+            id value = dictionary[pathComponent];
+            if (! [value isKindOfClass:NSDictionary.class]) {
+                return;
+            }
+        }
+        dictionary = dictionary[pathComponent];
     }
 }
 
@@ -100,13 +126,6 @@
 - (NSArray *)arrayForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
 {
     return [self objectForKeyPath:keyPath inDomain:domain withClass:NSArray.class];
-}
-
-- (id)objectForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain withClass:(Class)cls
-{
-    NSString *fullKeyPath = [[domain stringByAppendingString:@"."] stringByAppendingString:keyPath];
-    id object = [self.dictionary valueForKeyPath:fullKeyPath];
-    return [object isKindOfClass:cls] ? object : nil;
 }
 
 - (BOOL)boolForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain

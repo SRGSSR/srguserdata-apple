@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (float)floatForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
 - (double)doubleForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
 
+- (void)removeObjectForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
+
 @end
 
 NS_ASSUME_NONNULL_END
