@@ -4,6 +4,7 @@
 //  License information is available from the LICENSE file.
 //
 
+#import "SRGDataStore.h"
 #import "SRGUserDataService.h"
 
 #import <SRGIdentity/SRGIdentity.h>

@@ -14,6 +14,7 @@
 #import "SRGHistoryRequest.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataService+Private.h"
+#import "SRGUserDataService+Subclassing.h"
 #import "SRGUserObject+Private.h"
 #import "SRGUserObject+Subclassing.h"
 

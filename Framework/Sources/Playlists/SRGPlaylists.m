@@ -16,6 +16,7 @@
 #import "SRGUser+Private.h"
 #import "SRGUserDataError.h"
 #import "SRGUserDataService+Private.h"
+#import "SRGUserDataService+Subclassing.h"
 #import "SRGUserObject+Private.h"
 #import "SRGUserObject+Subclassing.h"
 

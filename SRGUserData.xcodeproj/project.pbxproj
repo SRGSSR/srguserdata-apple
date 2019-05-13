@@ -120,6 +120,7 @@
 		6F478B2B22818A6100CDC022 /* NSDateFormatter+Demo.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */; };
 		6F6359F82289584600E7F697 /* SRGPreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F6359F62289584600E7F697 /* SRGPreferences.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6F6359F92289584600E7F697 /* SRGPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359F72289584600E7F697 /* SRGPreferences.m */; };
+		6F6359FC2289896A00E7F697 /* PreferencesTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */; };
 		6F64BDF02274E19F00ED0DFE /* MigrationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FCCE4802212BFD600423EFF /* MigrationTestCase.m */; };
 		6F687FC62281FE9800E6AE2C /* SRGPlaylistEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
@@ -372,6 +373,7 @@
 		6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+Demo.m"; sourceTree = "<group>"; };
 		6F6359F62289584600E7F697 /* SRGPreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferences.h; sourceTree = "<group>"; };
 		6F6359F72289584600E7F697 /* SRGPreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferences.m; sourceTree = "<group>"; };
+		6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesTestCase.m; sourceTree = "<group>"; };
 		6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylistEntry+Private.h"; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -849,6 +851,7 @@
 				0850E2C822304999003BDCB8 /* UserDataTestCase.m */,
 				6FB19596221442BF00D3BF88 /* UserObjectTestCase.m */,
 				6F1747F52274855700CC9C39 /* PlaylistsSynchronizationTestCase.m */,
+				6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1209,6 +1212,7 @@
 				6FB19597221442BF00D3BF88 /* UserObjectTestCase.m in Sources */,
 				6F32342D2212E9B90046E265 /* TestData.xcdatamodeld in Sources */,
 				6F64BDF02274E19F00ED0DFE /* MigrationTestCase.m in Sources */,
+				6F6359FC2289896A00E7F697 /* PreferencesTestCase.m in Sources */,
 				08C9919D22538379003E7816 /* PlaylistsTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
