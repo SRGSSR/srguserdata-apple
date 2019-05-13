@@ -6,12 +6,20 @@
 
 #import "SRGPreferences.h"
 
+#import "SRGPreferenceChangeLogEntry.h"
+#import "SRGUser+Private.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserDataService+Subclassing.h"
+
+// TODO: - Thread-safety considerations
+//       - Serialize change log entries as well
+//       - Delete each log entry consumed during sync
+//       - Should coalesce operations by keypath / domain (only the last one in the changelog must be kept)
 
 @interface SRGPreferences ()
 
 @property (nonatomic) NSMutableDictionary *dictionary;
+@property (nonatomic) NSMutableArray<SRGPreferenceChangeLogEntry *> *changeLogEntries;
 
 @end
 
@@ -23,6 +31,7 @@
 {
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
         self.dictionary = [self dictionaryFromFile] ?: [NSMutableDictionary dictionary];
+        self.changeLogEntries = [NSMutableArray array];
     }
     return self;
 }
@@ -80,6 +89,15 @@
         }
     }
     [self saveFileFromDictionary:self.dictionary];
+    
+    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGUser userInManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
+        if (user.accountUid) {
+            SRGPreferenceChangeLogEntry *entry = [SRGPreferenceChangeLogEntry changeLogEntryForUpsertAtKeyPath:keyPath inDomain:domain withObject:object];
+            [self.changeLogEntries addObject:entry];
+        }
+    }];
 }
 
 - (id)objectForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain withClass:(Class)cls
@@ -107,6 +125,15 @@
         dictionary = dictionary[pathComponent];
     }
     [self saveFileFromDictionary:self.dictionary];
+    
+    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGUser userInManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
+        if (user.accountUid) {
+            SRGPreferenceChangeLogEntry *entry = [SRGPreferenceChangeLogEntry changeLogEntryForDeleteAtKeyPath:keyPath inDomain:domain];
+            [self.changeLogEntries addObject:entry];
+        }
+    }];
 }
 
 - (void)setString:(NSString *)string forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
