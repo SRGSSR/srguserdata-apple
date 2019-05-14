@@ -55,7 +55,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 - (void)saveFileFromDictionary:(NSDictionary *)dictionary
 {
     NSURL *folderURL = self.dataStore.persistentContainer.srg_fileURL.URLByDeletingPathExtension;
-    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.absoluteString]) {
+    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.path]) {
         [NSFileManager.defaultManager createDirectoryAtURL:folderURL withIntermediateDirectories:YES attributes:nil error:NULL];
     }
     
@@ -67,12 +67,12 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 - (NSMutableDictionary *)dictionaryFromFile
 {
     NSURL *folderURL = self.dataStore.persistentContainer.srg_fileURL.URLByDeletingPathExtension;
-    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.absoluteString]) {
+    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.path]) {
         return nil;
     }
     
     NSURL *fileURL = [folderURL URLByAppendingPathComponent:@"preferences.json"];
-    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.absoluteString]) {
+    if (! [NSFileManager.defaultManager fileExistsAtPath:fileURL.path]) {
         return nil;
     }
     
@@ -240,12 +240,12 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 - (void)clearData
 {
     NSURL *folderURL = self.dataStore.persistentContainer.srg_fileURL.URLByDeletingPathExtension;
-    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.absoluteString]) {
+    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.path]) {
         return;
     }
     
     NSURL *fileURL = [folderURL URLByAppendingPathComponent:@"preferences.json"];
-    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.absoluteString]) {
+    if (! [NSFileManager.defaultManager fileExistsAtPath:fileURL.path]) {
         return;
     }
     
