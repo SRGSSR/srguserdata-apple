@@ -4,12 +4,13 @@
 //  License information is available from the LICENSE file.
 //
 
+#import "UserDataViewController.h"
+
 #import <SRGUserData/SRGUserData.h>
-#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PlaylistViewController : UITableViewController
+@interface PlaylistViewController : UserDataViewController
 
 - (instancetype)initWithPlaylist:(SRGPlaylist *)playlist;
 

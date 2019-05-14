@@ -6,7 +6,6 @@
 
 #import "PreferencesViewController.h"
 
-#import "NSDateFormatter+Demo.h"
 #import "SRGUserData_demo-Swift.h"
 
 #import <SRGIdentity/SRGIdentity.h>
@@ -30,8 +29,6 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 @property (nonatomic) NSArray *keys;
 @property (nonatomic) NSDictionary *dictionary;
-
-@property (nonatomic, getter=isRefreshTriggered) BOOL refreshTriggered;
 
 @end
 
@@ -61,64 +58,9 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 {
     [super viewDidLoad];
     
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    self.refreshControl = refreshControl;
-    
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didLogin:)
-                                               name:SRGIdentityServiceUserDidLoginNotification
-                                             object:SRGIdentityService.currentIdentityService];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didLogout:)
-                                               name:SRGIdentityServiceUserDidLogoutNotification
-                                             object:SRGIdentityService.currentIdentityService];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didUpdateAccount:)
-                                               name:SRGIdentityServiceDidUpdateAccountNotification
-                                             object:SRGIdentityService.currentIdentityService];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didFinishSynchronization:)
-                                               name:SRGUserDataDidFinishSynchronizationNotification
-                                             object:SRGUserData.currentUserData];
-    
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(addPreference:)];
-    
-    [self updateNavigationBar];
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    [self refresh];
-}
-
-#pragma mark UI
-
-- (void)updateNavigationBar
-{
-    if (self.navigationController.viewControllers.firstObject == self) {
-        if (! SRGIdentityService.currentIdentityService.loggedIn) {
-            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Login", nil)
-                                                                                     style:UIBarButtonItemStylePlain
-                                                                                    target:self
-                                                                                    action:@selector(login:)];
-        }
-        else {
-            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
-                                                                                     style:UIBarButtonItemStylePlain
-                                                                                    target:self
-                                                                                    action:@selector(showAccount:)];
-        }
-    }
-}
-
-- (void)updateTitleSectionHeader
-{
-    [self.tableView reloadData];
 }
 
 #pragma mark Data
@@ -131,16 +73,6 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
     [self.tableView reloadDataAnimatedWithOldObjects:self.keys newObjects:keys section:0 updateData:^{
         self.keys = keys;
     }];
-}
-
-#pragma mark UIScrollViewDelegate protocol
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-    if (self.refreshTriggered) {
-        [self refresh];
-        self.refreshTriggered = NO;
-    }
 }
 
 #pragma mark UITableViewDataSourceProtocol
@@ -159,18 +91,6 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:kCellIdentifier];
     }
     return cell;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    if (SRGIdentityService.currentIdentityService.loggedIn) {
-        NSDate *synchronizationDate = SRGUserData.currentUserData.user.synchronizationDate;
-        NSString *synchronizationDateString = synchronizationDate ? [NSDateFormatter.demo_relativeDateAndTimeFormatter stringFromDate:synchronizationDate] : NSLocalizedString(@"Never", nil);
-        return [NSString stringWithFormat:NSLocalizedString(@"Last synchronization: %@", nil), synchronizationDateString];
-    }
-    else {
-        return nil;
-    }
 }
 
 #pragma mark UITableViewDelegate protocol
@@ -210,7 +130,24 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
     NSString *key = self.keys[indexPath.row];
     
     id value = self.dictionary[key];
+    
     if ([value isKindOfClass:NSString.class]) {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Edit string", nil)
+                                                                                 message:nil
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            textField.placeholder = NSLocalizedString(@"Value", nil);
+        }];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            NSString *string = [alertController.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+            
+            NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
+            [SRGUserData.currentUserData.preferences setString:string atPath:subpath inDomain:self.domain];
+        }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+    else if ([value isKindOfClass:NSNumber.class]) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Edit number", nil)
                                                                                  message:nil
                                                                           preferredStyle:UIAlertControllerStyleAlert];
@@ -224,22 +161,6 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
             
             NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
             [SRGUserData.currentUserData.preferences setNumber:number atPath:subpath inDomain:self.domain];
-        }]];
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
-    else if ([value isKindOfClass:NSNumber.class]) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Edit string", nil)
-                                                                                 message:nil
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-            textField.placeholder = NSLocalizedString(@"Value", nil);
-        }];
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            NSString *string = [alertController.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-            
-            NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
-            [SRGUserData.currentUserData.preferences setString:string atPath:subpath inDomain:self.domain];
         }]];
         [self presentViewController:alertController animated:YES completion:nil];
     }
@@ -265,24 +186,6 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 }
 
 #pragma mark Actions
-
-- (void)login:(id)sender
-{
-    [SRGIdentityService.currentIdentityService loginWithEmailAddress:nil];
-}
-
-- (void)showAccount:(id)sender
-{
-    [SRGIdentityService.currentIdentityService showAccountView];
-}
-
-- (void)refresh:(id)sender
-{
-    if (self.refreshControl.refreshing) {
-        [self.refreshControl endRefreshing];
-    }
-    self.refreshTriggered = YES;
-}
 
 - (void)addPreference:(id)sender
 {
@@ -353,29 +256,6 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
     }]];
     [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alertController1 animated:YES completion:nil];
-}
-
-#pragma mark Notifications
-
-- (void)didLogin:(NSNotification *)notification
-{
-    [self updateTitleSectionHeader];
-    [self updateNavigationBar];
-}
-
-- (void)didLogout:(NSNotification *)notification
-{
-    [self updateTitleSectionHeader];
-}
-
-- (void)didUpdateAccount:(NSNotification *)notification
-{
-    [self updateNavigationBar];
-}
-
-- (void)didFinishSynchronization:(NSNotification *)notification
-{
-    [self updateTitleSectionHeader];
 }
 
 @end

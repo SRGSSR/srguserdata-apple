@@ -1,31 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PjS-fw-ycR">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="lBW-6i-kt3">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Preferences View Controller-->
-        <scene sceneID="3d6-vh-lyp">
+        <scene sceneID="hCJ-DD-iCO">
             <objects>
-                <tableViewController id="PjS-fw-ycR" customClass="PreferencesViewController" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="oOf-Oq-gpJ">
+                <viewController id="lBW-6i-kt3" customClass="PreferencesViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="YvL-da-bQN">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="YVA-kd-UYO">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <connections>
-                            <outlet property="dataSource" destination="PjS-fw-ycR" id="zEo-2v-JYA"/>
-                            <outlet property="delegate" destination="PjS-fw-ycR" id="8qm-vA-L8c"/>
-                        </connections>
-                    </tableView>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="AQF-Lj-Jzd" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="YVA-kd-UYO" secondAttribute="bottom" id="86h-Nc-p4F"/>
+                            <constraint firstItem="YVA-kd-UYO" firstAttribute="top" secondItem="YvL-da-bQN" secondAttribute="top" constant="20" id="UCh-P2-hxf"/>
+                            <constraint firstAttribute="trailing" secondItem="YVA-kd-UYO" secondAttribute="trailing" id="eOZ-hy-b15"/>
+                            <constraint firstItem="YVA-kd-UYO" firstAttribute="leading" secondItem="YvL-da-bQN" secondAttribute="leading" id="tQW-9q-Fmf"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="O3A-mC-B3m"/>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="YVA-kd-UYO" id="Rme-w7-jQw"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="h2P-kK-cyi" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="31" y="-368"/>
+            <point key="canvasLocation" x="-778" y="-718"/>
         </scene>
     </scenes>
 </document>

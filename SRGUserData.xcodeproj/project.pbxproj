@@ -120,6 +120,8 @@
 		6F478B2B22818A6100CDC022 /* NSDateFormatter+Demo.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */; };
 		6F5C6365228AAF190001CC4C /* PreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C6364228AAF190001CC4C /* PreferencesViewController.m */; };
 		6F5C6367228AAF2A0001CC4C /* PreferencesViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F5C6366228AAF2A0001CC4C /* PreferencesViewController.storyboard */; };
+		6F5C638D228B3DD70001CC4C /* DataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C638B228B3DD70001CC4C /* DataViewController.m */; };
+		6F5C6392228B3DE90001CC4C /* UserDataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C6390228B3DE90001CC4C /* UserDataViewController.m */; };
 		6F6359F82289584600E7F697 /* SRGPreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F6359F62289584600E7F697 /* SRGPreferences.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6F6359F92289584600E7F697 /* SRGPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359F72289584600E7F697 /* SRGPreferences.m */; };
 		6F6359FC2289896A00E7F697 /* PreferencesTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */; };
@@ -380,6 +382,10 @@
 		6F5C6363228AAF190001CC4C /* PreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesViewController.h; sourceTree = "<group>"; };
 		6F5C6364228AAF190001CC4C /* PreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesViewController.m; sourceTree = "<group>"; };
 		6F5C6366228AAF2A0001CC4C /* PreferencesViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PreferencesViewController.storyboard; sourceTree = "<group>"; };
+		6F5C638A228B3DD70001CC4C /* DataViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataViewController.h; sourceTree = "<group>"; };
+		6F5C638B228B3DD70001CC4C /* DataViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DataViewController.m; sourceTree = "<group>"; };
+		6F5C638F228B3DE90001CC4C /* UserDataViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserDataViewController.h; sourceTree = "<group>"; };
+		6F5C6390228B3DE90001CC4C /* UserDataViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserDataViewController.m; sourceTree = "<group>"; };
 		6F6359F62289584600E7F697 /* SRGPreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferences.h; sourceTree = "<group>"; };
 		6F6359F72289584600E7F697 /* SRGPreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferences.m; sourceTree = "<group>"; };
 		6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesTestCase.m; sourceTree = "<group>"; };
@@ -735,10 +741,14 @@
 		6F478B28228189CD00CDC022 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				6F5C638A228B3DD70001CC4C /* DataViewController.h */,
+				6F5C638B228B3DD70001CC4C /* DataViewController.m */,
 				6F478B2922818A6100CDC022 /* NSDateFormatter+Demo.h */,
 				6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */,
 				080491812284BFA200E4CEC2 /* PlayerPlaylist.h */,
 				080491802284BFA200E4CEC2 /* PlayerPlaylist.m */,
+				6F5C638F228B3DE90001CC4C /* UserDataViewController.h */,
+				6F5C6390228B3DE90001CC4C /* UserDataViewController.m */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1222,6 +1232,7 @@
 				6F8A93FE20FDCAA800AA6434 /* AppDelegate.m in Sources */,
 				6F8A93FD20FDCAA800AA6434 /* main.m in Sources */,
 				6F17A496228499DA001C4CC2 /* DeepDiffBridge.swift in Sources */,
+				6F5C638D228B3DD70001CC4C /* DataViewController.m in Sources */,
 				086320EF2257FDB300C719A6 /* PlaylistViewController.m in Sources */,
 				086320E92257F05200C719A6 /* PlaylistsViewController.m in Sources */,
 				6F41C9772216A9C1003F434A /* HistoryViewController.m in Sources */,
@@ -1229,6 +1240,7 @@
 				6F41C97C2216AA0D003F434A /* MediasViewController.m in Sources */,
 				6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */,
 				080491822284BFA200E4CEC2 /* PlayerPlaylist.m in Sources */,
+				6F5C6392228B3DE90001CC4C /* UserDataViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

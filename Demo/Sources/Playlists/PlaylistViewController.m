@@ -6,7 +6,6 @@
 
 #import "PlaylistViewController.h"
 
-#import "NSDateFormatter+Demo.h"
 #import "PlayerViewController.h"
 #import "SRGUserData_demo-Swift.h"
 
@@ -16,11 +15,9 @@
 @interface PlaylistViewController ()
 
 @property (nonatomic) SRGPlaylist *playlist;
-
 @property (nonatomic) NSArray<SRGMedia *> *medias;
 
 @property (nonatomic, weak) SRGBaseRequest *request;
-@property (nonatomic, getter=isRefreshTriggered) BOOL refreshTriggered;
 
 @end
 
@@ -30,16 +27,16 @@
 
 - (instancetype)initWithPlaylist:(SRGPlaylist *)playlist
 {
-    if (self = [super init]) {
-        self.playlist = playlist;
-    }
-    return self;
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
+    PlaylistViewController *viewController = [storyboard instantiateInitialViewController];
+    viewController.playlist = playlist;
+    return viewController;
 }
 
 - (instancetype)init
 {
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
-    return [storyboard instantiateInitialViewController];
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 #pragma mark View lifecycle
@@ -48,22 +45,10 @@
 {
     [super viewDidLoad];
     
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    self.refreshControl = refreshControl;
-    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(playlistEntriesDidChange:)
                                                name:SRGPlaylistEntriesDidChangeNotification
                                              object:SRGUserData.currentUserData.playlists];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didLogout:)
-                                               name:SRGIdentityServiceUserDidLogoutNotification
-                                             object:SRGIdentityService.currentIdentityService];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didFinishSynchronization:)
-                                               name:SRGUserDataDidFinishSynchronizationNotification
-                                             object:SRGUserData.currentUserData];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
     
@@ -73,30 +58,24 @@
                                                                                                action:@selector(updatePlaylist:)];
     }
     
-    [self reloadData];
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    [self refresh];
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [super viewWillDisappear:animated];
-    
-    if (self.movingFromParentViewController || self.beingDismissed) {
-        [self.request cancel];
-    }
+    [self reloadTitle];
 }
 
 #pragma mark Data
 
+- (void)reloadTitle
+{
+    NSString *title = self.playlist.name;
+    self.title = title;
+}
+
+#pragma mark Subclassing hooks
+
 - (void)refresh
 {
-    [self.request cancel];
+    if (self.request.running) {
+        return;
+    }
     
     BOOL ascending = ! [self.playlist.uid isEqualToString:SRGPlaylistUidWatchLater];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylistEntry.new, date) ascending:ascending];
@@ -120,20 +99,9 @@
     }];
 }
 
-- (void)reloadData
+- (void)cancelRefresh
 {
-    NSString *title = self.playlist.name;
-    self.title = title;
-}
-
-#pragma mark UIScrollViewDelegate protocol
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-    if (self.refreshTriggered) {
-        [self refresh];
-        self.refreshTriggered = YES;
-    }
+    [self.request cancel];
 }
 
 #pragma mark UITableViewDataSource protocol
@@ -146,18 +114,6 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return [tableView dequeueReusableCellWithIdentifier:@"MediaCell"];
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    if (SRGIdentityService.currentIdentityService.loggedIn) {
-        NSDate *synchronizationDate = SRGUserData.currentUserData.user.synchronizationDate;
-        NSString *synchronizationDateString = synchronizationDate ? [NSDateFormatter.demo_relativeDateAndTimeFormatter stringFromDate:synchronizationDate] : NSLocalizedString(@"Never", nil);
-        return [NSString stringWithFormat:NSLocalizedString(@"Last synchronization: %@", nil), synchronizationDateString];
-    }
-    else {
-        return nil;
-    }
 }
 
 #pragma mark UITableViewDelegate protocol
@@ -194,14 +150,6 @@
 
 #pragma mark Actions
 
-- (void)refresh:(id)sender
-{
-    if (self.refreshControl.refreshing) {
-        [self.refreshControl endRefreshing];
-    }
-    self.refreshTriggered = NO;
-}
-
 - (void)updatePlaylist:(id)sender
 {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Update playlist name", nil)
@@ -219,7 +167,7 @@
             [SRGUserData.currentUserData.playlists savePlaylistWithName:name uid:self.playlist.uid completionBlock:^(NSString * _Nullable uid, NSError * _Nullable error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (! error) {
-                        [self reloadData];
+                        [self reloadTitle];
                     }
                 });
             }];
@@ -233,16 +181,6 @@
 - (void)playlistEntriesDidChange:(NSNotification *)notification
 {
     [self refresh];
-}
-
-- (void)didLogout:(NSNotification *)notification
-{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-}
-
-- (void)didFinishSynchronization:(NSNotification *)notification
-{
-    [self.tableView reloadData];
 }
 
 @end

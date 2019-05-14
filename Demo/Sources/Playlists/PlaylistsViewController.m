@@ -6,7 +6,6 @@
 
 #import "PlaylistsViewController.h"
 
-#import "NSDateFormatter+Demo.h"
 #import "PlayerViewController.h"
 #import "PlaylistViewController.h"
 #import "SRGUserData_demo-Swift.h"
@@ -17,8 +16,6 @@
 @interface PlaylistsViewController ()
 
 @property (nonatomic) NSArray<SRGPlaylist *> *playlists;
-
-@property (nonatomic, getter=isRefreshTriggered) BOOL refreshTriggered;
 
 @end
 
@@ -45,71 +42,19 @@
 {
     [super viewDidLoad];
     
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    self.refreshControl = refreshControl;
-    
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didLogin:)
-                                               name:SRGIdentityServiceUserDidLoginNotification
-                                             object:SRGIdentityService.currentIdentityService];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didLogout:)
-                                               name:SRGIdentityServiceUserDidLogoutNotification
-                                             object:SRGIdentityService.currentIdentityService];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didUpdateAccount:)
-                                               name:SRGIdentityServiceDidUpdateAccountNotification
-                                             object:SRGIdentityService.currentIdentityService];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(playlistsDidChange:)
                                                name:SRGPlaylistsDidChangeNotification
                                              object:SRGUserData.currentUserData.playlists];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didFinishSynchronization:)
-                                               name:SRGUserDataDidFinishSynchronizationNotification
-                                             object:SRGUserData.currentUserData];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"PlaylistCell"];
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(addPlaylist:)];
-    
-    [self updateNavigationBar];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    [self refresh];
-}
-
-#pragma mark UI
-
-- (void)updateNavigationBar
-{
-    if (! SRGIdentityService.currentIdentityService.loggedIn) {
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Login", nil)
-                                                                                 style:UIBarButtonItemStylePlain
-                                                                                target:self
-                                                                                action:@selector(login:)];
-    }
-    else {
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
-                                                                                 style:UIBarButtonItemStylePlain
-                                                                                target:self
-                                                                                action:@selector(showAccount:)];
-    }
-}
-
-- (void)updateTitleSectionHeader
-{
-    [self.tableView reloadData];
-}
-
-#pragma mark Data
+#pragma mark Subclassing hooks
 
 - (void)refresh
 {
@@ -122,16 +67,6 @@
     }];
 }
 
-#pragma mark UIScrollViewDelegate protocol
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-    if (self.refreshTriggered) {
-        [self refresh];
-        self.refreshTriggered = NO;
-    }
-}
-
 #pragma mark UITableViewDataSource protocol
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -142,18 +77,6 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return [tableView dequeueReusableCellWithIdentifier:@"PlaylistCell"];
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    if (SRGIdentityService.currentIdentityService.loggedIn) {
-        NSDate *synchronizationDate = SRGUserData.currentUserData.user.synchronizationDate;
-        NSString *synchronizationDateString = synchronizationDate ? [NSDateFormatter.demo_relativeDateAndTimeFormatter stringFromDate:synchronizationDate] : NSLocalizedString(@"Never", nil);
-        return [NSString stringWithFormat:NSLocalizedString(@"Last synchronization: %@", nil), synchronizationDateString];
-    }
-    else {
-        return nil;
-    }
 }
 
 #pragma mark UITableViewDelegate protocol
@@ -221,50 +144,11 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)login:(id)sender
-{
-    [SRGIdentityService.currentIdentityService loginWithEmailAddress:nil];
-}
-
-- (void)showAccount:(id)sender
-{
-    [SRGIdentityService.currentIdentityService showAccountView];
-}
-
-- (void)refresh:(id)sender
-{
-    if (self.refreshControl.refreshing) {
-        [self.refreshControl endRefreshing];
-    }
-    self.refreshTriggered = YES;
-}
-
 #pragma mark Notifications
-
-- (void)didLogin:(NSNotification *)notification
-{
-    [self updateTitleSectionHeader];
-    [self updateNavigationBar];
-}
-
-- (void)didLogout:(NSNotification *)notification
-{
-    [self updateTitleSectionHeader];
-}
-
-- (void)didUpdateAccount:(NSNotification *)notification
-{
-    [self updateNavigationBar];
-}
 
 - (void)playlistsDidChange:(NSNotification *)notification
 {
     [self refresh];
-}
-
-- (void)didFinishSynchronization:(NSNotification *)notification
-{
-    [self updateTitleSectionHeader];
 }
 
 @end

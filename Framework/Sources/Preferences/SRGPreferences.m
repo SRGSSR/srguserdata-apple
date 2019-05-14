@@ -200,7 +200,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 
 - (void)setDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:dictionary atPath:path inDomain:domain];
+    [self setObject:[dictionary mutableCopy] atPath:path inDomain:domain];
 }
 
 - (NSString *)stringAtPath:(NSString *)path inDomain:(NSString *)domain

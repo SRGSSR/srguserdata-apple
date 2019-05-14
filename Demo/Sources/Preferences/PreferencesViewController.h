@@ -4,11 +4,11 @@
 //  License information is available from the LICENSE file.
 //
 
-#import <UIKit/UIKit.h>
+#import "UserDataViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PreferencesViewController : UITableViewController
+@interface PreferencesViewController : UserDataViewController
 
 - (instancetype)initWithPath:(nullable NSString *)path inDomain:(NSString *)domain;
 
