@@ -7,6 +7,7 @@
 #import "PreferencesViewController.h"
 
 #import "NSDateFormatter+Demo.h"
+#import "SRGUserData_demo-Swift.h"
 
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGUserData/SRGUserData.h>
@@ -15,6 +16,9 @@
 
 @property (nonatomic, copy) NSString *keyPath;
 @property (nonatomic, copy) NSString *domain;
+
+@property (nonatomic) NSArray *keys;
+@property (nonatomic) NSDictionary *dictionary;
 
 @end
 
@@ -74,7 +78,7 @@
 {
     [super viewWillAppear:animated];
     
-    [self.tableView reloadData];
+    [self refresh];
 }
 
 #pragma mark UI
@@ -100,12 +104,27 @@
     [self.tableView reloadData];
 }
 
+#pragma mark Data
+
+- (void)refresh
+{
+    if (self.refreshControl.refreshing) {
+        [self.refreshControl endRefreshing];
+    }
+    
+    self.dictionary = [SRGUserData.currentUserData.preferences dictionaryForKeyPath:self.keyPath inDomain:self.domain];
+    
+    NSArray<NSString *> *keys = [self.dictionary.allKeys sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    [self.tableView reloadDataAnimatedWithOldObjects:self.keys newObjects:keys section:0 updateData:^{
+        self.keys = keys;
+    }];
+}
 
 #pragma mark UITableViewDataSourceProtocol
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 0;
+    return self.keys.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -129,7 +148,7 @@
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
+    cell.textLabel.text = self.keys[indexPath.row];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -165,8 +184,7 @@
 
 - (void)refresh:(id)sender
 {
-    [self.tableView reloadData];
-    [self.refreshControl endRefreshing];
+    [self refresh];
 }
 
 #pragma mark Notifications

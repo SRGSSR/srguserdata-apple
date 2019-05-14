@@ -11,6 +11,20 @@
 #import "SRGUserDataService+Private.h"
 #import "SRGUserDataService+Subclassing.h"
 
+static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
+{
+    NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionary];
+    [dictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull object, BOOL * _Nonnull stop) {
+        if ([object isKindOfClass:NSMutableDictionary.class]) {
+            mutableDictionary[key] = [object copy];
+        }
+        else {
+            mutableDictionary[key] = object;
+        }
+    }];
+    return [mutableDictionary copy];
+}
+
 // TODO: - Thread-safety considerations
 //       - Serialize change log entries as well
 //       - Delete each log entry consumed during sync
@@ -102,7 +116,7 @@
 
 - (id)objectForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain withClass:(Class)cls
 {
-    NSString *fullKeyPath = [[domain stringByAppendingString:@"."] stringByAppendingString:keyPath];
+    NSString *fullKeyPath = keyPath ? [[domain stringByAppendingString:@"."] stringByAppendingString:keyPath] : domain;
     id object = [self.dictionary valueForKeyPath:fullKeyPath];
     return [object isKindOfClass:cls] ? object : nil;
 }
@@ -134,6 +148,11 @@
             [self.changeLogEntries addObject:entry];
         }
     }];
+}
+
+- (NSDictionary *)dictionaryForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+{
+    return SRGDictionaryMakeImmutable([self objectForKeyPath:keyPath inDomain:domain withClass:NSDictionary.class]);
 }
 
 - (void)setString:(NSString *)string forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
@@ -233,6 +252,16 @@
     [NSFileManager.defaultManager removeItemAtURL:fileURL error:NULL];
     
     [self.dictionary removeAllObjects];
+}
+
+#pragma mark Description
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; dictionary = %@>",
+            [self class],
+            self,
+            self.dictionary];
 }
 
 @end
