@@ -71,6 +71,10 @@
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"PreferenceCell"];
     
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                                                                           target:self
+                                                                                           action:@selector(addPreference:)];
+    
     [self updateNavigationBar];
 }
 
@@ -185,6 +189,28 @@
 - (void)refresh:(id)sender
 {
     [self refresh];
+}
+
+- (void)addPreference:(id)sender
+{
+    NSString *keyPath = [self.keyPath stringByAppendingString:NSUUID.UUID.UUIDString] ?: NSUUID.UUID.UUIDString;
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add setting", nil)
+                                                                             message:nil
+                                                                      preferredStyle:UIAlertControllerStyleActionSheet];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"String", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSInteger random = arc4random() % 1000;
+        [SRGUserData.currentUserData.preferences setString:@(random).stringValue forKeyPath:keyPath inDomain:self.domain];
+    }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Number", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSInteger random = arc4random() % 1000;
+        [SRGUserData.currentUserData.preferences setNumber:@(random) forKeyPath:keyPath inDomain:self.domain];
+    }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Level", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        // TODO:
+    }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 #pragma mark Notifications
