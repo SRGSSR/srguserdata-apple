@@ -199,14 +199,56 @@
                                                                              message:nil
                                                                       preferredStyle:UIAlertControllerStyleActionSheet];
     [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"String", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        NSString *keyPath = [self.keyPath stringByAppendingString:NSUUID.UUID.UUIDString] ?: NSUUID.UUID.UUIDString;
-        NSInteger random = arc4random() % 1000;
-        [SRGUserData.currentUserData.preferences setString:@(random).stringValue forKeyPath:keyPath inDomain:self.domain];
+        UIAlertController *alertController2 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add number", nil)
+                                                                                  message:nil
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            textField.placeholder = NSLocalizedString(@"Name", nil);
+        }];
+        [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            textField.placeholder = NSLocalizedString(@"Value", nil);
+        }];
+        [alertController2 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+        [alertController2 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            NSString *name = [alertController2.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+            if (name.length != 0) {
+                NSString *keyPath = [self.keyPath stringByAppendingString:name] ?: name;
+                NSString *value = [alertController2.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+                [SRGUserData.currentUserData.preferences setString:value forKeyPath:keyPath inDomain:self.domain];
+            }
+        }]];
+        [self presentViewController:alertController2 animated:YES completion:nil];
     }]];
     [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Number", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        NSString *keyPath = [self.keyPath stringByAppendingString:NSUUID.UUID.UUIDString] ?: NSUUID.UUID.UUIDString;
-        NSInteger random = arc4random() % 1000;
-        [SRGUserData.currentUserData.preferences setNumber:@(random) forKeyPath:keyPath inDomain:self.domain];
+        UIAlertController *alertController2 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add number", nil)
+                                                                                  message:nil
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            textField.placeholder = NSLocalizedString(@"Name", nil);
+        }];
+        [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            textField.placeholder = NSLocalizedString(@"Value", nil);
+            textField.keyboardType = UIKeyboardTypeNumberPad;
+        }];
+        [alertController2 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+        [alertController2 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            NSString *name = [alertController2.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+            if (name.length != 0) {
+                static dispatch_once_t s_onceToken;
+                static NSNumberFormatter *s_numberFormatter;
+                dispatch_once(&s_onceToken, ^{
+                    s_numberFormatter = [[NSNumberFormatter alloc] init];
+                    s_numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+                });
+                
+                NSString *value = [alertController2.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+                NSNumber *number = [s_numberFormatter numberFromString:value];
+                
+                NSString *keyPath = [self.keyPath stringByAppendingString:name] ?: name;
+                [SRGUserData.currentUserData.preferences setNumber:number forKeyPath:keyPath inDomain:self.domain];
+            }
+        }]];
+        [self presentViewController:alertController2 animated:YES completion:nil];
     }]];
     [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Level", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         UIAlertController *alertController2 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add setting level", nil)

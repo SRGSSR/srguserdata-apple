@@ -30,6 +30,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 //       - Delete each log entry consumed during sync
 //       - Should coalesce operations by keypath / domain (only the last one in the changelog must be kept)
 //       - Prevent keys with length = 0
+//       - Support nullable in setters. Remove methods with primitive types
 
 @interface SRGPreferences ()
 
