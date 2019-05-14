@@ -20,6 +20,7 @@
 @property (nonatomic) NSArray<SRGMedia *> *medias;
 
 @property (nonatomic, weak) SRGBaseRequest *request;
+@property (nonatomic, getter=isRefreshTriggered) BOOL refreshTriggered;
 
 @end
 
@@ -129,10 +130,6 @@
         
         NSArray<NSString *> *mediaURNs = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
         SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:mediaURNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-            if (self.refreshControl.refreshing) {
-                [self.refreshControl endRefreshing];
-            }
-            
             if (error) {
                 return;
             }
@@ -144,6 +141,16 @@
         [request resume];
         self.request = request;;
     }];
+}
+
+#pragma mark UIScrollViewDelegate protocol
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if (self.refreshTriggered) {
+        [self refresh];
+        self.refreshTriggered = YES;
+    }
 }
 
 #pragma mark UITableViewDataSource protocol
@@ -215,7 +222,10 @@
 
 - (void)refresh:(id)sender
 {
-    [self refresh];
+    if (self.refreshControl.refreshing) {
+        [self.refreshControl endRefreshing];
+    }
+    self.refreshTriggered = NO;
 }
 
 #pragma mark Notifications

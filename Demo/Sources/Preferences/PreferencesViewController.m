@@ -31,6 +31,8 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 @property (nonatomic) NSArray *keys;
 @property (nonatomic) NSDictionary *dictionary;
 
+@property (nonatomic, getter=isRefreshTriggered) BOOL refreshTriggered;
+
 @end
 
 @implementation PreferencesViewController
@@ -123,16 +125,22 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 - (void)refresh
 {
-    if (self.refreshControl.refreshing) {
-        [self.refreshControl endRefreshing];
-    }
-    
     self.dictionary = [SRGUserData.currentUserData.preferences dictionaryAtPath:self.path inDomain:self.domain];
     
     NSArray<NSString *> *keys = [self.dictionary.allKeys sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
     [self.tableView reloadDataAnimatedWithOldObjects:self.keys newObjects:keys section:0 updateData:^{
         self.keys = keys;
     }];
+}
+
+#pragma mark UIScrollViewDelegate protocol
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if (self.refreshTriggered) {
+        [self refresh];
+        self.refreshTriggered = NO;
+    }
 }
 
 #pragma mark UITableViewDataSourceProtocol
@@ -270,7 +278,10 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 - (void)refresh:(id)sender
 {
-    [self refresh];
+    if (self.refreshControl.refreshing) {
+        [self.refreshControl endRefreshing];
+    }
+    self.refreshTriggered = YES;
 }
 
 - (void)addPreference:(id)sender

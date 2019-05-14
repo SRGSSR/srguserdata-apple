@@ -18,6 +18,8 @@
 
 @property (nonatomic) NSArray<SRGPlaylist *> *playlists;
 
+@property (nonatomic, getter=isRefreshTriggered) BOOL refreshTriggered;
+
 @end
 
 @implementation PlaylistsViewController
@@ -111,10 +113,6 @@
 
 - (void)refresh
 {
-    if (self.refreshControl.refreshing) {
-        [self.refreshControl endRefreshing];
-    }
-    
     NSSortDescriptor *typeSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, type) ascending:NO];
     NSSortDescriptor *nameSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, name) ascending:YES];
     NSArray<SRGPlaylist *> *playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:@[typeSortDescriptor, nameSortDescriptor]];
@@ -122,6 +120,16 @@
     [self.tableView reloadDataAnimatedWithOldObjects:self.playlists newObjects:playlists section:0 updateData:^{
         self.playlists = playlists;
     }];
+}
+
+#pragma mark UIScrollViewDelegate protocol
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if (self.refreshTriggered) {
+        [self refresh];
+        self.refreshTriggered = NO;
+    }
 }
 
 #pragma mark UITableViewDataSource protocol
@@ -225,7 +233,10 @@
 
 - (void)refresh:(id)sender
 {
-    [self refresh];
+    if (self.refreshControl.refreshing) {
+        [self.refreshControl endRefreshing];
+    }
+    self.refreshTriggered = YES;
 }
 
 #pragma mark Notifications
