@@ -29,6 +29,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 //       - Serialize change log entries as well
 //       - Delete each log entry consumed during sync
 //       - Should coalesce operations by keypath / domain (only the last one in the changelog must be kept)
+//       - Prevent keys with length = 0
 
 @interface SRGPreferences ()
 
@@ -150,11 +151,6 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     }];
 }
 
-- (NSDictionary *)dictionaryForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
-{
-    return SRGDictionaryMakeImmutable([self objectForKeyPath:keyPath inDomain:domain withClass:NSDictionary.class]);
-}
-
 - (void)setString:(NSString *)string forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
 {
     [self setObject:string forKeyPath:keyPath inDomain:domain];
@@ -168,6 +164,11 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 - (void)setArray:(NSArray *)array forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
 {
     [self setObject:array forKeyPath:keyPath inDomain:domain];
+}
+
+- (void)setDictionary:(NSDictionary *)dictionary forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+{
+    [self setObject:dictionary forKeyPath:keyPath inDomain:domain];
 }
 
 - (void)setBool:(BOOL)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
@@ -203,6 +204,11 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 - (NSArray *)arrayForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
 {
     return [self objectForKeyPath:keyPath inDomain:domain withClass:NSArray.class];
+}
+
+- (NSDictionary *)dictionaryForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+{
+    return SRGDictionaryMakeImmutable([self objectForKeyPath:keyPath inDomain:domain withClass:NSDictionary.class]);
 }
 
 - (BOOL)boolForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain

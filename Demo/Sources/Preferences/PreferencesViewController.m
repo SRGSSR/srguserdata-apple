@@ -195,24 +195,38 @@
 
 - (void)addPreference:(id)sender
 {
-    NSString *keyPath = [self.keyPath stringByAppendingString:NSUUID.UUID.UUIDString] ?: NSUUID.UUID.UUIDString;
-    
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add setting", nil)
+    UIAlertController *alertController1 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add setting", nil)
                                                                              message:nil
                                                                       preferredStyle:UIAlertControllerStyleActionSheet];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"String", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"String", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSString *keyPath = [self.keyPath stringByAppendingString:NSUUID.UUID.UUIDString] ?: NSUUID.UUID.UUIDString;
         NSInteger random = arc4random() % 1000;
         [SRGUserData.currentUserData.preferences setString:@(random).stringValue forKeyPath:keyPath inDomain:self.domain];
     }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Number", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Number", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSString *keyPath = [self.keyPath stringByAppendingString:NSUUID.UUID.UUIDString] ?: NSUUID.UUID.UUIDString;
         NSInteger random = arc4random() % 1000;
         [SRGUserData.currentUserData.preferences setNumber:@(random) forKeyPath:keyPath inDomain:self.domain];
     }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Level", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        // TODO:
+    [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Level", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertController *alertController2 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add setting level", nil)
+                                                                                  message:nil
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            textField.placeholder = NSLocalizedString(@"Name", nil);
+        }];
+        [alertController2 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+        [alertController2 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            NSString *name = [alertController2.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+            if (name.length != 0) {
+                NSString *keyPath = [self.keyPath stringByAppendingString:name] ?: name;
+                [SRGUserData.currentUserData.preferences setDictionary:@{} forKeyPath:keyPath inDomain:self.domain];
+            }
+        }]];
+        [self presentViewController:alertController2 animated:YES completion:nil];
     }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
-    [self presentViewController:alertController animated:YES completion:nil];
+    [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alertController1 animated:YES completion:nil];
 }
 
 #pragma mark Notifications

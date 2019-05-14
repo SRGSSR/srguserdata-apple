@@ -10,11 +10,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SRGPreferences : SRGUserDataService
 
-- (nullable NSDictionary *)dictionaryForKeyPath:(nullable NSString *)keyPath inDomain:(NSString *)domain;
-
 - (void)setString:(NSString *)string forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
 - (void)setNumber:(NSNumber *)number forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
 - (void)setArray:(NSArray *)array forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
+- (void)setDictionary:(NSDictionary *)dictionary forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
 
 - (void)setBool:(BOOL)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
 - (void)setInteger:(NSInteger)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
@@ -24,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSString *)stringForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
 - (nullable NSNumber *)numberForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
 - (nullable NSArray *)arrayForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
+- (nullable NSDictionary *)dictionaryForKeyPath:(nullable NSString *)keyPath inDomain:(NSString *)domain;
 
 - (BOOL)boolForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
 - (NSInteger)integerForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
