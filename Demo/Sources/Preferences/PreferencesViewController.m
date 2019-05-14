@@ -159,7 +159,7 @@
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    
+    // TODO:
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -170,7 +170,9 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        
+        NSString *key = self.keys[indexPath.row];
+        NSString *keyPath = [self.keyPath stringByAppendingString:key] ?: key;
+        [SRGUserData.currentUserData.preferences removeObjectForKeyPath:keyPath inDomain:self.domain];
     }
 }
 
