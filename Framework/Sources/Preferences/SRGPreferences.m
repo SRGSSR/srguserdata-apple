@@ -31,6 +31,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 //       - Should coalesce operations by keypath / domain (only the last one in the changelog must be kept)
 //       - Prevent keys with length = 0
 //       - Support nullable in setters. Remove methods with primitive types
+//       - Path -> keypath
 
 @interface SRGPreferences ()
 
