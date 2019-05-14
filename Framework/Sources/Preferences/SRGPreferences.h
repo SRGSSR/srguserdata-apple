@@ -10,27 +10,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SRGPreferences : SRGUserDataService
 
-- (void)setString:(NSString *)string forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (void)setNumber:(NSNumber *)number forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (void)setArray:(NSArray *)array forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (void)setDictionary:(NSDictionary *)dictionary forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
+- (void)setString:(NSString *)string atPath:(NSString *)path inDomain:(NSString *)domain;
+- (void)setNumber:(NSNumber *)number atPath:(NSString *)path inDomain:(NSString *)domain;
+- (void)setArray:(NSArray *)array atPath:(NSString *)path inDomain:(NSString *)domain;
+- (void)setDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain;
 
-- (void)setBool:(BOOL)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (void)setInteger:(NSInteger)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (void)setFloat:(float)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (void)setDouble:(double)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
+- (nullable NSString *)stringAtPath:(NSString *)path inDomain:(NSString *)domain;
+- (nullable NSNumber *)numberAtPath:(NSString *)path inDomain:(NSString *)domain;
+- (nullable NSArray *)arrayAtPath:(NSString *)path inDomain:(NSString *)domain;
+- (nullable NSDictionary *)dictionaryAtPath:(nullable NSString *)path inDomain:(NSString *)domain;
 
-- (nullable NSString *)stringForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (nullable NSNumber *)numberForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (nullable NSArray *)arrayForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (nullable NSDictionary *)dictionaryForKeyPath:(nullable NSString *)keyPath inDomain:(NSString *)domain;
-
-- (BOOL)boolForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (NSInteger)integerForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (float)floatForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-- (double)doubleForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
-
-- (void)removeObjectForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
+- (void)removeObjectAtPath:(NSString *)path inDomain:(NSString *)domain;
 
 @end
 

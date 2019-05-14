@@ -16,8 +16,8 @@ typedef NS_ENUM(NSInteger, SRGPreferenceChangeLogEntryType) {
 
 @interface SRGPreferenceChangeLogEntry : NSObject
 
-+ (SRGPreferenceChangeLogEntry *)changeLogEntryForUpsertAtKeyPath:(NSString *)keyPath inDomain:(NSString *)domain withObject:(id)object;
-+ (SRGPreferenceChangeLogEntry *)changeLogEntryForDeleteAtKeyPath:(NSString *)keyPath inDomain:(NSString *)domain;
++ (SRGPreferenceChangeLogEntry *)changeLogEntryForUpsertAtPath:(NSString *)path inDomain:(NSString *)domain withObject:(id)object;
++ (SRGPreferenceChangeLogEntry *)changeLogEntryForDeleteAtPath:(NSString *)path inDomain:(NSString *)domain;
 
 + (NSArray<SRGPreferenceChangeLogEntry *> *)changeLogEntriesForDictionary:(NSDictionary *)dictionary inDomain:(NSString *)domain;
 

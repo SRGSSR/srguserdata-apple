@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PreferencesViewController : UITableViewController
 
-- (instancetype)initWithKeyPath:(nullable NSString *)keyPath inDomain:(NSString *)domain;
+- (instancetype)initWithPath:(nullable NSString *)path inDomain:(NSString *)domain;
 
 @end
 

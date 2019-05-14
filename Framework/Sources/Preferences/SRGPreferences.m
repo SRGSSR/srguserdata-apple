@@ -11,6 +11,14 @@
 #import "SRGUserDataService+Private.h"
 #import "SRGUserDataService+Subclassing.h"
 
+// TODO: - Thread-safety considerations
+//       - Serialize change log entries as well
+//       - Delete each log entry consumed during sync
+//       - Should coalesce operations by path / domain (only the last one in the changelog must be kept)
+//       - Prevent keys with length = 0
+//       - Support nullable in setters
+//       - Spaces / slashes / dots in keys + UT + encoding
+
 static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 {
     NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionary];
@@ -25,14 +33,6 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     return [mutableDictionary copy];
 }
 
-// TODO: - Thread-safety considerations
-//       - Serialize change log entries as well
-//       - Delete each log entry consumed during sync
-//       - Should coalesce operations by keypath / domain (only the last one in the changelog must be kept)
-//       - Prevent keys with length = 0
-//       - Support nullable in setters. Remove methods with primitive types
-//       - Path -> keypath
-
 @interface SRGPreferences ()
 
 @property (nonatomic) NSMutableDictionary *dictionary;
@@ -41,6 +41,21 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 @end
 
 @implementation SRGPreferences
+
+#pragma mark Class methods
+
++ (NSArray<NSString *> *)pathComponentsForPath:(NSString *)path inDomain:(NSString *)domain
+{
+    NSParameterAssert(domain);
+    
+    NSArray<NSString *> *pathComponents = path.pathComponents;
+    if (pathComponents) {
+        return [@[domain] arrayByAddingObjectsFromArray:pathComponents];
+    }
+    else {
+        return @[domain];
+    }
+}
 
 #pragma mark Object lifecycle
 
@@ -85,9 +100,9 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 
 #pragma mark Preference management
 
-- (void)setObject:(id)object forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (void)setObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    NSArray<NSString *> *pathComponents = [@[domain] arrayByAddingObjectsFromArray:[keyPath componentsSeparatedByString:@"."]];
+    NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
     
     NSMutableDictionary *dictionary = self.dictionary;
     for (NSString *pathComponent in pathComponents) {
@@ -95,11 +110,11 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
             dictionary[pathComponent] = object;
         }
         else {
-            id value = dictionary[pathComponent];
-            if (! value) {
+            id object = dictionary[pathComponent];
+            if (! object) {
                 dictionary[pathComponent] = [NSMutableDictionary dictionary];
             }
-            else if (! [value isKindOfClass:NSDictionary.class]) {
+            else if (! [object isKindOfClass:NSDictionary.class]) {
                 return;
             }
             dictionary = dictionary[pathComponent];
@@ -111,22 +126,37 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (user.accountUid) {
-            SRGPreferenceChangeLogEntry *entry = [SRGPreferenceChangeLogEntry changeLogEntryForUpsertAtKeyPath:keyPath inDomain:domain withObject:object];
+            SRGPreferenceChangeLogEntry *entry = [SRGPreferenceChangeLogEntry changeLogEntryForUpsertAtPath:path inDomain:domain withObject:object];
             [self.changeLogEntries addObject:entry];
         }
     }];
 }
 
-- (id)objectForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain withClass:(Class)cls
+- (id)objectAtPath:(NSString *)path inDomain:(NSString *)domain withClass:(Class)cls
 {
-    NSString *fullKeyPath = keyPath ? [[domain stringByAppendingString:@"."] stringByAppendingString:keyPath] : domain;
-    id object = [self.dictionary valueForKeyPath:fullKeyPath];
-    return [object isKindOfClass:cls] ? object : nil;
+    NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
+    
+    NSMutableDictionary *dictionary = self.dictionary;
+    for (NSString *pathComponent in pathComponents) {
+        id object = dictionary[pathComponent];
+        
+        if (pathComponent == pathComponents.lastObject) {
+            return [object isKindOfClass:cls] ? object : nil;
+        }
+        else {
+            if (! [object isKindOfClass:NSDictionary.class]) {
+                break;
+            }
+            
+            dictionary = object;
+        }
+    }
+    return nil;
 }
 
-- (void)removeObjectForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (void)removeObjectAtPath:(NSString *)path inDomain:(NSString *)domain
 {
-    NSArray<NSString *> *pathComponents = [@[domain] arrayByAddingObjectsFromArray:[keyPath componentsSeparatedByString:@"."]];
+    NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
     
     NSMutableDictionary *dictionary = self.dictionary;
     for (NSString *pathComponent in pathComponents) {
@@ -147,90 +177,50 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (user.accountUid) {
-            SRGPreferenceChangeLogEntry *entry = [SRGPreferenceChangeLogEntry changeLogEntryForDeleteAtKeyPath:keyPath inDomain:domain];
+            SRGPreferenceChangeLogEntry *entry = [SRGPreferenceChangeLogEntry changeLogEntryForDeleteAtPath:path inDomain:domain];
             [self.changeLogEntries addObject:entry];
         }
     }];
 }
 
-- (void)setString:(NSString *)string forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (void)setString:(NSString *)string atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:string forKeyPath:keyPath inDomain:domain];
+    [self setObject:string atPath:path inDomain:domain];
 }
 
-- (void)setNumber:(NSNumber *)number forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (void)setNumber:(NSNumber *)number atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:number forKeyPath:keyPath inDomain:domain];
+    [self setObject:number atPath:path inDomain:domain];
 }
 
-- (void)setArray:(NSArray *)array forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (void)setArray:(NSArray *)array atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:array forKeyPath:keyPath inDomain:domain];
+    [self setObject:array atPath:path inDomain:domain];
 }
 
-- (void)setDictionary:(NSDictionary *)dictionary forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (void)setDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:dictionary forKeyPath:keyPath inDomain:domain];
+    [self setObject:dictionary atPath:path inDomain:domain];
 }
 
-- (void)setBool:(BOOL)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (NSString *)stringAtPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:@(value) forKeyPath:keyPath inDomain:domain];
+    return [self objectAtPath:path inDomain:domain withClass:NSString.class];
 }
 
-- (void)setInteger:(NSInteger)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (NSNumber *)numberAtPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:@(value) forKeyPath:keyPath inDomain:domain];
+    return [self objectAtPath:path inDomain:domain withClass:NSNumber.class];
 }
 
-- (void)setFloat:(float)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (NSArray *)arrayAtPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:@(value) forKeyPath:keyPath inDomain:domain];
+    return [self objectAtPath:path inDomain:domain withClass:NSArray.class];
 }
 
-- (void)setDouble:(double)value forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (NSDictionary *)dictionaryAtPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:@(value) forKeyPath:keyPath inDomain:domain];
-}
-
-- (NSString *)stringForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
-{
-    return [self objectForKeyPath:keyPath inDomain:domain withClass:NSString.class];
-}
-
-- (NSNumber *)numberForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
-{
-    return [self objectForKeyPath:keyPath inDomain:domain withClass:NSNumber.class];
-}
-
-- (NSArray *)arrayForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
-{
-    return [self objectForKeyPath:keyPath inDomain:domain withClass:NSArray.class];
-}
-
-- (NSDictionary *)dictionaryForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
-{
-    return SRGDictionaryMakeImmutable([self objectForKeyPath:keyPath inDomain:domain withClass:NSDictionary.class]);
-}
-
-- (BOOL)boolForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
-{
-    return [self numberForKeyPath:keyPath inDomain:domain].boolValue;
-}
-
-- (NSInteger)integerForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
-{
-    return [self numberForKeyPath:keyPath inDomain:domain].integerValue;
-}
-
-- (float)floatForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
-{
-    return [self numberForKeyPath:keyPath inDomain:domain].floatValue;
-}
-
-- (double)doubleForKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
-{
-    return [self numberForKeyPath:keyPath inDomain:domain].doubleValue;
+    return SRGDictionaryMakeImmutable([self objectAtPath:path inDomain:domain withClass:NSDictionary.class]);
 }
 
 #pragma mark Subclassing hooks

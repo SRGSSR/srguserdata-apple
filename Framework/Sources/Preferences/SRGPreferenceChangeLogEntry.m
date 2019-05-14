@@ -21,7 +21,7 @@ static NSString *SRGPreferenceChangeLogEntryTypeName(SRGPreferenceChangeLogEntry
 @interface SRGPreferenceChangeLogEntry ()
 
 @property (nonatomic) SRGPreferenceChangeLogEntryType type;
-@property (nonatomic, copy) NSString *keyPath;
+@property (nonatomic, copy) NSString *path;
 @property (nonatomic, copy) NSString *domain;
 @property (nonatomic) id object;
 
@@ -31,38 +31,38 @@ static NSString *SRGPreferenceChangeLogEntryTypeName(SRGPreferenceChangeLogEntry
 
 #pragma mark Class methods
 
-+ (SRGPreferenceChangeLogEntry *)changeLogEntryForUpsertAtKeyPath:(NSString *)keyPath inDomain:(NSString *)domain withObject:(id)object
++ (SRGPreferenceChangeLogEntry *)changeLogEntryForUpsertAtPath:(NSString *)path inDomain:(NSString *)domain withObject:(id)object
 {
-    return [[[self class] alloc] initWithType:SRGPreferenceChangeLogEntryTypeUpsert forKeyPath:keyPath inDomain:domain withObject:object];
+    return [[[self class] alloc] initWithType:SRGPreferenceChangeLogEntryTypeUpsert forPath:path inDomain:domain withObject:object];
 }
 
-+ (SRGPreferenceChangeLogEntry *)changeLogEntryForDeleteAtKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
++ (SRGPreferenceChangeLogEntry *)changeLogEntryForDeleteAtPath:(NSString *)path inDomain:(NSString *)domain
 {
-    return [[[self class] alloc] initWithType:SRGPreferenceChangeLogEntryTypeDelete forKeyPath:keyPath inDomain:domain withObject:nil];
+    return [[[self class] alloc] initWithType:SRGPreferenceChangeLogEntryTypeDelete forPath:path inDomain:domain withObject:nil];
 }
 
 + (NSArray<SRGPreferenceChangeLogEntry *> *)changeLogEntriesForDictionary:(NSDictionary *)dictionary inDomain:(NSString *)domain
 {
-    return [self changeLogEntriesForDictionary:dictionary keyPath:nil inDomain:domain];
+    return [self changeLogEntriesForDictionary:dictionary atPath:nil inDomain:domain];
 }
 
-+ (NSArray<SRGPreferenceChangeLogEntry *> *)changeLogEntriesForDictionary:(NSDictionary *)dictionary keyPath:(NSString *)keyPath inDomain:(NSString *)domain
++ (NSArray<SRGPreferenceChangeLogEntry *> *)changeLogEntriesForDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain
 {
     NSMutableArray<SRGPreferenceChangeLogEntry *> *entries = [NSMutableArray array];
     
-    SRGPreferenceChangeLogEntry *entry = [[SRGPreferenceChangeLogEntry alloc] initWithType:SRGPreferenceChangeLogEntryTypeNode forKeyPath:keyPath inDomain:domain withObject:@{}];
+    SRGPreferenceChangeLogEntry *entry = [[SRGPreferenceChangeLogEntry alloc] initWithType:SRGPreferenceChangeLogEntryTypeNode forPath:path inDomain:domain withObject:@{}];
     [entries addObject:entry];
     
     for (NSString *key in dictionary.allKeys) {
-        NSString *subKeyPath = keyPath ? [keyPath stringByAppendingPathComponent:key] : key;
+        NSString *subpath = path ? [path stringByAppendingPathComponent:key] : key;
         
         id object = dictionary[key];
         if ([object isKindOfClass:NSDictionary.class]) {
-            NSArray<SRGPreferenceChangeLogEntry *> *subEntries = [self changeLogEntriesForDictionary:object keyPath:subKeyPath inDomain:domain];
+            NSArray<SRGPreferenceChangeLogEntry *> *subEntries = [self changeLogEntriesForDictionary:object atPath:subpath inDomain:domain];
             [entries addObjectsFromArray:subEntries];
         }
         else {
-            SRGPreferenceChangeLogEntry *subEntry = [[SRGPreferenceChangeLogEntry alloc] initWithType:SRGPreferenceChangeLogEntryTypeUpsert forKeyPath:subKeyPath inDomain:domain withObject:object];
+            SRGPreferenceChangeLogEntry *subEntry = [[SRGPreferenceChangeLogEntry alloc] initWithType:SRGPreferenceChangeLogEntryTypeUpsert forPath:subpath inDomain:domain withObject:object];
             [entries addObject:subEntry];
         }
     }
@@ -72,11 +72,11 @@ static NSString *SRGPreferenceChangeLogEntryTypeName(SRGPreferenceChangeLogEntry
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithType:(SRGPreferenceChangeLogEntryType)type forKeyPath:(NSString *)keyPath inDomain:(NSString *)domain withObject:(id)object
+- (instancetype)initWithType:(SRGPreferenceChangeLogEntryType)type forPath:(NSString *)path inDomain:(NSString *)domain withObject:(id)object
 {
     if (self = [super init]) {
         self.type = type;
-        self.keyPath = keyPath;
+        self.path = path;
         self.domain = domain;
         self.object = object;
     }
@@ -87,11 +87,11 @@ static NSString *SRGPreferenceChangeLogEntryTypeName(SRGPreferenceChangeLogEntry
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; type = %@; keyPath = %@; domain: %@; object: %@>",
+    return [NSString stringWithFormat:@"<%@: %p; type = %@; path = %@; domain: %@; object: %@>",
             [self class],
             self,
             SRGPreferenceChangeLogEntryTypeName(self.type),
-            self.keyPath,
+            self.path,
             self.domain,
             self.object];
 }

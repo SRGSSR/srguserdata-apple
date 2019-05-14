@@ -25,7 +25,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 @interface PreferencesViewController ()
 
-@property (nonatomic, copy) NSString *keyPath;
+@property (nonatomic, copy) NSString *path;
 @property (nonatomic, copy) NSString *domain;
 
 @property (nonatomic) NSArray *keys;
@@ -37,11 +37,11 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithKeyPath:(NSString *)keyPath inDomain:(NSString *)domain
+- (instancetype)initWithPath:(NSString *)path inDomain:(NSString *)domain
 {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
     PreferencesViewController *viewController = [storyboard instantiateInitialViewController];
-    viewController.keyPath = keyPath;
+    viewController.path = path;
     viewController.domain = domain;
     return viewController;
 }
@@ -50,7 +50,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 - (NSString *)title
 {
-    return self.keyPath.lastPathComponent ?: NSLocalizedString(@"Preferences", nil);
+    return self.path.lastPathComponent ?: NSLocalizedString(@"Preferences", nil);
 }
 
 #pragma mark View lifecycle
@@ -127,7 +127,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
         [self.refreshControl endRefreshing];
     }
     
-    self.dictionary = [SRGUserData.currentUserData.preferences dictionaryForKeyPath:self.keyPath inDomain:self.domain];
+    self.dictionary = [SRGUserData.currentUserData.preferences dictionaryAtPath:self.path inDomain:self.domain];
     
     NSArray<NSString *> *keys = [self.dictionary.allKeys sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
     [self.tableView reloadDataAnimatedWithOldObjects:self.keys newObjects:keys section:0 updateData:^{
@@ -214,8 +214,8 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
             NSString *value = [alertController.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
             NSNumber *number = [PreferencesNumberFormatter() numberFromString:value];
             
-            NSString *keyPath = [self.keyPath stringByAppendingString:key] ?: key;
-            [SRGUserData.currentUserData.preferences setNumber:number forKeyPath:keyPath inDomain:self.domain];
+            NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
+            [SRGUserData.currentUserData.preferences setNumber:number atPath:subpath inDomain:self.domain];
         }]];
         [self presentViewController:alertController animated:YES completion:nil];
     }
@@ -230,14 +230,14 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
         [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             NSString *string = [alertController.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
             
-            NSString *keyPath = [self.keyPath stringByAppendingString:key] ?: key;
-            [SRGUserData.currentUserData.preferences setString:string forKeyPath:keyPath inDomain:self.domain];
+            NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
+            [SRGUserData.currentUserData.preferences setString:string atPath:subpath inDomain:self.domain];
         }]];
         [self presentViewController:alertController animated:YES completion:nil];
     }
     else if ([value isKindOfClass:NSDictionary.class]) {
-        NSString *keyPath = [self.keyPath stringByAppendingString:key] ?: key;
-        PreferencesViewController *preferencesViewController = [[PreferencesViewController alloc] initWithKeyPath:keyPath inDomain:self.domain];
+        NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
+        PreferencesViewController *preferencesViewController = [[PreferencesViewController alloc] initWithPath:subpath inDomain:self.domain];
         [self.navigationController pushViewController:preferencesViewController animated:YES];
     }
 }
@@ -251,8 +251,8 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSString *key = self.keys[indexPath.row];
-        NSString *keyPath = [self.keyPath stringByAppendingString:key] ?: key;
-        [SRGUserData.currentUserData.preferences removeObjectForKeyPath:keyPath inDomain:self.domain];
+        NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
+        [SRGUserData.currentUserData.preferences removeObjectAtPath:subpath inDomain:self.domain];
     }
 }
 
@@ -292,9 +292,9 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
         [alertController2 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             NSString *key = [alertController2.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
             if (key.length != 0) {
-                NSString *keyPath = [self.keyPath stringByAppendingString:key] ?: key;
+                NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
                 NSString *string = [alertController2.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-                [SRGUserData.currentUserData.preferences setString:string forKeyPath:keyPath inDomain:self.domain];
+                [SRGUserData.currentUserData.preferences setString:string atPath:subpath inDomain:self.domain];
             }
         }]];
         [self presentViewController:alertController2 animated:YES completion:nil];
@@ -317,8 +317,8 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
                 NSString *value = [alertController2.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
                 NSNumber *number = [PreferencesNumberFormatter() numberFromString:value];
                 
-                NSString *keyPath = [self.keyPath stringByAppendingString:key] ?: key;
-                [SRGUserData.currentUserData.preferences setNumber:number forKeyPath:keyPath inDomain:self.domain];
+                NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
+                [SRGUserData.currentUserData.preferences setNumber:number atPath:subpath inDomain:self.domain];
             }
         }]];
         [self presentViewController:alertController2 animated:YES completion:nil];
@@ -334,8 +334,8 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
         [alertController2 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             NSString *key = [alertController2.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
             if (key.length != 0) {
-                NSString *keyPath = [self.keyPath stringByAppendingString:key] ?: key;
-                [SRGUserData.currentUserData.preferences setDictionary:@{} forKeyPath:keyPath inDomain:self.domain];
+                NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
+                [SRGUserData.currentUserData.preferences setDictionary:@{} atPath:subpath inDomain:self.domain];
             }
         }]];
         [self presentViewController:alertController2 animated:YES completion:nil];
