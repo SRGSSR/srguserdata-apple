@@ -118,6 +118,8 @@
 		6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F41C9AA2216C3CB003F434A /* PlayerViewController.m */; };
 		6F46DD76221429110013C10A /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F46DD75221429100013C10A /* Person.m */; };
 		6F478B2B22818A6100CDC022 /* NSDateFormatter+Demo.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */; };
+		6F5C6365228AAF190001CC4C /* PreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C6364228AAF190001CC4C /* PreferencesViewController.m */; };
+		6F5C6367228AAF2A0001CC4C /* PreferencesViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F5C6366228AAF2A0001CC4C /* PreferencesViewController.storyboard */; };
 		6F6359F82289584600E7F697 /* SRGPreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F6359F62289584600E7F697 /* SRGPreferences.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6F6359F92289584600E7F697 /* SRGPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359F72289584600E7F697 /* SRGPreferences.m */; };
 		6F6359FC2289896A00E7F697 /* PreferencesTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */; };
@@ -375,6 +377,9 @@
 		6F46DD75221429100013C10A /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		6F478B2922818A6100CDC022 /* NSDateFormatter+Demo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+Demo.h"; sourceTree = "<group>"; };
 		6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+Demo.m"; sourceTree = "<group>"; };
+		6F5C6363228AAF190001CC4C /* PreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesViewController.h; sourceTree = "<group>"; };
+		6F5C6364228AAF190001CC4C /* PreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesViewController.m; sourceTree = "<group>"; };
+		6F5C6366228AAF2A0001CC4C /* PreferencesViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PreferencesViewController.storyboard; sourceTree = "<group>"; };
 		6F6359F62289584600E7F697 /* SRGPreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferences.h; sourceTree = "<group>"; };
 		6F6359F72289584600E7F697 /* SRGPreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferences.m; sourceTree = "<group>"; };
 		6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesTestCase.m; sourceTree = "<group>"; };
@@ -738,6 +743,16 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		6F5C6362228AAEF00001CC4C /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				6F5C6363228AAF190001CC4C /* PreferencesViewController.h */,
+				6F5C6364228AAF190001CC4C /* PreferencesViewController.m */,
+				6F5C6366228AAF2A0001CC4C /* PreferencesViewController.storyboard */,
+			);
+			path = Preferences;
+			sourceTree = "<group>";
+		};
 		6F6359F52289581300E7F697 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
@@ -780,6 +795,7 @@
 				6F41C9792216A9F9003F434A /* Medias */,
 				6F41C9A72216C3CB003F434A /* Player */,
 				086320E52257F05200C719A6 /* Playlists */,
+				6F5C6362228AAEF00001CC4C /* Preferences */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1120,6 +1136,7 @@
 				086320EA2257F05200C719A6 /* PlaylistsViewController.storyboard in Resources */,
 				6F41C9AB2216C3CC003F434A /* PlayerViewController.storyboard in Resources */,
 				086320EE2257FDB300C719A6 /* PlaylistViewController.storyboard in Resources */,
+				6F5C6367228AAF2A0001CC4C /* PreferencesViewController.storyboard in Resources */,
 				6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */,
 				6F41C9782216A9C1003F434A /* HistoryViewController.storyboard in Resources */,
 				6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */,
@@ -1201,6 +1218,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F5C6365228AAF190001CC4C /* PreferencesViewController.m in Sources */,
 				6F8A93FE20FDCAA800AA6434 /* AppDelegate.m in Sources */,
 				6F8A93FD20FDCAA800AA6434 /* main.m in Sources */,
 				6F17A496228499DA001C4CC2 /* DeepDiffBridge.swift in Sources */,

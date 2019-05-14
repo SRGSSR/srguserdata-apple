@@ -9,6 +9,7 @@
 #import "HistoryViewController.h"
 #import "MediasViewController.h"
 #import "PlaylistsViewController.h"
+#import "PreferencesViewController.h"
 
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGIdentity/SRGIdentity.h>
@@ -51,8 +52,12 @@
     UINavigationController *playlistsNavigationController = [[UINavigationController alloc] initWithRootViewController:playlistsViewController];
     playlistsNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Playlists", nil) image:[UIImage imageNamed:@"playlists_30"] tag:2];
     
+    PreferencesViewController *preferencesViewController = [[PreferencesViewController alloc] initWithKeyPath:nil inDomain:@"userdata-demo"];
+    UINavigationController *preferencesNavigationController = [[UINavigationController alloc] initWithRootViewController:preferencesViewController];
+    preferencesNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Preferences", nil) image:[UIImage imageNamed:@"preferences_30"] tag:2];
+    
     UITabBarController *tabBarController = [[UITabBarController alloc] init];
-    tabBarController.viewControllers = @[mediasNavigationController, historyNavigationController, playlistsNavigationController];
+    tabBarController.viewControllers = @[mediasNavigationController, historyNavigationController, playlistsNavigationController, preferencesNavigationController];
     
     self.window.rootViewController = tabBarController;
     return YES;
