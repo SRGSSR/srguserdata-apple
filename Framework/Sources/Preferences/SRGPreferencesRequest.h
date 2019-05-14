@@ -20,27 +20,27 @@ typedef void (^SRGPreferencesDeleteCompletionBlock)(NSHTTPURLResponse * _Nullabl
                               withSession:(NSURLSession *)session
                           completionBlock:(SRGPreferencesCompletionBlock)completionBlock;
 
-+ (SRGRequest *)preferenceAtKeyPath:(NSString *)keyPath
-                           inDomain:(NSString *)domain
-                     fromServiceURL:(NSURL *)serviceURL
-                    forSessionToken:(NSString *)sessionToken
-                        withSession:(NSURLSession *)session
-                    completionBlock:(SRGPreferencesCompletionBlock)completionBlock;
++ (SRGRequest *)preferenceAtPath:(NSString *)path
+                        inDomain:(NSString *)domain
+                  fromServiceURL:(NSURL *)serviceURL
+                 forSessionToken:(NSString *)sessionToken
+                     withSession:(NSURLSession *)session
+                 completionBlock:(SRGPreferencesCompletionBlock)completionBlock;
 
 + (SRGRequest *)putPreferenceWithObject:(id)object
-                              atKeyPath:(NSString *)keyPath
+                                 atPath:(NSString *)path
                                inDomain:(NSString *)domain
                            toServiceURL:(NSURL *)serviceURL
                         forSessionToken:(NSString *)sessionToken
                             withSession:(NSURLSession *)session
                         completionBlock:(SRGPreferencesPutCompletionBlock)completionBlock;
 
-+ (SRGRequest *)deletePreferenceAtKeyPath:(nullable NSString *)keyPath
-                                 inDomain:(NSString *)domain
-                           fromServiceURL:(NSURL *)serviceURL
-                          forSessionToken:(NSString *)sessionToken
-                              withSession:(NSURLSession *)session
-                          completionBlock:(SRGPreferencesDeleteCompletionBlock)completionBlock;
++ (SRGRequest *)deletePreferenceAtPath:(nullable NSString *)path
+                              inDomain:(NSString *)domain
+                        fromServiceURL:(NSURL *)serviceURL
+                       forSessionToken:(NSString *)sessionToken
+                           withSession:(NSURLSession *)session
+                       completionBlock:(SRGPreferencesDeleteCompletionBlock)completionBlock;
 
 @end
 

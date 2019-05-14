@@ -22,14 +22,14 @@
     }];
 }
 
-+ (SRGRequest *)preferenceAtKeyPath:(NSString *)keyPath
-                           inDomain:(NSString *)domain
-                     fromServiceURL:(NSURL *)serviceURL
-                    forSessionToken:(NSString *)sessionToken
-                        withSession:(NSURLSession *)session
-                    completionBlock:(SRGPreferencesCompletionBlock)completionBlock
++ (SRGRequest *)preferenceAtPath:(NSString *)path
+                        inDomain:(NSString *)domain
+                  fromServiceURL:(NSURL *)serviceURL
+                 forSessionToken:(NSString *)sessionToken
+                     withSession:(NSURLSession *)session
+                 completionBlock:(SRGPreferencesCompletionBlock)completionBlock
 {
-    NSString *fullPath = [domain stringByAppendingPathComponent:keyPath];
+    NSString *fullPath = [domain stringByAppendingPathComponent:path];
     NSURL *URL = [serviceURL URLByAppendingPathComponent:fullPath];
     
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URL];
@@ -42,21 +42,21 @@
 }
 
 + (SRGRequest *)putPreferenceWithObject:(id)object
-                              atKeyPath:(NSString *)keyPath
+                                 atPath:(NSString *)path
                                inDomain:(NSString *)domain
                            toServiceURL:(NSURL *)serviceURL
                         forSessionToken:(NSString *)sessionToken
                             withSession:(NSURLSession *)session
                         completionBlock:(SRGPreferencesPutCompletionBlock)completionBlock
 {
-    NSString *fullPath = [domain stringByAppendingPathComponent:keyPath];
+    NSString *fullPath = [domain stringByAppendingPathComponent:path];
     NSURL *URL = [serviceURL URLByAppendingPathComponent:fullPath.stringByDeletingLastPathComponent];
     
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URL];
     URLRequest.HTTPMethod = @"PUT";
     [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", sessionToken] forHTTPHeaderField:@"Authorization"];
     [URLRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-
+    
     NSDictionary *JSONDictionary = [NSDictionary dictionaryWithObject:object forKey:fullPath.lastPathComponent];
     URLRequest.HTTPBody = [NSJSONSerialization dataWithJSONObject:JSONDictionary options:0 error:NULL];
     
@@ -66,14 +66,14 @@
     }];
 }
 
-+ (SRGRequest *)deletePreferenceAtKeyPath:(NSString *)keyPath
-                                 inDomain:(NSString *)domain
-                           fromServiceURL:(NSURL *)serviceURL
-                          forSessionToken:(NSString *)sessionToken
-                              withSession:(NSURLSession *)session
-                          completionBlock:(SRGPreferencesDeleteCompletionBlock)completionBlock
++ (SRGRequest *)deletePreferenceAtPath:(NSString *)path
+                              inDomain:(NSString *)domain
+                        fromServiceURL:(NSURL *)serviceURL
+                       forSessionToken:(NSString *)sessionToken
+                           withSession:(NSURLSession *)session
+                       completionBlock:(SRGPreferencesDeleteCompletionBlock)completionBlock
 {
-    NSString *fullPath = keyPath ? [domain stringByAppendingPathComponent:keyPath] : domain;
+    NSString *fullPath = path ? [domain stringByAppendingPathComponent:path] : domain;
     NSURL *URL = [serviceURL URLByAppendingPathComponent:fullPath];
     
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URL];
