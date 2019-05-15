@@ -8,6 +8,7 @@
 
 #import "SRGPreferenceChangeLogEntry.h"
 #import "SRGUser+Private.h"
+#import "SRGUserDataLogger.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserDataService+Subclassing.h"
 
@@ -62,15 +63,15 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 - (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
 {
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
-        self.dictionary = [self dictionaryFromFile] ?: [NSMutableDictionary dictionary];
-        self.changeLogEntries = [NSMutableArray array];
+        self.dictionary = [self savedPreferenceDictionary] ?: [NSMutableDictionary dictionary];
+        self.changeLogEntries =  [self savedChangeLogEntries] ?: [NSMutableArray array];
     }
     return self;
 }
 
 #pragma mark Serialization
 
-- (void)saveFileFromDictionary:(NSDictionary *)dictionary
+- (void)savePreferenceDictionary:(NSDictionary *)dictionary
 {
     NSURL *folderURL = self.dataStore.persistentContainer.srg_fileURL.URLByDeletingPathExtension;
     if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.path]) {
@@ -82,7 +83,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     [data writeToURL:fileURL atomically:YES];
 }
 
-- (NSMutableDictionary *)dictionaryFromFile
+- (NSMutableDictionary *)savedPreferenceDictionary
 {
     NSURL *folderURL = self.dataStore.persistentContainer.srg_fileURL.URLByDeletingPathExtension;
     if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.path]) {
@@ -96,6 +97,35 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     
     NSData *data = [NSData dataWithContentsOfURL:fileURL];
     return [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
+}
+
+- (NSMutableArray<SRGPreferenceChangeLogEntry *> *)savedChangeLogEntries
+{
+    NSURL *folderURL = self.dataStore.persistentContainer.srg_fileURL.URLByDeletingPathExtension;
+    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.path]) {
+        return nil;
+    }
+    
+    NSURL *fileURL = [folderURL URLByAppendingPathComponent:@"changes.json"];
+    if (! [NSFileManager.defaultManager fileExistsAtPath:fileURL.path]) {
+        return nil;
+    }
+    
+    NSData *data = [NSData dataWithContentsOfURL:fileURL];
+    id JSONObject = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
+    if (! [JSONObject isKindOfClass:NSArray.class]) {
+        SRGUserDataLogError(@"preferences", @"Could not parse changelog file.");
+        return nil;
+    }
+    
+    NSError *parseError = nil;
+    NSArray<SRGPreferenceChangeLogEntry *> *entries = [MTLJSONAdapter modelsOfClass:SRGPreferencesDidChangeNotification.class fromJSONArray:JSONObject error:&parseError];
+    if (parseError) {
+        SRGUserDataLogError(@"preferences", @"Could not parse changelog file. Reason: %@", parseError);
+        return nil;
+    }
+    
+    return [entries mutableCopy];
 }
 
 #pragma mark Preference management
@@ -123,7 +153,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     
     [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
     
-    [self saveFileFromDictionary:self.dictionary];
+    [self savePreferenceDictionary:self.dictionary];
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
@@ -177,7 +207,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     
     [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
     
-    [self saveFileFromDictionary:self.dictionary];
+    [self savePreferenceDictionary:self.dictionary];
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
@@ -248,12 +278,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         return;
     }
     
-    NSURL *fileURL = [folderURL URLByAppendingPathComponent:@"preferences.json"];
-    if (! [NSFileManager.defaultManager fileExistsAtPath:fileURL.path]) {
-        return;
-    }
-    
-    [NSFileManager.defaultManager removeItemAtURL:fileURL error:NULL];
+    [NSFileManager.defaultManager removeItemAtURL:folderURL error:NULL];
     
     [self.dictionary removeAllObjects];
     

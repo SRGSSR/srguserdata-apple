@@ -5,6 +5,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Mantle/Mantle.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,12 +15,12 @@ typedef NS_ENUM(NSInteger, SRGPreferenceChangeLogEntryType) {
     SRGPreferenceChangeLogEntryTypeNode
 };
 
-@interface SRGPreferenceChangeLogEntry : NSObject
+@interface SRGPreferenceChangeLogEntry : MTLModel <MTLJSONSerializing>
 
 + (SRGPreferenceChangeLogEntry *)changeLogEntryForUpsertAtPath:(NSString *)path inDomain:(NSString *)domain withObject:(id)object;
 + (SRGPreferenceChangeLogEntry *)changeLogEntryForDeleteAtPath:(NSString *)path inDomain:(NSString *)domain;
 
-+ (NSArray<SRGPreferenceChangeLogEntry *> *)changeLogEntriesForDictionary:(NSDictionary *)dictionary inDomain:(NSString *)domain;
++ (NSArray<SRGPreferenceChangeLogEntry *> *)changeLogEntriesForPreferenceDictionary:(NSDictionary *)dictionary inDomain:(NSString *)domain;
 
 @end
 

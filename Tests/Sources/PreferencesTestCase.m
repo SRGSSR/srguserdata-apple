@@ -52,18 +52,18 @@
 - (void)testMigrationToChangeLog
 {
     // TODO: Should be turned into proper tests
-    NSArray<SRGPreferenceChangeLogEntry *> *entries1 = [SRGPreferenceChangeLogEntry changeLogEntriesForDictionary:@{} inDomain:@"domain"];
+    NSArray<SRGPreferenceChangeLogEntry *> *entries1 = [SRGPreferenceChangeLogEntry changeLogEntriesForPreferenceDictionary:@{} inDomain:@"domain"];
     NSLog(@"%@", entries1);
     
-    NSArray<SRGPreferenceChangeLogEntry *> *entries2 = [SRGPreferenceChangeLogEntry changeLogEntriesForDictionary:@{ @"n" : @1,
-                                                                                                                     @"s" : @"hello" } inDomain:@"domain"];
+    NSArray<SRGPreferenceChangeLogEntry *> *entries2 = [SRGPreferenceChangeLogEntry changeLogEntriesForPreferenceDictionary:@{ @"n" : @1,
+                                                                                                                               @"s" : @"hello" } inDomain:@"domain"];
     NSLog(@"%@", entries2);
     
-    NSArray<SRGPreferenceChangeLogEntry *> *entries3 = [SRGPreferenceChangeLogEntry changeLogEntriesForDictionary:@{ @"n" : @1,
-                                                                                                                     @"s" : @"lev1",
-                                                                                                                     @"d" : @{ @"n" : @2,
-                                                                                                                               @"s" : @"lev2" }
-                                                                                                                     } inDomain:@"domain"];
+    NSArray<SRGPreferenceChangeLogEntry *> *entries3 = [SRGPreferenceChangeLogEntry changeLogEntriesForPreferenceDictionary:@{ @"n" : @1,
+                                                                                                                               @"s" : @"lev1",
+                                                                                                                               @"d" : @{ @"n" : @2,
+                                                                                                                                         @"s" : @"lev2" }
+                                                                                                                               } inDomain:@"domain"];
     NSLog(@"%@", entries3);
 }
 

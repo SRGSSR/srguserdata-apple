@@ -6,6 +6,8 @@
 
 #import "SRGPreferenceChangeLogEntry.h"
 
+#import <libextobjc/libextobjc.h>
+
 static NSString *SRGPreferenceChangeLogEntryTypeName(SRGPreferenceChangeLogEntryType type)
 {
     static dispatch_once_t s_onceToken;
@@ -41,7 +43,7 @@ static NSString *SRGPreferenceChangeLogEntryTypeName(SRGPreferenceChangeLogEntry
     return [[[self class] alloc] initWithType:SRGPreferenceChangeLogEntryTypeDelete forPath:path inDomain:domain withObject:nil];
 }
 
-+ (NSArray<SRGPreferenceChangeLogEntry *> *)changeLogEntriesForDictionary:(NSDictionary *)dictionary inDomain:(NSString *)domain
++ (NSArray<SRGPreferenceChangeLogEntry *> *)changeLogEntriesForPreferenceDictionary:(NSDictionary *)dictionary inDomain:(NSString *)domain
 {
     return [self changeLogEntriesForDictionary:dictionary atPath:nil inDomain:domain];
 }
@@ -70,6 +72,21 @@ static NSString *SRGPreferenceChangeLogEntryTypeName(SRGPreferenceChangeLogEntry
     return [entries copy];
 }
 
+#pragma mark MTLJSONSerializing protocol
+
++ (NSDictionary *)JSONKeyPathsByPropertyKey
+{
+    static NSDictionary *s_mapping;
+    static dispatch_once_t s_onceToken;
+    dispatch_once(&s_onceToken, ^{
+        s_mapping = @{ @keypath(SRGPreferenceChangeLogEntry.new, type) : @"type",
+                       @keypath(SRGPreferenceChangeLogEntry.new, path) : @"path",
+                       @keypath(SRGPreferenceChangeLogEntry.new, domain) : @"domain",
+                       @keypath(SRGPreferenceChangeLogEntry.new, object) : @"object" };
+    });
+    return s_mapping;
+}
+
 #pragma mark Object lifecycle
 
 - (instancetype)initWithType:(SRGPreferenceChangeLogEntryType)type forPath:(NSString *)path inDomain:(NSString *)domain withObject:(id)object
@@ -81,6 +98,22 @@ static NSString *SRGPreferenceChangeLogEntryTypeName(SRGPreferenceChangeLogEntry
         self.object = object;
     }
     return self;
+}
+
+#pragma mark Transformers
+
++ (NSValueTransformer *)typeJSONTransformer
+{
+    static NSValueTransformer *s_transformer;
+    static dispatch_once_t s_onceToken;
+    dispatch_once(&s_onceToken, ^{
+        s_transformer = [NSValueTransformer mtl_valueMappingTransformerWithDictionary:@{ @"upsert" : @(SRGPreferenceChangeLogEntryTypeUpsert),
+                                                                                         @"delete" : @(SRGPreferenceChangeLogEntryTypeDelete),
+                                                                                         @"node" : @(SRGPreferenceChangeLogEntryTypeNode) }
+                                                                         defaultValue:@(SRGPreferenceChangeLogEntryTypeUpsert)
+                                                                  reverseDefaultValue:nil];
+    });
+    return s_transformer;
 }
 
 #pragma mark Description
