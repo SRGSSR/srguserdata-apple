@@ -14,7 +14,6 @@
 #import "SRGUserDataService+Subclassing.h"
 
 // TODO: - Thread-safety considerations
-//       - Serialize change log entries as well
 //       - Delete each log entry consumed during sync
 //       - Should coalesce operations by path / domain (only the last one in the changelog must be kept)
 //       - UT: Spaces / slashes / dots in keys + encoding if needed
@@ -23,6 +22,10 @@ NSString * const SRGPreferencesDidChangeNotification = @"SRGPreferencesDidChange
 
 static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 {
+    if (! dictionary) {
+        return nil;
+    }
+    
     NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionary];
     [dictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull object, BOOL * _Nonnull stop) {
         if ([object isKindOfClass:NSMutableDictionary.class]) {
