@@ -89,6 +89,9 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     }
     
     NSData *data = [NSData dataWithContentsOfURL:fileURL];
+    if (! data) {
+        return nil;
+    }
     
     NSError *JSONError = nil;
     id JSONObject = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&JSONError];
@@ -270,11 +273,21 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 
 #pragma mark Subclassing hooks
 
+- (void)prepareDataForInitialSynchronizationWithCompletionBlock:(void (^)(void))completionBlock
+{
+    if (! [NSFileManager.defaultManager fileExistsAtPath:self.fileURL.path]) {
+        completionBlock();
+        return;
+    }
+    
+    NSArray<SRGPreferenceChangelogEntry *> *entries = [SRGPreferenceChangelogEntry changelogEntriesFromPreferenceFileAtURL:self.fileURL];
+    [entries enumerateObjectsUsingBlock:^(SRGPreferenceChangelogEntry * _Nonnull entry, NSUInteger idx, BOOL * _Nonnull stop) {
+        [self.changelog addEntry:entry];
+    }];
+}
+
 - (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
-    
-    
-    
     completionBlock(nil);
 }
 

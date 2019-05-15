@@ -51,6 +51,9 @@
     }
     
     NSData *data = [NSData dataWithContentsOfURL:fileURL];
+    if (! data) {
+        return nil;
+    }
     
     NSError *JSONError = nil;
     id JSONObject = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&JSONError];

@@ -20,7 +20,7 @@ typedef NS_ENUM(NSInteger, SRGPreferenceChangelogEntryType) {
 + (SRGPreferenceChangelogEntry *)changelogEntryForUpsertAtPath:(NSString *)path inDomain:(NSString *)domain withObject:(id)object;
 + (SRGPreferenceChangelogEntry *)changelogEntryForDeleteAtPath:(NSString *)path inDomain:(NSString *)domain;
 
-+ (NSArray<SRGPreferenceChangelogEntry *> *)changelogEntriesForPreferenceDictionary:(NSDictionary *)dictionary inDomain:(NSString *)domain;
++ (nullable NSArray<SRGPreferenceChangelogEntry *> *)changelogEntriesFromPreferenceFileAtURL:(NSURL *)fileURL;
 
 @end
 

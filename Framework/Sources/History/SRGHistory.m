@@ -147,7 +147,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
         }
         
         [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-            for (NSManagedObjectID *historyEntryID in historyEntriesMap.allKeys) {
+            for (NSManagedObjectID *historyEntryID in historyEntriesMap) {
                 SRGHistoryEntry *historyEntry = [managedObjectContext existingObjectWithID:historyEntryID error:NULL];
                 if (historyEntry.discarded) {
                     [managedObjectContext deleteObject:historyEntry];

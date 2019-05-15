@@ -6,6 +6,8 @@
 
 #import "SRGPreferenceChangelogEntry.h"
 
+#import "SRGUserDataLogger.h"
+
 #import <libextobjc/libextobjc.h>
 
 static NSString *SRGPreferenceChangelogEntryTypeName(SRGPreferenceChangelogEntryType type)
@@ -43,19 +45,51 @@ static NSString *SRGPreferenceChangelogEntryTypeName(SRGPreferenceChangelogEntry
     return [[[self class] alloc] initWithType:SRGPreferenceChangelogEntryTypeDelete forPath:path inDomain:domain withObject:nil];
 }
 
-+ (NSArray<SRGPreferenceChangelogEntry *> *)changelogEntriesForPreferenceDictionary:(NSDictionary *)dictionary inDomain:(NSString *)domain
++ (NSArray<SRGPreferenceChangelogEntry *> *)changelogEntriesFromPreferenceFileAtURL:(NSURL *)fileURL
 {
-    return [self changelogEntriesForDictionary:dictionary atPath:nil inDomain:domain];
+    NSData *data = [NSData dataWithContentsOfURL:fileURL];
+    if (! data) {
+        return nil;
+    }
+    
+    NSError *JSONError = nil;
+    id JSONObject = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&JSONError];
+    if (JSONError) {
+        SRGUserDataLogError(@"changelog_entry", @"Could not read preference file. Reason %@", JSONError);
+        return nil;
+    }
+    
+    if (! [JSONObject isKindOfClass:NSDictionary.class]) {
+        SRGUserDataLogError(@"preferences", @"Could not read preference file. The format is invalid");
+        return nil;
+    }
+    
+    NSDictionary *JSONDictionary = JSONObject;
+    
+    NSMutableArray<SRGPreferenceChangelogEntry *> *entries = [NSMutableArray array];
+    for (NSString *domain in JSONDictionary) {
+        id value = JSONDictionary[domain];
+        if (! [value isKindOfClass:NSDictionary.class]) {
+            SRGUserDataLogWarning(@"preferences", @"Could not recover entries in the '%@' domain. The format is invalid", domain);
+        }
+        
+        NSArray<SRGPreferenceChangelogEntry *> *domainEntries = [self changelogEntriesForDictionary:value atPath:nil inDomain:domain];
+        [entries addObjectsFromArray:domainEntries];
+    }
+    
+    return [entries copy];
 }
 
 + (NSArray<SRGPreferenceChangelogEntry *> *)changelogEntriesForDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain
 {
+    NSParameterAssert(domain);
+    
     NSMutableArray<SRGPreferenceChangelogEntry *> *entries = [NSMutableArray array];
     
     SRGPreferenceChangelogEntry *entry = [[SRGPreferenceChangelogEntry alloc] initWithType:SRGPreferenceChangelogEntryTypeNode forPath:path inDomain:domain withObject:@{}];
     [entries addObject:entry];
     
-    for (NSString *key in dictionary.allKeys) {
+    for (NSString *key in dictionary) {
         NSString *subpath = path ? [path stringByAppendingPathComponent:key] : key;
         
         id object = dictionary[key];

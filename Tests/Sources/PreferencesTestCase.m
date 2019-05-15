@@ -49,22 +49,4 @@
     [self.userData.preferences setString:nil atPath:@"a" inDomain:@"test"];
 }
 
-- (void)testMigrationToChangeLog
-{
-    // TODO: Should be turned into proper tests
-    NSArray<SRGPreferenceChangelogEntry *> *entries1 = [SRGPreferenceChangelogEntry changelogEntriesForPreferenceDictionary:@{} inDomain:@"domain"];
-    NSLog(@"%@", entries1);
-    
-    NSArray<SRGPreferenceChangelogEntry *> *entries2 = [SRGPreferenceChangelogEntry changelogEntriesForPreferenceDictionary:@{ @"n" : @1,
-                                                                                                                               @"s" : @"hello" } inDomain:@"domain"];
-    NSLog(@"%@", entries2);
-    
-    NSArray<SRGPreferenceChangelogEntry *> *entries3 = [SRGPreferenceChangelogEntry changelogEntriesForPreferenceDictionary:@{ @"n" : @1,
-                                                                                                                               @"s" : @"lev1",
-                                                                                                                               @"d" : @{ @"n" : @2,
-                                                                                                                                         @"s" : @"lev2" }
-                                                                                                                               } inDomain:@"domain"];
-    NSLog(@"%@", entries3);
-}
-
 @end
