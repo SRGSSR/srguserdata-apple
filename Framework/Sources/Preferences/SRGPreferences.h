@@ -8,6 +8,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+OBJC_EXPORT NSString * const SRGPreferencesDidChangeNotification;
+
 @interface SRGPreferences : SRGUserDataService
 
 - (void)setString:(NSString *)string atPath:(NSString *)path inDomain:(NSString *)domain;

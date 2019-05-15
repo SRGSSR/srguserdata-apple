@@ -19,6 +19,8 @@
 //       - Support nullable in setters
 //       - Spaces / slashes / dots in keys + UT + encoding
 
+NSString * const SRGPreferencesDidChangeNotification = @"SRGPreferencesDidChangeNotification";
+
 static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 {
     NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionary];
@@ -120,6 +122,9 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
             dictionary = dictionary[pathComponent];
         }
     }
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+    
     [self saveFileFromDictionary:self.dictionary];
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -171,6 +176,9 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         }
         dictionary = dictionary[pathComponent];
     }
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+    
     [self saveFileFromDictionary:self.dictionary];
     
     [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
@@ -250,6 +258,8 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     [NSFileManager.defaultManager removeItemAtURL:fileURL error:NULL];
     
     [self.dictionary removeAllObjects];
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
 }
 
 #pragma mark Description

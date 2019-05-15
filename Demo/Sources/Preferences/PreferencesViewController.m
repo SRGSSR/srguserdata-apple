@@ -58,6 +58,11 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 {
     [super viewDidLoad];
     
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(preferencesDidChange:)
+                                               name:SRGPreferencesDidChangeNotification
+                                             object:SRGUserData.currentUserData.preferences];
+    
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(addPreference:)];
@@ -197,7 +202,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
                                                                                   message:nil
                                                                            preferredStyle:UIAlertControllerStyleAlert];
         [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-            textField.placeholder = NSLocalizedString(@"Name", nil);
+            textField.placeholder = NSLocalizedString(@"Key", nil);
         }];
         [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
             textField.placeholder = NSLocalizedString(@"Value", nil);
@@ -218,7 +223,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
                                                                                   message:nil
                                                                            preferredStyle:UIAlertControllerStyleAlert];
         [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-            textField.placeholder = NSLocalizedString(@"Name", nil);
+            textField.placeholder = NSLocalizedString(@"Key", nil);
         }];
         [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
             textField.placeholder = NSLocalizedString(@"Value", nil);
@@ -237,12 +242,12 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
         }]];
         [self presentViewController:alertController2 animated:YES completion:nil];
     }]];
-    [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Level", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        UIAlertController *alertController2 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add setting level", nil)
+    [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Dictionary", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertController *alertController2 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add setting dictionary", nil)
                                                                                   message:nil
                                                                            preferredStyle:UIAlertControllerStyleAlert];
         [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-            textField.placeholder = NSLocalizedString(@"Name", nil);
+            textField.placeholder = NSLocalizedString(@"Key", nil);
         }];
         [alertController2 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
         [alertController2 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -256,6 +261,13 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
     }]];
     [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alertController1 animated:YES completion:nil];
+}
+
+#pragma mark Notifications
+
+- (void)preferencesDidChange:(NSNotification *)notification
+{
+    [self refresh];
 }
 
 @end
