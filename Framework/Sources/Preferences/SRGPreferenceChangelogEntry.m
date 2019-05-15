@@ -10,24 +10,11 @@
 
 #import <libextobjc/libextobjc.h>
 
-static NSString *SRGPreferenceChangelogEntryTypeName(SRGPreferenceChangelogEntryType type)
-{
-    static dispatch_once_t s_onceToken;
-    static NSDictionary *s_names;
-    dispatch_once(&s_onceToken, ^{
-        s_names = @{ @(SRGPreferenceChangelogEntryTypeUpsert) : @"upsert",
-                     @(SRGPreferenceChangelogEntryTypeDelete) : @"delete",
-                     @(SRGPreferenceChangelogEntryTypeNode) : @"node" };
-    });
-    return s_names[@(type)];
-}
-
 @interface SRGPreferenceChangelogEntry ()
 
-@property (nonatomic) SRGPreferenceChangelogEntryType type;
+@property (nonatomic) id<NSCopying> object;
 @property (nonatomic, copy) NSString *path;
 @property (nonatomic, copy) NSString *domain;
-@property (nonatomic) id object;
 
 @end
 
@@ -35,14 +22,9 @@ static NSString *SRGPreferenceChangelogEntryTypeName(SRGPreferenceChangelogEntry
 
 #pragma mark Class methods
 
-+ (SRGPreferenceChangelogEntry *)changelogEntryForUpsertAtPath:(NSString *)path inDomain:(NSString *)domain withObject:(id)object
++ (SRGPreferenceChangelogEntry *)changelogEntryWithObject:(id<NSCopying>)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    return [[[self class] alloc] initWithType:SRGPreferenceChangelogEntryTypeUpsert forPath:path inDomain:domain withObject:object];
-}
-
-+ (SRGPreferenceChangelogEntry *)changelogEntryForDeleteAtPath:(NSString *)path inDomain:(NSString *)domain
-{
-    return [[[self class] alloc] initWithType:SRGPreferenceChangelogEntryTypeDelete forPath:path inDomain:domain withObject:nil];
+    return [[[self class] alloc] initWithObject:object atPath:path inDomain:domain];
 }
 
 + (NSArray<SRGPreferenceChangelogEntry *> *)changelogEntriesFromPreferenceFileAtURL:(NSURL *)fileURL
@@ -86,11 +68,6 @@ static NSString *SRGPreferenceChangelogEntryTypeName(SRGPreferenceChangelogEntry
     
     NSMutableArray<SRGPreferenceChangelogEntry *> *entries = [NSMutableArray array];
     
-    if (path) {
-        SRGPreferenceChangelogEntry *entry = [[SRGPreferenceChangelogEntry alloc] initWithType:SRGPreferenceChangelogEntryTypeNode forPath:path inDomain:domain withObject:@{}];
-        [entries addObject:entry];
-    }
-    
     for (NSString *key in dictionary) {
         NSString *subpath = path ? [path stringByAppendingPathComponent:key] : key;
         
@@ -100,7 +77,7 @@ static NSString *SRGPreferenceChangelogEntryTypeName(SRGPreferenceChangelogEntry
             [entries addObjectsFromArray:subEntries];
         }
         else {
-            SRGPreferenceChangelogEntry *subEntry = [[SRGPreferenceChangelogEntry alloc] initWithType:SRGPreferenceChangelogEntryTypeUpsert forPath:subpath inDomain:domain withObject:object];
+            SRGPreferenceChangelogEntry *subEntry = [[SRGPreferenceChangelogEntry alloc] initWithObject:object atPath:subpath inDomain:domain];
             [entries addObject:subEntry];
         }
     }
@@ -115,54 +92,35 @@ static NSString *SRGPreferenceChangelogEntryTypeName(SRGPreferenceChangelogEntry
     static NSDictionary *s_mapping;
     static dispatch_once_t s_onceToken;
     dispatch_once(&s_onceToken, ^{
-        s_mapping = @{ @keypath(SRGPreferenceChangelogEntry.new, type) : @"type",
+        s_mapping = @{ @keypath(SRGPreferenceChangelogEntry.new, object) : @"object",
                        @keypath(SRGPreferenceChangelogEntry.new, path) : @"path",
-                       @keypath(SRGPreferenceChangelogEntry.new, domain) : @"domain",
-                       @keypath(SRGPreferenceChangelogEntry.new, object) : @"object" };
+                       @keypath(SRGPreferenceChangelogEntry.new, domain) : @"domain" };
     });
     return s_mapping;
 }
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithType:(SRGPreferenceChangelogEntryType)type forPath:(NSString *)path inDomain:(NSString *)domain withObject:(id)object
+- (instancetype)initWithObject:(id<NSCopying>)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
     if (self = [super init]) {
-        self.type = type;
+        self.object = object;
         self.path = path;
         self.domain = domain;
-        self.object = [object copy];
     }
     return self;
-}
-
-#pragma mark Transformers
-
-+ (NSValueTransformer *)typeJSONTransformer
-{
-    static NSValueTransformer *s_transformer;
-    static dispatch_once_t s_onceToken;
-    dispatch_once(&s_onceToken, ^{
-        s_transformer = [NSValueTransformer mtl_valueMappingTransformerWithDictionary:@{ @"upsert" : @(SRGPreferenceChangelogEntryTypeUpsert),
-                                                                                         @"delete" : @(SRGPreferenceChangelogEntryTypeDelete),
-                                                                                         @"node" : @(SRGPreferenceChangelogEntryTypeNode) }
-                                                                         defaultValue:@(SRGPreferenceChangelogEntryTypeUpsert)
-                                                                  reverseDefaultValue:nil];
-    });
-    return s_transformer;
 }
 
 #pragma mark Description
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; type = %@; path = %@; domain: %@; object: %@>",
+    return [NSString stringWithFormat:@"<%@: %p; object = %@; path = %@; domain: %@>",
             [self class],
             self,
-            SRGPreferenceChangelogEntryTypeName(self.type),
+            self.object,
             self.path,
-            self.domain,
-            self.object];
+            self.domain];
 }
 
 @end

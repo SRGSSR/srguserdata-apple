@@ -9,23 +9,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, SRGPreferenceChangelogEntryType) {
-    SRGPreferenceChangelogEntryTypeUpsert,
-    SRGPreferenceChangelogEntryTypeDelete,
-    SRGPreferenceChangelogEntryTypeNode
-};
-
 @interface SRGPreferenceChangelogEntry : MTLModel <MTLJSONSerializing>
 
-+ (SRGPreferenceChangelogEntry *)changelogEntryForUpsertAtPath:(NSString *)path inDomain:(NSString *)domain withObject:(id)object;
-+ (SRGPreferenceChangelogEntry *)changelogEntryForDeleteAtPath:(NSString *)path inDomain:(NSString *)domain;
++ (SRGPreferenceChangelogEntry *)changelogEntryWithObject:(nullable id<NSCopying>)object atPath:(NSString *)path inDomain:(NSString *)domain;
 
 + (nullable NSArray<SRGPreferenceChangelogEntry *> *)changelogEntriesFromPreferenceFileAtURL:(NSURL *)fileURL;
 
-@property (nonatomic, readonly) SRGPreferenceChangelogEntryType type;
 @property (nonatomic, readonly, copy) NSString *path;
 @property (nonatomic, readonly, copy) NSString *domain;
-@property (nonatomic, readonly, nullable) id object;
+@property (nonatomic, readonly, nullable) id<NSCopying> object;
 
 @end
 

@@ -15,7 +15,6 @@
 #import "SRGUserDataService+Subclassing.h"
 
 // TODO: - Thread-safety considerations
-//       - Delete each log entry consumed during sync
 //       - Should coalesce operations by path / domain (only the last one in the changelog must be kept)
 //       - UT: Spaces / slashes / dots in keys + encoding if needed
 
@@ -178,7 +177,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (user.accountUid) {
-            SRGPreferenceChangelogEntry *entry = [SRGPreferenceChangelogEntry changelogEntryForUpsertAtPath:path inDomain:domain withObject:object];
+            SRGPreferenceChangelogEntry *entry = [SRGPreferenceChangelogEntry changelogEntryWithObject:object atPath:path inDomain:domain];
             [self.changelog addEntry:entry];
         }
     }];
@@ -203,38 +202,6 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         }
     }
     return nil;
-}
-
-- (void)removeObjectAtPath:(NSString *)path inDomain:(NSString *)domain
-{
-    NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
-    
-    NSMutableDictionary *dictionary = self.dictionary;
-    for (NSString *pathComponent in pathComponents) {
-        if (pathComponent == pathComponents.lastObject) {
-            [dictionary removeObjectForKey:pathComponent];
-        }
-        else {
-            id value = dictionary[pathComponent];
-            if (! [value isKindOfClass:NSDictionary.class]) {
-                return;
-            }
-        }
-        dictionary = dictionary[pathComponent];
-    }
-    
-    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
-    
-    [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
-    
-    [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        return [SRGUser userInManagedObjectContext:managedObjectContext];
-    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
-        if (user.accountUid) {
-            SRGPreferenceChangelogEntry *entry = [SRGPreferenceChangelogEntry changelogEntryForDeleteAtPath:path inDomain:domain];
-            [self.changelog addEntry:entry];
-        }
-    }];
 }
 
 - (void)setString:(NSString *)string atPath:(NSString *)path inDomain:(NSString *)domain
@@ -277,6 +244,11 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     return SRGDictionaryMakeImmutable([self objectAtPath:path inDomain:domain withClass:NSDictionary.class]);
 }
 
+- (void)removeObjectAtPath:(NSString *)path inDomain:(NSString *)domain
+{
+    [self setObject:nil atPath:path inDomain:domain];
+}
+
 #pragma mark Subclassing hooks
 
 - (void)prepareDataForInitialSynchronizationWithCompletionBlock:(void (^)(void))completionBlock
@@ -298,40 +270,32 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     
     self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
         if (finished) {
+            // TODO: Pull server settings
             completionBlock(error);
         }
     }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
     
     NSArray<SRGPreferenceChangelogEntry *> *entries = self.changelog.entries;
     for (SRGPreferenceChangelogEntry *entry in entries) {
-        switch (entry.type) {
-            case SRGPreferenceChangelogEntryTypeUpsert: {
-                SRGRequest *request = [SRGPreferencesRequest putPreferenceWithObject:entry.object atPath:entry.path inDomain:entry.domain toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-                    [self.requestQueue reportError:error];
-                    
-                    if (! error) {
-                        [self.changelog removeEntry:entry];
-                    }
-                }];
-                [self.requestQueue addRequest:request resume:YES];
-                break;
-            }
+        if (entry.object) {
+            SRGRequest *request = [SRGPreferencesRequest putPreferenceWithObject:entry.object atPath:entry.path inDomain:entry.domain toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                [self.requestQueue reportError:error];
                 
-            case SRGPreferenceChangelogEntryTypeDelete: {
-                SRGRequest *request = [SRGPreferencesRequest deletePreferenceAtPath:entry.path inDomain:entry.domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-                    [self.requestQueue reportError:error];
-                    
-                    if (! error) {
-                        [self.changelog removeEntry:entry];
-                    }
-                }];
-                [self.requestQueue addRequest:request resume:YES];
-                break;
-            }
+                if (! error) {
+                    [self.changelog removeEntry:entry];
+                }
+            }];
+            [self.requestQueue addRequest:request resume:YES];
+        }
+        else {
+            SRGRequest *request = [SRGPreferencesRequest deletePreferenceAtPath:entry.path inDomain:entry.domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                [self.requestQueue reportError:error];
                 
-            default: {
-                break;
-            }
+                if (! error) {
+                    [self.changelog removeEntry:entry];
+                }
+            }];
+            [self.requestQueue addRequest:request resume:YES];
         }
     }
 }
