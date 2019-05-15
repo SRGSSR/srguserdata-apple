@@ -95,7 +95,7 @@ static NSString *SRGPreferenceChangelogEntryTypeName(SRGPreferenceChangelogEntry
         self.type = type;
         self.path = path;
         self.domain = domain;
-        self.object = object;
+        self.object = [object copy];
     }
     return self;
 }

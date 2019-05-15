@@ -64,7 +64,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 {
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
         self.dictionary = [self savedPreferenceDictionary] ?: [NSMutableDictionary dictionary];
-        self.changelogEntries =  [self savedChangelogEntries] ?: [NSMutableArray array];
+        self.changelogEntries = [self savedChangelogEntries] ?: [NSMutableArray array];
     }
     return self;
 }
@@ -78,7 +78,13 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         [NSFileManager.defaultManager createDirectoryAtURL:folderURL withIntermediateDirectories:YES attributes:nil error:NULL];
     }
     
+    NSError *JSONError = nil;
     NSData *data = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:NULL];
+    if (JSONError) {
+        SRGUserDataLogError(@"preferences", @"Could not save preferences. Reason %@", JSONError);
+        return;
+    }
+    
     NSURL *fileURL = [folderURL URLByAppendingPathComponent:@"preferences.json"];
     [data writeToURL:fileURL atomically:YES];
 }
@@ -96,7 +102,46 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     }
     
     NSData *data = [NSData dataWithContentsOfURL:fileURL];
-    return [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
+    
+    NSError *JSONError = nil;
+    id JSONObject = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&JSONError];
+    if (JSONError) {
+        SRGUserDataLogError(@"preferences", @"Could not read preferences. Reason %@", JSONError);
+        return nil;
+    }
+    
+    if (! [JSONObject isKindOfClass:NSDictionary.class]) {
+        SRGUserDataLogError(@"preferences", @"Could not read preferences. The format is invalid");
+        return nil;
+    }
+    
+    return JSONObject;
+    
+}
+
+- (void)saveChangelogEntries:(NSArray<SRGPreferenceChangelogEntry *> *)changelogEntries
+{
+    NSURL *folderURL = self.dataStore.persistentContainer.srg_fileURL.URLByDeletingPathExtension;
+    if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.path]) {
+        [NSFileManager.defaultManager createDirectoryAtURL:folderURL withIntermediateDirectories:YES attributes:nil error:NULL];
+    }
+    
+    NSError *adapterError = nil;
+    NSArray *JSONArray = [MTLJSONAdapter JSONArrayFromModels:changelogEntries error:&adapterError];
+    if (adapterError) {
+        SRGUserDataLogError(@"preferences", @"Could not save changelog. Reason %@", adapterError);
+        return;
+    }
+    
+    NSError *JSONError = nil;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:JSONArray options:0 error:&JSONError];
+    if (JSONError) {
+        SRGUserDataLogError(@"preferences", @"Could not save changelog. Reason %@", JSONError);
+        return;
+    }
+    
+    NSURL *fileURL = [folderURL URLByAppendingPathComponent:@"changes.json"];
+    [data writeToURL:fileURL atomically:YES];
 }
 
 - (NSMutableArray<SRGPreferenceChangelogEntry *> *)savedChangelogEntries
@@ -112,16 +157,23 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     }
     
     NSData *data = [NSData dataWithContentsOfURL:fileURL];
-    id JSONObject = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
-    if (! [JSONObject isKindOfClass:NSArray.class]) {
-        SRGUserDataLogError(@"preferences", @"Could not parse changelog file.");
+    
+    NSError *JSONError = nil;
+    id JSONObject = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&JSONError];
+    if (JSONError) {
+        SRGUserDataLogError(@"preferences", @"Could not read changelog. Reason %@", JSONError);
         return nil;
     }
     
-    NSError *parseError = nil;
-    NSArray<SRGPreferenceChangelogEntry *> *entries = [MTLJSONAdapter modelsOfClass:SRGPreferencesDidChangeNotification.class fromJSONArray:JSONObject error:&parseError];
-    if (parseError) {
-        SRGUserDataLogError(@"preferences", @"Could not parse changelog file. Reason: %@", parseError);
+    if (! [JSONObject isKindOfClass:NSArray.class]) {
+        SRGUserDataLogError(@"preferences", @"Could not read changelog. The format is invalid");
+        return nil;
+    }
+    
+    NSError *adapterError = nil;
+    NSArray<SRGPreferenceChangelogEntry *> *entries = [MTLJSONAdapter modelsOfClass:SRGPreferenceChangelogEntry.class fromJSONArray:JSONObject error:&adapterError];
+    if (adapterError) {
+        SRGUserDataLogError(@"preferences", @"Could not read changelog. Reason: %@", adapterError);
         return nil;
     }
     
@@ -161,6 +213,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         if (user.accountUid) {
             SRGPreferenceChangelogEntry *entry = [SRGPreferenceChangelogEntry changelogEntryForUpsertAtPath:path inDomain:domain withObject:object];
             [self.changelogEntries addObject:entry];
+            [self saveChangelogEntries:self.changelogEntries];
         }
     }];
 }
@@ -215,6 +268,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         if (user.accountUid) {
             SRGPreferenceChangelogEntry *entry = [SRGPreferenceChangelogEntry changelogEntryForDeleteAtPath:path inDomain:domain];
             [self.changelogEntries addObject:entry];
+            [self saveChangelogEntries:self.changelogEntries];
         }
     }];
 }

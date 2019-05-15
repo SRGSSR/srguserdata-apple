@@ -198,7 +198,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
                                                                              message:nil
                                                                       preferredStyle:UIAlertControllerStyleActionSheet];
     [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"String", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        UIAlertController *alertController2 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add number", nil)
+        UIAlertController *alertController2 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add string", nil)
                                                                                   message:nil
                                                                            preferredStyle:UIAlertControllerStyleAlert];
         [alertController2 addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
