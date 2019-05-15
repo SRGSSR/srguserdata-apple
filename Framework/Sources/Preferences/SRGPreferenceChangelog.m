@@ -87,6 +87,10 @@
 
 - (void)addEntry:(SRGPreferenceChangelogEntry *)entry
 {
+    // TODO: Edit the changelog to discard older entries which are replaced with the new one, e.g.
+    //         - delete of a path already upserted in the changelog makes the older entries useless
+    //         - deletion of a path should cleanup entries in its subtree
+    //         - etc.
     [self.changelogEntries addObject:entry];
     [SRGPreferenceChangelog saveChangelogEntries:self.changelogEntries toFileURL:self.fileURL];
 }

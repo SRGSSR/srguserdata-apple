@@ -5,9 +5,6 @@
 //
 
 #import "SRGUserDataService.h"
-#import "SRGUserObject.h"
-
-#import <SRGIdentity/SRGIdentity.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,6 +12,15 @@ NS_ASSUME_NONNULL_BEGIN
  *  Methods hooks for service subclass implementations.
  */
 @interface SRGUserDataService (Subclassing)
+
+/**
+ *  This method provides a way for the service to prepare existing local data for initial synchronization, so that it
+ *  can be properly merged with existing remote data.
+ *
+ *  The provided completion block must be called on completion, otherwise the behavior is undefined. The block can
+ *  be called from any thread.
+ */
+- (void)prepareDataForInitialSynchronizationWithCompletionBlock:(void (^)(void))completionBlock;
 
 /**
  *  This method is called when synchronization starts, from any thread. Services can implement their logic here (usually
@@ -30,11 +36,6 @@ NS_ASSUME_NONNULL_BEGIN
  *  network requests retrieving and sending data).
  */
 - (void)cancelSynchronization;
-
-/**
- *  Services must implement this method to return the objects they are responsible to synchronize.
- */
-- (NSArray<SRGUserObject *> *)userObjectsInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Method called when local service data needs to be cleared.

@@ -8,6 +8,7 @@
 
 #import "SRGPreferenceChangelog.h"
 #import "SRGUser+Private.h"
+#import "SRGUserData+Private.h"
 #import "SRGUserDataLogger.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserDataService+Subclassing.h"
@@ -103,10 +104,10 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
+- (instancetype)initWithServiceURL:(NSURL *)serviceURL userData:(SRGUserData *)userData
 {
-    if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
-        self.fileURL = [[dataStore.persistentContainer.srg_fileURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"prefs"];
+    if (self = [super initWithServiceURL:serviceURL userData:userData]) {
+        self.fileURL = [[userData.storeFileURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"prefs"];
         self.dictionary = [SRGPreferences savedPreferenceDictionaryFromFileURL:self.fileURL] ?: [NSMutableDictionary dictionary];
         self.changelog = [[SRGPreferenceChangelog alloc] initForPreferencesFileWithURL:self.fileURL];
     }
@@ -114,6 +115,27 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 }
 
 #pragma mark Preference management
+
+- (BOOL)hasObjectAtPath:(NSString *)path inDomain:(NSString *)domain
+{
+    NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
+    
+    NSMutableDictionary *dictionary = self.dictionary;
+    for (NSString *pathComponent in pathComponents) {
+        id value = dictionary[pathComponent];
+        
+        if (pathComponent == pathComponents.lastObject) {
+            return value != nil;
+        }
+        else {
+            if (! [value isKindOfClass:NSDictionary.class]) {
+                break;
+            }
+            dictionary = value;
+        }
+    }
+    return NO;
+}
 
 - (void)setObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
@@ -140,7 +162,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     
     [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
     
-    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (user.accountUid) {
@@ -165,7 +187,6 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
             if (! [value isKindOfClass:NSDictionary.class]) {
                 break;
             }
-            
             dictionary = value;
         }
     }
@@ -194,7 +215,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     
     [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
     
-    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (user.accountUid) {
@@ -248,6 +269,9 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 
 - (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
+    
+    
+    
     completionBlock(nil);
 }
 

@@ -14,6 +14,7 @@
 #import "SRGPlaylistEntry+Private.h"
 #import "SRGPlaylistsRequest.h"
 #import "SRGUser+Private.h"
+#import "SRGUserData+Private.h"
 #import "SRGUserDataError.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserDataService+Subclassing.h"
@@ -67,9 +68,9 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
+- (instancetype)initWithServiceURL:(NSURL *)serviceURL userData:(SRGUserData *)userData
 {
-    if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
+    if (self = [super initWithServiceURL:serviceURL userData:userData]) {
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
         self.session = [NSURLSession sessionWithConfiguration:sessionConfiguration];
         
@@ -94,7 +95,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     NSMutableSet<NSString *> *changedUids = [NSMutableSet set];
     NSMutableDictionary<NSString *, NSSet<NSString *> *> *playlistEntriesUidsIndex = [NSMutableDictionary dictionary];
     
-    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGPlaylist *> *previousPlaylists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         NSArray<NSDictionary *> *replacementPlaylistDictionaries = [SRGPlaylist dictionariesForObjects:previousPlaylists replacedWithDictionaries:playlistDictionaries];
         
@@ -138,7 +139,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     __block BOOL playlistFound = NO;
     NSMutableSet<NSString *> *changedUids = [NSMutableSet set];
     
-    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid matchingPredicate:nil inManagedObjectContext:managedObjectContext];
         if (! playlist) {
             return;
@@ -230,7 +231,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                 [self.requestQueue reportError:error];
                 
                 if (! error) {
-                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                    [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                         SRGPlaylist *playlist = [managedObjectContext existingObjectWithID:playlistID error:NULL];
                         [managedObjectContext deleteObject:playlist];
                     } withPriority:NSOperationQueuePriorityLow completionBlock:nil];
@@ -243,7 +244,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                 [self.requestQueue reportError:error];
                 
                 if (! error) {
-                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                    [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                         SRGPlaylist *playlist = [managedObjectContext existingObjectWithID:playlistID error:NULL];
                         [playlist updateWithDictionary:playlistDictionary];
                         playlist.dirty = NO;
@@ -261,7 +262,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     NSParameterAssert(sessionToken);
     NSParameterAssert(completionBlock);
     
-    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGPlaylist *> * _Nullable playlists, NSError * _Nullable error) {
         if (playlists.count == 0) {
@@ -324,7 +325,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                 [self.requestQueue reportError:error];
                 
                 if (! error) {
-                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                    [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                         for (NSManagedObjectID *playlistEntryID in discardedPlaylistEntryIDs) {
                             SRGPlaylistEntry *playlistEntry = [managedObjectContext existingObjectWithID:playlistEntryID error:NULL];
                             [managedObjectContext deleteObject:playlistEntry];
@@ -348,7 +349,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                 [self.requestQueue reportError:error];
                 
                 if (! error) {
-                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                    [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                         for (NSManagedObjectID *playlistEntryID in updatedPlaylistEntryIDs) {
                             SRGPlaylistEntry *playlistEntry = [managedObjectContext existingObjectWithID:playlistEntryID error:NULL];
                             NSDictionary *playlistEntryDictionary = updatedPlaylistEntryDictionaryIndex[playlistEntry.uid];
@@ -367,9 +368,9 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 
 - (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
-    NSString *sessionToken = self.identityService.sessionToken;
+    NSString *sessionToken = self.userData.identityService.sessionToken;
     
-    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (error) {
@@ -378,7 +379,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         }
         
         NSManagedObjectID *userID = user.objectID;
-        [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGPlaylist.new, dirty)];
             return [SRGPlaylist objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGPlaylist *> * _Nullable playlists, NSError * _Nullable error) {
@@ -393,7 +394,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                     return;
                 }
                 
-                [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
                     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGPlaylistEntry.new, dirty)];
                     return [SRGPlaylistEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
                 } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGPlaylistEntry *> * _Nullable playlistEntries, NSError * _Nullable error) {
@@ -420,7 +421,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                                     return;
                                 }
                                 
-                                [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                                [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                                     SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
                                     user.playlistsSynchronizationDate = NSDate.date;
                                 } withPriority:NSOperationQueuePriorityLow completionBlock:completionBlock];
@@ -452,7 +453,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     NSMutableSet<NSString *> *deletedUids = [NSMutableSet set];
     NSMutableDictionary<NSString *, NSSet<NSString *> *> *playlistEntriesUidsIndex = [NSMutableDictionary dictionary];
     
-    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGPlaylist *> *playlists = [SRGPlaylist objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         for (SRGPlaylist *playlist in playlists) {
             NSString *playlistUid = playlist.uid;
@@ -509,28 +510,28 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 
 - (NSArray<SRGPlaylist *> *)playlistsMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
 {
-    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [self playlistsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     }];
 }
 
 - (NSString *)playlistsMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGPlaylist *> * _Nullable, NSError * _Nullable))completionBlock
 {
-    return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [self playlistsMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
 - (SRGPlaylist *)playlistWithUid:(NSString *)uid
 {
-    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [self playlistWithUid:uid inManagedObjectContext:managedObjectContext];
     }];
 }
 
 - (NSString *)playlistWithUid:(NSString *)uid completionBlock:(void (^)(SRGPlaylist * _Nullable, NSError * _Nullable))completionBlock
 {
-    return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [self playlistWithUid:uid inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
@@ -555,7 +556,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     
     __block BOOL forbidden = NO;
     
-    return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         if (type != SRGPlaylistTypeForPlaylistWithUid(uid)) {
             forbidden = YES;
             return;
@@ -586,7 +587,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     __block NSSet<NSString *> *changedUids = nil;
     NSMutableDictionary<NSString *, NSSet<NSString *> *> *playlistEntriesUidsIndex = [NSMutableDictionary dictionary];
     
-    return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         for (NSString *uid in uids) {
             SRGPlaylist *playlist = [SRGPlaylist objectWithUid:uid matchingPredicate:nil inManagedObjectContext:managedObjectContext];
             if (! playlist) {
@@ -648,14 +649,14 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 
 - (NSArray<SRGPlaylistEntry *> *)playlistEntriesInPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
 {
-    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [self playlistEntriesInPlaylistWithUid:playlistUid matchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     }];
 }
 
 - (NSString *)playlistEntriesInPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGPlaylistEntry *> * _Nullable, NSError * _Nullable))completionBlock
 {
-    return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [self playlistEntriesInPlaylistWithUid:playlistUid matchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
@@ -664,7 +665,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 {
     __block BOOL playlistFound = NO;
     
-    return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid matchingPredicate:nil inManagedObjectContext:managedObjectContext];
         if (! playlist) {
             return;
@@ -700,7 +701,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
     __block BOOL playlistFound = NO;
     __block NSSet<NSString *> *changedUids = nil;
     
-    return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGPlaylist *playlist = [SRGPlaylist objectWithUid:playlistUid matchingPredicate:nil inManagedObjectContext:managedObjectContext];
         if (! playlist) {
             return;
@@ -731,7 +732,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
 
 - (void)cancelTaskWithHandle:(NSString *)handle
 {
-    [self.dataStore cancelBackgroundTaskWithHandle:handle];
+    [self.userData.dataStore cancelBackgroundTaskWithHandle:handle];
 }
 
 @end

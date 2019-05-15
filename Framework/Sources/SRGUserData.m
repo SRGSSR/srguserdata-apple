@@ -167,13 +167,13 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
         NSMutableDictionary<SRGUserDataServiceType, SRGUserDataService *> *services = [NSMutableDictionary dictionary];
         
         NSURL *historyServiceURL = [serviceURL URLByAppendingPathComponent:@"history"];
-        services[SRGUserDataServiceTypeHistory] = [[SRGHistory alloc] initWithServiceURL:historyServiceURL identityService:identityService dataStore:self.dataStore];
+        services[SRGUserDataServiceTypeHistory] = [[SRGHistory alloc] initWithServiceURL:historyServiceURL userData:self];
         
         NSURL *playlistsServiceURL = [serviceURL URLByAppendingPathComponent:@"playlist"];
-        services[SRGUserDataServiceTypePlaylists] = [[SRGPlaylists alloc] initWithServiceURL:playlistsServiceURL identityService:identityService dataStore:self.dataStore];
+        services[SRGUserDataServiceTypePlaylists] = [[SRGPlaylists alloc] initWithServiceURL:playlistsServiceURL userData:self];
         
         NSURL *preferencesServiceURL = [serviceURL URLByAppendingPathComponent:@"preference"];
-        services[SRGUserDataServiceTypePreferences] = [[SRGPreferences alloc] initWithServiceURL:preferencesServiceURL identityService:identityService dataStore:self.dataStore];
+        services[SRGUserDataServiceTypePreferences] = [[SRGPreferences alloc] initWithServiceURL:preferencesServiceURL userData:self];
         
         self.services = [services copy];
         
@@ -220,6 +220,11 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
 }
 
 #pragma mark Getters and setters
+
+- (NSURL *)storeFileURL
+{
+    return self.dataStore.persistentContainer.srg_fileURL;
+}
 
 - (SRGUser *)user
 {    
@@ -376,17 +381,21 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
 
 - (void)userDidLogin:(NSNotification *)notification
 {
-    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-        [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
-            NSArray<SRGUserObject *> *objects = [service userObjectsInManagedObjectContext:managedObjectContext];
-            for (SRGUserObject *object in objects) {
-                object.dirty = YES;
+    __block NSUInteger remainingServices = self.services.count;
+    [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
+        [service prepareDataForInitialSynchronizationWithCompletionBlock:^{
+            --remainingServices;
+            if (remainingServices == 0) {
+                if (! NSThread.isMainThread) {
+                    dispatch_sync(dispatch_get_main_queue(), ^{
+                        [self synchronize];
+                    });
+                }
+                else {
+                    [self synchronize];
+                }
             }
         }];
-    } withPriority:NSOperationQueuePriorityVeryHigh completionBlock:^(NSError * _Nullable error) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [self synchronize];
-        });
     }];
 }
 

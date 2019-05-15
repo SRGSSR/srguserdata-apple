@@ -12,6 +12,8 @@ OBJC_EXPORT NSString * const SRGPreferencesDidChangeNotification;
 
 @interface SRGPreferences : SRGUserDataService
 
+- (BOOL)hasObjectAtPath:(NSString *)path inDomain:(NSString *)domain;
+
 - (void)setString:(nullable NSString *)string atPath:(NSString *)path inDomain:(NSString *)domain;
 - (void)setNumber:(nullable NSNumber *)number atPath:(NSString *)path inDomain:(NSString *)domain;
 - (void)setArray:(nullable NSArray *)array atPath:(NSString *)path inDomain:(NSString *)domain;

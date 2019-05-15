@@ -16,6 +16,7 @@
 #import "SRGUserDataError.h"
 #import "SRGUserDataService.h"
 #import "SRGUserObject.h"
+#import "SRGUserObjectService.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
