@@ -7,6 +7,7 @@
 #import "SRGPreferences.h"
 
 #import "SRGPreferenceChangelog.h"
+#import "SRGPreferencesRequest.h"
 #import "SRGUser+Private.h"
 #import "SRGUserData+Private.h"
 #import "SRGUserDataLogger.h"
@@ -42,8 +43,10 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 
 @property (nonatomic) NSURL *fileURL;
 @property (nonatomic) NSMutableDictionary *dictionary;
-
 @property (nonatomic) SRGPreferenceChangelog *changelog;
+
+@property (nonatomic) SRGRequestQueue *requestQueue;
+@property (nonatomic) NSURLSession *session;
 
 @end
 
@@ -116,6 +119,9 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         self.fileURL = [[userData.storeFileURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"prefs"];
         self.dictionary = [SRGPreferences savedPreferenceDictionaryFromFileURL:self.fileURL] ?: [NSMutableDictionary dictionary];
         self.changelog = [[SRGPreferenceChangelog alloc] initForPreferencesFileWithURL:self.fileURL];
+        
+        NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        self.session = [NSURLSession sessionWithConfiguration:sessionConfiguration];
     }
     return self;
 }
@@ -288,12 +294,51 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 
 - (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
-    completionBlock(nil);
+    NSString *sessionToken = self.userData.identityService.sessionToken;
+    
+    self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
+        if (finished) {
+            completionBlock(error);
+        }
+    }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
+    
+    NSArray<SRGPreferenceChangelogEntry *> *entries = self.changelog.entries;
+    for (SRGPreferenceChangelogEntry *entry in entries) {
+        switch (entry.type) {
+            case SRGPreferenceChangelogEntryTypeUpsert: {
+                SRGRequest *request = [SRGPreferencesRequest putPreferenceWithObject:entry.object atPath:entry.path inDomain:entry.domain toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                    [self.requestQueue reportError:error];
+                    
+                    if (! error) {
+                        [self.changelog removeEntry:entry];
+                    }
+                }];
+                [self.requestQueue addRequest:request resume:YES];
+                break;
+            }
+                
+            case SRGPreferenceChangelogEntryTypeDelete: {
+                SRGRequest *request = [SRGPreferencesRequest deletePreferenceAtPath:entry.path inDomain:entry.domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                    [self.requestQueue reportError:error];
+                    
+                    if (! error) {
+                        [self.changelog removeEntry:entry];
+                    }
+                }];
+                [self.requestQueue addRequest:request resume:YES];
+                break;
+            }
+                
+            default: {
+                break;
+            }
+        }
+    }
 }
 
 - (void)cancelSynchronization
 {
-    
+    [self.requestQueue cancel];
 }
 
 - (void)clearData
@@ -301,7 +346,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     [NSFileManager.defaultManager removeItemAtURL:self.fileURL error:NULL];
     [self.dictionary removeAllObjects];
     
-    [self.changelog clearData];
+    [self.changelog removeAllEntries];
     
     [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
 }

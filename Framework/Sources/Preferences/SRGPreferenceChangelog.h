@@ -12,9 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initForPreferencesFileWithURL:(NSURL *)preferencesFileURL;
 
-- (void)addEntry:(SRGPreferenceChangelogEntry *)entry;
+@property (nonatomic, readonly) NSArray<SRGPreferenceChangelogEntry *> *entries;
 
-- (void)clearData;
+- (void)addEntry:(SRGPreferenceChangelogEntry *)entry;
+- (void)removeEntry:(SRGPreferenceChangelogEntry *)entry;
+
+- (void)removeAllEntries;
 
 @end
 

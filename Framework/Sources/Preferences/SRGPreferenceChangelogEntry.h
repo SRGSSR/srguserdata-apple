@@ -22,6 +22,11 @@ typedef NS_ENUM(NSInteger, SRGPreferenceChangelogEntryType) {
 
 + (nullable NSArray<SRGPreferenceChangelogEntry *> *)changelogEntriesFromPreferenceFileAtURL:(NSURL *)fileURL;
 
+@property (nonatomic, readonly) SRGPreferenceChangelogEntryType type;
+@property (nonatomic, readonly, copy) NSString *path;
+@property (nonatomic, readonly, copy) NSString *domain;
+@property (nonatomic, readonly, nullable) id object;
+
 @end
 
 NS_ASSUME_NONNULL_END

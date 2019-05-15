@@ -88,6 +88,15 @@
     return self;
 }
 
+#pragma mark Getters and setters
+
+- (NSArray<SRGPreferenceChangelogEntry *> *)entries
+{
+    return [self.changelogEntries copy];
+}
+
+#pragma mark Changelog management
+
 - (void)addEntry:(SRGPreferenceChangelogEntry *)entry
 {
     // TODO: Edit the changelog to discard older entries which are replaced with the new one, e.g.
@@ -98,7 +107,13 @@
     [SRGPreferenceChangelog saveChangelogEntries:self.changelogEntries toFileURL:self.fileURL];
 }
 
-- (void)clearData
+- (void)removeEntry:(SRGPreferenceChangelogEntry *)entry
+{
+    [self.changelogEntries removeObject:entry];
+    [SRGPreferenceChangelog saveChangelogEntries:self.changelogEntries toFileURL:self.fileURL];
+}
+
+- (void)removeAllEntries
 {
     [NSFileManager.defaultManager removeItemAtURL:self.fileURL error:NULL];
     [self.changelogEntries removeAllObjects];
