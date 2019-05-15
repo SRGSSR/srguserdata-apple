@@ -86,8 +86,10 @@ static NSString *SRGPreferenceChangelogEntryTypeName(SRGPreferenceChangelogEntry
     
     NSMutableArray<SRGPreferenceChangelogEntry *> *entries = [NSMutableArray array];
     
-    SRGPreferenceChangelogEntry *entry = [[SRGPreferenceChangelogEntry alloc] initWithType:SRGPreferenceChangelogEntryTypeNode forPath:path inDomain:domain withObject:@{}];
-    [entries addObject:entry];
+    if (path) {
+        SRGPreferenceChangelogEntry *entry = [[SRGPreferenceChangelogEntry alloc] initWithType:SRGPreferenceChangelogEntryTypeNode forPath:path inDomain:domain withObject:@{}];
+        [entries addObject:entry];
+    }
     
     for (NSString *key in dictionary) {
         NSString *subpath = path ? [path stringByAppendingPathComponent:key] : key;
