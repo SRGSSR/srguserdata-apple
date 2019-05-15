@@ -6,7 +6,7 @@
 
 #import "SRGPreferences.h"
 
-#import "SRGPreferenceChangeLogEntry.h"
+#import "SRGPreferenceChangelogEntry.h"
 #import "SRGUser+Private.h"
 #import "SRGUserDataLogger.h"
 #import "SRGUserDataService+Private.h"
@@ -37,7 +37,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 @interface SRGPreferences ()
 
 @property (nonatomic) NSMutableDictionary *dictionary;
-@property (nonatomic) NSMutableArray<SRGPreferenceChangeLogEntry *> *changeLogEntries;
+@property (nonatomic) NSMutableArray<SRGPreferenceChangelogEntry *> *changelogEntries;
 
 @end
 
@@ -64,7 +64,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
 {
     if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
         self.dictionary = [self savedPreferenceDictionary] ?: [NSMutableDictionary dictionary];
-        self.changeLogEntries =  [self savedChangeLogEntries] ?: [NSMutableArray array];
+        self.changelogEntries =  [self savedChangelogEntries] ?: [NSMutableArray array];
     }
     return self;
 }
@@ -99,7 +99,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     return [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
 }
 
-- (NSMutableArray<SRGPreferenceChangeLogEntry *> *)savedChangeLogEntries
+- (NSMutableArray<SRGPreferenceChangelogEntry *> *)savedChangelogEntries
 {
     NSURL *folderURL = self.dataStore.persistentContainer.srg_fileURL.URLByDeletingPathExtension;
     if (! [NSFileManager.defaultManager fileExistsAtPath:folderURL.path]) {
@@ -119,7 +119,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     }
     
     NSError *parseError = nil;
-    NSArray<SRGPreferenceChangeLogEntry *> *entries = [MTLJSONAdapter modelsOfClass:SRGPreferencesDidChangeNotification.class fromJSONArray:JSONObject error:&parseError];
+    NSArray<SRGPreferenceChangelogEntry *> *entries = [MTLJSONAdapter modelsOfClass:SRGPreferencesDidChangeNotification.class fromJSONArray:JSONObject error:&parseError];
     if (parseError) {
         SRGUserDataLogError(@"preferences", @"Could not parse changelog file. Reason: %@", parseError);
         return nil;
@@ -159,8 +159,8 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (user.accountUid) {
-            SRGPreferenceChangeLogEntry *entry = [SRGPreferenceChangeLogEntry changeLogEntryForUpsertAtPath:path inDomain:domain withObject:object];
-            [self.changeLogEntries addObject:entry];
+            SRGPreferenceChangelogEntry *entry = [SRGPreferenceChangelogEntry changelogEntryForUpsertAtPath:path inDomain:domain withObject:object];
+            [self.changelogEntries addObject:entry];
         }
     }];
 }
@@ -213,8 +213,8 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (user.accountUid) {
-            SRGPreferenceChangeLogEntry *entry = [SRGPreferenceChangeLogEntry changeLogEntryForDeleteAtPath:path inDomain:domain];
-            [self.changeLogEntries addObject:entry];
+            SRGPreferenceChangelogEntry *entry = [SRGPreferenceChangelogEntry changelogEntryForDeleteAtPath:path inDomain:domain];
+            [self.changelogEntries addObject:entry];
         }
     }];
 }

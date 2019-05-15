@@ -77,6 +77,8 @@
 		6F19DAA6221FF61800085C7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAA3221FF61800085C7D /* main.m */; };
 		6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F19DAA9222005A800085C7D /* SRGHistoryRequest.h */; };
 		6F19DAAC222005A800085C7D /* SRGHistoryRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAAA222005A800085C7D /* SRGHistoryRequest.m */; };
+		6F222B9F228BF35B0066ABE3 /* SRGPreferenceChangelogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F222B9D228BF35A0066ABE3 /* SRGPreferenceChangelogEntry.m */; };
+		6F222BA0228BF35B0066ABE3 /* SRGPreferenceChangelogEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F222B9E228BF35A0066ABE3 /* SRGPreferenceChangelogEntry.h */; };
 		6F308A682212CE7E003D3385 /* UserData_DB_invalid in Resources */ = {isa = PBXBuildFile; fileRef = 6FFEB7442212CBE60098F131 /* UserData_DB_invalid */; };
 		6F32342D2212E9B90046E265 /* TestData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6F32342A2212E9890046E265 /* TestData.xcdatamodeld */; };
 		6F3234322212ED240046E265 /* UserDataBaseTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F3234312212ED230046E265 /* UserDataBaseTestCase.m */; };
@@ -127,8 +129,6 @@
 		6F6359FC2289896A00E7F697 /* PreferencesTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */; };
 		6F6359FF2289AEC500E7F697 /* SRGPreferencesRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F6359FD2289AEC500E7F697 /* SRGPreferencesRequest.h */; };
 		6F635A002289AEC500E7F697 /* SRGPreferencesRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359FE2289AEC500E7F697 /* SRGPreferencesRequest.m */; };
-		6F635A032289B8E200E7F697 /* SRGPreferenceChangeLogEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F635A012289B8E200E7F697 /* SRGPreferenceChangeLogEntry.h */; };
-		6F635A042289B8E200E7F697 /* SRGPreferenceChangeLogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F635A022289B8E200E7F697 /* SRGPreferenceChangeLogEntry.m */; };
 		6F64BDF02274E19F00ED0DFE /* MigrationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FCCE4802212BFD600423EFF /* MigrationTestCase.m */; };
 		6F687FC62281FE9800E6AE2C /* SRGPlaylistEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
@@ -349,6 +349,8 @@
 		6F19DAA5221FF61800085C7D /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6F19DAA9222005A800085C7D /* SRGHistoryRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGHistoryRequest.h; sourceTree = "<group>"; };
 		6F19DAAA222005A800085C7D /* SRGHistoryRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGHistoryRequest.m; sourceTree = "<group>"; };
+		6F222B9D228BF35A0066ABE3 /* SRGPreferenceChangelogEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPreferenceChangelogEntry.m; sourceTree = "<group>"; };
+		6F222B9E228BF35A0066ABE3 /* SRGPreferenceChangelogEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPreferenceChangelogEntry.h; sourceTree = "<group>"; };
 		6F32342B2212E9890046E265 /* TestData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestData.xcdatamodel; sourceTree = "<group>"; };
 		6F3234312212ED230046E265 /* UserDataBaseTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDataBaseTestCase.m; sourceTree = "<group>"; };
 		6F3234332212ED370046E265 /* UserDataBaseTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDataBaseTestCase.h; sourceTree = "<group>"; };
@@ -391,8 +393,6 @@
 		6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesTestCase.m; sourceTree = "<group>"; };
 		6F6359FD2289AEC500E7F697 /* SRGPreferencesRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferencesRequest.h; sourceTree = "<group>"; };
 		6F6359FE2289AEC500E7F697 /* SRGPreferencesRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferencesRequest.m; sourceTree = "<group>"; };
-		6F635A012289B8E200E7F697 /* SRGPreferenceChangeLogEntry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferenceChangeLogEntry.h; sourceTree = "<group>"; };
-		6F635A022289B8E200E7F697 /* SRGPreferenceChangeLogEntry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferenceChangeLogEntry.m; sourceTree = "<group>"; };
 		6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylistEntry+Private.h"; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -766,8 +766,8 @@
 		6F6359F52289581300E7F697 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
-				6F635A012289B8E200E7F697 /* SRGPreferenceChangeLogEntry.h */,
-				6F635A022289B8E200E7F697 /* SRGPreferenceChangeLogEntry.m */,
+				6F222B9E228BF35A0066ABE3 /* SRGPreferenceChangelogEntry.h */,
+				6F222B9D228BF35A0066ABE3 /* SRGPreferenceChangelogEntry.m */,
 				6F6359F62289584600E7F697 /* SRGPreferences.h */,
 				6F6359F72289584600E7F697 /* SRGPreferences.m */,
 				6F6359FD2289AEC500E7F697 /* SRGPreferencesRequest.h */,
@@ -937,7 +937,6 @@
 				6F6359FF2289AEC500E7F697 /* SRGPreferencesRequest.h in Headers */,
 				6F0178AF22080FEC00B4BCD9 /* SRGHistoryEntry.h in Headers */,
 				6FA9ADFF222C4944007446BD /* SRGUserDataError.h in Headers */,
-				6F635A032289B8E200E7F697 /* SRGPreferenceChangeLogEntry.h in Headers */,
 				6F0178B122080FEC00B4BCD9 /* SRGUser.h in Headers */,
 				6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */,
 				6FC44DE8227349CC0022DC99 /* NSArray+SRGUserData.h in Headers */,
@@ -947,6 +946,7 @@
 				6FFB347322089A5E00E76E6D /* SRGDataStore.h in Headers */,
 				08C9919B22537833003E7816 /* SRGPlaylist+Private.h in Headers */,
 				6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */,
+				6F222BA0228BF35B0066ABE3 /* SRGPreferenceChangelogEntry.h in Headers */,
 				6F0178D02208199800B4BCD9 /* SRGUserDataTimerTarget.h in Headers */,
 				08C991A82254B97E003E7816 /* SRGPlaylistEntry.h in Headers */,
 				6F0178CC2208192B00B4BCD9 /* NSTimer+SRGUserData.h in Headers */,
@@ -1202,9 +1202,9 @@
 				6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */,
 				6F6359F92289584600E7F697 /* SRGPreferences.m in Sources */,
 				6FC44DE7227349CC0022DC99 /* NSArray+SRGUserData.m in Sources */,
-				6F635A042289B8E200E7F697 /* SRGPreferenceChangeLogEntry.m in Sources */,
 				6F635A002289AEC500E7F697 /* SRGPreferencesRequest.m in Sources */,
 				6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */,
+				6F222B9F228BF35B0066ABE3 /* SRGPreferenceChangelogEntry.m in Sources */,
 				6F938025227C0CE600315A83 /* NSSet+SRGUserData.m in Sources */,
 				08C991A92254B97E003E7816 /* SRGPlaylistEntry.m in Sources */,
 				08280F0C2258DEBD00AC978D /* SRGPlaylists.m in Sources */,

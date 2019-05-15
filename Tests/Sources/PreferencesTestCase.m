@@ -7,7 +7,7 @@
 #import "UserDataBaseTestCase.h"
 
 // Private headers
-#import "SRGPreferenceChangeLogEntry.h"
+#import "SRGPreferenceChangelogEntry.h"
 
 @interface PreferencesTestCase : UserDataBaseTestCase
 
@@ -52,14 +52,14 @@
 - (void)testMigrationToChangeLog
 {
     // TODO: Should be turned into proper tests
-    NSArray<SRGPreferenceChangeLogEntry *> *entries1 = [SRGPreferenceChangeLogEntry changeLogEntriesForPreferenceDictionary:@{} inDomain:@"domain"];
+    NSArray<SRGPreferenceChangelogEntry *> *entries1 = [SRGPreferenceChangelogEntry changelogEntriesForPreferenceDictionary:@{} inDomain:@"domain"];
     NSLog(@"%@", entries1);
     
-    NSArray<SRGPreferenceChangeLogEntry *> *entries2 = [SRGPreferenceChangeLogEntry changeLogEntriesForPreferenceDictionary:@{ @"n" : @1,
+    NSArray<SRGPreferenceChangelogEntry *> *entries2 = [SRGPreferenceChangelogEntry changelogEntriesForPreferenceDictionary:@{ @"n" : @1,
                                                                                                                                @"s" : @"hello" } inDomain:@"domain"];
     NSLog(@"%@", entries2);
     
-    NSArray<SRGPreferenceChangeLogEntry *> *entries3 = [SRGPreferenceChangeLogEntry changeLogEntriesForPreferenceDictionary:@{ @"n" : @1,
+    NSArray<SRGPreferenceChangelogEntry *> *entries3 = [SRGPreferenceChangelogEntry changelogEntriesForPreferenceDictionary:@{ @"n" : @1,
                                                                                                                                @"s" : @"lev1",
                                                                                                                                @"d" : @{ @"n" : @2,
                                                                                                                                          @"s" : @"lev2" }
