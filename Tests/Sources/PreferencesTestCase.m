@@ -45,6 +45,8 @@
     
     [self.userData.preferences removeObjectAtPath:@"a/b/c" inDomain:@"test"];
     XCTAssertNil([self.userData.preferences stringAtPath:@"a/b/c" inDomain:@"test"]);
+    
+    [self.userData.preferences setString:nil atPath:@"a" inDomain:@"test"];
 }
 
 - (void)testMigrationToChangeLog

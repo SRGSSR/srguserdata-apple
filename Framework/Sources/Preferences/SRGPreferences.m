@@ -15,9 +15,7 @@
 //       - Serialize change log entries as well
 //       - Delete each log entry consumed during sync
 //       - Should coalesce operations by path / domain (only the last one in the changelog must be kept)
-//       - Prevent keys with length = 0
-//       - Support nullable in setters
-//       - Spaces / slashes / dots in keys + UT + encoding
+//       - UT: Spaces / slashes / dots in keys + encoding if needed
 
 NSString * const SRGPreferencesDidChangeNotification = @"SRGPreferencesDidChangeNotification";
 
@@ -112,11 +110,11 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
             dictionary[pathComponent] = object;
         }
         else {
-            id object = dictionary[pathComponent];
-            if (! object) {
+            id value = dictionary[pathComponent];
+            if (! value) {
                 dictionary[pathComponent] = [NSMutableDictionary dictionary];
             }
-            else if (! [object isKindOfClass:NSDictionary.class]) {
+            else if (! [value isKindOfClass:NSDictionary.class]) {
                 return;
             }
             dictionary = dictionary[pathComponent];
@@ -143,17 +141,17 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     
     NSMutableDictionary *dictionary = self.dictionary;
     for (NSString *pathComponent in pathComponents) {
-        id object = dictionary[pathComponent];
+        id value = dictionary[pathComponent];
         
         if (pathComponent == pathComponents.lastObject) {
-            return [object isKindOfClass:cls] ? object : nil;
+            return [value isKindOfClass:cls] ? value : nil;
         }
         else {
-            if (! [object isKindOfClass:NSDictionary.class]) {
+            if (! [value isKindOfClass:NSDictionary.class]) {
                 break;
             }
             
-            dictionary = object;
+            dictionary = value;
         }
     }
     return nil;

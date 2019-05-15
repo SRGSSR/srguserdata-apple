@@ -12,10 +12,10 @@ OBJC_EXPORT NSString * const SRGPreferencesDidChangeNotification;
 
 @interface SRGPreferences : SRGUserDataService
 
-- (void)setString:(NSString *)string atPath:(NSString *)path inDomain:(NSString *)domain;
-- (void)setNumber:(NSNumber *)number atPath:(NSString *)path inDomain:(NSString *)domain;
-- (void)setArray:(NSArray *)array atPath:(NSString *)path inDomain:(NSString *)domain;
-- (void)setDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain;
+- (void)setString:(nullable NSString *)string atPath:(NSString *)path inDomain:(NSString *)domain;
+- (void)setNumber:(nullable NSNumber *)number atPath:(NSString *)path inDomain:(NSString *)domain;
+- (void)setArray:(nullable NSArray *)array atPath:(NSString *)path inDomain:(NSString *)domain;
+- (void)setDictionary:(nullable NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain;
 
 - (nullable NSString *)stringAtPath:(NSString *)path inDomain:(NSString *)domain;
 - (nullable NSNumber *)numberAtPath:(NSString *)path inDomain:(NSString *)domain;
