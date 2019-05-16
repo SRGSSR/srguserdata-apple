@@ -63,7 +63,9 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
 @property (nonatomic) NSMutableDictionary *dictionary;
 @property (nonatomic) SRGPreferenceChangelog *changelog;
 
+@property (nonatomic, weak) SRGRequest *pushRequest;
 @property (nonatomic) SRGRequestQueue *requestQueue;
+
 @property (nonatomic) NSURLSession *session;
 
 @end
@@ -279,34 +281,51 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
         return;
     }
     
-    self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
-        if (finished) {
-            completionBlock(error);
-        }
-    }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
+    typedef void (^PushEntryBlock)(SRGPreferenceChangelogEntry *);
+    __block __weak PushEntryBlock weakPushEntry = nil;
     
-    for (SRGPreferenceChangelogEntry *entry in entries) {
+    // The server currently does not support parallel updates reliably (some of them will fail). Serialize them instead.
+    // TODO: This should definitely be fixed. A better implementation would just use a request queue (see commit before
+    //       the following block was introduced), having a session configuration with max HTTP connections set to 1 for
+    //       serialization. Sadly this still seems too fast for the server to handle changes properly.
+    // FIXME: Bugs
+    //        1) When adding several items in a subdictionary in a row, somehow the local dictionary gets removed
+    //        2) When deleting several items, sometimes requests might repeat endlessly
+    PushEntryBlock pushEntry = ^(SRGPreferenceChangelogEntry *entry) {
+        PushEntryBlock strongPushEntry = weakPushEntry;
+        
+        void (^pushCompletionBlock)(NSHTTPURLResponse *, NSError *) = ^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError *error) {
+            if (error) {
+                completionBlock(error);
+                return;
+            }
+            
+            [self.changelog removeEntry:entry];
+            
+            NSInteger index = [entries indexOfObject:entry];
+            if (index < entries.count - 1) {
+                SRGPreferenceChangelogEntry *nextEntry = entries[index + 1];
+                strongPushEntry(nextEntry);
+            }
+            else {
+                completionBlock(nil);
+            }
+        };
+        
         if (entry.object) {
-            SRGRequest *request = [SRGPreferencesRequest putPreferenceWithObject:entry.object atPath:entry.path inDomain:entry.domain toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-                [self.requestQueue reportError:error];
-                
-                if (! error) {
-                    [self.changelog removeEntry:entry];
-                }
-            }];
-            [self.requestQueue addRequest:request resume:YES];
+            SRGRequest *request = [SRGPreferencesRequest putPreferenceWithObject:entry.object atPath:entry.path inDomain:entry.domain toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:pushCompletionBlock];
+            [request resume];
+            self.pushRequest = request;
         }
         else {
-            SRGRequest *request = [SRGPreferencesRequest deletePreferenceAtPath:entry.path inDomain:entry.domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-                [self.requestQueue reportError:error];
-                
-                if (! error) {
-                    [self.changelog removeEntry:entry];
-                }
-            }];
-            [self.requestQueue addRequest:request resume:YES];
+            SRGRequest *request = [SRGPreferencesRequest deletePreferenceAtPath:entry.path inDomain:entry.domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:pushCompletionBlock];
+            [request resume];
+            self.pushRequest = request;
         }
-    }
+    };
+    weakPushEntry = pushEntry;
+        
+    pushEntry(entries.firstObject);
 }
 
 - (void)pullPreferencesForSessionToken:(NSString *)sessionToken
@@ -372,6 +391,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
 
 - (void)cancelSynchronization
 {
+    [self.pushRequest cancel];
     [self.requestQueue cancel];
 }
 
