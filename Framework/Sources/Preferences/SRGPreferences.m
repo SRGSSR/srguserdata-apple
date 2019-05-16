@@ -148,6 +148,28 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
 
 #pragma mark Preference management
 
+- (BOOL)hasObjectAtPath:(NSString *)path inDomain:(NSString *)domain
+{
+    NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
+    
+    NSMutableDictionary *dictionary = self.dictionary;
+    for (NSUInteger i = 0; i < pathComponents.count; ++i) {
+        NSString *pathComponent = pathComponents[i];
+        id value = dictionary[pathComponent];
+        
+        if (i == pathComponents.count - 1) {
+            return value != nil;
+        }
+        else {
+            if (! [value isKindOfClass:NSDictionary.class]) {
+                break;
+            }
+            dictionary = value;
+        }
+    }
+    return NO;
+}
+
 - (void)setObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
     NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
@@ -220,36 +242,9 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
     [self setObject:array atPath:path inDomain:domain];
 }
 
-- (BOOL)hasObjectAtPath:(NSString *)path inDomain:(NSString *)domain
+- (void)setDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
-    
-    NSMutableDictionary *dictionary = self.dictionary;
-    for (NSUInteger i = 0; i < pathComponents.count; ++i) {
-        NSString *pathComponent = pathComponents[i];
-        id value = dictionary[pathComponent];
-        
-        if (i == pathComponents.count - 1) {
-            return value != nil;
-        }
-        else {
-            if (! [value isKindOfClass:NSDictionary.class]) {
-                break;
-            }
-            dictionary = value;
-        }
-    }
-    return NO;
-}
-
-- (NSDictionary *)dictionaryAtPath:(NSString *)path inDomain:(NSString *)domain
-{
-    return SRGDictionaryMakeImmutable([self objectAtPath:path inDomain:domain withClass:NSDictionary.class]);
-}
-
-- (void)removeObjectAtPath:(NSString *)path inDomain:(NSString *)domain
-{
-    [self setObject:nil atPath:path inDomain:domain];
+    [self setObject:SRGDictionaryMakeMutable(dictionary) atPath:path inDomain:domain];
 }
 
 - (NSString *)stringAtPath:(NSString *)path inDomain:(NSString *)domain
@@ -265,6 +260,16 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
 - (NSArray *)arrayAtPath:(NSString *)path inDomain:(NSString *)domain
 {
     return [self objectAtPath:path inDomain:domain withClass:NSArray.class];
+}
+
+- (NSDictionary *)dictionaryAtPath:(NSString *)path inDomain:(NSString *)domain
+{
+    return SRGDictionaryMakeImmutable([self objectAtPath:path inDomain:domain withClass:NSDictionary.class]);
+}
+
+- (void)removeObjectAtPath:(NSString *)path inDomain:(NSString *)domain
+{
+    [self setObject:nil atPath:path inDomain:domain];
 }
 
 #pragma mark Requests
