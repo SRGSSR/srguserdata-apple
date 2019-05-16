@@ -53,5 +53,7 @@
 //       are namely statically alloced and can be subtler to test
 // TODO: Add test for complete cleanup of remote prefs
 // TODO: Test for addition of same dic from 2 devices, with different items -> must merge
+// TODO: Decide and test behavior for insertion at path where one of the components already exist and does not
+//       point to a dictionary (currently: does nothing). Should insertion methods return a BOOL / error?
 
 @end
