@@ -51,5 +51,6 @@
 
 // TODO: Add test where an item with a simple key (e.g. a) is added to a dict with the same key. Such tiny keys
 //       are namely statically alloced and can be subtler to test
+// TODO: Add test for complete cleanup of remote prefs
 
 @end

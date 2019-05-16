@@ -192,9 +192,8 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
         }
     }
     
-    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
-    
     [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
+    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
     
     [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
@@ -345,16 +344,24 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
             return;
         }
         
-        for (NSString *domain in domains) {
-            SRGRequest *preferencesRequest = [SRGPreferencesRequest preferencesAtPath:nil inDomain:domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSDictionary * _Nullable dictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-                [self.requestQueue reportError:error];
-                
-                if (! error) {
-                    self.dictionary[domain] = SRGDictionaryMakeMutable(dictionary);
-                    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
-                }
-            }];
-            [self.requestQueue addRequest:preferencesRequest resume:YES];
+        if (domains.count != 0) {
+            for (NSString *domain in domains) {
+                SRGRequest *preferencesRequest = [SRGPreferencesRequest preferencesAtPath:nil inDomain:domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSDictionary * _Nullable dictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                    [self.requestQueue reportError:error];
+                    
+                    if (! error) {
+                        self.dictionary[domain] = SRGDictionaryMakeMutable(dictionary);
+                        [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
+                        [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+                    }
+                }];
+                [self.requestQueue addRequest:preferencesRequest resume:YES];
+            }
+        }
+        else {
+            [self.dictionary removeAllObjects];
+            [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
+            [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
         }
     }];
     [self.requestQueue addRequest:domainsRequest resume:YES];
