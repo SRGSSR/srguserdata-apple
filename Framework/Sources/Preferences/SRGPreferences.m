@@ -17,6 +17,7 @@
 // TODO: - Thread-safety considerations
 //       - Should coalesce operations by path / domain (only the last one in the changelog must be kept)
 //       - UT: Spaces / slashes / dots in keys + encoding if needed
+//       - Add test for SRGPreferencesDidChangeNotification on the main thread.
 
 NSString * const SRGPreferencesDidChangeNotification = @"SRGPreferencesDidChangeNotification";
 

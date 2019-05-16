@@ -121,6 +121,11 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
+    else if ([value isKindOfClass:NSArray.class]) {
+        cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Array (%@ objects)", nil), [value count]];
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
     else {
         cell.detailTextLabel.text = nil;
         cell.accessoryType = UITableViewCellAccessoryNone;
