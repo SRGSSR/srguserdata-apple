@@ -49,4 +49,7 @@
     [self.userData.preferences setString:nil atPath:@"a" inDomain:@"test"];
 }
 
+// TODO: Add test where an item with a simple key (e.g. a) is added to a dict with the same key. Such tiny keys
+//       are namely statically alloced and can be subtler to test
+
 @end

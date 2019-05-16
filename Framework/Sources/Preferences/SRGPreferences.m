@@ -153,10 +153,11 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
     NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
     
     NSMutableDictionary *dictionary = self.dictionary;
-    for (NSString *pathComponent in pathComponents) {
+    for (NSUInteger i = 0; i < pathComponents.count; ++i) {
+        NSString *pathComponent = pathComponents[i];
         id value = dictionary[pathComponent];
         
-        if (pathComponent == pathComponents.lastObject) {
+        if (i == pathComponents.count - 1) {
             return value != nil;
         }
         else {
@@ -174,8 +175,9 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
     NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
     
     NSMutableDictionary *dictionary = self.dictionary;
-    for (NSString *pathComponent in pathComponents) {
-        if (pathComponent == pathComponents.lastObject) {
+    for (NSUInteger i = 0; i < pathComponents.count; ++i) {
+        NSString *pathComponent = pathComponents[i];
+        if (i == pathComponents.count - 1) {
             dictionary[pathComponent] = object;
         }
         else {
@@ -209,10 +211,11 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
     NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
     
     NSMutableDictionary *dictionary = self.dictionary;
-    for (NSString *pathComponent in pathComponents) {
+    for (NSUInteger i = 0; i < pathComponents.count; ++i) {
+        NSString *pathComponent = pathComponents[i];
         id value = dictionary[pathComponent];
         
-        if (pathComponent == pathComponents.lastObject) {
+        if (i == pathComponents.count - 1) {
             return [value isKindOfClass:cls] ? value : nil;
         }
         else {
@@ -289,8 +292,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
     //       the following block was introduced), having a session configuration with max HTTP connections set to 1 for
     //       serialization. Sadly this still seems too fast for the server to handle changes properly.
     // FIXME: Bugs
-    //        1) When adding several items in a subdictionary in a row, somehow the local dictionary gets removed
-    //        2) When deleting several items, sometimes requests might repeat endlessly
+    //        1) When deleting several items, sometimes requests might repeat endlessly
     PushEntryBlock pushEntry = ^(SRGPreferenceChangelogEntry *entry) {
         PushEntryBlock strongPushEntry = weakPushEntry;
         
