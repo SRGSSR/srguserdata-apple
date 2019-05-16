@@ -41,6 +41,7 @@
     URLRequest.HTTPMethod = @"POST";
     [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", sessionToken] forHTTPHeaderField:@"Authorization"];
     [URLRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    NSAssert([NSJSONSerialization isValidJSONObject:dictionary], @"The data must be serializable to JSON");
     URLRequest.HTTPBody = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:NULL];
     
     return [SRGRequest JSONDictionaryRequestWithURLRequest:URLRequest session:session completionBlock:^(NSDictionary * _Nullable JSONDictionary, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -97,6 +98,7 @@
     URLRequest.HTTPMethod = @"PUT";
     [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", sessionToken] forHTTPHeaderField:@"Authorization"];
     [URLRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    NSAssert([NSJSONSerialization isValidJSONObject:dictionaries], @"The data must be serializable to JSON");
     URLRequest.HTTPBody = [NSJSONSerialization dataWithJSONObject:dictionaries options:0 error:NULL];
     
     return [SRGRequest JSONArrayRequestWithURLRequest:URLRequest session:session completionBlock:^(NSArray * _Nullable JSONArray, NSURLResponse * _Nullable response, NSError * _Nullable error) {

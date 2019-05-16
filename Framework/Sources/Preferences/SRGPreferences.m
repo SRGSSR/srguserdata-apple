@@ -30,13 +30,31 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionary];
     [dictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull object, BOOL * _Nonnull stop) {
         if ([object isKindOfClass:NSMutableDictionary.class]) {
-            mutableDictionary[key] = [object copy];
+            mutableDictionary[key] = SRGDictionaryMakeImmutable(object);
         }
         else {
             mutableDictionary[key] = object;
         }
     }];
     return [mutableDictionary copy];
+}
+
+static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
+{
+    if (! dictionary) {
+        return nil;
+    }
+    
+    NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionary];
+    [dictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull object, BOOL * _Nonnull stop) {
+        if ([object isKindOfClass:NSDictionary.class]) {
+            mutableDictionary[key] = SRGDictionaryMakeMutable(object);
+        }
+        else {
+            mutableDictionary[key] = object;
+        }
+    }];
+    return mutableDictionary;
 }
 
 @interface SRGPreferences ()
@@ -250,33 +268,23 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     [self setObject:nil atPath:path inDomain:domain];
 }
 
-#pragma mark Subclassing hooks
+#pragma mark Requests
 
-- (void)prepareDataForInitialSynchronizationWithCompletionBlock:(void (^)(void))completionBlock
+- (void)pushPreferencesForSessionToken:(NSString *)sessionToken
+                   withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
-    if (! [NSFileManager.defaultManager fileExistsAtPath:self.fileURL.path]) {
-        completionBlock();
+    NSArray<SRGPreferenceChangelogEntry *> *entries = self.changelog.entries;
+    if (entries.count == 0) {
+        completionBlock(nil);
         return;
     }
     
-    NSArray<SRGPreferenceChangelogEntry *> *entries = [SRGPreferenceChangelogEntry changelogEntriesFromPreferenceFileAtURL:self.fileURL];
-    [entries enumerateObjectsUsingBlock:^(SRGPreferenceChangelogEntry * _Nonnull entry, NSUInteger idx, BOOL * _Nonnull stop) {
-        [self.changelog addEntry:entry];
-    }];
-}
-
-- (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
-{
-    NSString *sessionToken = self.userData.identityService.sessionToken;
-    
     self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
         if (finished) {
-            // TODO: Pull server settings
             completionBlock(error);
         }
     }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
     
-    NSArray<SRGPreferenceChangelogEntry *> *entries = self.changelog.entries;
     for (SRGPreferenceChangelogEntry *entry in entries) {
         if (entry.object) {
             SRGRequest *request = [SRGPreferencesRequest putPreferenceWithObject:entry.object atPath:entry.path inDomain:entry.domain toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
@@ -299,6 +307,67 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
             [self.requestQueue addRequest:request resume:YES];
         }
     }
+}
+
+- (void)pullPreferencesForSessionToken:(NSString *)sessionToken
+                   withCompletionBlock:(void (^)(NSError *error))completionBlock
+{
+    self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
+        if (finished) {
+            completionBlock(error);
+        }
+    }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
+    
+    SRGRequest *domainsRequest = [SRGPreferencesRequest domainsFromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSString *> * _Nullable domains, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        if (error) {
+            completionBlock(error);
+            return;
+        }
+        
+        for (NSString *domain in domains) {
+            SRGRequest *preferencesRequest = [SRGPreferencesRequest preferencesAtPath:nil inDomain:domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSDictionary * _Nullable dictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+                [self.requestQueue reportError:error];
+                
+                if (! error) {
+                    self.dictionary[domain] = SRGDictionaryMakeMutable(dictionary);
+                    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+                }
+            }];
+            [self.requestQueue addRequest:preferencesRequest resume:YES];
+        }
+    }];
+    [self.requestQueue addRequest:domainsRequest resume:YES];
+}
+
+#pragma mark Subclassing hooks
+
+- (void)prepareDataForInitialSynchronizationWithCompletionBlock:(void (^)(void))completionBlock
+{
+    if (! [NSFileManager.defaultManager fileExistsAtPath:self.fileURL.path]) {
+        completionBlock();
+        return;
+    }
+    
+    NSArray<SRGPreferenceChangelogEntry *> *entries = [SRGPreferenceChangelogEntry changelogEntriesFromPreferenceFileAtURL:self.fileURL];
+    [entries enumerateObjectsUsingBlock:^(SRGPreferenceChangelogEntry * _Nonnull entry, NSUInteger idx, BOOL * _Nonnull stop) {
+        [self.changelog addEntry:entry];
+    }];
+    
+    completionBlock();
+}
+
+- (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
+{
+    NSString *sessionToken = self.userData.identityService.sessionToken;
+    
+    [self pushPreferencesForSessionToken:sessionToken withCompletionBlock:^(NSError *error) {
+        if (error) {
+            completionBlock(error);
+            return;
+        }
+        
+        [self pullPreferencesForSessionToken:sessionToken withCompletionBlock:completionBlock];
+    }];
 }
 
 - (void)cancelSynchronization

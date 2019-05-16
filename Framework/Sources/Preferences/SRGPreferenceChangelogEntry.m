@@ -12,7 +12,7 @@
 
 @interface SRGPreferenceChangelogEntry ()
 
-@property (nonatomic) id<NSCopying> object;
+@property (nonatomic) id object;
 @property (nonatomic, copy) NSString *path;
 @property (nonatomic, copy) NSString *domain;
 
@@ -22,7 +22,7 @@
 
 #pragma mark Class methods
 
-+ (SRGPreferenceChangelogEntry *)changelogEntryWithObject:(id<NSCopying>)object atPath:(NSString *)path inDomain:(NSString *)domain
++ (SRGPreferenceChangelogEntry *)changelogEntryWithObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
     return [[[self class] alloc] initWithObject:object atPath:path inDomain:domain];
 }
@@ -101,7 +101,7 @@
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithObject:(id<NSCopying>)object atPath:(NSString *)path inDomain:(NSString *)domain
+- (instancetype)initWithObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
     if (self = [super init]) {
         self.object = object;
