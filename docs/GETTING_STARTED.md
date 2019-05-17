@@ -120,18 +120,21 @@ For example, you could set an HD download setting flag as follows for some appli
 [SRGUserData.currentUserData.playlists.preferences setNumber:@YES atPath:@"settings/downloads/hd" inDomain:@"my_app"];
 ```
 
-You can then retrieve it in a similar way:
+You can then retrieve the value in a similar way:
 
 ```objective-c
 BOOL HDEnabled = [SRGUserData.currentUserData.playlists.preferences numberAtPath:@"settings/downloads/hd" inDomain:@"my_app"].boolValue;
 ```
 
-
 #### Change notifications
+
+Changes made to preferences are notified through `SRGPreferencesDidChangeNotification` notifications, whether a user is logged in or not. This ensures any part of your application can stay informed about changes and respond accordingly.
 
 ### Synchronization with a user account
 
-Once a user has logged in with an associated `SRGIdentityService` instance, user data will stay automatically synchronized. Your application can register to the `SRGUserDataDidStartSynchronizationNotification` and `SRGUserDataDidFinishSynchronizationNotification` notifications to detect when global synchronization starts or ends. For information purposes, the last device synchronization date can also be retrieved from the `SRGUserData` `user` information.
+Once a user has logged in with an associated `SRGIdentityService` instance, user data will stay automatically synchronized. Your application can register to the `SRGUserDataDidStartSynchronizationNotification` and `SRGUserDataDidFinishSynchronizationNotification` notifications to detect when global synchronization starts or ends. The end notification might contain error information if the synchronization went wrong for some reason.
+
+For information purposes, the last successful synchronization date can be retrieved from the `SRGUserData` `user` information.
 
 ### Thread-safety considerations
 
