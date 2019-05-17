@@ -23,6 +23,12 @@
 
 #pragma mark Tests
 
+- (void)testBools
+{
+    XCTAssertEqual([NSNumber numberWithBool:YES], (void *)kCFBooleanTrue);
+    XCTAssertEqual([NSNumber numberWithBool:NO], (void *)kCFBooleanFalse);
+}
+
 - (void)testString
 {
     [self.userData.preferences setString:@"x" atPath:@"a/b/c" inDomain:@"test"];

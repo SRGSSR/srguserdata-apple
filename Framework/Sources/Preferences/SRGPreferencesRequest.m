@@ -79,8 +79,16 @@ static NSNumberFormatter *SRGLocaleIndependentNumberFormatter(void)
         URLRequest.HTTPBody = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
     }
     else if ([object isKindOfClass:NSNumber.class]) {
-        NSString *numberString = [SRGLocaleIndependentNumberFormatter() stringFromNumber:object];
-        URLRequest.HTTPBody = [numberString dataUsingEncoding:NSUTF8StringEncoding];
+        if (object == (void *)kCFBooleanTrue) {
+            URLRequest.HTTPBody = [@"true" dataUsingEncoding:NSUTF8StringEncoding];
+        }
+        else if (object == (void *)kCFBooleanFalse) {
+            URLRequest.HTTPBody = [@"false" dataUsingEncoding:NSUTF8StringEncoding];
+        }
+        else {
+            NSString *numberString = [SRGLocaleIndependentNumberFormatter() stringFromNumber:object];
+            URLRequest.HTTPBody = [numberString dataUsingEncoding:NSUTF8StringEncoding];
+        }
     }
     else {
         NSAssert(NO, @"Only types appearing in a JSON are supported");
