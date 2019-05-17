@@ -187,7 +187,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
         }
     }
     
-    if (! [self.dictionary isEqualToDictionary:previousDictionary]) {
+    if ([self.dictionary isEqualToDictionary:previousDictionary]) {
         return;
     }
     
