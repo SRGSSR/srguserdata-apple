@@ -6,6 +6,7 @@
 
 #import "SRGPreferences.h"
 
+#import "NSArray+SRGUserData.h"
 #import "SRGPreferencesChangelog.h"
 #import "SRGPreferencesRequest.h"
 #import "SRGUser+Private.h"
@@ -15,8 +16,9 @@
 #import "SRGUserDataService+Subclassing.h"
 
 NSString * const SRGPreferencesDidChangeNotification = @"SRGPreferencesDidChangeNotification";
+NSString * const SRGPreferencesDomainsKey = @"SRGPreferencesDomains";
 
-static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
+static NSDictionary *SRGDictionaryMakeImmutableCopy(NSDictionary *dictionary)
 {
     if (! dictionary) {
         return nil;
@@ -25,7 +27,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionary];
     [dictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull object, BOOL * _Nonnull stop) {
         if ([object isKindOfClass:NSMutableDictionary.class]) {
-            mutableDictionary[key] = SRGDictionaryMakeImmutable(object);
+            mutableDictionary[key] = SRGDictionaryMakeImmutableCopy(object);
         }
         else {
             mutableDictionary[key] = object;
@@ -34,7 +36,7 @@ static NSDictionary *SRGDictionaryMakeImmutable(NSDictionary *dictionary)
     return [mutableDictionary copy];
 }
 
-static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
+static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 {
     if (! dictionary) {
         return nil;
@@ -43,7 +45,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
     NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionary];
     [dictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull object, BOOL * _Nonnull stop) {
         if ([object isKindOfClass:NSDictionary.class]) {
-            mutableDictionary[key] = SRGDictionaryMakeMutable(object);
+            mutableDictionary[key] = SRGDictionaryMakeMutableCopy(object);
         }
         else {
             mutableDictionary[key] = object;
@@ -168,6 +170,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
 - (void)setObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
     NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
+    NSDictionary *previousDictionary = SRGDictionaryMakeImmutableCopy(self.dictionary);
     
     NSMutableDictionary *dictionary = self.dictionary;
     for (NSUInteger i = 0; i < pathComponents.count; ++i) {
@@ -184,8 +187,14 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
         }
     }
     
+    if (! [self.dictionary isEqualToDictionary:previousDictionary]) {
+        return;
+    }
+    
     [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
-    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
+                                                      object:self
+                                                    userInfo:@{ SRGPreferencesDomainsKey : @[domain] }];
     
     [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
@@ -242,7 +251,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
     if (dictionary && ! [NSJSONSerialization isValidJSONObject:dictionary]) {
         return;
     }
-    [self setObject:SRGDictionaryMakeMutable(dictionary) atPath:path inDomain:domain];
+    [self setObject:SRGDictionaryMakeMutableCopy(dictionary) atPath:path inDomain:domain];
 }
 
 - (NSString *)stringAtPath:(NSString *)path inDomain:(NSString *)domain
@@ -262,7 +271,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
 
 - (NSDictionary *)dictionaryAtPath:(NSString *)path inDomain:(NSString *)domain
 {
-    return SRGDictionaryMakeImmutable([self objectAtPath:path inDomain:domain withClass:NSDictionary.class]);
+    return SRGDictionaryMakeImmutableCopy([self objectAtPath:path inDomain:domain withClass:NSDictionary.class]);
 }
 
 - (void)removeObjectAtPath:(NSString *)path inDomain:(NSString *)domain
@@ -339,17 +348,35 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
             return;
         }
         
+        NSArray<NSString *> *previousDomains = self.dictionary.allKeys;
+        NSArray<NSString *> *deletedDomains = [previousDomains srguserdata_arrayByRemovingObjectsInArray:domains];
+        
+        if (deletedDomains.count != 0) {
+            for (NSString *domain in deletedDomains) {
+                [self.dictionary removeObjectForKey:domain];
+            }
+            [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGPreferencesDomainsKey : deletedDomains }];
+            });
+        }
+        
         if (domains.count != 0) {
             for (NSString *domain in domains) {
                 SRGRequest *preferencesRequest = [SRGPreferencesRequest preferencesAtPath:nil inDomain:domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSDictionary * _Nullable dictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
                     [self.requestQueue reportError:error];
                     
-                    if (! error) {
-                        self.dictionary[domain] = SRGDictionaryMakeMutable(dictionary);
+                    if (dictionary && ! [self.dictionary isEqualToDictionary:dictionary]) {
+                        self.dictionary[domain] = SRGDictionaryMakeMutableCopy(dictionary);
                         [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
                         
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+                            [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
+                                                                              object:self
+                                                                            userInfo:@{ SRGPreferencesDomainsKey : @[domain] }];
                         });
                     }
                 }];
@@ -357,9 +384,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
             }
         }
         else {
-            [self.dictionary removeAllObjects];
-            [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
-            [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+            completionBlock(nil);
         }
     }];
     [self.requestQueue addRequest:domainsRequest resume:YES];
@@ -404,13 +429,17 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
 
 - (void)clearData
 {
+    NSArray<NSString *> *previousDomains = self.dictionary.allKeys;
+    
     [NSFileManager.defaultManager removeItemAtURL:self.fileURL error:NULL];
     [self.dictionary removeAllObjects];
     
     [self.changelog removeAllEntries];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+        [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
+                                                          object:self
+                                                        userInfo:@{ SRGPreferencesDomainsKey : previousDomains }];
     });
 }
 

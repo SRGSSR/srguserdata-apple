@@ -149,7 +149,7 @@
 
 - (void)testNotifications
 {
-    // TODO: Main thread
+    
 }
 
 // TODO: Add test where an item with a simple key (e.g. a) is added to a dict with the same key. Such tiny keys
@@ -160,7 +160,7 @@
 //       point to a dictionary (currently: does nothing). Should insertion methods return a BOOL / error?
 //       - Add test for SRGPreferencesDidChangeNotification on the main thread. Add domain as key in the user info
 //         dictionary. DidChange => Check that the dictionary in the domain has changed. If not, do not broadcast
-//         any notification
+//         any notification (UT: test if setting the same value)
 // TODO: Test storage of non-JSON serializable settings (e.g. with an NSDate)
 
 @end
