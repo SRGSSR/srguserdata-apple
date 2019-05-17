@@ -347,7 +347,10 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
                     if (! error) {
                         self.dictionary[domain] = SRGDictionaryMakeMutable(dictionary);
                         [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
-                        [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+                        
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+                        });
                     }
                 }];
                 [self.requestQueue addRequest:preferencesRequest resume:YES];
@@ -406,7 +409,9 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
     
     [self.changelog removeAllEntries];
     
-    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification object:self];
+    });
 }
 
 #pragma mark Description
