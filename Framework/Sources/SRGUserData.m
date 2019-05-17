@@ -33,6 +33,8 @@ static SRGUserData *s_currentUserData = nil;
 NSString * const SRGUserDataDidStartSynchronizationNotification = @"SRGUserDataDidStartSynchronizationNotification";
 NSString * const SRGUserDataDidFinishSynchronizationNotification = @"SRGUserDataDidFinishSynchronizationNotification";
 
+NSString * const SRGUserDataSynchronizationErrorsKey = @"SRGUserDataSynchronizationErrors";
+
 NSString *SRGUserDataMarketingVersion(void)
 {
     return NSBundle.srg_userDataBundle.infoDictionary[@"CFBundleShortVersionString"];
@@ -345,6 +347,8 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
     NSAssert(NSThread.isMainThread, @"Expected to be called on the main thread");
     [NSNotificationCenter.defaultCenter postNotificationName:SRGUserDataDidStartSynchronizationNotification object:self];
     
+    NSMutableArray<NSError *> *errors = [NSMutableArray array];
+    
     __block NSUInteger remainingServiceCount = self.services.count;
     [self.services enumerateKeysAndObjectsUsingBlock:^(SRGUserDataServiceType _Nonnull type, SRGUserDataService * _Nonnull service, BOOL * _Nonnull stop) {
         SRGUserDataLogInfo(@"user_data", @"Started synchronization for service %@", service);
@@ -354,18 +358,25 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
                 [self.identityService reportUnauthorization];
             }
             
+            if (error) {
+                [errors addObject:error];
+            }
+            
             NSCAssert(self.synchronizing, @"Must be synchronizing");
             
             --remainingServiceCount;
             if (remainingServiceCount == 0) {
                 [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-                    SRGUser *user = [SRGUser userInManagedObjectContext:managedObjectContext];
-                    user.synchronizationDate = NSDate.date;
+                    if (errors.count == 0) {
+                        SRGUser *user = [SRGUser userInManagedObjectContext:managedObjectContext];
+                        user.synchronizationDate = NSDate.date;
+                    }
                 } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSError * _Nullable error) {
                     self.synchronizing = NO;
                     
                     dispatch_sync(dispatch_get_main_queue(), ^{
-                        [NSNotificationCenter.defaultCenter postNotificationName:SRGUserDataDidFinishSynchronizationNotification object:self];
+                        NSDictionary *userInfo = (errors.count != 0) ? @{ SRGUserDataSynchronizationErrorsKey : errors } : nil;
+                        [NSNotificationCenter.defaultCenter postNotificationName:SRGUserDataDidFinishSynchronizationNotification object:self userInfo:userInfo];
                     });
                     
                     SRGUserDataLogInfo(@"user_data", @"Finished synchronization");

@@ -34,6 +34,11 @@ OBJC_EXPORT NSString * const SRGUserDataDidStartSynchronizationNotification;
 OBJC_EXPORT NSString * const SRGUserDataDidFinishSynchronizationNotification;
 
 /**
+ *  Information available for `SRGHistoryEntriesDidChangeNotification`.
+ */
+OBJC_EXPORT NSString * const SRGUserDataSynchronizationErrorsKey;                           // Key to access the list of `NSError` which have been encountered, if any.
+
+/**
  *  Manages data associated with a user. An identity service and service endpoints can be optionally provided, so that
  *  logged in users can synchronize their data with their account.
  *
