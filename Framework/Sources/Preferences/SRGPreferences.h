@@ -17,7 +17,7 @@ OBJC_EXPORT NSString * const SRGPreferencesDidChangeNotification;
 /**
  *  Information available for `SRGPreferencesDidChangeNotification`.
  */
-OBJC_EXPORT NSString * const SRGPreferencesDomainsKey;                           // Key to access the domains for which changes have been detected, as an array of `NSString` objects.
+OBJC_EXPORT NSString * const SRGPreferencesDomainsKey;                           // Key to access the domains for which changes have been detected, as an `NSSet` of `NSString` objects.
 
 /**
  *  Manages a local cache of user preferences, similar to `NSUserDefaults`. For logged in users, and provided a service

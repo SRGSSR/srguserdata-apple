@@ -6,7 +6,7 @@
 
 #import "SRGPreferences.h"
 
-#import "NSArray+SRGUserData.h"
+#import "NSSet+SRGUserData.h"
 #import "SRGPreferencesChangelog.h"
 #import "SRGPreferencesRequest.h"
 #import "SRGUser+Private.h"
@@ -194,7 +194,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
     [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
     [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
                                                       object:self
-                                                    userInfo:@{ SRGPreferencesDomainsKey : @[domain] }];
+                                                    userInfo:@{ SRGPreferencesDomainsKey : [NSSet setWithObject:domain] }];
     
     [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [SRGUser userInManagedObjectContext:managedObjectContext];
@@ -348,8 +348,8 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
             return;
         }
         
-        NSArray<NSString *> *previousDomains = self.dictionary.allKeys;
-        NSArray<NSString *> *deletedDomains = [previousDomains srguserdata_arrayByRemovingObjectsInArray:domains];
+        NSSet<NSString *> *previousDomains = [NSSet setWithArray:self.dictionary.allKeys];
+        NSSet<NSString *> *deletedDomains = [previousDomains srguserdata_setByRemovingObjectsInArray:domains];
         
         if (deletedDomains.count != 0) {
             for (NSString *domain in deletedDomains) {
@@ -376,7 +376,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
                                                                               object:self
-                                                                            userInfo:@{ SRGPreferencesDomainsKey : @[domain] }];
+                                                                            userInfo:@{ SRGPreferencesDomainsKey : [NSSet setWithObject:domain] }];
                         });
                     }
                 }];
@@ -429,7 +429,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 
 - (void)clearData
 {
-    NSArray<NSString *> *previousDomains = self.dictionary.allKeys;
+    NSSet<NSString *> *previousDomains = [NSSet setWithArray:self.dictionary.allKeys];
     
     [NSFileManager.defaultManager removeItemAtURL:self.fileURL error:NULL];
     [self.dictionary removeAllObjects];
