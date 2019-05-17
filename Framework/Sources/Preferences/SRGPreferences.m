@@ -6,18 +6,13 @@
 
 #import "SRGPreferences.h"
 
-#import "SRGPreferenceChangelog.h"
+#import "SRGPreferencesChangelog.h"
 #import "SRGPreferencesRequest.h"
 #import "SRGUser+Private.h"
 #import "SRGUserData+Private.h"
 #import "SRGUserDataLogger.h"
 #import "SRGUserDataService+Private.h"
 #import "SRGUserDataService+Subclassing.h"
-
-// TODO: - Thread-safety considerations
-//       - Should coalesce operations by path / domain (only the last one in the changelog must be kept)
-//       - UT: Spaces / slashes / dots in keys + encoding if needed
-//       - Add test for SRGPreferencesDidChangeNotification on the main thread.
 
 NSString * const SRGPreferencesDidChangeNotification = @"SRGPreferencesDidChangeNotification";
 
@@ -61,7 +56,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
 
 @property (nonatomic) NSURL *fileURL;
 @property (nonatomic) NSMutableDictionary *dictionary;
-@property (nonatomic) SRGPreferenceChangelog *changelog;
+@property (nonatomic) SRGPreferencesChangelog *changelog;
 
 @property (nonatomic, weak) SRGRequest *pushRequest;
 @property (nonatomic) SRGRequestQueue *requestQueue;
@@ -138,7 +133,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
     if (self = [super initWithServiceURL:serviceURL userData:userData]) {
         self.fileURL = [[userData.storeFileURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"prefs"];
         self.dictionary = [SRGPreferences savedPreferenceDictionaryFromFileURL:self.fileURL] ?: [NSMutableDictionary dictionary];
-        self.changelog = [[SRGPreferenceChangelog alloc] initForPreferencesFileWithURL:self.fileURL];
+        self.changelog = [[SRGPreferencesChangelog alloc] initForPreferencesFileWithURL:self.fileURL];
         
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
         self.session = [NSURLSession sessionWithConfiguration:sessionConfiguration];
@@ -182,11 +177,8 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
         }
         else {
             id value = dictionary[pathComponent];
-            if (! value) {
+            if (! [value isKindOfClass:NSDictionary.class]) {
                 dictionary[pathComponent] = [NSMutableDictionary dictionary];
-            }
-            else if (! [value isKindOfClass:NSDictionary.class]) {
-                return;
             }
             dictionary = dictionary[pathComponent];
         }
@@ -199,7 +191,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (user.accountUid) {
-            SRGPreferenceChangelogEntry *entry = [SRGPreferenceChangelogEntry changelogEntryWithObject:object atPath:path inDomain:domain];
+            SRGPreferencesChangelogEntry *entry = [SRGPreferencesChangelogEntry changelogEntryWithObject:object atPath:path inDomain:domain];
             [self.changelog addEntry:entry];
         }
     }];
@@ -277,22 +269,19 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
 - (void)pushPreferencesForSessionToken:(NSString *)sessionToken
                    withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
-    NSArray<SRGPreferenceChangelogEntry *> *entries = self.changelog.entries;
+    NSArray<SRGPreferencesChangelogEntry *> *entries = self.changelog.entries;
     if (entries.count == 0) {
         completionBlock(nil);
         return;
     }
     
-    typedef void (^PushEntryBlock)(SRGPreferenceChangelogEntry *);
+    typedef void (^PushEntryBlock)(SRGPreferencesChangelogEntry *);
     __block __weak PushEntryBlock weakPushEntry = nil;
     
-    // The server currently does not support parallel updates reliably (some of them will fail). Serialize them instead.
-    // TODO: This should definitely be fixed. A better implementation would just use a request queue (see commit before
-    //       the following block was introduced), having a session configuration with max HTTP connections set to 1 for
-    //       serialization. Sadly this still seems too fast for the server to handle changes properly.
-    // FIXME: Bugs
-    //        1) When deleting several items, sometimes requests might repeat endlessly
-    PushEntryBlock pushEntry = ^(SRGPreferenceChangelogEntry *entry) {
+    // TODO: Implementation could / should be simpler. The requests should be serializable by HTTPMaximumConnectionsPerHost
+    //       to 1 on the session configuration. Sadly this is not serialized enough for the server which will drop some of
+    //       the submitted changes randomly.
+    PushEntryBlock pushEntry = ^(SRGPreferencesChangelogEntry *entry) {
         PushEntryBlock strongPushEntry = weakPushEntry;
         
         void (^pushCompletionBlock)(NSHTTPURLResponse *, NSError *) = ^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError *error) {
@@ -305,7 +294,7 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
             
             NSInteger index = [entries indexOfObject:entry];
             if (index < entries.count - 1) {
-                SRGPreferenceChangelogEntry *nextEntry = entries[index + 1];
+                SRGPreferencesChangelogEntry *nextEntry = entries[index + 1];
                 strongPushEntry(nextEntry);
             }
             else {
@@ -376,8 +365,8 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
         return;
     }
     
-    NSArray<SRGPreferenceChangelogEntry *> *entries = [SRGPreferenceChangelogEntry changelogEntriesFromPreferenceFileAtURL:self.fileURL];
-    [entries enumerateObjectsUsingBlock:^(SRGPreferenceChangelogEntry * _Nonnull entry, NSUInteger idx, BOOL * _Nonnull stop) {
+    NSArray<SRGPreferencesChangelogEntry *> *entries = [SRGPreferencesChangelogEntry changelogEntriesFromPreferencesFileAtURL:self.fileURL];
+    [entries enumerateObjectsUsingBlock:^(SRGPreferencesChangelogEntry * _Nonnull entry, NSUInteger idx, BOOL * _Nonnull stop) {
         [self.changelog addEntry:entry];
     }];
     

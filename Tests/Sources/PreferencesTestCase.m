@@ -6,9 +6,6 @@
 
 #import "UserDataBaseTestCase.h"
 
-// Private headers
-#import "SRGPreferenceChangelogEntry.h"
-
 @interface PreferencesTestCase : UserDataBaseTestCase
 
 @end
@@ -55,5 +52,8 @@
 // TODO: Test for addition of same dic from 2 devices, with different items -> must merge
 // TODO: Decide and test behavior for insertion at path where one of the components already exist and does not
 //       point to a dictionary (currently: does nothing). Should insertion methods return a BOOL / error?
+//       - UT: Spaces / slashes / dots in keys + encoding if needed
+//       - Add test for SRGPreferencesDidChangeNotification on the main thread.
+// TODO: Test storage of non-JSON serializable settings (e.g. with an NSDate)
 
 @end

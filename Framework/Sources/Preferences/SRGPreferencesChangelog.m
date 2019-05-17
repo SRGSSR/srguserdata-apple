@@ -4,22 +4,22 @@
 //  License information is available from the LICENSE file.
 //
 
-#import "SRGPreferenceChangelog.h"
+#import "SRGPreferencesChangelog.h"
 
 #import "SRGUserDataLogger.h"
 
-@interface SRGPreferenceChangelog ()
+@interface SRGPreferencesChangelog ()
 
 @property (nonatomic) NSURL *fileURL;
-@property (nonatomic) NSMutableArray<SRGPreferenceChangelogEntry *> *changelogEntries;
+@property (nonatomic) NSMutableArray<SRGPreferencesChangelogEntry *> *changelogEntries;
 
 @end
 
-@implementation SRGPreferenceChangelog
+@implementation SRGPreferencesChangelog
 
 #pragma mark Class methods
 
-+ (void)saveChangelogEntries:(NSArray<SRGPreferenceChangelogEntry *> *)changelogEntries toFileURL:(NSURL *)fileURL
++ (void)saveChangelogEntries:(NSArray<SRGPreferencesChangelogEntry *> *)changelogEntries toFileURL:(NSURL *)fileURL
 {
     NSError *adapterError = nil;
     NSArray *JSONArray = [MTLJSONAdapter JSONArrayFromModels:changelogEntries error:&adapterError];
@@ -44,7 +44,7 @@
     SRGUserDataLogInfo(@"preference_changelog", @"Changelog successfully saved");
 }
 
-+ (NSMutableArray<SRGPreferenceChangelogEntry *> *)savedChangelogEntriesFromFileURL:(NSURL *)fileURL
++ (NSMutableArray<SRGPreferencesChangelogEntry *> *)savedChangelogEntriesFromFileURL:(NSURL *)fileURL
 {
     if (! [NSFileManager.defaultManager fileExistsAtPath:fileURL.path]) {
         return nil;
@@ -68,7 +68,7 @@
     }
     
     NSError *adapterError = nil;
-    NSArray<SRGPreferenceChangelogEntry *> *entries = [MTLJSONAdapter modelsOfClass:SRGPreferenceChangelogEntry.class fromJSONArray:JSONObject error:&adapterError];
+    NSArray<SRGPreferencesChangelogEntry *> *entries = [MTLJSONAdapter modelsOfClass:SRGPreferencesChangelogEntry.class fromJSONArray:JSONObject error:&adapterError];
     if (adapterError) {
         SRGUserDataLogError(@"preferences", @"Could not read changelog. Reason: %@", adapterError);
         return nil;
@@ -83,34 +83,32 @@
 {
     if (self = [super init]) {
         self.fileURL = [preferencesFileURL URLByAppendingPathExtension:@"changes"];
-        self.changelogEntries = [SRGPreferenceChangelog savedChangelogEntriesFromFileURL:self.fileURL] ?: [NSMutableArray array];
+        self.changelogEntries = [SRGPreferencesChangelog savedChangelogEntriesFromFileURL:self.fileURL] ?: [NSMutableArray array];
     }
     return self;
 }
 
 #pragma mark Getters and setters
 
-- (NSArray<SRGPreferenceChangelogEntry *> *)entries
+- (NSArray<SRGPreferencesChangelogEntry *> *)entries
 {
     return [self.changelogEntries copy];
 }
 
 #pragma mark Changelog management
 
-- (void)addEntry:(SRGPreferenceChangelogEntry *)entry
+- (void)addEntry:(SRGPreferencesChangelogEntry *)entry
 {
-    // TODO: Edit the changelog to discard older entries which are replaced with the new one, e.g.
-    //         - delete of a path already upserted in the changelog makes the older entries useless
-    //         - deletion of a path should cleanup entries in its subtree
-    //         - etc.
+    // TODO: Could be optimized. Some operations (e.g. a deletion followed by an insertion) could namely be coalesced
+    //       into a single operation, reducing the number of operations to be submitted afterwards.
     [self.changelogEntries addObject:entry];
-    [SRGPreferenceChangelog saveChangelogEntries:self.changelogEntries toFileURL:self.fileURL];
+    [SRGPreferencesChangelog saveChangelogEntries:self.changelogEntries toFileURL:self.fileURL];
 }
 
-- (void)removeEntry:(SRGPreferenceChangelogEntry *)entry
+- (void)removeEntry:(SRGPreferencesChangelogEntry *)entry
 {
     [self.changelogEntries removeObject:entry];
-    [SRGPreferenceChangelog saveChangelogEntries:self.changelogEntries toFileURL:self.fileURL];
+    [SRGPreferencesChangelog saveChangelogEntries:self.changelogEntries toFileURL:self.fileURL];
 }
 
 - (void)removeAllEntries

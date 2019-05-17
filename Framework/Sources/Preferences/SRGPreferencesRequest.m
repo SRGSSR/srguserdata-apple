@@ -68,9 +68,7 @@ static NSNumberFormatter *SRGLocaleIndependentNumberFormatter(void)
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URL];
     URLRequest.HTTPMethod = @"PUT";
     [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", sessionToken] forHTTPHeaderField:@"Authorization"];
-    
-    // FIXME: For the request to work the content type must currently always be JSON (this is a known server bug). When
-    //        the bug has been fixed, provide correct content types
+    // Strings and numbers are valid application/json: https://www.json.org/
     [URLRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     
     if ([NSJSONSerialization isValidJSONObject:object]) {

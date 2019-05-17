@@ -110,6 +110,25 @@ Reads can be made synchronously or asynchronously depending on your needs.
 
 Playlist changes are notified through `SRGPlaylistsDidChangeNotification` notifications, and playlist entry updates through `SRGPlaylistEntriessDidChangeNotification` notifications, whether a user is logged in or not. This ensures any part of your application can stay informed about changes and respond accordingly.
 
+### Preferences
+
+`SRGUserData` provides the `preferences` property as an entry point to read and write preferences. Similar to `NSUserDefaults`, preferences store settings, mostly strings and numbers. These settings are saved in a tree whose paths can be accessed as in a filesystem within domains, providing a way to contextually group settings, typically by application.
+
+For example, you could set an HD download setting flag as follows for some application:
+
+```objective-c
+[SRGUserData.currentUserData.playlists.preferences setNumber:@YES atPath:@"settings/downloads/hd" inDomain:@"my_app"];
+```
+
+You can then retrieve it in a similar way:
+
+```objective-c
+BOOL HDEnabled = [SRGUserData.currentUserData.playlists.preferences numberAtPath:@"settings/downloads/hd" inDomain:@"my_app"].boolValue;
+```
+
+
+#### Change notifications
+
 ### Synchronization with a user account
 
 Once a user has logged in with an associated `SRGIdentityService` instance, user data will stay automatically synchronized. Your application can register to the `SRGUserDataDidStartSynchronizationNotification` and `SRGUserDataDidFinishSynchronizationNotification` notifications to detect when global synchronization starts or ends. For information purposes, the last device synchronization date can also be retrieved from the `SRGUserData` `user` information.

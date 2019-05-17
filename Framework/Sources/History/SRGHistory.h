@@ -22,11 +22,11 @@ OBJC_EXPORT NSString * const SRGHistoryEntriesUidsKey;                          
 
 /**
  *  Manages a local cache for history entries. History entries are characterized by an identifier and an associated
- *  playback position. Based on a local cache, this class ensures efficient history retrieval from a webservice and
- *  keeps local and distant histories in sync.
+ *  playback position. For logged in users, and provided a service URL has been set when instantiating `SRGUserData`,
+ *  local and distant histories are automatically kept in sync.
  *
  *  You can register for history change notifications, see above. These will be sent by the `SRGHistory` instance
- *  itself.
+ *  itself and received on the main thread.
  */
 @interface SRGHistory : SRGUserDataService
 
