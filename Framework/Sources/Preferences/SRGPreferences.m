@@ -231,11 +231,17 @@ static NSDictionary *SRGDictionaryMakeMutable(NSDictionary *dictionary)
 
 - (void)setArray:(NSArray *)array atPath:(NSString *)path inDomain:(NSString *)domain
 {
+    if (array && ! [NSJSONSerialization isValidJSONObject:array]) {
+        return;
+    }
     [self setObject:array atPath:path inDomain:domain];
 }
 
 - (void)setDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain
 {
+    if (dictionary && ! [NSJSONSerialization isValidJSONObject:dictionary]) {
+        return;
+    }
     [self setObject:SRGDictionaryMakeMutable(dictionary) atPath:path inDomain:domain];
 }
 

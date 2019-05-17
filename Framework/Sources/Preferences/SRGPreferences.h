@@ -49,7 +49,8 @@ OBJC_EXPORT NSString * const SRGPreferencesDidChangeNotification;
 
 /**
  *  Set collection objects at a specific path in a domain. If set to `nil`, any existing item at this location will be
- *  discarded, no matter its type. Arrays and dictionaries must be serializable to JSON, otherwise no value will be set.
+ *  discarded, no matter its type. Arrays and dictionaries must be serializable to JSON, otherwise no change will be
+ *  made.
  *
  *  @discussion If a path is specified for which a component already matches an existing leaf, the leaf will be replaced
  *              by a new node and the existing value lost. Note that arrays or dictionaries submitted from two connected
