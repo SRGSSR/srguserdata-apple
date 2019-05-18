@@ -35,6 +35,14 @@ OBJC_EXPORT NSString * const SRGPreferencesDomainsKey;                          
  *
  *  You can register for preference update notifications, see above. These will be sent by the `SRGPreferences` instance
  *  itself and received on the main thread.
+ *
+ *  ## Valid domains and paths
+ *
+ *  Domains may not contain slashes, spaces or characters not in `NSCharacterSet.URLPathAllowedCharacterSet`. Path
+ *  components obey to the same rule (they cannot contain slashes which are their delimiters). Slashes appearing at
+ *  the beginning or end of a path are ignored.
+ *
+ *  In general, you should prefer alphanumeric characters when naming domains or building paths.
  */
 @interface SRGPreferences : SRGUserDataService
 

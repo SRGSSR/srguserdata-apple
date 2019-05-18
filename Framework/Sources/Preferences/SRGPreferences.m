@@ -75,13 +75,32 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 {
     NSParameterAssert(domain);
     
-    NSArray<NSString *> *pathComponents = path.pathComponents;
-    if (pathComponents) {
-        return [@[domain] arrayByAddingObjectsFromArray:pathComponents];
+    if (domain.length == 0 || [domain containsString:@"/"]) {
+        SRGUserDataLogWarning(@"preferences", @"Unsupported domain '%@'", domain);
+        return nil;
     }
-    else {
+    
+    if ([domain rangeOfCharacterFromSet:NSCharacterSet.URLPathAllowedCharacterSet.invertedSet].location != NSNotFound) {
+        SRGUserDataLogWarning(@"preferences", @"Unsupported path '%@'", path);
+        return nil;
+    }
+    
+    if (! path) {
         return @[domain];
     }
+    
+    NSString *trimmedPath = [path stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/"]];
+    if (trimmedPath.length == 0) {
+        SRGUserDataLogWarning(@"preferences", @"Unsupported path '%@'", path);
+        return nil;
+    }
+    
+    if ([trimmedPath rangeOfCharacterFromSet:NSCharacterSet.URLPathAllowedCharacterSet.invertedSet].location != NSNotFound) {
+        SRGUserDataLogWarning(@"preferences", @"Unsupported path '%@'", path);
+        return nil;
+    }
+    
+    return [@[domain] arrayByAddingObjectsFromArray:trimmedPath.pathComponents];    
 }
 
 + (void)savePreferenceDictionary:(NSDictionary *)dictionary toFileURL:(NSURL *)fileURL
@@ -148,6 +167,9 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 - (BOOL)hasObjectAtPath:(NSString *)path inDomain:(NSString *)domain
 {
     NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
+    if (! pathComponents) {
+        return 0;
+    }
     
     NSMutableDictionary *dictionary = self.dictionary;
     for (NSUInteger i = 0; i < pathComponents.count; ++i) {
@@ -170,6 +192,10 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 - (void)setObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
     NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
+    if (! pathComponents) {
+        return;
+    }
+    
     NSDictionary *previousDictionary = SRGDictionaryMakeImmutableCopy(self.dictionary);
     
     NSMutableDictionary *dictionary = self.dictionary;
@@ -209,6 +235,9 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 - (id)objectAtPath:(NSString *)path inDomain:(NSString *)domain withClass:(Class)cls
 {
     NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
+    if (! pathComponents) {
+        return nil;
+    }
     
     NSMutableDictionary *dictionary = self.dictionary;
     for (NSUInteger i = 0; i < pathComponents.count; ++i) {

@@ -84,6 +84,13 @@
     XCTAssertNil([self.userData.preferences arrayAtPath:@"path/to/missing/a" inDomain:@"test"]);
 }
 
+- (void)testNoArrayMerge
+{
+    [self.userData.preferences setArray:@[ @"1", @2, @"3" ] atPath:@"a" inDomain:@"test"];
+    [self.userData.preferences setArray:@[ @"4", @"5" ] atPath:@"a" inDomain:@"test"];
+    XCTAssertEqualObjects([self.userData.preferences arrayAtPath:@"a" inDomain:@"test"], (@[ @"4", @"5" ]));
+}
+
 - (void)testDictionary
 {
     [self.userData.preferences setDictionary:@{ @"A" : @"a",
@@ -101,6 +108,14 @@
                                                                                                           @"D" : @4 }));
     
     XCTAssertNil([self.userData.preferences arrayAtPath:@"path/to/missing/d" inDomain:@"test"]);
+}
+
+- (void)testNoDictionaryMerge
+{
+    [self.userData.preferences setString:@"x" atPath:@"a/b" inDomain:@"test"];
+    [self.userData.preferences setString:@"y" atPath:@"a/c" inDomain:@"test"];
+    [self.userData.preferences setDictionary:@{ @"d" : @"z" } atPath:@"a" inDomain:@"test"];
+    XCTAssertEqualObjects([self.userData.preferences dictionaryAtPath:@"a" inDomain:@"test"], @{ @"d" : @"z" });
 }
 
 - (void)testUnsupportedArray
@@ -171,12 +186,26 @@
     XCTAssertNil([self.userData.preferences arrayAtPath:@"d" inDomain:@"test"]);
 }
 
+- (void)testDoubleSlashInPath
+{
+    [self.userData.preferences setString:@"x" atPath:@"a//b" inDomain:@"test"];
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"a//b" inDomain:@"test"], @"x");
+}
+
 - (void)testSameKeysInPath
 {
     [self.userData.preferences setString:@"x" atPath:@"a/b/c" inDomain:@"test"];
     [self.userData.preferences setString:@"y" atPath:@"a/b/a" inDomain:@"test"];
     XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"a/b/c" inDomain:@"test"], @"x");
     XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"a/b/a" inDomain:@"test"], @"y");
+}
+
+- (void)testDomainDictionary
+{
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test"];
+    [self.userData.preferences setString:@"y" atPath:@"b/c" inDomain:@"test"];
+    XCTAssertEqualObjects([self.userData.preferences dictionaryAtPath:nil inDomain:@"test"], (@{ @"a" : @"x",
+                                                                                                 @"b" : @{ @"c" : @"y" }}));
 }
 
 - (void)testRemoval
@@ -190,9 +219,79 @@
     [self.userData.preferences setString:nil atPath:@"a" inDomain:@"test"];
 }
 
-- (void)testSpecialCharactersInPaths
+- (void)testSupportedDomains
 {
-    // TODO: Test paths beginning with /, containing empty items
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"aA1$-_"];
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"a" inDomain:@"aA1$-_"], @"x");
+}
+
+- (void)testUnsupportedDomains
+{
+    [self.userData.preferences setString:@"1" atPath:@"a" inDomain:@""];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"a" inDomain:@""]);
+    
+    [self.userData.preferences setString:@"2" atPath:@"a" inDomain:@" "];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"a" inDomain:@" "]);
+    
+    [self.userData.preferences setString:@"3" atPath:@"a" inDomain:@"/"];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"a" inDomain:@"/"]);
+    
+    [self.userData.preferences setString:@"4" atPath:@"a" inDomain:@"d/"];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"a" inDomain:@"d/"]);
+    
+    [self.userData.preferences setString:@"5" atPath:@"a" inDomain:@"/d"];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"a" inDomain:@"/d"]);
+    
+    [self.userData.preferences setString:@"6" atPath:@"a" inDomain:@"/d/"];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"a" inDomain:@"/d/"]);
+    
+    [self.userData.preferences setString:@"7" atPath:@"a" inDomain:@"a%20b"];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"a" inDomain:@"a%20b"]);
+}
+
+- (void)testSupportedPaths
+{
+    [self.userData.preferences setString:@"x" atPath:@"aA1$-_/bB2$-_" inDomain:@"domain"];
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"aA1$-_/bB2$-_" inDomain:@"domain"], @"x");
+}
+
+- (void)testUnsupportedPaths
+{
+    [self.userData.preferences setString:@"1" atPath:@"" inDomain:@"test"];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"" inDomain:@"test"]);
+    
+    [self.userData.preferences setString:@"2" atPath:@" " inDomain:@"test"];
+    XCTAssertNil([self.userData.preferences stringAtPath:@" " inDomain:@"test"]);
+    
+    [self.userData.preferences setString:@"3" atPath:@"/" inDomain:@"test"];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"/" inDomain:@"test"]);
+    
+    [self.userData.preferences setString:@"4" atPath:@"//" inDomain:@"test"];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"//" inDomain:@"test"]);
+    
+    [self.userData.preferences setString:@"5" atPath:@"a%20b" inDomain:@"test"];
+    XCTAssertNil([self.userData.preferences stringAtPath:@"" inDomain:@"test"]);
+}
+
+- (void)testPathTrimming
+{
+    [self.userData.preferences setString:@"x" atPath:@"/a" inDomain:@"domain"];
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"a" inDomain:@"domain"], @"x");
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"/a" inDomain:@"domain"], @"x");
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"a/" inDomain:@"domain"], @"x");
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"/a/" inDomain:@"domain"], @"x");
+    
+    [self.userData.preferences setString:@"x" atPath:@"b/" inDomain:@"domain"];
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"b" inDomain:@"domain"], @"x");
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"/b" inDomain:@"domain"], @"x");
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"b/" inDomain:@"domain"], @"x");
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"/b/" inDomain:@"domain"], @"x");
+    
+    [self.userData.preferences setString:@"x" atPath:@"/c/" inDomain:@"domain"];
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"c" inDomain:@"domain"], @"x");
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"/c" inDomain:@"domain"], @"x");
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"c/" inDomain:@"domain"], @"x");
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"/c/" inDomain:@"domain"], @"x");
 }
 
 - (void)testNotifications
@@ -200,17 +299,12 @@
     
 }
 
-// TODO: Add test where an item with a simple key (e.g. a) is added to a dict with the same key. Such tiny keys
-//       are namely statically alloced and can be subtler to test
 // TODO: Add test for complete cleanup of remote prefs
 // TODO: Test for addition of same dic from 2 devices, with different items -> must merge
-// TODO: Decide and test behavior for insertion at path where one of the components already exist and does not
-//       point to a dictionary (currently: does nothing). Should insertion methods return a BOOL / error?
-//       - Add test for SRGPreferencesDidChangeNotification on the main thread. Add domain as key in the user info
-//         dictionary. DidChange => Check that the dictionary in the domain has changed. If not, do not broadcast
-//         any notification (UT: test if setting the same value)
-// TODO: Test storage of non-JSON serializable settings (e.g. with an NSDate)
+// TODO: Add test for SRGPreferencesDidChangeNotification on the main thread. Test that this notification is not sent
+//       when no changed occur (e.g. sync without changes, setting the same value, etc.)
 // TODO: Check sync and notifs with a few domains removed remotely, while other ones have been added (one notif with
 //       several deleted domains, and other notifs individually for updated domains)
+// TODO: Test sync with special paths
 
 @end
