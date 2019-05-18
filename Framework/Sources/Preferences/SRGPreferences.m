@@ -375,7 +375,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
     
     SRGRequest *domainsRequest = [SRGPreferencesRequest domainsFromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSString *> * _Nullable domains, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         if (error) {
-            completionBlock(error);
+            [self.requestQueue reportError:error];
             return;
         }
         
@@ -413,9 +413,6 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
                 }];
                 [self.requestQueue addRequest:preferencesRequest resume:YES];
             }
-        }
-        else {
-            completionBlock(nil);
         }
     }];
     [self.requestQueue addRequest:domainsRequest resume:YES];
