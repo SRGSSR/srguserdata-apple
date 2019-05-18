@@ -184,7 +184,7 @@
     [self.userData.preferences setString:@"x" atPath:@"a/b/c" inDomain:@"test"];
     XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"a/b/c" inDomain:@"test"], @"x");
     
-    [self.userData.preferences removeObjectAtPath:@"a/b/c" inDomain:@"test"];
+    [self.userData.preferences removeObjectsAtPaths:@[@"a/b/c"] inDomain:@"test"];
     XCTAssertNil([self.userData.preferences stringAtPath:@"a/b/c" inDomain:@"test"]);
     
     [self.userData.preferences setString:nil atPath:@"a" inDomain:@"test"];

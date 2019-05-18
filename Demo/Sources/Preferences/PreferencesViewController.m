@@ -208,7 +208,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSString *key = self.keys[indexPath.row];
         NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
-        [SRGUserData.currentUserData.preferences removeObjectAtPath:subpath inDomain:self.domain];
+        [SRGUserData.currentUserData.preferences removeObjectsAtPaths:@[subpath] inDomain:self.domain];
     }
 }
 
