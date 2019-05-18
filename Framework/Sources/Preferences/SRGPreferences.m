@@ -170,10 +170,11 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 - (void)setObject:(id)object atPaths:(NSArray<NSString *> *)paths inDomain:(NSString *)domain
 {
     NSDictionary *previousDictionary = SRGDictionaryMakeImmutableCopy(self.dictionary);
-    NSMutableDictionary *dictionary = self.dictionary;
     
     for (NSString *path in paths) {
         NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
+        
+        NSMutableDictionary *dictionary = self.dictionary;
         for (NSUInteger i = 0; i < pathComponents.count; ++i) {
             NSString *pathComponent = pathComponents[i];
             if (i == pathComponents.count - 1) {
@@ -189,7 +190,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
         }
     }
     
-    if ([dictionary isEqualToDictionary:previousDictionary]) {
+    if ([self.dictionary isEqualToDictionary:previousDictionary]) {
         return;
     }
     
