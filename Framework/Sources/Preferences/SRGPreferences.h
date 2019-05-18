@@ -76,7 +76,7 @@ OBJC_EXPORT NSString * const SRGPreferencesDomainsKey;                          
 - (nullable NSDictionary *)dictionaryAtPath:(nullable NSString *)path inDomain:(NSString *)domain;
 
 /**
- *  Remove any objects at a specific paths in a domain. The method does nothing when no object exists at the specified
+ *  Remove objects at the specific paths in a domain. The method does nothing when no object exists at a specified
  *  location.
  */
 - (void)removeObjectsAtPaths:(NSArray<NSString *> *)paths inDomain:(NSString *)domain;

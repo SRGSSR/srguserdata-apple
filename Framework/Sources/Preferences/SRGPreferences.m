@@ -167,26 +167,23 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
     return NO;
 }
 
-- (void)setObject:(id)object atPaths:(NSArray<NSString *> *)paths inDomain:(NSString *)domain
+- (void)setObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
+    NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
     NSDictionary *previousDictionary = SRGDictionaryMakeImmutableCopy(self.dictionary);
     
-    for (NSString *path in paths) {
-        NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
-        
-        NSMutableDictionary *dictionary = self.dictionary;
-        for (NSUInteger i = 0; i < pathComponents.count; ++i) {
-            NSString *pathComponent = pathComponents[i];
-            if (i == pathComponents.count - 1) {
-                dictionary[pathComponent] = object;
+    NSMutableDictionary *dictionary = self.dictionary;
+    for (NSUInteger i = 0; i < pathComponents.count; ++i) {
+        NSString *pathComponent = pathComponents[i];
+        if (i == pathComponents.count - 1) {
+            dictionary[pathComponent] = object;
+        }
+        else {
+            id value = dictionary[pathComponent];
+            if (! [value isKindOfClass:NSDictionary.class]) {
+                dictionary[pathComponent] = [NSMutableDictionary dictionary];
             }
-            else {
-                id value = dictionary[pathComponent];
-                if (! [value isKindOfClass:NSDictionary.class]) {
-                    dictionary[pathComponent] = [NSMutableDictionary dictionary];
-                }
-                dictionary = dictionary[pathComponent];
-            }
+            dictionary = dictionary[pathComponent];
         }
     }
     
@@ -203,10 +200,8 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
         return [SRGUser userInManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
         if (user.accountUid) {
-            for (NSString *path in paths) {
-                SRGPreferencesChangelogEntry *entry = [SRGPreferencesChangelogEntry changelogEntryWithObject:object atPath:path inDomain:domain];
-                [self.changelog addEntry:entry];
-            }
+            SRGPreferencesChangelogEntry *entry = [SRGPreferencesChangelogEntry changelogEntryWithObject:object atPath:path inDomain:domain];
+            [self.changelog addEntry:entry];
         }
     }];
 }
@@ -235,12 +230,12 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 
 - (void)setString:(NSString *)string atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:string atPaths:@[path] inDomain:domain];
+    [self setObject:string atPath:path inDomain:domain];
 }
 
 - (void)setNumber:(NSNumber *)number atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    [self setObject:number atPaths:@[path] inDomain:domain];
+    [self setObject:number atPath:path inDomain:domain];
 }
 
 - (void)setArray:(NSArray *)array atPath:(NSString *)path inDomain:(NSString *)domain
@@ -248,7 +243,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
     if (array && ! [NSJSONSerialization isValidJSONObject:array]) {
         return;
     }
-    [self setObject:array atPaths:@[path] inDomain:domain];
+    [self setObject:array atPath:path inDomain:domain];
 }
 
 - (void)setDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain
@@ -256,7 +251,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
     if (dictionary && ! [NSJSONSerialization isValidJSONObject:dictionary]) {
         return;
     }
-    [self setObject:SRGDictionaryMakeMutableCopy(dictionary) atPaths:@[path] inDomain:domain];
+    [self setObject:SRGDictionaryMakeMutableCopy(dictionary) atPath:path inDomain:domain];
 }
 
 - (NSString *)stringAtPath:(NSString *)path inDomain:(NSString *)domain
@@ -281,7 +276,9 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 
 - (void)removeObjectsAtPaths:(NSArray<NSString *> *)paths inDomain:(NSString *)domain
 {
-    [self setObject:nil atPaths:paths inDomain:domain];
+    for (NSString *path in paths) {
+        [self setObject:nil atPath:path inDomain:domain];
+    }
 }
 
 #pragma mark Requests
