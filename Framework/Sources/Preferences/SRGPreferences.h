@@ -34,7 +34,7 @@ OBJC_EXPORT NSString * const SRGPreferencesDomainsKey;                          
  *  applications might choose to have a common domain for shared preferences.
  *
  *  You can register for preference update notifications, see above. These will be sent by the `SRGPreferences` instance
- *  itself and received on the main thread.
+ *  itself and received on the main thread. No notifications are sent when no changes have actually been made.
  *
  *  ## Valid domains and paths
  *
@@ -73,6 +73,15 @@ OBJC_EXPORT NSString * const SRGPreferencesDomainsKey;                          
  */
 - (void)setArray:(nullable NSArray *)array atPath:(NSString *)path inDomain:(NSString *)domain;
 - (void)setDictionary:(nullable NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain;
+
+/**
+ *  Perform multiple object insertions at associated paths in a domain. Each entry in the dictionary must be a path
+ *  mapped to an object of supported type (string, number, array or dictionary). If changes to the same key are
+ *  performed, the result is undefined.
+ *
+ *  @discussion The `SRGPreferencesDidChangeNotification` notification is sent only once.
+ */
+- (void)setObjectsAtPaths:(NSDictionary<NSString *, id> *)objectsAtPaths inDomain:(NSString *)domain;
 
 /**
  *  Return an object at a specific path in a domain. If no object exists at the specified location, or if the type of

@@ -91,6 +91,16 @@
     XCTAssertEqualObjects([self.userData.preferences arrayAtPath:@"a" inDomain:@"test"], (@[ @"4", @"5" ]));
 }
 
+- (void)testUnsupportedArray
+{
+    [self.userData.preferences setArray:@[ NSDate.date ] atPath:@"path/to/invalid_array" inDomain:@"test"];
+    XCTAssertNil([self.userData.preferences arrayAtPath:@"invalid_array" inDomain:@"test"]);
+    
+    // Since the object was not inserted, intermediate paths must not have been altered either
+    XCTAssertFalse([self.userData.preferences hasObjectAtPath:@"path" inDomain:@"test"]);
+    XCTAssertFalse([self.userData.preferences hasObjectAtPath:@"path/to" inDomain:@"test"]);
+}
+
 - (void)testDictionary
 {
     [self.userData.preferences setDictionary:@{ @"A" : @"a",
@@ -118,16 +128,6 @@
     XCTAssertEqualObjects([self.userData.preferences dictionaryAtPath:@"a" inDomain:@"test"], @{ @"d" : @"z" });
 }
 
-- (void)testUnsupportedArray
-{
-    [self.userData.preferences setArray:@[ NSDate.date ] atPath:@"path/to/invalid_array" inDomain:@"test"];
-    XCTAssertNil([self.userData.preferences arrayAtPath:@"invalid_array" inDomain:@"test"]);
-    
-    // Since the object was not inserted, intermediate paths must not have been altered either
-    XCTAssertFalse([self.userData.preferences hasObjectAtPath:@"path" inDomain:@"test"]);
-    XCTAssertFalse([self.userData.preferences hasObjectAtPath:@"path/to" inDomain:@"test"]);
-}
-
 - (void)testUnsupportedDictionary
 {
     [self.userData.preferences setDictionary:@{ @"A" : NSDate.date } atPath:@"path/to/invalid_dictionary" inDomain:@"test"];
@@ -136,6 +136,33 @@
     // Since the object was not inserted, intermediate paths must not have been altered either
     XCTAssertFalse([self.userData.preferences hasObjectAtPath:@"path" inDomain:@"test"]);
     XCTAssertFalse([self.userData.preferences hasObjectAtPath:@"path/to" inDomain:@"test"]);
+}
+
+- (void)testMultipleInsertions
+{
+    [self.userData.preferences setObjectsAtPaths:@{ @"s" : @"x",
+                                                    @"n" : @1,
+                                                    @"d" : @{ @"a" : @"y",
+                                                              @"b" : @2 },
+                                                    @"a" : @[ @1, @"2", @3 ],
+                                                    @"o/s" : @"x",
+                                                    @"o/n" : @2 } inDomain:@"test"];
+    XCTAssertEqualObjects([self.userData.preferences dictionaryAtPath:nil inDomain:@"test"], (@{ @"s" : @"x",
+                                                                                                 @"n" : @1,
+                                                                                                 @"d" : @{ @"a" : @"y",
+                                                                                                           @"b" : @2 },
+                                                                                                 @"a" : @[ @1, @"2", @3 ],
+                                                                                                 @"o" : @{ @"s" : @"x",
+                                                                                                           @"n" : @2 } }));
+}
+
+- (void)testMultipleInsertionsWithInvalidObjects
+{
+    [self.userData.preferences setObjectsAtPaths:@{ @"s" : @"x",
+                                                    @"n" : @1,
+                                                    @"d" : NSDate.date } inDomain:@"test"];
+    XCTAssertEqualObjects([self.userData.preferences dictionaryAtPath:nil inDomain:@"test"], (@{ @"s" : @"x",
+                                                                                                 @"n" : @1 }));
 }
 
 - (void)testObjectUpdate
@@ -387,7 +414,24 @@
 
 - (void)testSingleNotificationOnMultipleChanges
 {
+    __block NSUInteger changeNotificationCount = 0;
     
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPreferencesDidChangeNotification object:self.userData.preferences queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        ++changeNotificationCount;
+    }];
+    
+    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    
+    [self.userData.preferences setObjectsAtPaths:@{ @"s" : @"x",
+                                                    @"n" : @1 } inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+    
+    XCTAssertEqual(changeNotificationCount, 1);
 }
 
 - (void)testSingleNotificationOnMultipleRemovals
@@ -487,12 +531,53 @@
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
-- (void)testNoNotificationForInvalidMultipleChanges
+- (void)testNoNotificationForMultipleChangesWithSameValues
 {
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test"];
+    [self.userData.preferences setString:@"y" atPath:@"b" inDomain:@"test"];
     
+    __block NSUInteger changeNotificationCount = 0;
+    
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPreferencesDidChangeNotification object:self.userData.preferences queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        ++changeNotificationCount;
+    }];
+    
+    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    
+    [self.userData.preferences setObjectsAtPaths:@{ @"a" : @"x",
+                                                    @"b" : @"y" } inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+    
+    XCTAssertEqual(changeNotificationCount, 0);
 }
 
-// TODO: Add multiple value setter + UTs
+- (void)testNoNotificationForMultipleInvalidChanges
+{
+    __block NSUInteger changeNotificationCount = 0;
+    
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPreferencesDidChangeNotification object:self.userData.preferences queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        ++changeNotificationCount;
+    }];
+    
+    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    
+    [self.userData.preferences setObjectsAtPaths:@{ @"s" : NSDate.date,
+                                                    @"u" : [NSURL URLWithString:@"http://www.rts.ch/play"] } inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+    
+    XCTAssertEqual(changeNotificationCount, 0);
+}
+
 // TODO: Add test for complete cleanup of remote prefs
 // TODO: Test for addition of same dic from 2 devices, with different items -> must merge
 // TODO: Check sync and notifs with a few domains removed remotely, while other ones have been added (one notif with
