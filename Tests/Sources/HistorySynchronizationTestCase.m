@@ -280,6 +280,26 @@
     }];
 }
 
+- (void)testNotificationDuringInitialSynchronization
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b" ]];
+    
+    [self setupForAvailableService];
+    
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"a", @"b", nil]));
+        return YES;
+    }];
+    
+    [self login];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b" ]];
+}
+
 - (void)testSynchronizationWithUnavailableService
 {
     [self setupForUnavailableService];
@@ -307,7 +327,7 @@
     }];
 }
 
-- (void)testChangeNotificationsWithDiscardedLocalEntries
+- (void)testNotificationsWithDiscardedLocalEntries
 {
     [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
     
@@ -345,7 +365,7 @@
     [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
 }
 
-- (void)testChangeNotificationsWithDiscardedRemoteEntries
+- (void)testNotificationsWithDiscardedRemoteEntries
 {
     [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
     

@@ -445,14 +445,14 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 - (void)pullPreferencesForSessionToken:(NSString *)sessionToken
                    withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
-    NSSet<NSString *> *previousDomains = [NSSet setWithArray:self.dictionary.allKeys];
+    NSMutableSet<NSString *> *changedDomains = [NSMutableSet setWithArray:self.dictionary.allKeys];
     
     self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
         if (finished) {
-            if (previousDomains.count != 0) {
+            if (changedDomains.count != 0) {
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPreferencesDomainsKey : previousDomains }];
+                                                                userInfo:@{ SRGPreferencesDomainsKey : changedDomains }];
             }
             completionBlock(error);
         }
@@ -464,7 +464,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
             return;
         }
         
-        NSSet<NSString *> *deletedDomains = [previousDomains srguserdata_setByRemovingObjectsInArray:domains];
+        NSSet<NSString *> *deletedDomains = [changedDomains srguserdata_setByRemovingObjectsInArray:domains];
         if (deletedDomains.count != 0) {
             for (NSString *domain in deletedDomains) {
                 [self.dictionary removeObjectForKey:domain];
@@ -473,6 +473,8 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
         }
         
         if (domains.count != 0) {
+            [changedDomains addObjectsFromArray:domains];
+            
             for (NSString *domain in domains) {
                 SRGRequest *preferencesRequest = [SRGPreferencesRequest preferencesAtPath:nil inDomain:domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSDictionary * _Nullable dictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
                     [self.requestQueue reportError:error];

@@ -112,9 +112,14 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 @property (nonatomic, readonly, nullable) NSString *sessionToken;
 
 /**
- *  Login a test user with SRG Identity, associating it with the provided session token.
+ *  Trigger a login. Do not wait for the login to be complete.
  */
 - (void)login;
+
+/**
+ *  Login a test user with SRG Identity, associating it with the provided session token. Wait until login has been made.
+ */
+- (void)loginAndWait;
 
 /**
  *  Login a test user, perform an initial synchronization and wait until it finishes.

@@ -335,7 +335,31 @@
     }];
 }
 
-- (void)testChangeNotificationsWithDiscardedLocalEntries
+- (void)testNotificationDuringInitialSynchronization
+{
+    [self insertRemotePreferenceWithObject:@"x" atPath:@"a" inDomain:@"test1"];
+    [self insertRemotePreferenceWithObject:@"y" atPath:@"b" inDomain:@"test2"];
+    
+    [self setupForAvailableService];
+    
+    [self expectationForSingleNotification:SRGPreferencesDidChangeNotification object:self.userData.preferences handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], ([NSSet setWithObjects:@"test1", @"test2", nil]));
+        return YES;
+    }];
+    
+    [self login];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalPreferences:@{ @"a" : @"x" } inDomain:@"test1"];
+    [self assertLocalPreferences:@{ @"b" : @"y" } inDomain:@"test2"];
+    
+    [self assertRemotePreferences:@{ @"a" : @"x" } inDomain:@"test1"];
+    [self assertRemotePreferences:@{ @"b" : @"y" } inDomain:@"test2"];
+}
+
+- (void)testNotificationsWithDiscardedLocalEntries
 {
     [self insertRemotePreferenceWithObject:@"x" atPath:@"a" inDomain:@"test1"];
     [self insertRemotePreferenceWithObject:@"y" atPath:@"b" inDomain:@"test2"];
@@ -372,7 +396,7 @@
     [self assertRemotePreferences:@{ @"b" : @"y" } inDomain:@"test2"];
 }
 
-- (void)testChangeNotificationsWithDiscardedRemoteEntries
+- (void)testNotificationsWithDiscardedRemoteEntries
 {
     [self insertRemotePreferenceWithObject:@"x" atPath:@"a" inDomain:@"test1"];
     [self insertRemotePreferenceWithObject:@"y" atPath:@"b" inDomain:@"test2"];

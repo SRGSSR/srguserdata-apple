@@ -495,6 +495,42 @@
     }];
 }
 
+- (void)testNotificationDuringInitialSynchronization
+{    
+    [self insertRemotePlaylistWithUid:@"a"];
+    [self insertRemotePlaylistWithUid:@"b"];
+    
+    [self insertRemotePlaylistEntriesWithUids:@[ @"1", @"2", @"3" ] forPlaylistWithUid:@"a"];
+    
+    [self setupForAvailableService];
+    
+    [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        
+        if ([notification.userInfo[SRGPlaylistsUidsKey] isEqual:[NSSet setWithObject:SRGPlaylistUidWatchLater]]) {
+            return NO;
+        }
+        
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", @"b", nil]));
+        return YES;
+    }];
+    [self expectationForSingleNotification:SRGPlaylistEntriesDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPlaylistEntriesUidsKey], ([NSSet setWithObjects:@"1", @"2", @"3", nil]));
+        return YES;
+    }];
+    
+    [self login];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalPlaylistUids:@[ @"a", @"b" ]];
+    [self assertRemotePlaylistUids:@[ @"a", @"b" ]];
+    
+    [self assertLocalPlaylistEntriesUids:@[ @"1", @"2", @"3" ] forPlaylistWithUid:@"a"];
+    [self assertRemotePlaylistEntriesUids:@[ @"1", @"2", @"3" ] forPlaylistWithUid:@"a"];
+}
+
 - (void)testSynchronizationWithUnavailableService
 {
     [self setupForUnavailableService];
@@ -526,7 +562,7 @@
     }];
 }
 
-- (void)testChangeNotificationsWithDiscardedLocalEmptyPlaylists
+- (void)testNotificationsWithDiscardedLocalEmptyPlaylists
 {
     [self insertRemotePlaylistWithUid:@"a"];
     [self insertRemotePlaylistWithUid:@"b"];
@@ -567,7 +603,7 @@
     [self assertRemotePlaylistUids:@[ @"b", @"d" ]];
 }
 
-- (void)testChangeNotificationsWithDiscardedLocalPlaylistEntries
+- (void)testNotificationsWithDiscardedLocalPlaylistEntries
 {
     [self insertRemotePlaylistWithUid:@"a"];
     
@@ -613,7 +649,7 @@
     [self assertLocalPlaylistEntriesUids:@[ @"1", @"3", @"5" ] forPlaylistWithUid:@"a"];
 }
 
-- (void)testChangeNotificationsWithDiscardedLocalPlaylistsWithEntries
+- (void)testNotificationsWithDiscardedLocalPlaylistsWithEntries
 {
     [self insertRemotePlaylistWithUid:@"a"];
     [self insertRemotePlaylistWithUid:@"b"];
@@ -649,7 +685,7 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
 }
 
-- (void)testChangeNotificationsWithDiscardedRemoteEmptyPlaylists
+- (void)testNotificationsWithDiscardedRemoteEmptyPlaylists
 {
     [self insertRemotePlaylistWithUid:@"a"];
     [self insertRemotePlaylistWithUid:@"b"];
@@ -676,7 +712,7 @@
     [self assertRemotePlaylistUids:@[ @"b", @"d" ]];
 }
 
-- (void)testChangeNotificationsWithDiscardedRemotePlaylistEntries
+- (void)testNotificationsWithDiscardedRemotePlaylistEntries
 {
     [self insertRemotePlaylistWithUid:@"a"];
     
@@ -712,7 +748,7 @@
     [self assertLocalPlaylistEntriesUids:@[ @"1", @"3", @"5" ] forPlaylistWithUid:@"a"];
 }
 
-- (void)testChangeNotificationsWithDiscardedRemotePlaylistsWithEntries
+- (void)testNotificationsWithDiscardedRemotePlaylistsWithEntries
 {
     [self insertRemotePlaylistWithUid:@"a"];
     [self insertRemotePlaylistWithUid:@"b"];

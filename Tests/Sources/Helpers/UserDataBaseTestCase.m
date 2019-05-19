@@ -259,6 +259,14 @@ NSURL *TestPreferencesServiceURL(void)
 - (void)login
 {
     XCTAssertNotNil(self.sessionToken);
+        
+    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, self.sessionToken)];
+    XCTAssertTrue(hasHandledCallbackURL);
+}
+
+- (void)loginAndWait
+{
+    XCTAssertNotNil(self.sessionToken);
     
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLoginNotification object:self.identityService handler:nil];
     [self expectationForSingleNotification:SRGIdentityServiceDidUpdateAccountNotification object:self.identityService handler:nil];
