@@ -296,7 +296,7 @@
 
 - (void)testNotifications
 {
-    
+    // TODO: Check that notif only on change, and that a single notif is received for multiple remove
 }
 
 // TODO: Add test for complete cleanup of remote prefs

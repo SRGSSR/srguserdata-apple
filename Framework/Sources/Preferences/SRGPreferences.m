@@ -103,6 +103,37 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
     return [@[domain] arrayByAddingObjectsFromArray:trimmedPath.pathComponents];    
 }
 
++ (BOOL)updateDictionary:(NSMutableDictionary *)dictionary withObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
+{
+    NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
+    if (! pathComponents) {
+        return NO;
+    }
+    
+    NSMutableDictionary *currentDictionary = dictionary;
+    for (NSUInteger i = 0; i < pathComponents.count; ++i) {
+        NSString *pathComponent = pathComponents[i];
+        if (i == pathComponents.count - 1) {
+            id currentObject = currentDictionary[pathComponent];
+            if ([currentObject isEqual:object]) {
+                return NO;
+            }
+            else {
+                currentDictionary[pathComponent] = object;
+            }
+        }
+        else {
+            id value = currentDictionary[pathComponent];
+            if (! [value isKindOfClass:NSDictionary.class]) {
+                currentDictionary[pathComponent] = [NSMutableDictionary dictionary];
+            }
+            currentDictionary = currentDictionary[pathComponent];
+        }
+    }
+    
+    return YES;
+}
+
 + (void)savePreferenceDictionary:(NSDictionary *)dictionary toFileURL:(NSURL *)fileURL
 {
     NSError *JSONError = nil;
@@ -191,28 +222,9 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 
 - (void)setObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    NSArray<NSString *> *pathComponents = [SRGPreferences pathComponentsForPath:path inDomain:domain];
-    if (! pathComponents) {
-        return;
-    }
-    
     NSDictionary *previousDictionary = SRGDictionaryMakeImmutableCopy(self.dictionary);
     
-    NSMutableDictionary *dictionary = self.dictionary;
-    for (NSUInteger i = 0; i < pathComponents.count; ++i) {
-        NSString *pathComponent = pathComponents[i];
-        if (i == pathComponents.count - 1) {
-            dictionary[pathComponent] = object;
-        }
-        else {
-            id value = dictionary[pathComponent];
-            if (! [value isKindOfClass:NSDictionary.class]) {
-                dictionary[pathComponent] = [NSMutableDictionary dictionary];
-            }
-            dictionary = dictionary[pathComponent];
-        }
-    }
-    
+    [SRGPreferences updateDictionary:self.dictionary withObject:object atPath:path inDomain:domain];
     if ([self.dictionary isEqualToDictionary:previousDictionary]) {
         return;
     }
@@ -305,9 +317,34 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 
 - (void)removeObjectsAtPaths:(NSArray<NSString *> *)paths inDomain:(NSString *)domain
 {
+    NSDictionary *previousDictionary = SRGDictionaryMakeImmutableCopy(self.dictionary);
+    
+    NSMutableSet<NSString *> *removedPaths = [NSMutableSet set];
     for (NSString *path in paths) {
-        [self setObject:nil atPath:path inDomain:domain];
+        if ([SRGPreferences updateDictionary:self.dictionary withObject:nil atPath:path inDomain:domain]) {
+            [removedPaths addObject:path];
+        }
     }
+    
+    if ([self.dictionary isEqualToDictionary:previousDictionary]) {
+        return;
+    }
+    
+    [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
+    [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
+                                                      object:self
+                                                    userInfo:@{ SRGPreferencesDomainsKey : [NSSet setWithObject:domain] }];
+    
+    [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+        return [SRGUser userInManagedObjectContext:managedObjectContext];
+    } withPriority:NSOperationQueuePriorityNormal completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
+        if (user.accountUid) {
+            for (NSString *removedPath in removedPaths) {
+                SRGPreferencesChangelogEntry *entry = [SRGPreferencesChangelogEntry changelogEntryWithObject:nil atPath:removedPath inDomain:domain];
+                [self.changelog addEntry:entry];
+            }
+        }
+    }];
 }
 
 #pragma mark Requests
