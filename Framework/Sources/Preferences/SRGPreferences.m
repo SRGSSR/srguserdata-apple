@@ -422,12 +422,12 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
         };
         
         if (entry.object) {
-            SRGRequest *request = [SRGPreferencesRequest putPreferenceWithObject:entry.object atPath:entry.path inDomain:entry.domain toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:pushCompletionBlock];
+            SRGRequest *request = [[SRGPreferencesRequest putPreferenceWithObject:entry.object atPath:entry.path inDomain:entry.domain toServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:pushCompletionBlock] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
             [request resume];
             self.pushRequest = request;
         }
         else {
-            SRGRequest *request = [SRGPreferencesRequest deletePreferenceAtPath:entry.path inDomain:entry.domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:pushCompletionBlock];
+            SRGRequest *request = [[SRGPreferencesRequest deletePreferenceAtPath:entry.path inDomain:entry.domain fromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:pushCompletionBlock] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
             [request resume];
             self.pushRequest = request;
         }
@@ -446,7 +446,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
         }
     }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
     
-    SRGRequest *domainsRequest = [SRGPreferencesRequest domainsFromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSString *> * _Nullable domains, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    SRGRequest *domainsRequest = [[SRGPreferencesRequest domainsFromServiceURL:self.serviceURL forSessionToken:sessionToken withSession:self.session completionBlock:^(NSArray<NSString *> * _Nullable domains, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         if (error) {
             [self.requestQueue reportError:error];
             return;
@@ -487,7 +487,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
                 [self.requestQueue addRequest:preferencesRequest resume:YES];
             }
         }
-    }];
+    }] requestWithOptions:SRGRequestOptionBackgroundCompletionEnabled | SRGRequestOptionCancellationErrorsEnabled];
     [self.requestQueue addRequest:domainsRequest resume:YES];
 }
 
