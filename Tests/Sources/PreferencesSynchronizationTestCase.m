@@ -283,9 +283,91 @@
     [self loginAndWaitForInitialSynchronization];
 }
 
-// TODO: Add test for complete cleanup of remote prefs
-// TODO: Test for addition of same dic from 2 devices, with different items -> must merge
-// TODO: Check sync and notifs with a few domains removed remotely, while other ones have been added (one notif with
-//       several deleted domains, and other notifs individually for updated domains)
+- (void)testNoSynchronizationWithoutLoggedInUser
+{
+    [self setupForAvailableService];
+    
+    id startObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGUserDataDidStartSynchronizationNotification object:self.userData queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No start notification is expected");
+    }];
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPreferencesDidChangeNotification object:self.userData.preferences queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No change notification is expected");
+    }];
+    id finishObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGUserDataDidFinishSynchronizationNotification object:self.userData queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No finish notification is expected");
+    }];
+    
+    [self expectationForElapsedTimeInterval:5. withHandler:nil];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:startObserver];
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+        [NSNotificationCenter.defaultCenter removeObserver:finishObserver];
+    }];
+}
+
+- (void)testSynchronizationWithUnavailableService
+{
+    [self setupForUnavailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self expectationForSingleNotification:SRGUserDataDidStartSynchronizationNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
+    }];
+    [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
+    }];
+    
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPreferencesDidChangeNotification object:self.userData.preferences queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTFail(@"No change notification is expected");
+    }];
+    
+    [self expectationForElapsedTimeInterval:5. withHandler:nil];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+}
+
+- (void)testChangeNotificationsWithDiscardedLocalEntries
+{
+    [self insertRemotePreferenceWithObject:@"x" atPath:@"a" inDomain:@"test1"];
+    [self insertRemotePreferenceWithObject:@"y" atPath:@"b" inDomain:@"test2"];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    // Changes are notified when preferences are removed locally
+    [self expectationForSingleNotification:SRGPreferencesDidChangeNotification object:self.userData.preferences handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], ([NSSet setWithObjects:@"test1", nil]));
+        return YES;
+    }];
+    
+    [self.userData.preferences removeObjectsAtPaths:@[@"a"] inDomain:@"test1"];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    // No more changes must be received for empty domains when synchronizing
+    [self expectationForSingleNotification:SRGPreferencesDidChangeNotification object:self.userData.preferences handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], ([NSSet setWithObjects:@"test2", nil]));
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalPreferences:nil inDomain:@"test1"];
+    [self assertLocalPreferences:@{ @"b" : @"y" } inDomain:@"test2"];
+    
+    [self assertRemotePreferences:nil inDomain:@"test1"];
+    [self assertRemotePreferences:@{ @"b" : @"y" } inDomain:@"test2"];
+}
 
 @end

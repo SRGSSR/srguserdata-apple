@@ -135,6 +135,11 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
         }
     }
     
+    NSMutableDictionary *domainDictionary = dictionary[domain];
+    if (domainDictionary.count == 0) {
+        dictionary[domain] = nil;
+    }
+    
     return YES;
 }
 
