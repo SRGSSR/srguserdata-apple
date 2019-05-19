@@ -345,6 +345,7 @@
     
     // Changes are notified when preferences are removed locally
     [self expectationForSingleNotification:SRGPreferencesDidChangeNotification object:self.userData.preferences handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
         XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], ([NSSet setWithObjects:@"test1", nil]));
         return YES;
     }];
@@ -355,7 +356,36 @@
     
     // No more changes must be received for empty domains when synchronizing
     [self expectationForSingleNotification:SRGPreferencesDidChangeNotification object:self.userData.preferences handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
         XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], ([NSSet setWithObjects:@"test2", nil]));
+        return YES;
+    }];
+    
+    [self synchronize];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalPreferences:nil inDomain:@"test1"];
+    [self assertLocalPreferences:@{ @"b" : @"y" } inDomain:@"test2"];
+    
+    [self assertRemotePreferences:nil inDomain:@"test1"];
+    [self assertRemotePreferences:@{ @"b" : @"y" } inDomain:@"test2"];
+}
+
+- (void)testChangeNotificationsWithDiscardedRemoteEntries
+{
+    [self insertRemotePreferenceWithObject:@"x" atPath:@"a" inDomain:@"test1"];
+    [self insertRemotePreferenceWithObject:@"y" atPath:@"b" inDomain:@"test2"];
+    
+    [self setupForAvailableService];
+    [self loginAndWaitForInitialSynchronization];
+    
+    [self discardRemotePreferenceAtPath:@"a" inDomain:@"test1"];
+    
+    // Changes are notified when synchronization occurs with the remote changes
+    [self expectationForSingleNotification:SRGPreferencesDidChangeNotification object:self.userData.preferences handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], ([NSSet setWithObjects:@"test1", @"test2", nil]));
         return YES;
     }];
     

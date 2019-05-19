@@ -460,7 +460,7 @@
     [self loginAndWaitForInitialSynchronization];
 }
 
-- (void)testSynchronizationWithoutLoggedInUser
+- (void)testNoSynchronizationWithoutLoggedInUser
 {
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData handler:^BOOL(NSNotification * _Nonnull notification) {
         return [notification.userInfo[SRGPlaylistsUidsKey] containsObject:SRGPlaylistUidWatchLater];
@@ -538,6 +538,7 @@
     
     // Changes are notified when playlists are marked as being discarded
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
         XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", @"c", nil]));
         return YES;
     }];
@@ -553,6 +554,7 @@
     
     // No more changes must be received for the discarded playlists when deleted during synchronization
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
         XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"b", @"d", nil]));
         return YES;
     }];
@@ -661,6 +663,7 @@
     
     // Changes are notified when synchronization occurs with the remote changes
     [self expectationForSingleNotification:SRGPlaylistsDidChangeNotification object:self.userData.playlists handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
         XCTAssertEqualObjects(notification.userInfo[SRGPlaylistsUidsKey], ([NSSet setWithObjects:@"a", @"b", @"c", @"d", nil]));
         return YES;
     }];

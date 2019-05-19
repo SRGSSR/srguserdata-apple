@@ -445,8 +445,15 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 - (void)pullPreferencesForSessionToken:(NSString *)sessionToken
                    withCompletionBlock:(void (^)(NSError *error))completionBlock
 {
+    NSSet<NSString *> *previousDomains = [NSSet setWithArray:self.dictionary.allKeys];
+    
     self.requestQueue = [[[SRGRequestQueue alloc] initWithStateChangeBlock:^(BOOL finished, NSError * _Nullable error) {
         if (finished) {
+            if (previousDomains.count != 0) {
+                [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
+                                                                  object:self
+                                                                userInfo:@{ SRGPreferencesDomainsKey : previousDomains }];
+            }
             completionBlock(error);
         }
     }] requestQueueWithOptions:SRGRequestQueueOptionAutomaticCancellationOnErrorEnabled];
@@ -457,20 +464,12 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
             return;
         }
         
-        NSSet<NSString *> *previousDomains = [NSSet setWithArray:self.dictionary.allKeys];
         NSSet<NSString *> *deletedDomains = [previousDomains srguserdata_setByRemovingObjectsInArray:domains];
-        
         if (deletedDomains.count != 0) {
             for (NSString *domain in deletedDomains) {
                 [self.dictionary removeObjectForKey:domain];
             }
             [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
-                                                                  object:self
-                                                                userInfo:@{ SRGPreferencesDomainsKey : deletedDomains }];
-            });
         }
         
         if (domains.count != 0) {
@@ -481,12 +480,6 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
                     if (dictionary && ! [self.dictionary isEqualToDictionary:dictionary]) {
                         self.dictionary[domain] = SRGDictionaryMakeMutableCopy(dictionary);
                         [SRGPreferences savePreferenceDictionary:self.dictionary toFileURL:self.fileURL];
-                        
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [NSNotificationCenter.defaultCenter postNotificationName:SRGPreferencesDidChangeNotification
-                                                                              object:self
-                                                                            userInfo:@{ SRGPreferencesDomainsKey : [NSSet setWithObject:domain] }];
-                        });
                     }
                 }];
                 [self.requestQueue addRequest:preferencesRequest resume:YES];
