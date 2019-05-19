@@ -294,17 +294,208 @@
     XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"/c/" inDomain:@"domain"], @"x");
 }
 
-- (void)testNotifications
+- (void)testNotificationOnInsertion
 {
-    // TODO: Check that notif only on change, and that a single notif is received for multiple remove
+    [self expectationForSingleNotification:SRGPreferencesDidChangeNotification object:self.userData.preferences handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        return YES;
+    }];
+    
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
+- (void)testNotificationOnModification
+{
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test"];
+    XCTAssertEqualObjects([self.userData.preferences stringAtPath:@"a" inDomain:@"test"], @"x");
+    
+    [self expectationForSingleNotification:SRGPreferencesDidChangeNotification object:self.userData.preferences handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        return YES;
+    }];
+    
+    [self.userData.preferences setString:@"xx" atPath:@"a" inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)testNotificationOnRemoval
+{
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test"];
+    
+    [self expectationForSingleNotification:SRGPreferencesDidChangeNotification object:self.userData.preferences handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        return YES;
+    }];
+    
+    [self.userData.preferences removeObjectsAtPaths:@[@"a"] inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)testMultipleNotificationsOnMultipleSingleInsertions
+{
+    __block NSUInteger changeNotificationCount = 0;
+    
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPreferencesDidChangeNotification object:self.userData.preferences queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        ++changeNotificationCount;
+    }];
+    
+    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    
+    [self.userData.preferences setString:@"xx" atPath:@"a" inDomain:@"test"];
+    [self.userData.preferences setString:@"yy" atPath:@"b" inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+    
+    XCTAssertEqual(changeNotificationCount, 2);
+}
+
+- (void)testMultipleNotificationsOnMultipleSingleModifications
+{
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test"];
+    [self.userData.preferences setString:@"y" atPath:@"b" inDomain:@"test"];
+    
+    __block NSUInteger changeNotificationCount = 0;
+    
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPreferencesDidChangeNotification object:self.userData.preferences queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        ++changeNotificationCount;
+    }];
+    
+    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    
+    [self.userData.preferences setString:@"xx" atPath:@"a" inDomain:@"test"];
+    [self.userData.preferences setString:@"yy" atPath:@"b" inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+    
+    XCTAssertEqual(changeNotificationCount, 2);
+}
+
+- (void)testSingleNotificationOnMultipleChanges
+{
+    
+}
+
+- (void)testSingleNotificationOnMultipleRemovals
+{
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test"];
+    [self.userData.preferences setString:@"y" atPath:@"b" inDomain:@"test"];
+    
+    __block NSUInteger changeNotificationCount = 0;
+    
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPreferencesDidChangeNotification object:self.userData.preferences queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        ++changeNotificationCount;
+    }];
+    
+    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    
+    [self.userData.preferences removeObjectsAtPaths:@[@"a", @"b"] inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+    
+    XCTAssertEqual(changeNotificationCount, 1);
+}
+
+- (void)testNoNotificationForRemovalOfUnknownObject
+{
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test"];
+    
+    __block NSUInteger changeNotificationCount = 0;
+    
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPreferencesDidChangeNotification object:self.userData.preferences queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        ++changeNotificationCount;
+    }];
+    
+    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    
+    [self.userData.preferences removeObjectsAtPaths:@[@"b"] inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+    
+    XCTAssertEqual(changeNotificationCount, 0);
+}
+
+- (void)testNoNotificationForModificationWithSameValue
+{
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test"];
+    [self.userData.preferences setString:@"y" atPath:@"b" inDomain:@"test"];
+    
+    __block NSUInteger changeNotificationCount = 0;
+    
+    id changeObserver = [NSNotificationCenter.defaultCenter addObserverForName:SRGPreferencesDidChangeNotification object:self.userData.preferences queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGPreferencesDomainsKey], [NSSet setWithObject:@"test"]);
+        ++changeNotificationCount;
+    }];
+    
+    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test"];
+    [self.userData.preferences setString:@"y" atPath:@"b" inDomain:@"test"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:^(NSError * _Nullable error) {
+        [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
+    }];
+    
+    XCTAssertEqual(changeNotificationCount, 0);
+}
+
+- (void)testNotificationsForChangesInDifferentDomains
+{
+    __block BOOL changeNotification1Received = NO;
+    __block BOOL changeNotification2Received = NO;
+    
+    [self expectationForSingleNotification:SRGPreferencesDidChangeNotification object:self.userData.preferences handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        
+        if ([notification.userInfo[SRGPreferencesDomainsKey] isEqualToSet:[NSSet setWithObject:@"test1"]]) {
+            changeNotification1Received = YES;
+        }
+        else if ([notification.userInfo[SRGPreferencesDomainsKey] isEqualToSet:[NSSet setWithObject:@"test2"]]) {
+            changeNotification2Received = YES;
+        }
+        return changeNotification1Received && changeNotification2Received;
+    }];
+    
+    [self expectationForElapsedTimeInterval:3. withHandler:nil];
+    
+    [self.userData.preferences setString:@"x" atPath:@"a" inDomain:@"test1"];
+    [self.userData.preferences setString:@"y" atPath:@"b" inDomain:@"test2"];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)testNoNotificationForInvalidMultipleChanges
+{
+    
+}
+
+// TODO: Add multiple value setter + UTs
 // TODO: Add test for complete cleanup of remote prefs
 // TODO: Test for addition of same dic from 2 devices, with different items -> must merge
-// TODO: Add test for SRGPreferencesDidChangeNotification on the main thread. Test that this notification is not sent
-//       when no changed occur (e.g. sync without changes, setting the same value, etc.)
 // TODO: Check sync and notifs with a few domains removed remotely, while other ones have been added (one notif with
 //       several deleted domains, and other notifs individually for updated domains)
-// TODO: Test sync with special paths
 
 @end
