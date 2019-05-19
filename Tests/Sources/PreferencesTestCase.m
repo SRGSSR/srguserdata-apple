@@ -578,9 +578,4 @@
     XCTAssertEqual(changeNotificationCount, 0);
 }
 
-// TODO: Add test for complete cleanup of remote prefs
-// TODO: Test for addition of same dic from 2 devices, with different items -> must merge
-// TODO: Check sync and notifs with a few domains removed remotely, while other ones have been added (one notif with
-//       several deleted domains, and other notifs individually for updated domains)
-
 @end
