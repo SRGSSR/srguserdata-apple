@@ -6,7 +6,6 @@
 
 #import "PlaylistsViewController.h"
 
-#import "NSDateFormatter+Demo.h"
 #import "PlayerViewController.h"
 #import "PlaylistViewController.h"
 #import "SRGUserData_demo-Swift.h"
@@ -43,78 +42,22 @@
 {
     [super viewDidLoad];
     
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    self.refreshControl = refreshControl;
-    
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didLogin:)
-                                               name:SRGIdentityServiceUserDidLoginNotification
-                                             object:SRGIdentityService.currentIdentityService];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didLogout:)
-                                               name:SRGIdentityServiceUserDidLogoutNotification
-                                             object:SRGIdentityService.currentIdentityService];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didUpdateAccount:)
-                                               name:SRGIdentityServiceDidUpdateAccountNotification
-                                             object:SRGIdentityService.currentIdentityService];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(playlistsDidChange:)
                                                name:SRGPlaylistsDidChangeNotification
                                              object:SRGUserData.currentUserData.playlists];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didFinishSynchronization:)
-                                               name:SRGUserDataDidFinishSynchronizationNotification
-                                             object:SRGUserData.currentUserData];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"PlaylistCell"];
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(addPlaylist:)];
-    
-    [self updateNavigationBar];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    [self refresh];
-}
-
-#pragma mark UI
-
-- (void)updateNavigationBar
-{
-    if (! SRGIdentityService.currentIdentityService.loggedIn) {
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Login", nil)
-                                                                                 style:UIBarButtonItemStylePlain
-                                                                                target:self
-                                                                                action:@selector(login:)];
-    }
-    else {
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
-                                                                                 style:UIBarButtonItemStylePlain
-                                                                                target:self
-                                                                                action:@selector(showAccount:)];
-    }
-}
-
-- (void)updateTitleSectionHeader
-{
-    [self.tableView reloadData];
-}
-
-#pragma mark Data
+#pragma mark Subclassing hooks
 
 - (void)refresh
 {
-    if (self.refreshControl.refreshing) {
-        [self.refreshControl endRefreshing];
-    }
-    
     NSSortDescriptor *typeSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, type) ascending:NO];
     NSSortDescriptor *nameSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylist.new, name) ascending:YES];
     NSArray<SRGPlaylist *> *playlists = [SRGUserData.currentUserData.playlists playlistsMatchingPredicate:nil sortedWithDescriptors:@[typeSortDescriptor, nameSortDescriptor]];
@@ -136,18 +79,6 @@
     return [tableView dequeueReusableCellWithIdentifier:@"PlaylistCell"];
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    if (SRGIdentityService.currentIdentityService.loggedIn) {
-        NSDate *synchronizationDate = SRGUserData.currentUserData.user.synchronizationDate;
-        NSString *synchronizationDateString = synchronizationDate ? [NSDateFormatter.demo_relativeDateAndTimeFormatter stringFromDate:synchronizationDate] : NSLocalizedString(@"Never", nil);
-        return [NSString stringWithFormat:NSLocalizedString(@"Last synchronization: %@", nil), synchronizationDateString];
-    }
-    else {
-        return nil;
-    }
-}
-
 #pragma mark UITableViewDelegate protocol
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -156,6 +87,7 @@
     cell.textLabel.text = playlist.name;
     cell.imageView.image = [playlist.uid isEqualToString:SRGPlaylistUidWatchLater] ? [UIImage imageNamed:@"watch_later_22"] : [UIImage imageNamed:@"playlist_22"];
     cell.imageView.tintColor = UIColor.blackColor;
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -180,7 +112,7 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (editingStyle == UITableViewCellEditingStyleDelete){
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
         SRGPlaylist *playlist = self.playlists[indexPath.row];
         [SRGUserData.currentUserData.playlists discardPlaylistsWithUids:@[playlist.uid] completionBlock:nil];
     }
@@ -197,7 +129,7 @@
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.placeholder = NSLocalizedString(@"Playlist name", nil);
     }];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleDefault handler:nil]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Create", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         NSString *name = [alertController.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
         if (name.length > 0) {
@@ -213,47 +145,11 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)login:(id)sender
-{
-    [SRGIdentityService.currentIdentityService loginWithEmailAddress:nil];
-}
-
-- (void)showAccount:(id)sender
-{
-    [SRGIdentityService.currentIdentityService showAccountView];
-}
-
-- (void)refresh:(id)sender
-{
-    [self refresh];
-}
-
 #pragma mark Notifications
-
-- (void)didLogin:(NSNotification *)notification
-{
-    [self updateTitleSectionHeader];
-    [self updateNavigationBar];
-}
-
-- (void)didLogout:(NSNotification *)notification
-{
-    [self updateTitleSectionHeader];
-}
-
-- (void)didUpdateAccount:(NSNotification *)notification
-{
-    [self updateNavigationBar];
-}
 
 - (void)playlistsDidChange:(NSNotification *)notification
 {
     [self refresh];
-}
-
-- (void)didFinishSynchronization:(NSNotification *)notification
-{
-    [self updateTitleSectionHeader];
 }
 
 @end

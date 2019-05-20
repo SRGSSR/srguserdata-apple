@@ -13,7 +13,9 @@
 #import "SRGHistoryEntry+Private.h"
 #import "SRGHistoryRequest.h"
 #import "SRGUser+Private.h"
+#import "SRGUserData+Private.h"
 #import "SRGUserDataService+Private.h"
+#import "SRGUserDataService+Subclassing.h"
 #import "SRGUserObject+Private.h"
 #import "SRGUserObject+Subclassing.h"
 
@@ -38,9 +40,9 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithServiceURL:(NSURL *)serviceURL identityService:(SRGIdentityService *)identityService dataStore:(SRGDataStore *)dataStore
+- (instancetype)initWithServiceURL:(NSURL *)serviceURL userData:(SRGUserData *)userData
 {
-    if (self = [super initWithServiceURL:serviceURL identityService:identityService dataStore:dataStore]) {
+    if (self = [super initWithServiceURL:serviceURL userData:userData]) {
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
         self.session = [NSURLSession sessionWithConfiguration:sessionConfiguration];
     }
@@ -58,7 +60,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
     
     NSMutableSet<NSString *> *changedUids = [NSMutableSet set];
     
-    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         for (NSDictionary *historyEntryDictionary in historyEntryDictionaries) {
             SRGHistoryEntry *historyEntry = [SRGHistoryEntry synchronizeWithDictionary:historyEntryDictionary matchingPredicate:nil inManagedObjectContext:managedObjectContext];
             if (historyEntry) {
@@ -144,8 +146,8 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
             return;
         }
         
-        [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
-            for (NSManagedObjectID *historyEntryID in historyEntriesMap.allKeys) {
+        [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+            for (NSManagedObjectID *historyEntryID in historyEntriesMap) {
                 SRGHistoryEntry *historyEntry = [managedObjectContext existingObjectWithID:historyEntryID error:NULL];
                 if (historyEntry.discarded) {
                     [managedObjectContext deleteObject:historyEntry];
@@ -165,9 +167,9 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
 
 - (void)synchronizeWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock
 {
-    NSString *sessionToken = self.identityService.sessionToken;
+    NSString *sessionToken = self.userData.identityService.sessionToken;
     
-    [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == YES", @keypath(SRGHistoryEntry.new, dirty)];
         return [SRGHistoryEntry objectsMatchingPredicate:predicate sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityLow completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
@@ -182,7 +184,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
                 return;
             }
             
-            [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+            [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
                 return [SRGUser userInManagedObjectContext:managedObjectContext];
             } withPriority:NSOperationQueuePriorityLow completionBlock:^(SRGUser * _Nullable user, NSError * _Nullable error) {
                 if (error) {
@@ -197,7 +199,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
                         return;
                     }
                     
-                    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+                    [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
                         SRGUser *user = [managedObjectContext existingObjectWithID:userID error:NULL];
                         user.historySynchronizationDate = serverDate;
                     } withPriority:NSOperationQueuePriorityLow completionBlock:completionBlock];
@@ -222,7 +224,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
 {
     __block NSSet<NSString *> *previousUids = nil;
     
-    [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<SRGHistoryEntry *> *historyEntries = [SRGHistoryEntry objectsMatchingPredicate:nil sortedWithDescriptors:nil inManagedObjectContext:managedObjectContext];
         NSString *keyPath = [NSString stringWithFormat:@"@distinctUnionOfObjects.%@", @keypath(SRGHistoryEntry.new, uid)];
         previousUids = [NSSet setWithArray:[historyEntries valueForKeyPath:keyPath]];
@@ -257,35 +259,35 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
 
 - (NSArray<SRGHistoryEntry *> *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors
 {
-    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [self historyEntriesMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     }];
 }
 
 - (NSString *)historyEntriesMatchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors completionBlock:(void (^)(NSArray<SRGHistoryEntry *> * _Nullable, NSError * _Nullable))completionBlock
 {
-    return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [self historyEntriesMatchingPredicate:predicate sortedWithDescriptors:sortDescriptors inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
 - (SRGHistoryEntry *)historyEntryWithUid:(NSString *)uid
 {
-    return [self.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performMainThreadReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [self historyEntryWithUid:uid inManagedObjectContext:managedObjectContext];
     }];
 }
 
 - (NSString *)historyEntryWithUid:(NSString *)uid completionBlock:(void (^)(SRGHistoryEntry * _Nullable, NSError * _Nullable))completionBlock
 {
-    return [self.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundReadTask:^id _Nullable(NSManagedObjectContext * _Nonnull managedObjectContext) {
         return [self historyEntryWithUid:uid inManagedObjectContext:managedObjectContext];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:completionBlock];
 }
 
 - (NSString *)saveHistoryEntryWithUid:(NSString *)uid lastPlaybackTime:(CMTime)lastPlaybackTime deviceUid:(NSString *)deviceUid completionBlock:(void (^)(NSError * _Nonnull))completionBlock
 {
-    return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         SRGHistoryEntry *historyEntry = [SRGHistoryEntry upsertWithUid:uid matchingPredicate:nil inManagedObjectContext:managedObjectContext];
         historyEntry.lastPlaybackTime = lastPlaybackTime;
         historyEntry.deviceUid = deviceUid;
@@ -305,7 +307,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
 {
     __block NSSet<NSString *> *changedUids = nil;
     
-    return [self.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
+    return [self.userData.dataStore performBackgroundWriteTask:^(NSManagedObjectContext * _Nonnull managedObjectContext) {
         NSArray<NSString *> *discardedUids = [SRGHistoryEntry discardObjectsWithUids:uids matchingPredicate:nil inManagedObjectContext:managedObjectContext];
         changedUids = [NSSet setWithArray:discardedUids];
     } withPriority:NSOperationQueuePriorityNormal completionBlock:^(NSError * _Nullable error) {
@@ -322,7 +324,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
 
 - (void)cancelTaskWithHandle:(NSString *)handle
 {
-    [self.dataStore cancelBackgroundTaskWithHandle:handle];
+    [self.userData.dataStore cancelBackgroundTaskWithHandle:handle];
 }
 
 @end

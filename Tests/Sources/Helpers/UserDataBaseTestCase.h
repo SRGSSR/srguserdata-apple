@@ -112,9 +112,14 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 @property (nonatomic, readonly, nullable) NSString *sessionToken;
 
 /**
- *  Login a test user with SRG Identity, associating it with the provided session token.
+ *  Trigger a login. Do not wait for the login to be complete.
  */
 - (void)login;
+
+/**
+ *  Login a test user with SRG Identity, associating it with the provided session token. Wait until login has been made.
+ */
+- (void)loginAndWait;
 
 /**
  *  Login a test user, perform an initial synchronization and wait until it finishes.
@@ -225,6 +230,9 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
 
 @end
 
+/**
+ *  Playlist test data creation on the local device.
+ */
 @interface UserDataBaseTestCase (PlaylistLocalTestData)
 
 /**
@@ -257,6 +265,50 @@ OBJC_EXPORT NSURL *TestPlaylistsServiceURL(void);
  *  Assert that the local entry identifiers for a specific playlist match a specific list (order is ignored).
  */
 - (void)assertLocalPlaylistEntriesUids:(NSArray<NSString *> *)uids forPlaylistWithUid:(NSString *)playlistUid;
+
+@end
+
+/**
+ *  Preferences test data creation on the remote user data service.
+ */
+@interface UserDataBaseTestCase (PreferencesRemoteTestData)
+
+/**
+ *  Insert a remote preference.
+ */
+- (void)insertRemotePreferenceWithObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain;
+
+/**
+ *  Discard a remote preference.
+ */
+- (void)discardRemotePreferenceAtPath:(NSString *)path inDomain:(NSString *)domain;
+
+/**
+ *  Assert that remote preferences match a specific dictionary.
+ */
+- (void)assertRemotePreferences:(nullable NSDictionary *)dictionary inDomain:(NSString *)domain;
+
+@end
+
+/**
+ *  Preferences test data creation on the local device.
+ */
+@interface UserDataBaseTestCase (PreferencesLocalTestData)
+
+/**
+ *  Insert a local preference.
+ */
+- (void)insertLocalPreferenceWithObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain;
+
+/**
+ *  Discard a local preference.
+ */
+- (void)discardLocalPreferenceAtPath:(NSString *)path inDomain:(NSString *)domain;
+
+/**
+ *  Assert that local preferences match a specific dictionary.
+ */
+- (void)assertLocalPreferences:(nullable NSDictionary *)dictionary inDomain:(NSString *)domain;
 
 @end
 

@@ -35,7 +35,7 @@
     
     // Databases have been generated for a previously logged in user. Restore the same conditions.
     [self setupForAvailableService];
-    [self login];
+    [self loginAndWait];
 }
 
 #pragma mark Tests

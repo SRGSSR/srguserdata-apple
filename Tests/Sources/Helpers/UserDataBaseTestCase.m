@@ -8,6 +8,7 @@
 
 #import "SRGHistoryRequest.h"
 #import "SRGPlaylistsRequest.h"
+#import "SRGPreferencesRequest.h"
 #import "SRGUserObject+Private.h"
 
 #import <libextobjc/libextobjc.h>
@@ -29,7 +30,7 @@
 
 static NSURL *TestServiceURL(void)
 {
-    return [NSURL URLWithString:@"https://profil.rts.ch/api"];
+    return [NSURL URLWithString:@"https://stage-profil.rts.ch/api"];
 }
 
 static NSURL *TestWebserviceURL(void)
@@ -67,6 +68,11 @@ NSURL *TestHistoryServiceURL(void)
 NSURL *TestPlaylistsServiceURL(void)
 {
     return [TestServiceURL() URLByAppendingPathComponent:@"playlist"];
+}
+
+NSURL *TestPreferencesServiceURL(void)
+{
+    return [TestServiceURL() URLByAppendingPathComponent:@"preference"];
 }
 
 @interface UserDataBaseTestCase ()
@@ -251,6 +257,14 @@ NSURL *TestPlaylistsServiceURL(void)
 }
 
 - (void)login
+{
+    XCTAssertNotNil(self.sessionToken);
+        
+    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, self.sessionToken)];
+    XCTAssertTrue(hasHandledCallbackURL);
+}
+
+- (void)loginAndWait
 {
     XCTAssertNotNil(self.sessionToken);
     
@@ -581,6 +595,70 @@ NSURL *TestPlaylistsServiceURL(void)
     NSArray<SRGPlaylistEntry *> *playlistEntries = [self.userData.playlists playlistEntriesInPlaylistWithUid:playlistUid matchingPredicate:predicate sortedWithDescriptors:nil];
     NSArray<NSString *> *localUids = [playlistEntries valueForKeyPath:@keypath(SRGPlaylistEntry.new, uid)];
     XCTAssertEqualObjects([NSSet setWithArray:uids], [NSSet setWithArray:localUids]);
+}
+
+#pragma mark Preferences remote data management
+
+- (void)insertRemotePreferenceWithObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
+{
+    XCTAssertNotNil(self.sessionToken);
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Preferences request"];
+    
+    [[SRGPreferencesRequest putPreferenceWithObject:object atPath:path inDomain:domain toServiceURL:TestPreferencesServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)discardRemotePreferenceAtPath:(NSString *)path inDomain:(NSString *)domain
+{
+    XCTAssertNotNil(self.sessionToken);
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Preferences request"];
+    
+    [[SRGPreferencesRequest deletePreferenceAtPath:path inDomain:domain fromServiceURL:TestPreferencesServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:10. handler:nil];
+}
+
+- (void)assertRemotePreferences:(NSDictionary *)dictionary inDomain:(NSString *)domain
+{
+    XCTAssertNotNil(self.sessionToken);
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Preferences request"];
+    
+    [[SRGPreferencesRequest preferencesAtPath:nil inDomain:domain fromServiceURL:TestPreferencesServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSDictionary * _Nullable preferencesDictionary, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+        XCTAssertEqualObjects(dictionary, preferencesDictionary);
+        [expectation fulfill];
+    }] resume];
+    
+    [self waitForExpectationsWithTimeout:100. handler:nil];
+}
+
+#pragma mark Preferences local data management
+
+- (void)insertLocalPreferenceWithObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
+{
+    XCTAssertNotNil(self.userData);
+    
+    [self.userData.preferences setObjectsAtPaths:@{ path : object } inDomain:domain];
+}
+
+- (void)discardLocalPreferenceAtPath:(NSString *)path inDomain:(NSString *)domain
+{
+    [self.userData.preferences removeObjectsAtPaths:@[path] inDomain:domain];
+}
+
+- (void)assertLocalPreferences:(NSDictionary *)dictionary inDomain:(NSString *)domain
+{
+    NSDictionary *preferencesDictionary = [self.userData.preferences dictionaryAtPath:nil inDomain:domain];
+    XCTAssertEqualObjects(dictionary, preferencesDictionary);
 }
 
 @end

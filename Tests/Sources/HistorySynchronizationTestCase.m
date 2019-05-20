@@ -255,7 +255,7 @@
     [self loginAndWaitForInitialSynchronization];
 }
 
-- (void)testSynchronizationWithoutLoggedInUser
+- (void)testNoSynchronizationWithoutLoggedInUser
 {
     [self setupForAvailableService];
     
@@ -278,6 +278,26 @@
         [NSNotificationCenter.defaultCenter removeObserver:changeObserver];
         [NSNotificationCenter.defaultCenter removeObserver:finishObserver];
     }];
+}
+
+- (void)testNotificationDuringInitialSynchronization
+{
+    [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b" ]];
+    
+    [self setupForAvailableService];
+    
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"a", @"b", nil]));
+        return YES;
+    }];
+    
+    [self login];
+    
+    [self waitForExpectationsWithTimeout:30. handler:nil];
+    
+    [self assertLocalHistoryUids:@[ @"a", @"b" ]];
+    [self assertRemoteHistoryUids:@[ @"a", @"b" ]];
 }
 
 - (void)testSynchronizationWithUnavailableService
@@ -307,7 +327,7 @@
     }];
 }
 
-- (void)testChangeNotificationsWithDiscardedLocalEntries
+- (void)testNotificationsWithDiscardedLocalEntries
 {
     [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
     
@@ -316,6 +336,7 @@
     
     // Changes are notified when entries are marked as being discarded
     [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
         XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"a", @"c", nil]));
         return YES;
     }];
@@ -330,7 +351,8 @@
     [self waitForExpectationsWithTimeout:30. handler:nil];
     
     // No more changes must be received for the discarded entries when deleted during synchronization
-    [self expectationForNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+    [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
         XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"b", @"d", nil]));
         return YES;
     }];
@@ -343,7 +365,7 @@
     [self assertRemoteHistoryUids:@[ @"b", @"d" ]];
 }
 
-- (void)testChangeNotificationsWithDiscardedRemoteEntries
+- (void)testNotificationsWithDiscardedRemoteEntries
 {
     [self insertRemoteHistoryEntriesWithUids:@[ @"a", @"b", @"c", @"d" ]];
     
@@ -354,6 +376,7 @@
     
     // Changes are notified when synchronization occurs with the remote changes
     [self expectationForSingleNotification:SRGHistoryEntriesDidChangeNotification object:self.userData.history handler:^BOOL(NSNotification * _Nonnull notification) {
+        XCTAssertTrue(NSThread.isMainThread);
         XCTAssertEqualObjects(notification.userInfo[SRGHistoryEntriesUidsKey], ([NSSet setWithObjects:@"a", @"c", @"b", @"d", nil]));
         return YES;
     }];

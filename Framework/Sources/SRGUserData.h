@@ -11,10 +11,12 @@
 #import "SRGHistoryEntry.h"
 #import "SRGPlaylist.h"
 #import "SRGPlaylists.h"
+#import "SRGPreferences.h"
 #import "SRGUser.h"
 #import "SRGUserDataError.h"
 #import "SRGUserDataService.h"
 #import "SRGUserObject.h"
+#import "SRGUserObjectService.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,6 +32,11 @@ OBJC_EXPORT NSString * const SRGUserDataDidStartSynchronizationNotification;
  *  Notification sent when global synchronization has finished.
  */
 OBJC_EXPORT NSString * const SRGUserDataDidFinishSynchronizationNotification;
+
+/**
+ *  Information available for `SRGHistoryEntriesDidChangeNotification`.
+ */
+OBJC_EXPORT NSString * const SRGUserDataSynchronizationErrorsKey;                           // Key to access the list of `NSError` which have been encountered, if any.
 
 /**
  *  Manages data associated with a user. An identity service and service endpoints can be optionally provided, so that
@@ -74,6 +81,11 @@ OBJC_EXPORT NSString * const SRGUserDataDidFinishSynchronizationNotification;
  *  Access to the user playlists.
  */
 @property (nonatomic, readonly) SRGPlaylists *playlists;
+
+/**
+ *  Access to user preferences.
+ */
+@property (nonatomic, readonly) SRGPreferences *preferences;
 
 @end
 

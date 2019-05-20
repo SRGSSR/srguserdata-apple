@@ -53,9 +53,13 @@
         self.writeCompletionBlocks = [NSMapTable strongToStrongObjectsMapTable];
         
         self.concurrentQueue = dispatch_queue_create("ch.srgssr.playsrg.SRGDataStore.concurrent", DISPATCH_QUEUE_CONCURRENT);
+        
+        
     }
     return self;
 }
+
+#pragma mark Getters and setters
 
 #pragma mark Task execution
 

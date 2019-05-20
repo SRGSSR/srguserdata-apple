@@ -34,12 +34,12 @@ OBJC_EXPORT NSString * const SRGPlaylistUidKey;                                 
 OBJC_EXPORT NSString * const SRGPlaylistEntriesUidsKey;                           // Key to access the list of uids which have changed (inserted, updated or deleted) as an `NSSet` of `NSString` objects.
 
 /**
- *  Manages a local cache for playlists. Playlists are characterized by an identifier, a name and a type. Based
- *  on a local cache, this class ensures efficient playlist retrieval from a webservice and keeps local and distant
- *  playlists in sync.
+ *  Manages a local cache for playlists. Playlists are characterized by an identifier, a name and a type. For logged in
+ *  users, and provided a service URL has been set when instantiating `SRGUserData`, local and distant playlists are
+ *  automatically kept in sync.
  *
  *  You can register for playlists update notifications, see above. These will be sent by the `SRGPlaylists` instance
- *  itself.
+ *  itself and received on the main thread.
  */
 @interface SRGPlaylists : SRGUserDataService
 

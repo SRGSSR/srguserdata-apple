@@ -48,6 +48,11 @@
     
     self.letterboxController.playlistDataSource = self.playerPlaylist;
     
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(metadataDidChange:)
+                                               name:SRGLetterboxMetadataDidChangeNotification
+                                             object:self.letterboxController];
+    
     @weakify(self)
     [self.letterboxController addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1., NSEC_PER_SEC) queue:NULL usingBlock:^(CMTime time) {
         @strongify(self)
@@ -61,6 +66,8 @@
     if (self.URN) {
         [self.letterboxController playURN:self.URN atPosition:self.position withPreferredSettings:nil];
     }
+    
+    [self reloadData];
 }
 
 #pragma mark Home indicator
@@ -68,6 +75,13 @@
 - (BOOL)prefersHomeIndicatorAutoHidden
 {
     return self.letterboxView.userInterfaceHidden;
+}
+
+#pragma mark UI
+
+- (void)reloadData
+{
+    self.playlistsButton.hidden = (self.letterboxController.media == nil);
 }
 
 #pragma mark SRGLetterboxViewDelegate protocol
@@ -97,6 +111,7 @@
 - (IBAction)addToPlaylist:(id)sender
 {
     SRGMedia *media = self.letterboxController.media;
+    NSAssert(media, @"A media must be available");
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add to playlist", nil)
                                                                              message:media.title
                                                                       preferredStyle:UIAlertControllerStyleActionSheet];
@@ -118,6 +133,13 @@
     
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+#pragma mark Notifications
+
+- (void)metadataDidChange:(NSNotification *)reloadData
+{
+    [self reloadData];
 }
 
 @end
