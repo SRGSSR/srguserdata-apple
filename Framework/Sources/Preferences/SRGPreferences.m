@@ -399,14 +399,16 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
         return;
     }
     
-    typedef void (^PushEntryBlock)(SRGPreferencesChangelogEntry *);
+    typedef void (^PushEntryBlock)(NSUInteger index);
     __block __weak PushEntryBlock weakPushEntry = nil;
     
     // TODO: Implementation could / should be simpler. The requests should be serializable by HTTPMaximumConnectionsPerHost
     //       to 1 on the session configuration. Sadly this is not serialized enough for the server which will drop some of
     //       the submitted changes randomly.
-    PushEntryBlock pushEntry = ^(SRGPreferencesChangelogEntry *entry) {
+    PushEntryBlock pushEntry = ^(NSUInteger index) {
         PushEntryBlock strongPushEntry = weakPushEntry;
+        
+        SRGPreferencesChangelogEntry *entry = entries[index];
         
         void (^pushCompletionBlock)(NSHTTPURLResponse *, NSError *) = ^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError *error) {
             if (error) {
@@ -416,10 +418,8 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
             
             [self.changelog removeEntry:entry];
             
-            NSInteger index = [entries indexOfObject:entry];
             if (index < entries.count - 1) {
-                SRGPreferencesChangelogEntry *nextEntry = entries[index + 1];
-                strongPushEntry(nextEntry);
+                strongPushEntry(index + 1);
             }
             else {
                 completionBlock(nil);
@@ -439,7 +439,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
     };
     weakPushEntry = pushEntry;
         
-    pushEntry(entries.firstObject);
+    pushEntry(0);
 }
 
 - (void)pullPreferencesForSessionToken:(NSString *)sessionToken
