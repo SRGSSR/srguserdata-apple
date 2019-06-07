@@ -7,6 +7,7 @@
 #import "MediasViewController.h"
 
 #import "PlayerViewController.h"
+#import "SRGUserData_demo-Swift.h"
 
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGUserData/SRGUserData.h>
@@ -41,51 +42,33 @@
 {
     [super viewDidLoad];
     
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    self.refreshControl = refreshControl;
-
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    [self refresh];
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [super viewWillDisappear:animated];
-    
-    if (self.movingFromParentViewController || self.beingDismissed) {
-        [self.request cancel];
-    }
-}
-
-#pragma mark Data
+#pragma mark Subclassing hooks
 
 - (void)refresh
 {
-    if (self.request) {
+    if (self.request.running) {
         return;
     }
     
     SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider tvMostPopularMediasForVendor:SRGVendorRTS withCompletionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-        if (self.refreshControl.refreshing) {
-            [self.refreshControl endRefreshing];
-        }
-        
         if (error) {
             return;
         }
         
-        self.medias = medias;
-        [self.tableView reloadData];
+        [self.tableView reloadDataAnimatedWithOldObjects:self.medias newObjects:medias section:0 updateData:^{
+            self.medias = medias;
+        }];
     }] requestWithPageSize:50];
     [request resume];
     self.request = request;
+}
+
+- (void)cancelRefresh
+{
+    [self.request cancel];
 }
 
 #pragma mark UITableViewDataSource protocol
@@ -114,15 +97,8 @@
     SRGMedia *media = self.medias[indexPath.row];
     SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
     
-    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime];
+    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime playerPlaylist:nil];
     [self presentViewController:playerViewController animated:YES completion:nil];
-}
-
-#pragma mark Actions
-
-- (void)refresh:(id)sender
-{
-    [self refresh];
 }
 
 @end

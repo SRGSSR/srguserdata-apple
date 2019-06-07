@@ -24,36 +24,43 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  Return an existing object for the specified identifier, `nil` if none is found.
  */
-+ (nullable __kindof SRGUserObject *)objectWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (nullable __kindof SRGUserObject *)objectWithUid:(NSString *)uid matchingPredicate:(nullable NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Create an entry with the specified identifier, or return an existing one for update purposes.
  */
-+ (__kindof SRGUserObject *)upsertWithUid:(NSString *)uid inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (__kindof SRGUserObject *)upsertWithUid:(NSString *)uid matchingPredicate:(nullable NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Synchronize the receiver with the information from the provided dictionary. The entry might be created, updated
- *  or deleted automatically, in which it is returned by the method. If the dictionary data is invalid, the method
- *  returns `nil`.
+ *  or deleted automatically, in which case it is returned by the method.
  *
  *  @discussion To persist changes, the Core Data managed object context needs to be saved.
  */
-+ (nullable __kindof SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (nullable __kindof SRGUserObject *)synchronizeWithDictionary:(NSDictionary *)dictionary matchingPredicate:(nullable NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
+
+/**
+ *  Return the list of dictionaries which would need to be saved in order to replace a list of objects with a list of
+ *  dictionaries representing another object list.
+ */
++ (NSArray<NSDictionary *> *)dictionariesForObjects:(NSArray<SRGUserObject *> *)objects replacedWithDictionaries:(NSArray<NSDictionary *> *)dictionaries;
 
 /**
  *  Discard the objects with the specified identifiers. Since some of them might not be found, the method returns the actual
  *  list of identifiers which will be discarded. For logged in users, objects will be deleted when the next synchronization
- *  is performed. For logged out users, objects are removed immediately.
+ *  is performed. For offline users, objects are removed immediately.
  *
- *  @discussion Order is not preserved in the rerturned value (in comparison to the original list). Already discarded objects
+ *  @discussion Order is not preserved in the rerturned list (in comparison to the original list). Already discarded objects
  *              are omitted.
  */
-+ (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (NSArray<NSString *> *)discardObjectsWithUids:(nullable NSArray<NSString *> *)uids
+                              matchingPredicate:(nullable NSPredicate *)predicate
+                         inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Delete all objects, removing them from the database directly. No synchronization will be triggered for logged in users.
  */
-+ (void)deleteAllInManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (void)deleteAllObjectsMatchingPredicate:(nullable NSPredicate *)predicate inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 /**
  *  Set to `YES` to flag the object as requiring a synchronization for the currently logged in user.
@@ -61,6 +68,11 @@ NS_ASSUME_NONNULL_BEGIN
  *  @discussion The value of this flag is unspecified when no user is logged in.
  */
 @property (nonatomic) BOOL dirty;
+
+/**
+ *  `YES` iff the entry has been marked as discarded.
+ */
+@property (nonatomic, readonly) BOOL discarded;
 
 @end
 

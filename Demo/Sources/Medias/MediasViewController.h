@@ -4,11 +4,11 @@
 //  License information is available from the LICENSE file.
 //
 
-#import <UIKit/UIKit.h>
+#import "DataViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MediasViewController : UITableViewController
+@interface MediasViewController : DataViewController
 
 @end
 

@@ -25,11 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, copy, nullable) NSDate *date;
 
-/**
- *  `YES` iff the entry has been marked as discarded.
- */
-@property (nonatomic, readonly) BOOL discarded;
-
 @end
 
 NS_ASSUME_NONNULL_END

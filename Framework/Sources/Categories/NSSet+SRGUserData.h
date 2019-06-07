@@ -8,10 +8,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface NSSet (SRGUserData)
+
 /**
- *  An abstract base class for services synchronizing user data.
+ *  Return the receiver, from which objects from the specified array have been removed.
  */
-@interface SRGUserDataService : NSObject
+- (NSSet *)srguserdata_setByRemovingObjectsInArray:(NSArray *)array;
 
 @end
 

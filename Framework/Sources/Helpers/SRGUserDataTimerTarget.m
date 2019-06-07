@@ -14,6 +14,8 @@
 
 @implementation SRGUserDataTimerTarget
 
+#pragma mark Object lifecycle
+
 - (instancetype)initWithBlock:(void (^)(NSTimer * _Nonnull))block
 {
     if (self = [super init]) {
@@ -21,6 +23,8 @@
     }
     return self;
 }
+
+#pragma mark Public methods
 
 - (void)fire:(NSTimer *)timer
 {

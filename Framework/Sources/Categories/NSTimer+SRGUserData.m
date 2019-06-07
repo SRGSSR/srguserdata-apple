@@ -10,6 +10,8 @@
 
 @implementation NSTimer (SRGUserData)
 
+#pragma mark Class methods
+
 + (NSTimer *)srguserdata_timerWithTimeInterval:(NSTimeInterval)interval repeats:(BOOL)repeats block:(void (^)(NSTimer * _Nonnull timer))block
 {
     NSTimer *timer = nil;

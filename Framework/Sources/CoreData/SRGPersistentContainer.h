@@ -20,6 +20,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)srg_loadPersistentStoreWithCompletionHandler:(void (^)(NSError * _Nullable error))completionHandler;
 
 /**
+ *  The file URL where the persistent container stores its data.
+ */
+@property (nonatomic, readonly) NSURL *srg_fileURL;
+
+/**
  *  Main thread context.
  */
 @property (nonatomic, readonly, nullable) NSManagedObjectContext *viewContext;

@@ -7,15 +7,16 @@
 #import "HistoryViewController.h"
 
 #import "PlayerViewController.h"
+#import "SRGUserData_demo-Swift.h"
 
 #import <libextobjc/libextobjc.h>
 #import <SRGDataProvider/SRGDataProvider.h>
-#import <SRGIdentity/SRGIdentity.h>
 #import <SRGUserData/SRGUserData.h>
 
 @interface HistoryViewController ()
 
 @property (nonatomic) NSArray<SRGMedia *> *medias;
+
 @property (nonatomic, weak) SRGBaseRequest *request;
 
 @end
@@ -43,88 +44,46 @@
 {
     [super viewDidLoad];
     
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    self.refreshControl = refreshControl;
-    
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didLogin:)
-                                               name:SRGIdentityServiceUserDidLoginNotification
-                                             object:SRGIdentityService.currentIdentityService];
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didUpdateAccount:)
-                                               name:SRGIdentityServiceDidUpdateAccountNotification
-                                             object:SRGIdentityService.currentIdentityService];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(historyDidChange:)
-                                               name:SRGHistoryDidChangeNotification
+                                               name:SRGHistoryEntriesDidChangeNotification
                                              object:SRGUserData.currentUserData.history];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"MediaCell"];
-    
-    [self updateNavigationBar];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    [self refresh];
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [super viewWillDisappear:animated];
-    
-    if (self.movingFromParentViewController || self.beingDismissed) {
-        [self.request cancel];
-    }
-}
-
-#pragma mark UI
-
-- (void)updateNavigationBar
-{
-    if (! SRGIdentityService.currentIdentityService.loggedIn) {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Login", nil)
-                                                                                  style:UIBarButtonItemStylePlain
-                                                                                 target:self
-                                                                                 action:@selector(login:)];
-    }
-    else {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
-                                                                                  style:UIBarButtonItemStylePlain
-                                                                                 target:self
-                                                                                 action:@selector(showAccount:)];
-    }
-}
-
-
-#pragma mark Data
+#pragma mark Subclassing hooks
 
 - (void)refresh
 {
-    [self.request cancel];
+    if (self.request.running) {
+        return;
+    }
     
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == NO", @keypath(SRGHistoryEntry.new, discarded)];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@keypath(SRGHistoryEntry.new, date) ascending:NO];
-    [SRGUserData.currentUserData.history historyEntriesMatchingPredicate:predicate sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+    [SRGUserData.currentUserData.history historyEntriesMatchingPredicate:nil sortedWithDescriptors:@[sortDescriptor] completionBlock:^(NSArray<SRGHistoryEntry *> * _Nullable historyEntries, NSError * _Nullable error) {
+        if (error) {
+            return;
+        }
+        
         NSArray<NSString *> *mediaURNs = [historyEntries valueForKeyPath:@keypath(SRGHistoryEntry.new, uid)];
         SRGBaseRequest *request = [[SRGDataProvider.currentDataProvider mediasWithURNs:mediaURNs completionBlock:^(NSArray<SRGMedia *> * _Nullable medias, SRGPage * _Nonnull page, SRGPage * _Nullable nextPage, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
-            if (self.refreshControl.refreshing) {
-                [self.refreshControl endRefreshing];
-            }
-            
             if (error) {
                 return;
             }
             
-            self.medias = medias;
-            [self.tableView reloadData];
+            [self.tableView reloadDataAnimatedWithOldObjects:self.medias newObjects:medias section:0 updateData:^{
+                self.medias = medias;
+            }];
         }] requestWithPageSize:50];
         [request resume];
-        self.request = request;
+        self.request = request;;
     }];
+}
+
+- (void)cancelRefresh
+{
+    [self.request cancel];
 }
 
 #pragma mark UITableViewDataSource protocol
@@ -153,7 +112,7 @@
     SRGMedia *media = self.medias[indexPath.row];
     SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
     
-    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime];
+    PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime playerPlaylist:nil];
     [self presentViewController:playerViewController animated:YES completion:nil];
 }
 
@@ -164,56 +123,17 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (editingStyle == UITableViewCellEditingStyleDelete){
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
         SRGMedia *media = self.medias[indexPath.row];
-        [SRGUserData.currentUserData.history discardHistoryEntriesWithUids:@[media.URN] completionBlock:^(NSError * _Nonnull error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableArray<SRGMedia *> *medias = [self.medias mutableCopy];
-                [medias removeObjectAtIndex:indexPath.row];
-                self.medias = [medias copy];
-                
-                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            });
-        }];
+        [SRGUserData.currentUserData.history discardHistoryEntriesWithUids:@[media.URN] completionBlock:nil];
     }
-}
-
-#pragma mark Actions
-
-- (void)login:(id)sender
-{
-    [SRGIdentityService.currentIdentityService loginWithEmailAddress:nil];
-}
-
-- (void)showAccount:(id)sender
-{
-    [SRGIdentityService.currentIdentityService showAccountView];
-}
-
-- (void)refresh:(id)sender
-{
-    [self refresh];
 }
 
 #pragma mark Notifications
 
-- (void)didLogin:(NSNotification *)notification
-{
-    [self updateNavigationBar];
-}
-
-- (void)didUpdateAccount:(NSNotification *)notification
-{
-    [self updateNavigationBar];
-}
-
 - (void)historyDidChange:(NSNotification *)notification
 {
-    NSArray<NSString *> *previousURNs = notification.userInfo[SRGHistoryPreviousUidsKey];
-    NSArray<NSString *> *URNs = notification.userInfo[SRGHistoryUidsKey];
-    if (URNs.count == 0 || previousURNs.count == 0) {
-        [self refresh];
-    }
+    [self refresh];
 }
 
 @end

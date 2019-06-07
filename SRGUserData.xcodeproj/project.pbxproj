@@ -7,9 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		080491822284BFA200E4CEC2 /* PlayerPlaylist.m in Sources */ = {isa = PBXBuildFile; fileRef = 080491802284BFA200E4CEC2 /* PlayerPlaylist.m */; };
+		08083BD822639F8B00BE9F19 /* SRGPlaylistsRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */; };
+		08083BD922639F8B00BE9F19 /* SRGPlaylistsRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */; };
 		082442A8220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 082442A7220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel */; };
 		082442AF220CB0DD00F39785 /* UserData_DB_v4 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AD220CB0DD00F39785 /* UserData_DB_v4 */; };
 		082442B0220CB0DD00F39785 /* UserData_DB_v3 in Resources */ = {isa = PBXBuildFile; fileRef = 082442AE220CB0DD00F39785 /* UserData_DB_v3 */; };
+		08280F0C2258DEBD00AC978D /* SRGPlaylists.m in Sources */ = {isa = PBXBuildFile; fileRef = 08280F0A2258DEBD00AC978D /* SRGPlaylists.m */; };
+		08280F0D2258DEBD00AC978D /* SRGPlaylists.h in Headers */ = {isa = PBXBuildFile; fileRef = 08280F0B2258DEBD00AC978D /* SRGPlaylists.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		08280F2222596BAD00AC978D /* UserData_DB_v6 in Resources */ = {isa = PBXBuildFile; fileRef = 08280F2122596BAD00AC978D /* UserData_DB_v6 */; };
+		084ACC2D22535F48008ACBD0 /* SRGPlaylist.m in Sources */ = {isa = PBXBuildFile; fileRef = 084ACC2B22535F48008ACBD0 /* SRGPlaylist.m */; };
+		084ACC2E22535F48008ACBD0 /* SRGPlaylist.h in Headers */ = {isa = PBXBuildFile; fileRef = 084ACC2C22535F48008ACBD0 /* SRGPlaylist.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0850E2C5223043C4003BDCB8 /* UserData_DB_v1 in Resources */ = {isa = PBXBuildFile; fileRef = 0850E2C4223043C4003BDCB8 /* UserData_DB_v1 */; };
 		0850E2C92230499A003BDCB8 /* UserDataTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0850E2C822304999003BDCB8 /* UserDataTestCase.m */; };
 		0858B69822010C9E000F00CF /* SRGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; };
@@ -27,7 +35,17 @@
 		08624E63223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08624E62223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel */; };
 		08624E65223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08624E64223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel */; };
 		08624E67223B114D007D919A /* UserData_DB_v5 in Resources */ = {isa = PBXBuildFile; fileRef = 08624E66223B114D007D919A /* UserData_DB_v5 */; };
+		086320E92257F05200C719A6 /* PlaylistsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 086320E72257F05200C719A6 /* PlaylistsViewController.m */; };
+		086320EA2257F05200C719A6 /* PlaylistsViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 086320E82257F05200C719A6 /* PlaylistsViewController.storyboard */; };
+		086320EE2257FDB300C719A6 /* PlaylistViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 086320EB2257FDB300C719A6 /* PlaylistViewController.storyboard */; };
+		086320EF2257FDB300C719A6 /* PlaylistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 086320ED2257FDB300C719A6 /* PlaylistViewController.m */; };
+		088B32BB22746E8E009AE195 /* OHHTTPStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 088B32BA22746E8E009AE195 /* OHHTTPStubs.framework */; };
+		088B32BC22746F88009AE195 /* OHHTTPStubs.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 088B32BA22746E8E009AE195 /* OHHTTPStubs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		08B327A7221324810051DDA6 /* HistoryTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 08B327A6221324810051DDA6 /* HistoryTestCase.m */; };
+		08C9919B22537833003E7816 /* SRGPlaylist+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 08C9919A22537833003E7816 /* SRGPlaylist+Private.h */; };
+		08C9919D22538379003E7816 /* PlaylistsTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 08C9919C22538379003E7816 /* PlaylistsTestCase.m */; };
+		08C991A82254B97E003E7816 /* SRGPlaylistEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = 08C991A62254B97E003E7816 /* SRGPlaylistEntry.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		08C991A92254B97E003E7816 /* SRGPlaylistEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 08C991A72254B97E003E7816 /* SRGPlaylistEntry.m */; };
 		08E9CC122230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08E9CC112230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel */; };
 		08E9CC142230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08E9CC132230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel */; };
 		08E9CC1622308CD70039A875 /* UserData_DB_v2 in Resources */ = {isa = PBXBuildFile; fileRef = 08E9CC1522308CD70039A875 /* UserData_DB_v2 */; };
@@ -51,10 +69,22 @@
 		6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54220FC7FF4009C02CF /* SRGUserData.m */; };
 		6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */; };
 		6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */; };
+		6F1747F62274855800CC9C39 /* PlaylistsSynchronizationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F1747F52274855700CC9C39 /* PlaylistsSynchronizationTestCase.m */; };
+		6F17A48E228498BD001C4CC2 /* DeepDiff.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F17A48D228498BD001C4CC2 /* DeepDiff.framework */; };
+		6F17A48F228498BD001C4CC2 /* DeepDiff.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F17A48D228498BD001C4CC2 /* DeepDiff.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F17A496228499DA001C4CC2 /* DeepDiffBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F17A495228499DA001C4CC2 /* DeepDiffBridge.swift */; };
 		6F19DA8B221ED8A300085C7D /* Masonry.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F19DAA6221FF61800085C7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAA3221FF61800085C7D /* main.m */; };
 		6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F19DAA9222005A800085C7D /* SRGHistoryRequest.h */; };
 		6F19DAAC222005A800085C7D /* SRGHistoryRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAAA222005A800085C7D /* SRGHistoryRequest.m */; };
+		6F222B9F228BF35B0066ABE3 /* SRGPreferencesChangelogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F222B9D228BF35A0066ABE3 /* SRGPreferencesChangelogEntry.m */; };
+		6F222BA0228BF35B0066ABE3 /* SRGPreferencesChangelogEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F222B9E228BF35A0066ABE3 /* SRGPreferencesChangelogEntry.h */; };
+		6F222BA3228C03ED0066ABE3 /* SRGPreferencesChangelog.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F222BA1228C03ED0066ABE3 /* SRGPreferencesChangelog.h */; };
+		6F222BA4228C03ED0066ABE3 /* SRGPreferencesChangelog.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F222BA2228C03ED0066ABE3 /* SRGPreferencesChangelog.m */; };
+		6F222BA7228C146C0066ABE3 /* SRGUserObjectService.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F222BA5228C146C0066ABE3 /* SRGUserObjectService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6F222BA8228C146C0066ABE3 /* SRGUserObjectService.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F222BA6228C146C0066ABE3 /* SRGUserObjectService.m */; };
+		6F222BAC228C14FA0066ABE3 /* SRGUserObjectService+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F222BAA228C14FA0066ABE3 /* SRGUserObjectService+Subclassing.h */; };
+		6F229AC22291C45A004F8050 /* PreferencesSynchronizationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F229AC12291C45A004F8050 /* PreferencesSynchronizationTestCase.m */; };
 		6F308A682212CE7E003D3385 /* UserData_DB_invalid in Resources */ = {isa = PBXBuildFile; fileRef = 6FFEB7442212CBE60098F131 /* UserData_DB_invalid */; };
 		6F32342D2212E9B90046E265 /* TestData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6F32342A2212E9890046E265 /* TestData.xcdatamodeld */; };
 		6F3234322212ED240046E265 /* UserDataBaseTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F3234312212ED230046E265 /* UserDataBaseTestCase.m */; };
@@ -95,12 +125,26 @@
 		6F41C9AB2216C3CC003F434A /* PlayerViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F41C9A82216C3CB003F434A /* PlayerViewController.storyboard */; };
 		6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F41C9AA2216C3CB003F434A /* PlayerViewController.m */; };
 		6F46DD76221429110013C10A /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F46DD75221429100013C10A /* Person.m */; };
+		6F478B2B22818A6100CDC022 /* NSDateFormatter+Demo.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */; };
+		6F5C6365228AAF190001CC4C /* PreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C6364228AAF190001CC4C /* PreferencesViewController.m */; };
+		6F5C6367228AAF2A0001CC4C /* PreferencesViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F5C6366228AAF2A0001CC4C /* PreferencesViewController.storyboard */; };
+		6F5C638D228B3DD70001CC4C /* DataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C638B228B3DD70001CC4C /* DataViewController.m */; };
+		6F5C6392228B3DE90001CC4C /* UserDataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C6390228B3DE90001CC4C /* UserDataViewController.m */; };
+		6F6359F82289584600E7F697 /* SRGPreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F6359F62289584600E7F697 /* SRGPreferences.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6F6359F92289584600E7F697 /* SRGPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359F72289584600E7F697 /* SRGPreferences.m */; };
+		6F6359FC2289896A00E7F697 /* PreferencesTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */; };
+		6F6359FF2289AEC500E7F697 /* SRGPreferencesRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F6359FD2289AEC500E7F697 /* SRGPreferencesRequest.h */; };
+		6F635A002289AEC500E7F697 /* SRGPreferencesRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6359FE2289AEC500E7F697 /* SRGPreferencesRequest.m */; };
+		6F64BDF02274E19F00ED0DFE /* MigrationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FCCE4802212BFD600423EFF /* MigrationTestCase.m */; };
+		6F687FC62281FE9800E6AE2C /* SRGPlaylistEntry+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */; };
 		6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F120FDCAA800AA6434 /* Images.xcassets */; };
 		6F8A93FD20FDCAA800AA6434 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8A93F520FDCAA800AA6434 /* main.m */; };
 		6F8A93FE20FDCAA800AA6434 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8A93F620FDCAA800AA6434 /* AppDelegate.m */; };
 		6F8A940320FDD01B00AA6434 /* SRGUserData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; };
 		6F8A940420FDD01B00AA6434 /* SRGUserData.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6F938024227C0CE600315A83 /* NSSet+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F938022227C0CE600315A83 /* NSSet+SRGUserData.h */; };
+		6F938025227C0CE600315A83 /* NSSet+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F938023227C0CE600315A83 /* NSSet+SRGUserData.m */; };
 		6FA1D10D220C7A21003976D9 /* SRGUserObject+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */; };
 		6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */; };
 		6FA62D5F2204389A008569DC /* FXReachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FA62D5C2204389A008569DC /* FXReachability.framework */; };
@@ -132,7 +176,9 @@
 		6FB74D6C2101D4D200E2D365 /* SRGUserData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; };
 		6FB74D772101D5D600E2D365 /* HistorySynchronizationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */; };
 		6FB74D7B2101D69F00E2D365 /* SRGNetwork.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		6FCCE4812212BFD600423EFF /* MigrationTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FCCE4802212BFD600423EFF /* MigrationTestCase.m */; };
+		6FC44DE7227349CC0022DC99 /* NSArray+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FC44DE5227349CC0022DC99 /* NSArray+SRGUserData.m */; };
+		6FC44DE8227349CC0022DC99 /* NSArray+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FC44DE6227349CC0022DC99 /* NSArray+SRGUserData.h */; };
+		6FE8A62422821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 6FE8A62322821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel */; };
 		6FE91E7B2108A36A001B5E8F /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6FFB346522088BA200E76E6D /* SRGDataProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFB346422088BA200E76E6D /* SRGDataProvider.framework */; };
 		6FFB346622088BA200E76E6D /* SRGDataProvider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFB346422088BA200E76E6D /* SRGDataProvider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -202,6 +248,7 @@
 				0858B6A222010CD6000F00CF /* libextobjc.framework in Embed Frameworks */,
 				6FA62D6B22043955008569DC /* Mantle.framework in Embed Frameworks */,
 				6F41C9A12216BBB1003F434A /* YYWebImage.framework in Embed Frameworks */,
+				6F17A48F228498BD001C4CC2 /* DeepDiff.framework in Embed Frameworks */,
 				6F41C9A32216BBB1003F434A /* SRGAnalytics_MediaPlayer.framework in Embed Frameworks */,
 				6F41C98D2216B969003F434A /* SRGDiagnostics.framework in Embed Frameworks */,
 				6F8A940420FDD01B00AA6434 /* SRGUserData.framework in Embed Frameworks */,
@@ -222,6 +269,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				088B32BC22746F88009AE195 /* OHHTTPStubs.framework in Copy Files */,
 				6F19DA8B221ED8A300085C7D /* Masonry.framework in Copy Files */,
 				6FA62D70220439CF008569DC /* Mantle.framework in Copy Files */,
 				6FA62D71220439CF008569DC /* FXReachability.framework in Copy Files */,
@@ -238,11 +286,21 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		080491802284BFA200E4CEC2 /* PlayerPlaylist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerPlaylist.m; sourceTree = "<group>"; };
+		080491812284BFA200E4CEC2 /* PlayerPlaylist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerPlaylist.h; sourceTree = "<group>"; };
+		08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylistsRequest.m; sourceTree = "<group>"; };
+		08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPlaylistsRequest.h; sourceTree = "<group>"; };
 		082442A5220C8A8800F39785 /* SRGUserData_v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v2.xcdatamodel; sourceTree = "<group>"; };
 		082442A6220C8BA000F39785 /* SRGUserData_v3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v3.xcdatamodel; sourceTree = "<group>"; };
 		082442A7220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v5_v6.xcmappingmodel; sourceTree = "<group>"; };
 		082442AD220CB0DD00F39785 /* UserData_DB_v4 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v4; sourceTree = "<group>"; };
 		082442AE220CB0DD00F39785 /* UserData_DB_v3 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v3; sourceTree = "<group>"; };
+		08280F0A2258DEBD00AC978D /* SRGPlaylists.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylists.m; sourceTree = "<group>"; };
+		08280F0B2258DEBD00AC978D /* SRGPlaylists.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPlaylists.h; sourceTree = "<group>"; };
+		08280F2122596BAD00AC978D /* UserData_DB_v6 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v6; sourceTree = "<group>"; };
+		084ACC2A22535CA6008ACBD0 /* SRGUserData_v7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v7.xcdatamodel; sourceTree = "<group>"; };
+		084ACC2B22535F48008ACBD0 /* SRGPlaylist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylist.m; sourceTree = "<group>"; };
+		084ACC2C22535F48008ACBD0 /* SRGPlaylist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPlaylist.h; sourceTree = "<group>"; };
 		0850E2BF22304169003BDCB8 /* SRGUserData_v4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SRGUserData_v4.xcdatamodel; sourceTree = "<group>"; };
 		0850E2C4223043C4003BDCB8 /* UserData_DB_v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v1; sourceTree = "<group>"; };
 		0850E2C822304999003BDCB8 /* UserDataTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDataTestCase.m; sourceTree = "<group>"; };
@@ -254,7 +312,18 @@
 		08624E62223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v3_v4.xcmappingmodel; sourceTree = "<group>"; };
 		08624E64223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v4_v5.xcmappingmodel; sourceTree = "<group>"; };
 		08624E66223B114D007D919A /* UserData_DB_v5 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v5; sourceTree = "<group>"; };
+		086320E62257F05200C719A6 /* PlaylistsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaylistsViewController.h; sourceTree = "<group>"; };
+		086320E72257F05200C719A6 /* PlaylistsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaylistsViewController.m; sourceTree = "<group>"; };
+		086320E82257F05200C719A6 /* PlaylistsViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = PlaylistsViewController.storyboard; sourceTree = "<group>"; };
+		086320EB2257FDB300C719A6 /* PlaylistViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = PlaylistViewController.storyboard; sourceTree = "<group>"; };
+		086320EC2257FDB300C719A6 /* PlaylistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaylistViewController.h; sourceTree = "<group>"; };
+		086320ED2257FDB300C719A6 /* PlaylistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaylistViewController.m; sourceTree = "<group>"; };
+		088B32BA22746E8E009AE195 /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = Carthage/Build/iOS/OHHTTPStubs.framework; sourceTree = "<group>"; };
 		08B327A6221324810051DDA6 /* HistoryTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistoryTestCase.m; sourceTree = "<group>"; };
+		08C9919A22537833003E7816 /* SRGPlaylist+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylist+Private.h"; sourceTree = "<group>"; };
+		08C9919C22538379003E7816 /* PlaylistsTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaylistsTestCase.m; sourceTree = "<group>"; };
+		08C991A62254B97E003E7816 /* SRGPlaylistEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPlaylistEntry.h; sourceTree = "<group>"; };
+		08C991A72254B97E003E7816 /* SRGPlaylistEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPlaylistEntry.m; sourceTree = "<group>"; };
 		08E9CC112230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v1_v2.xcmappingmodel; sourceTree = "<group>"; };
 		08E9CC132230894B0039A875 /* SRGUserData_v2_v3.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v2_v3.xcmappingmodel; sourceTree = "<group>"; };
 		08E9CC1522308CD70039A875 /* UserData_DB_v2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UserData_DB_v2; sourceTree = "<group>"; };
@@ -277,11 +346,24 @@
 		6F0EB54220FC7FF4009C02CF /* SRGUserData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGUserData.m; sourceTree = "<group>"; };
 		6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+SRGUserData.m"; sourceTree = "<group>"; };
 		6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+SRGUserData.h"; sourceTree = "<group>"; };
+		6F1747F52274855700CC9C39 /* PlaylistsSynchronizationTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlaylistsSynchronizationTestCase.m; sourceTree = "<group>"; };
+		6F17A48D228498BD001C4CC2 /* DeepDiff.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeepDiff.framework; path = Carthage/Build/iOS/DeepDiff.framework; sourceTree = "<group>"; };
+		6F17A494228499D9001C4CC2 /* SRGUserData-demo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGUserData-demo-Bridging-Header.h"; sourceTree = "<group>"; };
+		6F17A495228499DA001C4CC2 /* DeepDiffBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepDiffBridge.swift; sourceTree = "<group>"; };
 		6F19DA90221FF5F800085C7D /* SRGUserData-testapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-testapp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F19DAA3221FF61800085C7D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6F19DAA5221FF61800085C7D /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6F19DAA9222005A800085C7D /* SRGHistoryRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGHistoryRequest.h; sourceTree = "<group>"; };
 		6F19DAAA222005A800085C7D /* SRGHistoryRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGHistoryRequest.m; sourceTree = "<group>"; };
+		6F222B9D228BF35A0066ABE3 /* SRGPreferencesChangelogEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGPreferencesChangelogEntry.m; sourceTree = "<group>"; };
+		6F222B9E228BF35A0066ABE3 /* SRGPreferencesChangelogEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGPreferencesChangelogEntry.h; sourceTree = "<group>"; };
+		6F222BA1228C03ED0066ABE3 /* SRGPreferencesChangelog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferencesChangelog.h; sourceTree = "<group>"; };
+		6F222BA2228C03ED0066ABE3 /* SRGPreferencesChangelog.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferencesChangelog.m; sourceTree = "<group>"; };
+		6F222BA5228C146C0066ABE3 /* SRGUserObjectService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGUserObjectService.h; sourceTree = "<group>"; };
+		6F222BA6228C146C0066ABE3 /* SRGUserObjectService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGUserObjectService.m; sourceTree = "<group>"; };
+		6F222BAA228C14FA0066ABE3 /* SRGUserObjectService+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserObjectService+Subclassing.h"; sourceTree = "<group>"; };
+		6F222BAE228C33BA0066ABE3 /* SRGUserData+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGUserData+Private.h"; sourceTree = "<group>"; };
+		6F229AC12291C45A004F8050 /* PreferencesSynchronizationTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesSynchronizationTestCase.m; sourceTree = "<group>"; };
 		6F32342B2212E9890046E265 /* TestData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestData.xcdatamodel; sourceTree = "<group>"; };
 		6F3234312212ED230046E265 /* UserDataBaseTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDataBaseTestCase.m; sourceTree = "<group>"; };
 		6F3234332212ED370046E265 /* UserDataBaseTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDataBaseTestCase.h; sourceTree = "<group>"; };
@@ -310,6 +392,21 @@
 		6F41C9AA2216C3CB003F434A /* PlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerViewController.m; sourceTree = "<group>"; };
 		6F46DD74221429100013C10A /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 		6F46DD75221429100013C10A /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+		6F478B2922818A6100CDC022 /* NSDateFormatter+Demo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+Demo.h"; sourceTree = "<group>"; };
+		6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+Demo.m"; sourceTree = "<group>"; };
+		6F5C6363228AAF190001CC4C /* PreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesViewController.h; sourceTree = "<group>"; };
+		6F5C6364228AAF190001CC4C /* PreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesViewController.m; sourceTree = "<group>"; };
+		6F5C6366228AAF2A0001CC4C /* PreferencesViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PreferencesViewController.storyboard; sourceTree = "<group>"; };
+		6F5C638A228B3DD70001CC4C /* DataViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataViewController.h; sourceTree = "<group>"; };
+		6F5C638B228B3DD70001CC4C /* DataViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DataViewController.m; sourceTree = "<group>"; };
+		6F5C638F228B3DE90001CC4C /* UserDataViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserDataViewController.h; sourceTree = "<group>"; };
+		6F5C6390228B3DE90001CC4C /* UserDataViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserDataViewController.m; sourceTree = "<group>"; };
+		6F6359F62289584600E7F697 /* SRGPreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferences.h; sourceTree = "<group>"; };
+		6F6359F72289584600E7F697 /* SRGPreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferences.m; sourceTree = "<group>"; };
+		6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesTestCase.m; sourceTree = "<group>"; };
+		6F6359FD2289AEC500E7F697 /* SRGPreferencesRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRGPreferencesRequest.h; sourceTree = "<group>"; };
+		6F6359FE2289AEC500E7F697 /* SRGPreferencesRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRGPreferencesRequest.m; sourceTree = "<group>"; };
+		6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SRGPlaylistEntry+Private.h"; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8A93F020FDCAA800AA6434 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6F8A93F120FDCAA800AA6434 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -317,6 +414,8 @@
 		6F8A93F520FDCAA800AA6434 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6F8A93F620FDCAA800AA6434 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		6F8A93FA20FDCAA800AA6434 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6F938022227C0CE600315A83 /* NSSet+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSSet+SRGUserData.h"; sourceTree = "<group>"; };
+		6F938023227C0CE600315A83 /* NSSet+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSSet+SRGUserData.m"; sourceTree = "<group>"; };
 		6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserObject+Subclassing.h"; sourceTree = "<group>"; };
 		6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataService+Subclassing.h"; sourceTree = "<group>"; };
 		6FA62D5C2204389A008569DC /* FXReachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FXReachability.framework; path = Carthage/Build/iOS/FXReachability.framework; sourceTree = "<group>"; };
@@ -332,6 +431,8 @@
 		6FB74D672101D4D200E2D365 /* SRGUserData-tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SRGUserData-tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistorySynchronizationTestCase.m; sourceTree = "<group>"; };
 		6FB74D762101D5D600E2D365 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6FC44DE5227349CC0022DC99 /* NSArray+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+SRGUserData.m"; sourceTree = "<group>"; };
+		6FC44DE6227349CC0022DC99 /* NSArray+SRGUserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+SRGUserData.h"; sourceTree = "<group>"; };
 		6FCBFEF8210B578B006BC355 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCBFEFA210B57BD006BC355 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCBFEFB210B57BD006BC355 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -339,6 +440,7 @@
 		6FCBFEFD210B57BE006BC355 /* rm */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = rm; path = rm.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCCE4802212BFD600423EFF /* MigrationTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MigrationTestCase.m; sourceTree = "<group>"; };
 		6FE6E5E32148DC1D00228573 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6FE8A62322821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = SRGUserData_v6_v7.xcmappingmodel; sourceTree = "<group>"; };
 		6FFB346422088BA200E76E6D /* SRGDataProvider.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGDataProvider.framework; path = Carthage/Build/iOS/SRGDataProvider.framework; sourceTree = "<group>"; };
 		6FFB346922089A5E00E76E6D /* SRGHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRGHistory.h; sourceTree = "<group>"; };
 		6FFB346A22089A5E00E76E6D /* SRGHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRGHistory.m; sourceTree = "<group>"; };
@@ -403,6 +505,7 @@
 				0858B6A522010CD6000F00CF /* SRGLogger.framework in Frameworks */,
 				6FA62D6A22043955008569DC /* Mantle.framework in Frameworks */,
 				6F41C9A02216BBB1003F434A /* YYWebImage.framework in Frameworks */,
+				6F17A48E228498BD001C4CC2 /* DeepDiff.framework in Frameworks */,
 				6F41C9A22216BBB1003F434A /* SRGAnalytics_MediaPlayer.framework in Frameworks */,
 				6F41C98C2216B969003F434A /* SRGDiagnostics.framework in Frameworks */,
 				0858B69C22010C9E000F00CF /* libextobjc.framework in Frameworks */,
@@ -427,6 +530,7 @@
 				0858B6A022010C9E000F00CF /* MAKVONotificationCenter.framework in Frameworks */,
 				0858B69D22010C9E000F00CF /* libextobjc.framework in Frameworks */,
 				6FE91E7B2108A36A001B5E8F /* SRGNetwork.framework in Frameworks */,
+				088B32BB22746E8E009AE195 /* OHHTTPStubs.framework in Frameworks */,
 				6FB74D6C2101D4D200E2D365 /* SRGUserData.framework in Frameworks */,
 				0858B69A22010C9E000F00CF /* SRGLogger.framework in Frameworks */,
 			);
@@ -448,8 +552,33 @@
 				082442AE220CB0DD00F39785 /* UserData_DB_v3 */,
 				082442AD220CB0DD00F39785 /* UserData_DB_v4 */,
 				08624E66223B114D007D919A /* UserData_DB_v5 */,
+				08280F2122596BAD00AC978D /* UserData_DB_v6 */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		08280F092258DEBD00AC978D /* Playlists */ = {
+			isa = PBXGroup;
+			children = (
+				08280F0B2258DEBD00AC978D /* SRGPlaylists.h */,
+				08280F0A2258DEBD00AC978D /* SRGPlaylists.m */,
+				08083BD722639F8B00BE9F19 /* SRGPlaylistsRequest.h */,
+				08083BD622639F8B00BE9F19 /* SRGPlaylistsRequest.m */,
+			);
+			path = Playlists;
+			sourceTree = "<group>";
+		};
+		086320E52257F05200C719A6 /* Playlists */ = {
+			isa = PBXGroup;
+			children = (
+				086320E62257F05200C719A6 /* PlaylistsViewController.h */,
+				086320E72257F05200C719A6 /* PlaylistsViewController.m */,
+				086320E82257F05200C719A6 /* PlaylistsViewController.storyboard */,
+				086320EC2257FDB300C719A6 /* PlaylistViewController.h */,
+				086320ED2257FDB300C719A6 /* PlaylistViewController.m */,
+				086320EB2257FDB300C719A6 /* PlaylistViewController.storyboard */,
+			);
+			path = Playlists;
 			sourceTree = "<group>";
 		};
 		6F0178AA22080FEC00B4BCD9 /* Model */ = {
@@ -458,6 +587,12 @@
 				6F0178AB22080FEC00B4BCD9 /* SRGHistoryEntry.h */,
 				6F0178AE22080FEC00B4BCD9 /* SRGHistoryEntry.m */,
 				6FFB348C2209D57400E76E6D /* SRGHistoryEntry+Private.h */,
+				084ACC2C22535F48008ACBD0 /* SRGPlaylist.h */,
+				084ACC2B22535F48008ACBD0 /* SRGPlaylist.m */,
+				08C9919A22537833003E7816 /* SRGPlaylist+Private.h */,
+				08C991A62254B97E003E7816 /* SRGPlaylistEntry.h */,
+				08C991A72254B97E003E7816 /* SRGPlaylistEntry.m */,
+				6F687FC42281FE9800E6AE2C /* SRGPlaylistEntry+Private.h */,
 				6F0178AD22080FEC00B4BCD9 /* SRGUser.h */,
 				6F0178AC22080FEC00B4BCD9 /* SRGUser.m */,
 				6F0178D722086F6D00B4BCD9 /* SRGUser+Private.h */,
@@ -520,15 +655,15 @@
 				6F0178CD2208199800B4BCD9 /* Helpers */,
 				6FFB346722089A5E00E76E6D /* History */,
 				6F0178AA22080FEC00B4BCD9 /* Model */,
+				08280F092258DEBD00AC978D /* Playlists */,
+				6F6359F52289581300E7F697 /* Preferences */,
+				6F222BAD228C150D0066ABE3 /* Services */,
 				6F0EB53E20FC7FA9009C02CF /* SRGUserData.h */,
 				6F0EB54220FC7FF4009C02CF /* SRGUserData.m */,
+				6F222BAE228C33BA0066ABE3 /* SRGUserData+Private.h */,
 				6FA9ADFD222C4944007446BD /* SRGUserDataError.h */,
 				6FA9ADFE222C4944007446BD /* SRGUserDataError.m */,
 				6F01789E22047D7300B4BCD9 /* SRGUserDataLogger.h */,
-				6FFB347B2209748900E76E6D /* SRGUserDataService.h */,
-				6FFB347D2209773F00E76E6D /* SRGUserDataService.m */,
-				6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */,
-				6FFB34872209C10800E76E6D /* SRGUserDataService+Private.h */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -536,12 +671,25 @@
 		6F0EB54420FC8049009C02CF /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				6FC44DE6227349CC0022DC99 /* NSArray+SRGUserData.h */,
+				6FC44DE5227349CC0022DC99 /* NSArray+SRGUserData.m */,
 				6F0EB54620FC8049009C02CF /* NSBundle+SRGUserData.h */,
 				6F0EB54520FC8049009C02CF /* NSBundle+SRGUserData.m */,
+				6F938022227C0CE600315A83 /* NSSet+SRGUserData.h */,
+				6F938023227C0CE600315A83 /* NSSet+SRGUserData.m */,
 				6F0178CA2208192B00B4BCD9 /* NSTimer+SRGUserData.h */,
 				6F0178C92208192B00B4BCD9 /* NSTimer+SRGUserData.m */,
 			);
 			path = Categories;
+			sourceTree = "<group>";
+		};
+		6F17A493228499CC001C4CC2 /* Bridges */ = {
+			isa = PBXGroup;
+			children = (
+				6F17A495228499DA001C4CC2 /* DeepDiffBridge.swift */,
+				6F17A494228499D9001C4CC2 /* SRGUserData-demo-Bridging-Header.h */,
+			);
+			path = Bridges;
 			sourceTree = "<group>";
 		};
 		6F19DAA2221FF61800085C7D /* TestApp */ = {
@@ -551,6 +699,20 @@
 				6F19DAA5221FF61800085C7D /* Info.plist */,
 			);
 			path = TestApp;
+			sourceTree = "<group>";
+		};
+		6F222BAD228C150D0066ABE3 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				6FFB347B2209748900E76E6D /* SRGUserDataService.h */,
+				6FFB347D2209773F00E76E6D /* SRGUserDataService.m */,
+				6FFB34872209C10800E76E6D /* SRGUserDataService+Private.h */,
+				6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */,
+				6F222BA5228C146C0066ABE3 /* SRGUserObjectService.h */,
+				6F222BA6228C146C0066ABE3 /* SRGUserObjectService.m */,
+				6F222BAA228C14FA0066ABE3 /* SRGUserObjectService+Subclassing.h */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		6F3234302212ED230046E265 /* Helpers */ = {
@@ -585,9 +747,9 @@
 		6F41C9A72216C3CB003F434A /* Player */ = {
 			isa = PBXGroup;
 			children = (
-				6F41C9A82216C3CB003F434A /* PlayerViewController.storyboard */,
 				6F41C9A92216C3CB003F434A /* PlayerViewController.h */,
 				6F41C9AA2216C3CB003F434A /* PlayerViewController.m */,
+				6F41C9A82216C3CB003F434A /* PlayerViewController.storyboard */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -599,6 +761,46 @@
 				6F46DD75221429100013C10A /* Person.m */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		6F478B28228189CD00CDC022 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				6F5C638A228B3DD70001CC4C /* DataViewController.h */,
+				6F5C638B228B3DD70001CC4C /* DataViewController.m */,
+				6F478B2922818A6100CDC022 /* NSDateFormatter+Demo.h */,
+				6F478B2A22818A6100CDC022 /* NSDateFormatter+Demo.m */,
+				080491812284BFA200E4CEC2 /* PlayerPlaylist.h */,
+				080491802284BFA200E4CEC2 /* PlayerPlaylist.m */,
+				6F5C638F228B3DE90001CC4C /* UserDataViewController.h */,
+				6F5C6390228B3DE90001CC4C /* UserDataViewController.m */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		6F5C6362228AAEF00001CC4C /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				6F5C6363228AAF190001CC4C /* PreferencesViewController.h */,
+				6F5C6364228AAF190001CC4C /* PreferencesViewController.m */,
+				6F5C6366228AAF2A0001CC4C /* PreferencesViewController.storyboard */,
+			);
+			path = Preferences;
+			sourceTree = "<group>";
+		};
+		6F6359F52289581300E7F697 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				6F6359F62289584600E7F697 /* SRGPreferences.h */,
+				6F6359F72289584600E7F697 /* SRGPreferences.m */,
+				6F222BA1228C03ED0066ABE3 /* SRGPreferencesChangelog.h */,
+				6F222BA2228C03ED0066ABE3 /* SRGPreferencesChangelog.m */,
+				6F222B9E228BF35A0066ABE3 /* SRGPreferencesChangelogEntry.h */,
+				6F222B9D228BF35A0066ABE3 /* SRGPreferencesChangelogEntry.m */,
+				6F6359FD2289AEC500E7F697 /* SRGPreferencesRequest.h */,
+				6F6359FE2289AEC500E7F697 /* SRGPreferencesRequest.m */,
+			);
+			path = Preferences;
 			sourceTree = "<group>";
 		};
 		6F8A93EE20FDCAA800AA6434 /* Demo */ = {
@@ -624,9 +826,13 @@
 			isa = PBXGroup;
 			children = (
 				6F8A93F320FDCAA800AA6434 /* Application */,
+				6F17A493228499CC001C4CC2 /* Bridges */,
+				6F478B28228189CD00CDC022 /* Helpers */,
 				6F41C9732216A9C1003F434A /* History */,
 				6F41C9792216A9F9003F434A /* Medias */,
 				6F41C9A72216C3CB003F434A /* Player */,
+				086320E52257F05200C719A6 /* Playlists */,
+				6F5C6362228AAEF00001CC4C /* Preferences */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -645,11 +851,13 @@
 			isa = PBXGroup;
 			children = (
 				6F41C9942216BA0C003F434A /* ComScore.framework */,
+				6F17A48D228498BD001C4CC2 /* DeepDiff.framework */,
 				6FA62D5C2204389A008569DC /* FXReachability.framework */,
 				0858B69622010C9E000F00CF /* libextobjc.framework */,
 				0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */,
 				6FA62D682204394B008569DC /* Mantle.framework */,
 				6F41C9842216B969003F434A /* Masonry.framework */,
+				088B32BA22746E8E009AE195 /* OHHTTPStubs.framework */,
 				6F41C9982216BBB0003F434A /* SRGAnalytics_DataProvider.framework */,
 				6F41C99A2216BBB0003F434A /* SRGAnalytics_MediaPlayer.framework */,
 				6F41C9972216BBB0003F434A /* SRGAnalytics.framework */,
@@ -678,6 +886,7 @@
 				08624E62223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel */,
 				08624E64223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel */,
 				082442A7220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel */,
+				6FE8A62322821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel */,
 				6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */,
 			);
 			path = Data;
@@ -703,6 +912,10 @@
 				6FB74D742101D5D600E2D365 /* HistorySynchronizationTestCase.m */,
 				08B327A6221324810051DDA6 /* HistoryTestCase.m */,
 				6FCCE4802212BFD600423EFF /* MigrationTestCase.m */,
+				6F1747F52274855700CC9C39 /* PlaylistsSynchronizationTestCase.m */,
+				08C9919C22538379003E7816 /* PlaylistsTestCase.m */,
+				6F229AC12291C45A004F8050 /* PreferencesSynchronizationTestCase.m */,
+				6F6359FB2289896A00E7F697 /* PreferencesTestCase.m */,
 				0850E2C822304999003BDCB8 /* UserDataTestCase.m */,
 				6FB19596221442BF00D3BF88 /* UserObjectTestCase.m */,
 			);
@@ -748,22 +961,36 @@
 			buildActionMask = 2147483647;
 			files = (
 				6FFB347C2209759000E76E6D /* SRGUserDataService.h in Headers */,
+				6F222BA3228C03ED0066ABE3 /* SRGPreferencesChangelog.h in Headers */,
 				6FFB347122089A5E00E76E6D /* SRGHistory.h in Headers */,
+				6F6359FF2289AEC500E7F697 /* SRGPreferencesRequest.h in Headers */,
 				6F0178AF22080FEC00B4BCD9 /* SRGHistoryEntry.h in Headers */,
 				6FA9ADFF222C4944007446BD /* SRGUserDataError.h in Headers */,
 				6F0178B122080FEC00B4BCD9 /* SRGUser.h in Headers */,
 				6F01789F22047D7300B4BCD9 /* SRGUserDataLogger.h in Headers */,
+				6FC44DE8227349CC0022DC99 /* NSArray+SRGUserData.h in Headers */,
+				6F687FC62281FE9800E6AE2C /* SRGPlaylistEntry+Private.h in Headers */,
 				6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */,
+				084ACC2E22535F48008ACBD0 /* SRGPlaylist.h in Headers */,
 				6FFB347322089A5E00E76E6D /* SRGDataStore.h in Headers */,
+				08C9919B22537833003E7816 /* SRGPlaylist+Private.h in Headers */,
 				6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */,
+				6F222BA0228BF35B0066ABE3 /* SRGPreferencesChangelogEntry.h in Headers */,
 				6F0178D02208199800B4BCD9 /* SRGUserDataTimerTarget.h in Headers */,
+				08C991A82254B97E003E7816 /* SRGPlaylistEntry.h in Headers */,
 				6F0178CC2208192B00B4BCD9 /* NSTimer+SRGUserData.h in Headers */,
 				6FFB34812209B0DC00E76E6D /* SRGUserObject.h in Headers */,
+				6F938024227C0CE600315A83 /* NSSet+SRGUserData.h in Headers */,
+				6F222BAC228C14FA0066ABE3 /* SRGUserObjectService+Subclassing.h in Headers */,
 				6F0EB54020FC7FA9009C02CF /* SRGUserData.h in Headers */,
+				08280F0D2258DEBD00AC978D /* SRGPlaylists.h in Headers */,
 				6FA1D10D220C7A21003976D9 /* SRGUserObject+Subclassing.h in Headers */,
 				6FFB34892209C10800E76E6D /* SRGUserDataService+Private.h in Headers */,
+				6F222BA7228C146C0066ABE3 /* SRGUserObjectService.h in Headers */,
+				6F6359F82289584600E7F697 /* SRGPreferences.h in Headers */,
 				6FFB34852209BF8D00E76E6D /* SRGUserObject+Private.h in Headers */,
 				6F0EB54820FC8049009C02CF /* NSBundle+SRGUserData.h in Headers */,
+				08083BD922639F8B00BE9F19 /* SRGPlaylistsRequest.h in Headers */,
 				6FFB347422089A5E00E76E6D /* SRGPersistentContainer.h in Headers */,
 				6F0178D822086F6D00B4BCD9 /* SRGUser+Private.h in Headers */,
 				6FFB348E2209D57400E76E6D /* SRGHistoryEntry+Private.h in Headers */,
@@ -871,7 +1098,7 @@
 		6F0EB52820FC7F58009C02CF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1010;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "SRG SSR";
 				TargetAttributes = {
 					6F0C98E52121E1C200073AB6 = {
@@ -885,6 +1112,7 @@
 					};
 					6F8A93D720FDCA0800AA6434 = {
 						CreatedOnToolsVersion = 9.4;
+						LastSwiftMigration = 1020;
 					};
 					6FB74D662101D4D200E2D365 = {
 						CreatedOnToolsVersion = 9.4;
@@ -946,7 +1174,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F41C97E2216AA18003F434A /* MediasViewController.storyboard in Resources */,
+				086320EA2257F05200C719A6 /* PlaylistsViewController.storyboard in Resources */,
 				6F41C9AB2216C3CC003F434A /* PlayerViewController.storyboard in Resources */,
+				086320EE2257FDB300C719A6 /* PlaylistViewController.storyboard in Resources */,
+				6F5C6367228AAF2A0001CC4C /* PreferencesViewController.storyboard in Resources */,
 				6F8A93FB20FDCAA800AA6434 /* LaunchScreen.storyboard in Resources */,
 				6F41C9782216A9C1003F434A /* HistoryViewController.storyboard in Resources */,
 				6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */,
@@ -960,6 +1191,7 @@
 				6F3234352212F61D0046E265 /* TestData_1 in Resources */,
 				082442AF220CB0DD00F39785 /* UserData_DB_v4 in Resources */,
 				6FB1959B221467E900D3BF88 /* UserData_DB_loggedOut in Resources */,
+				08280F2222596BAD00AC978D /* UserData_DB_v6 in Resources */,
 				08624E67223B114D007D919A /* UserData_DB_v5 in Resources */,
 				08E9CC1622308CD70039A875 /* UserData_DB_v2 in Resources */,
 				6F308A682212CE7E003D3385 /* UserData_DB_invalid in Resources */,
@@ -978,6 +1210,7 @@
 			files = (
 				08E9CC122230890D0039A875 /* SRGUserData_v1_v2.xcmappingmodel in Sources */,
 				082442A8220CA16300F39785 /* SRGUserData_v5_v6.xcmappingmodel in Sources */,
+				6FE8A62422821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel in Sources */,
 				6FB521C02208838E0042FCC3 /* SRGUserData.xcdatamodeld in Sources */,
 				08624E63223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel in Sources */,
 				08624E65223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel in Sources */,
@@ -994,12 +1227,23 @@
 				6F0178D12208199800B4BCD9 /* SRGUserDataTimerTarget.m in Sources */,
 				6FA9AE00222C4944007446BD /* SRGUserDataError.m in Sources */,
 				6FFB347E2209773F00E76E6D /* SRGUserDataService.m in Sources */,
+				08083BD822639F8B00BE9F19 /* SRGPlaylistsRequest.m in Sources */,
 				6FFB347622089A5E00E76E6D /* SRGPersistentContainer.m in Sources */,
 				6F0178B022080FEC00B4BCD9 /* SRGUser.m in Sources */,
 				6F0EB54720FC8049009C02CF /* NSBundle+SRGUserData.m in Sources */,
+				6F222BA4228C03ED0066ABE3 /* SRGPreferencesChangelog.m in Sources */,
+				6F6359F92289584600E7F697 /* SRGPreferences.m in Sources */,
+				6FC44DE7227349CC0022DC99 /* NSArray+SRGUserData.m in Sources */,
+				6F635A002289AEC500E7F697 /* SRGPreferencesRequest.m in Sources */,
 				6F0EB54320FC7FF4009C02CF /* SRGUserData.m in Sources */,
+				6F222B9F228BF35B0066ABE3 /* SRGPreferencesChangelogEntry.m in Sources */,
+				6F938025227C0CE600315A83 /* NSSet+SRGUserData.m in Sources */,
+				08C991A92254B97E003E7816 /* SRGPlaylistEntry.m in Sources */,
+				08280F0C2258DEBD00AC978D /* SRGPlaylists.m in Sources */,
 				6F0178B222080FEC00B4BCD9 /* SRGHistoryEntry.m in Sources */,
 				6FFB347222089A5E00E76E6D /* SRGHistory.m in Sources */,
+				6F222BA8228C146C0066ABE3 /* SRGUserObjectService.m in Sources */,
+				084ACC2D22535F48008ACBD0 /* SRGPlaylist.m in Sources */,
 				6F0178CB2208192B00B4BCD9 /* NSTimer+SRGUserData.m in Sources */,
 				6FFB347522089A5E00E76E6D /* SRGDataStore.m in Sources */,
 			);
@@ -1017,11 +1261,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F5C6365228AAF190001CC4C /* PreferencesViewController.m in Sources */,
 				6F8A93FE20FDCAA800AA6434 /* AppDelegate.m in Sources */,
 				6F8A93FD20FDCAA800AA6434 /* main.m in Sources */,
+				6F17A496228499DA001C4CC2 /* DeepDiffBridge.swift in Sources */,
+				6F5C638D228B3DD70001CC4C /* DataViewController.m in Sources */,
+				086320EF2257FDB300C719A6 /* PlaylistViewController.m in Sources */,
+				086320E92257F05200C719A6 /* PlaylistsViewController.m in Sources */,
 				6F41C9772216A9C1003F434A /* HistoryViewController.m in Sources */,
+				6F478B2B22818A6100CDC022 /* NSDateFormatter+Demo.m in Sources */,
 				6F41C97C2216AA0D003F434A /* MediasViewController.m in Sources */,
 				6F41C9AC2216C3CC003F434A /* PlayerViewController.m in Sources */,
+				080491822284BFA200E4CEC2 /* PlayerPlaylist.m in Sources */,
+				6F5C6392228B3DE90001CC4C /* UserDataViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1030,7 +1282,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F46DD76221429110013C10A /* Person.m in Sources */,
-				6FCCE4812212BFD600423EFF /* MigrationTestCase.m in Sources */,
+				6F1747F62274855800CC9C39 /* PlaylistsSynchronizationTestCase.m in Sources */,
+				6F229AC22291C45A004F8050 /* PreferencesSynchronizationTestCase.m in Sources */,
 				0850E2C92230499A003BDCB8 /* UserDataTestCase.m in Sources */,
 				6FB74D772101D5D600E2D365 /* HistorySynchronizationTestCase.m in Sources */,
 				08B327A7221324810051DDA6 /* HistoryTestCase.m in Sources */,
@@ -1038,6 +1291,9 @@
 				6F3234322212ED240046E265 /* UserDataBaseTestCase.m in Sources */,
 				6FB19597221442BF00D3BF88 /* UserObjectTestCase.m in Sources */,
 				6F32342D2212E9B90046E265 /* TestData.xcdatamodeld in Sources */,
+				6F64BDF02274E19F00ED0DFE /* MigrationTestCase.m in Sources */,
+				6F6359FC2289896A00E7F697 /* PreferencesTestCase.m in Sources */,
+				08C9919D22538379003E7816 /* PlaylistsTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1137,7 +1393,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -1178,6 +1434,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VMGRRW6SG7;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1191,12 +1448,16 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Demo/Sources/Bridges/SRGUserData-demo-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-static";
 		};
 		6F0C98DD2121E14000073AB6 /* Debug-static */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1263,9 +1524,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1304,6 +1566,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VMGRRW6SG7;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1317,12 +1580,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Demo/Sources/Bridges/SRGUserData-demo-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = "Release-static";
 		};
 		6F0C98E12121E14600073AB6 /* Release-static */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1451,7 +1717,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -1508,9 +1774,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1650,6 +1917,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VMGRRW6SG7;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1663,6 +1931,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Demo/Sources/Bridges/SRGUserData-demo-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -1670,6 +1941,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VMGRRW6SG7;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1683,12 +1955,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "ch.srgssr.SRGUserData-demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Demo/Sources/Bridges/SRGUserData-demo-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
 		6FB74D6F2101D4D200E2D365 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1709,6 +1984,7 @@
 		6FB74D702101D4D200E2D365 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1811,6 +2087,7 @@
 		6FB521BE2208838E0042FCC3 /* SRGUserData.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				084ACC2A22535CA6008ACBD0 /* SRGUserData_v7.xcdatamodel */,
 				08624E61223B0AE7007D919A /* SRGUserData_v6.xcdatamodel */,
 				0850E2CA22307E24003BDCB8 /* SRGUserData_v5.xcdatamodel */,
 				0850E2BF22304169003BDCB8 /* SRGUserData_v4.xcdatamodel */,
@@ -1818,7 +2095,7 @@
 				082442A5220C8A8800F39785 /* SRGUserData_v2.xcdatamodel */,
 				6FB521BF2208838E0042FCC3 /* SRGUserData_v1.xcdatamodel */,
 			);
-			currentVersion = 08624E61223B0AE7007D919A /* SRGUserData_v6.xcdatamodel */;
+			currentVersion = 084ACC2A22535CA6008ACBD0 /* SRGUserData_v7.xcdatamodel */;
 			path = SRGUserData.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

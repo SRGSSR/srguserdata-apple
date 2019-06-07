@@ -21,12 +21,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy, nullable) NSString *accountUid;
 
 /**
- *  The (device) date at which the history was synchronized for the last time. Can be
- *  used for information purposes.
+ *  The (device) date at which the user data was synchronized for the last time. Can be
+ *  used for information purposes only.
  *
  *  @discussion `nil` if the user is not logged in.
  */
-@property (nonatomic, readonly, nullable) NSDate *historyLocalSynchronizationDate;
+@property (nonatomic, readonly, nullable) NSDate *synchronizationDate;
 
 @end
 

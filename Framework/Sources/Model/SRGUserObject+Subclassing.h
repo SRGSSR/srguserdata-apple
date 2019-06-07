@@ -15,6 +15,16 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SRGUserObject (Subclassing)
 
 /**
+ *  Subclasses can implement this method to return a list of reserved default uids. Those will never be synchronized.
+ */
+@property (class, nonatomic, readonly) NSArray<NSString *> *reservedUids;
+
+/**
+ *  Subclasses must implement this method to provide the JSON key which is used to identity the item in a unique way.
+ */
+@property (class, nonatomic, readonly) NSString *uidKey;
+
+/**
  *  Update the current entry using the provided dictionary, in the format delivered by the associated service.
  */
 - (void)updateWithDictionary:(NSDictionary *)dictionary NS_REQUIRES_SUPER;
