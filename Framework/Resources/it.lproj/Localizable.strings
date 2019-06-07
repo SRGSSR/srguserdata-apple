@@ -2,11 +2,11 @@
 "The operation has been cancelled" = "L'operazione è stata annullata";
 
 /* Error message returned when attempting to edit a default read-only playlist */
-"The playlist cannot be edited" = "The playlist cannot be edited";
+"The playlist cannot be edited" = "La playlist non può essere modificata";
 
 /* Error message returned when adding an entry to an unknown playlist.
    Error message returned when removing some entries from an unknown playlist. */
-"The playlist does not exist" = "The playlist does not exist";
+"The playlist does not exist" = "La playlist non esiste";
 
 /* Default Watch later playlist name */
-"Watch later" = "Watch later";
+"Watch later" = "Guardare dopo";
