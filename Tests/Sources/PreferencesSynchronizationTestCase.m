@@ -17,7 +17,7 @@
 - (NSString *)sessionToken
 {
     // For playsrgtests+userdata3@gmail.com
-    return @"s:uWgK1yZsN2iHjzZVw6uiAIf5TXRg9pCC.6rCLBIwFlHc9VeDUVxcTwpygjhRJxGOugkjMq2PRdXs";
+    return @"s:aAiVxAvpr_S1kvNaEuruZVPc_O_FQuBF.isG5lbLHmxNof6A0JnOEBAu3VdiowIejIQYix8BWKk4";
 }
 
 #pragma mark Setup and teardown
