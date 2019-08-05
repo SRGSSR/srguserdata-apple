@@ -132,6 +132,7 @@
     
     PlayerPlaylist *playerPlaylist = [[PlayerPlaylist alloc] initWithMedias:self.medias currentIndex:indexPath.row];
     PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime playerPlaylist:playerPlaylist];
+    playerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:playerViewController animated:YES completion:nil];
 }
 
