@@ -70,6 +70,13 @@
     [self reloadData];
 }
 
+#pragma mark Status bar
+
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;
+}
+
 #pragma mark Home indicator
 
 - (BOOL)prefersHomeIndicatorAutoHidden
