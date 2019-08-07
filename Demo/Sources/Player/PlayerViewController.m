@@ -70,6 +70,13 @@
     [self reloadData];
 }
 
+#pragma mark Status bar
+
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;
+}
+
 #pragma mark Home indicator
 
 - (BOOL)prefersHomeIndicatorAutoHidden
@@ -130,6 +137,10 @@
             alertController.preferredAction = action;
         }
     }
+    
+    UIPopoverPresentationController *popoverPresentationController = alertController.popoverPresentationController;
+    popoverPresentationController.sourceView = sender;
+    popoverPresentationController.sourceRect = [sender bounds];
     
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alertController animated:YES completion:nil];

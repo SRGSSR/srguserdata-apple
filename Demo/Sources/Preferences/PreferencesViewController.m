@@ -289,6 +289,10 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
         [self presentViewController:alertController2 animated:YES completion:nil];
     }]];
     [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+    
+    UIPopoverPresentationController *popoverPresentationController = alertController1.popoverPresentationController;
+    popoverPresentationController.barButtonItem = sender;
+    
     [self presentViewController:alertController1 animated:YES completion:nil];
 }
 
