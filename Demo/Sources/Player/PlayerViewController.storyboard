@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="A6A-Ps-0a8">
-    <device id="ipad9_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14845" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="A6A-Ps-0a8">
+    <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14799.2"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -29,7 +27,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BM6-qQ-k06">
                                 <rect key="frame" x="10" y="30" width="16" height="22"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <state key="normal" image="close_48"/>
+                                <state key="normal" image="close_22"/>
                                 <connections>
                                     <action selector="close:" destination="A6A-Ps-0a8" eventType="touchUpInside" id="dLQ-FF-J0P"/>
                                 </connections>
@@ -37,7 +35,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xkj-lB-UHs">
                                 <rect key="frame" x="762" y="30" width="16" height="22"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <state key="normal" image="playlists_48"/>
+                                <state key="normal" image="playlist_22"/>
                                 <connections>
                                     <action selector="addToPlaylist:" destination="A6A-Ps-0a8" eventType="touchUpInside" id="Knm-9Q-Nax"/>
                                 </connections>
@@ -45,13 +43,13 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Xkj-lB-UHs" firstAttribute="top" secondItem="P37-7j-pII" secondAttribute="top" constant="10" id="3IN-2P-sRt"/>
+                            <constraint firstItem="Xkj-lB-UHs" firstAttribute="top" secondItem="P37-7j-pII" secondAttribute="top" constant="16" id="3IN-2P-sRt"/>
                             <constraint firstAttribute="bottom" secondItem="LJc-Y6-KTE" secondAttribute="bottom" id="73t-LL-4gD"/>
-                            <constraint firstItem="BM6-qQ-k06" firstAttribute="leading" secondItem="P37-7j-pII" secondAttribute="leading" constant="10" id="Bi3-Rn-NTM"/>
+                            <constraint firstItem="BM6-qQ-k06" firstAttribute="leading" secondItem="P37-7j-pII" secondAttribute="leading" constant="16" id="Bi3-Rn-NTM"/>
                             <constraint firstAttribute="trailing" secondItem="LJc-Y6-KTE" secondAttribute="trailing" id="SbW-p2-gjh"/>
-                            <constraint firstItem="BM6-qQ-k06" firstAttribute="top" secondItem="P37-7j-pII" secondAttribute="top" constant="10" id="bUD-46-u0M"/>
+                            <constraint firstItem="BM6-qQ-k06" firstAttribute="top" secondItem="P37-7j-pII" secondAttribute="top" constant="16" id="bUD-46-u0M"/>
                             <constraint firstItem="LJc-Y6-KTE" firstAttribute="leading" secondItem="Xul-ZD-b56" secondAttribute="leading" id="fSX-ZH-AMq"/>
-                            <constraint firstItem="Xkj-lB-UHs" firstAttribute="trailing" secondItem="P37-7j-pII" secondAttribute="trailing" constant="-10" id="lBX-Vu-94k"/>
+                            <constraint firstItem="Xkj-lB-UHs" firstAttribute="trailing" secondItem="P37-7j-pII" secondAttribute="trailing" constant="-16" id="lBX-Vu-94k"/>
                             <constraint firstItem="LJc-Y6-KTE" firstAttribute="top" secondItem="Xul-ZD-b56" secondAttribute="top" id="t2r-8H-YQE"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="P37-7j-pII"/>
@@ -70,7 +68,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="close_48" width="48" height="48"/>
-        <image name="playlists_48" width="48" height="48"/>
+        <image name="close_22" width="22" height="22"/>
+        <image name="playlist_22" width="22" height="22"/>
     </resources>
 </document>
