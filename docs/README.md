@@ -14,7 +14,7 @@ User data storage can be bound to an [SRG Identity](https://github.com/SRGSSR/sr
 
 ## Compatibility
 
-The library is suitable for applications running on iOS 9 and above. The project is meant to be opened with the latest Xcode version (currently Xcode 10).
+The library is suitable for applications running on iOS 9 and above. The project is meant to be opened with the latest Xcode version.
 
 ## Contributing
 
