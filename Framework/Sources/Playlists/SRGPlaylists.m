@@ -127,7 +127,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                 
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistsUidsKey : [changedUids copy] }];
+                                                                userInfo:@{ SRGPlaylistsUidsKey : changedUids.copy }];
             });
         }
         completionBlock(error);
@@ -485,7 +485,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
                 
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGPlaylistsDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGPlaylistsUidsKey : [deletedUids copy] }];
+                                                                userInfo:@{ SRGPlaylistsUidsKey : deletedUids.copy }];
             }
         });
     }];
@@ -644,7 +644,7 @@ NSString * const SRGPlaylistEntriesUidsKey = @"SRGPlaylistEntriesUids";
         [playlistEntriesSortDescriptor addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGPlaylistEntry.new, date) ascending:YES]];
     }
     
-    return [SRGPlaylistEntry objectsMatchingPredicate:fetchPredicate sortedWithDescriptors:[playlistEntriesSortDescriptor copy] inManagedObjectContext:managedObjectContext];
+    return [SRGPlaylistEntry objectsMatchingPredicate:fetchPredicate sortedWithDescriptors:playlistEntriesSortDescriptor.copy inManagedObjectContext:managedObjectContext];
 }
 
 - (NSArray<SRGPlaylistEntry *> *)playlistEntriesInPlaylistWithUid:(NSString *)playlistUid matchingPredicate:(NSPredicate *)predicate sortedWithDescriptors:(NSArray<NSSortDescriptor *> *)sortDescriptors

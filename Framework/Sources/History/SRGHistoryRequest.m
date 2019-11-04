@@ -26,7 +26,7 @@
         NSTimeInterval timestamp = round(date.timeIntervalSince1970 * 1000.);
         [queryItems addObject:[NSURLQueryItem queryItemWithName:@"after" value:@(timestamp).stringValue]];
     }
-    URLComponents.queryItems = [queryItems copy];
+    URLComponents.queryItems = queryItems.copy;
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URLComponents.URL];
     [URLRequest setValue:[NSString stringWithFormat:@"sessionToken %@", sessionToken] forHTTPHeaderField:@"Authorization"];
     
@@ -37,19 +37,19 @@
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K != %@", @keypath(NSURLQueryItem.new, name), @"limit"];
         [queryItems filterUsingPredicate:predicate];
         [queryItems addObject:[NSURLQueryItem queryItemWithName:@"limit" value:@(size).stringValue]];
-        URLComponents.queryItems = [queryItems copy];
+        URLComponents.queryItems = queryItems.copy;
         
-        NSMutableURLRequest *request = [URLRequest mutableCopy];
+        NSMutableURLRequest *request = URLRequest.mutableCopy;
         request.URL = URLComponents.URL;
-        return [request copy];
+        return request.copy;
     } paginator:^NSURLRequest * _Nullable(NSURLRequest * _Nonnull URLRequest, NSDictionary * _Nullable JSONDictionary, NSURLResponse * _Nullable response, NSUInteger size, NSUInteger number) {
         NSString *nextURLComponent = JSONDictionary[@"next"];
         NSString *nextURLString = nextURLComponent ? [URL.absoluteString stringByAppendingString:nextURLComponent] : nil;
         NSURL *nextURL = nextURLString ? [NSURL URLWithString:nextURLString] : nil;
         if (nextURL) {
-            NSMutableURLRequest *request = [URLRequest mutableCopy];
+            NSMutableURLRequest *request = URLRequest.mutableCopy;
             request.URL = nextURL;
-            return [request copy];
+            return request.copy;
         }
         else {
             return nil;

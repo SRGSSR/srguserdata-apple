@@ -51,10 +51,10 @@
 
 - (NSDictionary *)dictionary
 {
-    NSMutableDictionary *JSONDictionary = [[super dictionary] mutableCopy];
+    NSMutableDictionary *JSONDictionary = super.dictionary.mutableCopy;
     JSONDictionary[@"device_id"] = self.deviceUid;
     JSONDictionary[@"last_playback_position"] = @(self.lastPlaybackPosition);
-    return [JSONDictionary copy];
+    return JSONDictionary.copy;
 }
 
 @end

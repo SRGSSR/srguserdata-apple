@@ -59,7 +59,7 @@
         [entries addObjectsFromArray:domainEntries];
     }
     
-    return [entries copy];
+    return entries.copy;
 }
 
 + (NSArray<SRGPreferencesChangelogEntry *> *)changelogEntriesForDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain
@@ -82,7 +82,7 @@
         }
     }
     
-    return [entries copy];
+    return entries.copy;
 }
 
 #pragma mark MTLJSONSerializing protocol

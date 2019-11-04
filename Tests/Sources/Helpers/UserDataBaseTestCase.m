@@ -367,7 +367,7 @@ NSURL *TestPreferencesServiceURL(void)
         [dictionaries addObject:dictionary];
     }
     
-    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:[dictionaries copy] toServiceURL:TestHistoryServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:dictionaries.copy toServiceURL:TestHistoryServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];
@@ -456,7 +456,7 @@ NSURL *TestPreferencesServiceURL(void)
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
-    [[SRGPlaylistsRequest putPlaylistEntryDictionaries:[playlistEntryDictionaries copy] forPlaylistWithUid:playlistUid toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGPlaylistsRequest putPlaylistEntryDictionaries:playlistEntryDictionaries.copy forPlaylistWithUid:playlistUid toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];

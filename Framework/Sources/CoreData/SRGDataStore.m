@@ -229,7 +229,7 @@
 
 - (void)cancelAllBackgroundTasks
 {
-    for (NSString *handle in [[self.operations copy] keyEnumerator]) {
+    for (NSString *handle in [self.operations.copy keyEnumerator]) {
         [self cancelBackgroundTaskWithHandle:handle];
     }
 }

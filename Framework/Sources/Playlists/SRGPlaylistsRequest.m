@@ -121,7 +121,7 @@
     if (uids) {
         [queryItems addObject:[NSURLQueryItem queryItemWithName:@"mediaIds" value:[uids componentsJoinedByString:@","]]];
     }
-    URLComponents.queryItems = [queryItems copy];
+    URLComponents.queryItems = queryItems.copy;
     
     NSMutableURLRequest *URLRequest = [NSMutableURLRequest requestWithURL:URLComponents.URL];
     URLRequest.HTTPMethod = @"DELETE";

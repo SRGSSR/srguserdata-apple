@@ -72,7 +72,7 @@ NSString * const SRGHistoryEntriesUidsKey = @"SRGHistoryEntriesUids";
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:SRGHistoryEntriesDidChangeNotification
                                                                   object:self
-                                                                userInfo:@{ SRGHistoryEntriesUidsKey : [changedUids copy] }];
+                                                                userInfo:@{ SRGHistoryEntriesUidsKey : changedUids.copy }];
             });
         }
         completionBlock(error);
