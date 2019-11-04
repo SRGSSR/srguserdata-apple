@@ -549,7 +549,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p; dictionary = %@>",
-            [self class],
+            self.class,
             self,
             self.dictionary];
 }
