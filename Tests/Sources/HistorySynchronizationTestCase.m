@@ -196,7 +196,7 @@
         for (NSUInteger i = start; i < end; i++) {
             [uids addObject:@(i).stringValue];
         }
-        return [uids copy];
+        return uids.copy;
     };
     
     [self insertLocalHistoryEntriesWithUids:uidsBuilder(0, 1000)];

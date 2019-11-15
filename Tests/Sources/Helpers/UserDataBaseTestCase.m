@@ -171,7 +171,9 @@ NSURL *TestPreferencesServiceURL(void)
 {
     NSString *description = [NSString stringWithFormat:@"Expectation for notification '%@' from object %@", notificationName, objectToObserve];
     XCTestExpectation *expectation = [self expectationWithDescription:description];
-    __block id observer = [NSNotificationCenter.defaultCenter addObserverForName:notificationName object:objectToObserve queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
+    
+    __block id observer = nil;
+    observer = [NSNotificationCenter.defaultCenter addObserverForName:notificationName object:objectToObserve queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
         void (^fulfill)(void) = ^{
             [expectation fulfill];
             [NSNotificationCenter.defaultCenter removeObserver:observer];
@@ -367,7 +369,7 @@ NSURL *TestPreferencesServiceURL(void)
         [dictionaries addObject:dictionary];
     }
     
-    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:[dictionaries copy] toServiceURL:TestHistoryServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGHistoryRequest postBatchOfHistoryEntryDictionaries:dictionaries.copy toServiceURL:TestHistoryServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];
@@ -456,7 +458,7 @@ NSURL *TestPreferencesServiceURL(void)
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"Playlist request"];
     
-    [[SRGPlaylistsRequest putPlaylistEntryDictionaries:[playlistEntryDictionaries copy] forPlaylistWithUid:playlistUid toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
+    [[SRGPlaylistsRequest putPlaylistEntryDictionaries:playlistEntryDictionaries.copy forPlaylistWithUid:playlistUid toServiceURL:TestPlaylistsServiceURL() forSessionToken:self.sessionToken withSession:NSURLSession.sharedSession completionBlock:^(NSArray<NSDictionary *> * _Nullable playlistEntryDictionaries, NSHTTPURLResponse * _Nullable HTTPResponse, NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }] resume];

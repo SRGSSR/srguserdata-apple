@@ -177,7 +177,7 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
         NSURL *preferencesServiceURL = [serviceURL URLByAppendingPathComponent:@"preference"];
         services[SRGUserDataServiceTypePreferences] = [[SRGPreferences alloc] initWithServiceURL:preferencesServiceURL userData:self];
         
-        self.services = [services copy];
+        self.services = services.copy;
         
         if (serviceURL && identityService) {
             @weakify(self)

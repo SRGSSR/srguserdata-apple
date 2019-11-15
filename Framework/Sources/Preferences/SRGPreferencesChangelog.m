@@ -74,7 +74,7 @@
         return nil;
     }
     
-    return [entries mutableCopy];
+    return entries.mutableCopy;
 }
 
 #pragma mark Object lifecycle
@@ -92,7 +92,7 @@
 
 - (NSArray<SRGPreferencesChangelogEntry *> *)entries
 {
-    return [self.changelogEntries copy];
+    return self.changelogEntries.copy;
 }
 
 #pragma mark Changelog management

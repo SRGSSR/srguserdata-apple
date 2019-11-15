@@ -24,7 +24,7 @@
 
 + (SRGPreferencesChangelogEntry *)changelogEntryWithObject:(id)object atPath:(NSString *)path inDomain:(NSString *)domain
 {
-    return [[[self class] alloc] initWithObject:object atPath:path inDomain:domain];
+    return [[self.class alloc] initWithObject:object atPath:path inDomain:domain];
 }
 
 + (NSArray<SRGPreferencesChangelogEntry *> *)changelogEntriesFromPreferencesFileAtURL:(NSURL *)fileURL
@@ -59,7 +59,7 @@
         [entries addObjectsFromArray:domainEntries];
     }
     
-    return [entries copy];
+    return entries.copy;
 }
 
 + (NSArray<SRGPreferencesChangelogEntry *> *)changelogEntriesForDictionary:(NSDictionary *)dictionary atPath:(NSString *)path inDomain:(NSString *)domain
@@ -82,7 +82,7 @@
         }
     }
     
-    return [entries copy];
+    return entries.copy;
 }
 
 #pragma mark MTLJSONSerializing protocol
@@ -116,7 +116,7 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p; object = %@; path = %@; domain: %@>",
-            [self class],
+            self.class,
             self,
             self.object,
             self.path,

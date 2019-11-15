@@ -42,19 +42,19 @@
     
     MediasViewController *mediasViewController = [[MediasViewController alloc] init];
     UINavigationController *mediasNavigationController = [[UINavigationController alloc] initWithRootViewController:mediasViewController];
-    mediasNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Medias", nil) image:[UIImage imageNamed:@"media_25"] tag:0];
+    mediasNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Medias", nil) image:[UIImage imageNamed:@"media"] tag:0];
     
     HistoryViewController *historyViewController = [[HistoryViewController alloc] init];
     UINavigationController *historyNavigationController = [[UINavigationController alloc] initWithRootViewController:historyViewController];
-    historyNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"History", nil) image:[UIImage imageNamed:@"history_25"] tag:1];
+    historyNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"History", nil) image:[UIImage imageNamed:@"history"] tag:1];
     
     PlaylistsViewController *playlistsViewController = [[PlaylistsViewController alloc] init];
     UINavigationController *playlistsNavigationController = [[UINavigationController alloc] initWithRootViewController:playlistsViewController];
-    playlistsNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Playlists", nil) image:[UIImage imageNamed:@"playlists_25"] tag:2];
+    playlistsNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Playlists", nil) image:[UIImage imageNamed:@"playlists-large"] tag:2];
     
     PreferencesViewController *preferencesViewController = [[PreferencesViewController alloc] initWithPath:nil inDomain:@"userdata-demo"];
     UINavigationController *preferencesNavigationController = [[UINavigationController alloc] initWithRootViewController:preferencesViewController];
-    preferencesNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Preferences", nil) image:[UIImage imageNamed:@"preferences_25"] tag:2];
+    preferencesNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Preferences", nil) image:[UIImage imageNamed:@"preferences"] tag:2];
     
     UITabBarController *tabBarController = [[UITabBarController alloc] init];
     tabBarController.viewControllers = @[mediasNavigationController, historyNavigationController, playlistsNavigationController, preferencesNavigationController];
