@@ -73,7 +73,6 @@
 		6F17A48E228498BD001C4CC2 /* DeepDiff.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F17A48D228498BD001C4CC2 /* DeepDiff.framework */; };
 		6F17A48F228498BD001C4CC2 /* DeepDiff.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F17A48D228498BD001C4CC2 /* DeepDiff.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F17A496228499DA001C4CC2 /* DeepDiffBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F17A495228499DA001C4CC2 /* DeepDiffBridge.swift */; };
-		6F19DA8B221ED8A300085C7D /* Masonry.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F19DAA6221FF61800085C7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAA3221FF61800085C7D /* main.m */; };
 		6F19DAAB222005A800085C7D /* SRGHistoryRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F19DAA9222005A800085C7D /* SRGHistoryRequest.h */; };
 		6F19DAAC222005A800085C7D /* SRGHistoryRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F19DAAA222005A800085C7D /* SRGHistoryRequest.m */; };
@@ -106,8 +105,6 @@
 		6F41C98D2216B969003F434A /* SRGDiagnostics.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9822216B969003F434A /* SRGDiagnostics.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F41C98E2216B969003F434A /* SRGContentProtection.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9832216B969003F434A /* SRGContentProtection.framework */; };
 		6F41C98F2216B969003F434A /* SRGContentProtection.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9832216B969003F434A /* SRGContentProtection.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		6F41C9902216B969003F434A /* Masonry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; };
-		6F41C9912216B969003F434A /* Masonry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9842216B969003F434A /* Masonry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F41C9922216B969003F434A /* SRGAppearance.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9852216B969003F434A /* SRGAppearance.framework */; };
 		6F41C9932216B969003F434A /* SRGAppearance.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9852216B969003F434A /* SRGAppearance.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F41C9952216BA0C003F434A /* ComScore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F41C9942216BA0C003F434A /* ComScore.framework */; };
@@ -244,7 +241,6 @@
 				6F41C9962216BA0C003F434A /* ComScore.framework in Embed Frameworks */,
 				6FFB346622088BA200E76E6D /* SRGDataProvider.framework in Embed Frameworks */,
 				6F41C99F2216BBB1003F434A /* SRGAnalytics_DataProvider.framework in Embed Frameworks */,
-				6F41C9912216B969003F434A /* Masonry.framework in Embed Frameworks */,
 				0858B6A222010CD6000F00CF /* libextobjc.framework in Embed Frameworks */,
 				6FA62D6B22043955008569DC /* Mantle.framework in Embed Frameworks */,
 				6F41C9A12216BBB1003F434A /* YYWebImage.framework in Embed Frameworks */,
@@ -270,7 +266,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				088B32BC22746F88009AE195 /* OHHTTPStubs.framework in Copy Files */,
-				6F19DA8B221ED8A300085C7D /* Masonry.framework in Copy Files */,
 				6FA62D70220439CF008569DC /* Mantle.framework in Copy Files */,
 				6FA62D71220439CF008569DC /* FXReachability.framework in Copy Files */,
 				6FA62D72220439CF008569DC /* SRGIdentity.framework in Copy Files */,
@@ -379,7 +374,6 @@
 		6F41C9812216B968003F434A /* SRGMediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGMediaPlayer.framework; path = Carthage/Build/iOS/SRGMediaPlayer.framework; sourceTree = "<group>"; };
 		6F41C9822216B969003F434A /* SRGDiagnostics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGDiagnostics.framework; path = Carthage/Build/iOS/SRGDiagnostics.framework; sourceTree = "<group>"; };
 		6F41C9832216B969003F434A /* SRGContentProtection.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGContentProtection.framework; path = Carthage/Build/iOS/SRGContentProtection.framework; sourceTree = "<group>"; };
-		6F41C9842216B969003F434A /* Masonry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Masonry.framework; path = Carthage/Build/iOS/Masonry.framework; sourceTree = "<group>"; };
 		6F41C9852216B969003F434A /* SRGAppearance.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGAppearance.framework; path = Carthage/Build/iOS/SRGAppearance.framework; sourceTree = "<group>"; };
 		6F41C9942216BA0C003F434A /* ComScore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ComScore.framework; path = Carthage/Build/iOS/ComScore.framework; sourceTree = "<group>"; };
 		6F41C9972216BBB0003F434A /* SRGAnalytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGAnalytics.framework; path = Carthage/Build/iOS/SRGAnalytics.framework; sourceTree = "<group>"; };
@@ -501,7 +495,6 @@
 				6F41C9952216BA0C003F434A /* ComScore.framework in Frameworks */,
 				6FFB346522088BA200E76E6D /* SRGDataProvider.framework in Frameworks */,
 				6F41C99E2216BBB0003F434A /* SRGAnalytics_DataProvider.framework in Frameworks */,
-				6F41C9902216B969003F434A /* Masonry.framework in Frameworks */,
 				0858B6A522010CD6000F00CF /* SRGLogger.framework in Frameworks */,
 				6FA62D6A22043955008569DC /* Mantle.framework in Frameworks */,
 				6F41C9A02216BBB1003F434A /* YYWebImage.framework in Frameworks */,
@@ -856,7 +849,6 @@
 				0858B69622010C9E000F00CF /* libextobjc.framework */,
 				0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */,
 				6FA62D682204394B008569DC /* Mantle.framework */,
-				6F41C9842216B969003F434A /* Masonry.framework */,
 				088B32BA22746E8E009AE195 /* OHHTTPStubs.framework */,
 				6F41C9982216BBB0003F434A /* SRGAnalytics_DataProvider.framework */,
 				6F41C99A2216BBB0003F434A /* SRGAnalytics_MediaPlayer.framework */,

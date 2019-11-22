@@ -1,3 +1,3 @@
 github "AliSoftware/OHHTTPStubs" ~> 8.0.0
 github "onmyway133/DeepDiff" "2.2.0" 
-github "SRGSSR/srgletterbox-ios" "1.14.5"
+github "SRGSSR/srgletterbox-ios" "34da4457cda36be7291aefa61cc4f8fc048cc8cb"
