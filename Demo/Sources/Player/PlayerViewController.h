@@ -11,6 +11,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+API_AVAILABLE(tvos(9.0)) API_UNAVAILABLE(ios)
+OBJC_EXPORT SRGLetterboxViewController *LetterboxPlayerViewController(NSString * _Nullable URN, CMTime time, PlayerPlaylist * _Nullable playerPlaylist);
+
 API_UNAVAILABLE(tvos)
 @interface PlayerViewController : UIViewController
 

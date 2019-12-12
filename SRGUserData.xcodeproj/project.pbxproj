@@ -129,6 +129,7 @@
 		6FC7C58C23A2AFE10058349C /* SRGUserData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; };
 		6FC7C58D23A2AFE10058349C /* SRGUserData.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0EB53120FC7F58009C02CF /* SRGUserData.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6FC7C59523A2B8BD0058349C /* Resources.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FC7C59423A2B8BD0058349C /* Resources.m */; };
+		6FC7C59823A2BC520058349C /* PlayerViewController~tvos.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FC7C59623A2BC520058349C /* PlayerViewController~tvos.m */; };
 		6FE8A62422821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 6FE8A62322821025008F7387 /* SRGUserData_v6_v7.xcmappingmodel */; };
 		6FE91E7B2108A36A001B5E8F /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6FFB347122089A5E00E76E6D /* SRGHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FFB346922089A5E00E76E6D /* SRGHistory.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -359,6 +360,7 @@
 		6FC7C58B23A2A59B0058349C /* Demo.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Demo.xcconfig; sourceTree = "<group>"; };
 		6FC7C59323A2B8BD0058349C /* Resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Resources.h; sourceTree = "<group>"; };
 		6FC7C59423A2B8BD0058349C /* Resources.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Resources.m; sourceTree = "<group>"; };
+		6FC7C59623A2BC520058349C /* PlayerViewController~tvos.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "PlayerViewController~tvos.m"; sourceTree = "<group>"; };
 		6FCBFEF8210B578B006BC355 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCBFEFA210B57BD006BC355 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FCBFEFB210B57BD006BC355 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -652,6 +654,7 @@
 				6F41C9A92216C3CB003F434A /* PlayerViewController.h */,
 				6F41C9AA2216C3CB003F434A /* PlayerViewController~ios.m */,
 				6F41C9A82216C3CB003F434A /* PlayerViewController~ios.storyboard */,
+				6FC7C59623A2BC520058349C /* PlayerViewController~tvos.m */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -1218,6 +1221,7 @@
 				6F41C9AC2216C3CC003F434A /* PlayerViewController~ios.m in Sources */,
 				080491822284BFA200E4CEC2 /* PlayerPlaylist.m in Sources */,
 				6F5C6392228B3DE90001CC4C /* UserDataViewController.m in Sources */,
+				6FC7C59823A2BC520058349C /* PlayerViewController~tvos.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

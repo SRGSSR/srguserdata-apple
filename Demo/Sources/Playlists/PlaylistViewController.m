@@ -129,14 +129,12 @@
     
     SRGMedia *media = self.medias[indexPath.row];
     SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
-    
-#if TARGET_OS_IOS
     PlayerPlaylist *playerPlaylist = [[PlayerPlaylist alloc] initWithMedias:self.medias currentIndex:indexPath.row];
+#if TARGET_OS_IOS
     PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime playerPlaylist:playerPlaylist];
     playerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
 #else
-    SRGLetterboxViewController *playerViewController = [[SRGLetterboxViewController alloc] init];
-    [playerViewController.controller playURN:media.URN atPosition:[SRGPosition positionBeforeTime:historyEntry.lastPlaybackTime] withPreferredSettings:nil];
+    SRGLetterboxViewController *playerViewController = LetterboxPlayerViewController(media.URN, historyEntry.lastPlaybackTime, playerPlaylist);
 #endif
     [self presentViewController:playerViewController animated:YES completion:nil];
 }

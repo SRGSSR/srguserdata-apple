@@ -108,8 +108,7 @@
     PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime playerPlaylist:nil];
     playerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
 #else
-    SRGLetterboxViewController *playerViewController = [[SRGLetterboxViewController alloc] init];
-    [playerViewController.controller playURN:media.URN atPosition:[SRGPosition positionBeforeTime:historyEntry.lastPlaybackTime] withPreferredSettings:nil];
+    SRGLetterboxViewController *playerViewController = LetterboxPlayerViewController(media.URN, historyEntry.lastPlaybackTime, nil);
 #endif
     [self presentViewController:playerViewController animated:YES completion:nil];
 }
