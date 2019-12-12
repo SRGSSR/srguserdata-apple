@@ -27,8 +27,8 @@
     SRGIdentityService.currentIdentityService = [[SRGIdentityService alloc] initWithWebserviceURL:[NSURL URLWithString:@"https://hummingbird.rts.ch/api/profile"]
                                                                                        websiteURL:[NSURL URLWithString:@"https://www.rts.ch/profile"]];
     
-    NSString *libraryDirectory = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject;
-    NSURL *fileURL = [[NSURL fileURLWithPath:libraryDirectory] URLByAppendingPathComponent:@"UserData-demo.sqlite"];
+    NSString *cachesDirectory = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+    NSURL *fileURL = [[NSURL fileURLWithPath:cachesDirectory] URLByAppendingPathComponent:@"UserData-demo.sqlite"];
     SRGUserData.currentUserData = [[SRGUserData alloc] initWithStoreFileURL:fileURL
                                                                  serviceURL:[NSURL URLWithString:@"https://profil.rts.ch/api"]
                                                             identityService:SRGIdentityService.currentIdentityService];
