@@ -106,7 +106,7 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
         NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
         
         id<SRGPersistentContainer> persistentContainer = nil;
-        if (@available(iOS 10, *)) {
+        if (@available(iOS 10, tvOS 10, *)) {
             NSPersistentContainer *nativePersistentContainer = [NSPersistentContainer persistentContainerWithName:storeFileURL.lastPathComponent managedObjectModel:model];
             
             NSPersistentStoreDescription *persistentStoreDescription = [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeFileURL];

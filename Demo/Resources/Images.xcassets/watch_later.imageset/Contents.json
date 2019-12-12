@@ -1,8 +1,12 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
+      "idiom" : "iphone",
       "filename" : "watch_later-22.pdf"
+    },
+    {
+      "idiom" : "ipad",
+      "filename" : "watch_later-23.pdf"
     }
   ],
   "info" : {

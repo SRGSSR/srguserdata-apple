@@ -38,11 +38,11 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 - (instancetype)initWithPath:(NSString *)path inDomain:(NSString *)domain
 {
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
-    PreferencesViewController *viewController = [storyboard instantiateInitialViewController];
-    viewController.path = path;
-    viewController.domain = domain;
-    return viewController;
+    if (self = [super init]) {
+        self.path = path;
+        self.domain = domain;
+    }
+    return self;
 }
 
 #pragma mark Getters and setters
@@ -290,8 +290,10 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
     }]];
     [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
     
+#if TARGET_OS_IOS
     UIPopoverPresentationController *popoverPresentationController = alertController1.popoverPresentationController;
     popoverPresentationController.barButtonItem = sender;
+#endif
     
     [self presentViewController:alertController1 animated:YES completion:nil];
 }

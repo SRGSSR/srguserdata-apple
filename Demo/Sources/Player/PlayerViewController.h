@@ -11,6 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+API_UNAVAILABLE(tvos)
 @interface PlayerViewController : UIViewController
 
 - (instancetype)initWithURN:(nullable NSString *)URN time:(CMTime)time playerPlaylist:(nullable PlayerPlaylist *)playerPlaylist;

@@ -21,14 +21,6 @@
 
 @implementation MediasViewController
 
-#pragma mark Object lifecycle
-
-- (instancetype)init
-{
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
-    return [storyboard instantiateInitialViewController];
-}
-
 #pragma mark Getters and setters
 
 - (NSString *)title
@@ -97,8 +89,13 @@
     SRGMedia *media = self.medias[indexPath.row];
     SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
     
+#if TARGET_OS_IOS
     PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime playerPlaylist:nil];
     playerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+#else
+    SRGLetterboxViewController *playerViewController = [[SRGLetterboxViewController alloc] init];
+    [playerViewController.controller playURN:media.URN atPosition:[SRGPosition positionBeforeTime:historyEntry.lastPlaybackTime] withPreferredSettings:nil];    
+#endif
     [self presentViewController:playerViewController animated:YES completion:nil];
 }
 

@@ -51,10 +51,12 @@
                                                                                     action:@selector(login:)];
         }
         else {
+#if TARGET_OS_IOS
             self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
                                                                                      style:UIBarButtonItemStylePlain
                                                                                     target:self
                                                                                     action:@selector(showAccount:)];
+#endif
         }
     }
 }
@@ -85,10 +87,14 @@
     [SRGIdentityService.currentIdentityService loginWithEmailAddress:nil];
 }
 
+#if TARGET_OS_IOS
+
 - (void)showAccount:(id)sender
 {
     [SRGIdentityService.currentIdentityService showAccountView];
 }
+
+#endif
 
 #pragma mark Notifications
 

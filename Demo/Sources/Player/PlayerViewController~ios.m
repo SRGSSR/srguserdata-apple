@@ -7,6 +7,7 @@
 #import "PlayerViewController.h"
 
 #import "PlayerPlaylist.h"
+#import "Resources.h"
 
 #import <libextobjc/libextobjc.h>
 #import <SRGLetterbox/SRGLetterbox.h>
@@ -32,7 +33,7 @@
 
 - (instancetype)initWithURN:(nullable NSString *)URN time:(CMTime)time playerPlaylist:(nullable PlayerPlaylist *)playerPlaylist
 {
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:ResourceNameForUIClass(self.class) bundle:nil];
     PlayerViewController *viewController = [storyboard instantiateInitialViewController];
     viewController.URN = URN;
     viewController.position = [SRGPosition positionBeforeTime:time];

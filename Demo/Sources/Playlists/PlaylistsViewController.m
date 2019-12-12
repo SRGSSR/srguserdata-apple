@@ -21,14 +21,6 @@
 
 @implementation PlaylistsViewController
 
-#pragma mark Object lifecycle
-
-- (instancetype)init
-{
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
-    return [storyboard instantiateInitialViewController];
-}
-
 #pragma mark Getters and setters
 
 - (NSString *)title
