@@ -60,7 +60,15 @@
         
         NSString *URN = self.letterboxController.URN;
         if (URN) {
-            [SRGUserData.currentUserData.history saveHistoryEntryWithUid:URN lastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+            SRGSubdivision *subdivision = self.letterboxController.subdivision;
+            if ([subdivision isKindOfClass:SRGSegment.class]) {
+                SRGSegment *segment = (SRGSegment *)subdivision;
+                CMTime segmentPlaybackTime = CMTimeMaximum(CMTimeSubtract(time, CMTimeMakeWithSeconds(segment.markIn / 1000., NSEC_PER_SEC)), kCMTimeZero);
+                [SRGUserData.currentUserData.history saveHistoryEntryWithUid:URN lastPlaybackTime:segmentPlaybackTime deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+            }
+            else {
+                [SRGUserData.currentUserData.history saveHistoryEntryWithUid:URN lastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+            }
         }
     }];
     

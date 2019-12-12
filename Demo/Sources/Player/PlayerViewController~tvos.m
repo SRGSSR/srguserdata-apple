@@ -6,6 +6,7 @@
 
 #import "PlayerViewController.h"
 
+#import <libextobjc/libextobjc.h>
 #import <SRGUserData/SRGUserData.h>
 
 SRGLetterboxViewController *LetterboxPlayerViewController(NSString *URN, CMTime time, PlayerPlaylist *playerPlaylist)
@@ -15,13 +16,24 @@ SRGLetterboxViewController *LetterboxPlayerViewController(NSString *URN, CMTime 
     SRGLetterboxController *controller = playerViewController.controller;
     controller.playlistDataSource = playerPlaylist;
     
+    @weakify(controller)
     [controller addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1., NSEC_PER_SEC) queue:NULL usingBlock:^(CMTime time) {
+        @strongify(controller)
+        
         if (URN) {
-            [SRGUserData.currentUserData.history saveHistoryEntryWithUid:URN lastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+            SRGSubdivision *subdivision = controller.subdivision;
+            if ([subdivision isKindOfClass:SRGSegment.class]) {
+                SRGSegment *segment = (SRGSegment *)subdivision;
+                CMTime segmentPlaybackTime = CMTimeMaximum(CMTimeSubtract(time, CMTimeMakeWithSeconds(segment.markIn / 1000., NSEC_PER_SEC)), kCMTimeZero);
+                [SRGUserData.currentUserData.history saveHistoryEntryWithUid:URN lastPlaybackTime:segmentPlaybackTime deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+            }
+            else {
+                [SRGUserData.currentUserData.history saveHistoryEntryWithUid:URN lastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+            }
         }
     }];
     
-    [controller playURN:URN atPosition:[SRGPosition positionBeforeTime:time] withPreferredSettings:nil];
+    [controller playURN:URN atPosition:[SRGPosition positionAtTime:time] withPreferredSettings:nil];
     
     return playerViewController;
 }
