@@ -56,6 +56,11 @@
                                                                                      style:UIBarButtonItemStylePlain
                                                                                     target:self
                                                                                     action:@selector(showAccount:)];
+#else
+            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Logout", nil)
+                                                                                     style:UIBarButtonItemStylePlain
+                                                                                    target:self
+                                                                                    action:@selector(logout:)];
 #endif
         }
     }
@@ -92,6 +97,13 @@
 - (void)showAccount:(id)sender
 {
     [SRGIdentityService.currentIdentityService showAccountView];
+}
+
+#else
+
+- (void)logout:(id)sender
+{
+    [SRGIdentityService.currentIdentityService logout];
 }
 
 #endif
