@@ -56,6 +56,13 @@
     UINavigationController *preferencesNavigationController = [[UINavigationController alloc] initWithRootViewController:preferencesViewController];
     preferencesNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Preferences", nil) image:[UIImage imageNamed:@"preferences"] tag:2];
     
+#if TARGET_OS_TV
+    mediasNavigationController.navigationBarHidden = YES;
+    historyNavigationController.navigationBarHidden = YES;
+    playlistsNavigationController.navigationBarHidden = YES;
+    preferencesNavigationController.navigationBarHidden = YES;
+#endif
+    
     UITabBarController *tabBarController = [[UITabBarController alloc] init];
     tabBarController.viewControllers = @[mediasNavigationController, historyNavigationController, playlistsNavigationController, preferencesNavigationController];
     
