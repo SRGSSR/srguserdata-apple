@@ -427,7 +427,7 @@
         return playlistANotificationReceived && playlistBNotificationReceived && playlistWatchLaterNotificationReceived;
     }];
     
-    [self.identityService logout];
+    [self logout];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     

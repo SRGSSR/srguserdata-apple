@@ -249,7 +249,7 @@
         return YES;
     }];
     
-    [self.identityService logout];
+    [self logout];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
