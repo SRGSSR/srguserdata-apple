@@ -10,6 +10,7 @@
 #import "MediasViewController.h"
 #import "PlaylistsViewController.h"
 #import "PreferencesViewController.h"
+#import "SettingsViewController.h"
 
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGIdentity/SRGIdentity.h>
@@ -54,17 +55,22 @@
     
     PreferencesViewController *preferencesViewController = [[PreferencesViewController alloc] initWithPath:nil inDomain:@"userdata-demo"];
     UINavigationController *preferencesNavigationController = [[UINavigationController alloc] initWithRootViewController:preferencesViewController];
-    preferencesNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Preferences", nil) image:[UIImage imageNamed:@"preferences"] tag:2];
+    preferencesNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Preferences", nil) image:[UIImage imageNamed:@"preferences"] tag:3];
+    
+    SettingsViewController *settingsViewController = [[SettingsViewController alloc] init];
+    UINavigationController *settingsNavigationController = [[UINavigationController alloc] initWithRootViewController:settingsViewController];
+    settingsNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"Settings", nil) image:[UIImage imageNamed:@"settings"] tag:4];
     
 #if TARGET_OS_TV
     mediasNavigationController.navigationBarHidden = YES;
     historyNavigationController.navigationBarHidden = YES;
     playlistsNavigationController.navigationBarHidden = YES;
     preferencesNavigationController.navigationBarHidden = YES;
+    settingsNavigationController.navigationBarHidden = YES;
 #endif
     
     UITabBarController *tabBarController = [[UITabBarController alloc] init];
-    tabBarController.viewControllers = @[mediasNavigationController, historyNavigationController, playlistsNavigationController, preferencesNavigationController];
+    tabBarController.viewControllers = @[mediasNavigationController, historyNavigationController, playlistsNavigationController, preferencesNavigationController, settingsNavigationController];
     
     self.window.rootViewController = tabBarController;
     return YES;

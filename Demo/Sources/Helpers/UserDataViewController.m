@@ -28,43 +28,12 @@
                                                name:SRGIdentityServiceUserDidLogoutNotification
                                              object:SRGIdentityService.currentIdentityService];
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(didUpdateAccount:)
-                                               name:SRGIdentityServiceDidUpdateAccountNotification
-                                             object:SRGIdentityService.currentIdentityService];
-    [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(didFinishSynchronization:)
                                                name:SRGUserDataDidFinishSynchronizationNotification
                                              object:SRGUserData.currentUserData];
-    
-    [self updateNavigationBar];
 }
 
 #pragma mark UI
-
-- (void)updateNavigationBar
-{
-    if (self.navigationController.viewControllers.firstObject == self) {
-        if (! SRGIdentityService.currentIdentityService.loggedIn) {
-            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Login", nil)
-                                                                                     style:UIBarButtonItemStylePlain
-                                                                                    target:self
-                                                                                    action:@selector(login:)];
-        }
-        else {
-#if TARGET_OS_IOS
-            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil)
-                                                                                     style:UIBarButtonItemStylePlain
-                                                                                    target:self
-                                                                                    action:@selector(showAccount:)];
-#else
-            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Logout", nil)
-                                                                                     style:UIBarButtonItemStylePlain
-                                                                                    target:self
-                                                                                    action:@selector(logout:)];
-#endif
-        }
-    }
-}
 
 - (void)updateTitleSectionHeader
 {
@@ -85,45 +54,16 @@
     }
 }
 
-#pragma mark Actions
-
-- (void)login:(id)sender
-{
-    [SRGIdentityService.currentIdentityService loginWithEmailAddress:nil];
-}
-
-#if TARGET_OS_IOS
-
-- (void)showAccount:(id)sender
-{
-    [SRGIdentityService.currentIdentityService showAccountView];
-}
-
-#else
-
-- (void)logout:(id)sender
-{
-    [SRGIdentityService.currentIdentityService logout];
-}
-
-#endif
-
 #pragma mark Notifications
 
 - (void)didLogin:(NSNotification *)notification
 {
     [self updateTitleSectionHeader];
-    [self updateNavigationBar];
 }
 
 - (void)didLogout:(NSNotification *)notification
 {
     [self updateTitleSectionHeader];
-}
-
-- (void)didUpdateAccount:(NSNotification *)notification
-{
-    [self updateNavigationBar];
 }
 
 - (void)didFinishSynchronization:(NSNotification *)notification

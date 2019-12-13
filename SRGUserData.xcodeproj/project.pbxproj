@@ -103,6 +103,7 @@
 		6F938025227C0CE600315A83 /* NSSet+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F938023227C0CE600315A83 /* NSSet+SRGUserData.m */; };
 		6FA1D10D220C7A21003976D9 /* SRGUserObject+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */; };
 		6FA1D10F220C7DA9003976D9 /* SRGUserDataService+Subclassing.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */; };
+		6FA3931723A41C4200D22C56 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FA3931523A41C4200D22C56 /* SettingsViewController.m */; };
 		6FA62D5F2204389A008569DC /* FXReachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FA62D5C2204389A008569DC /* FXReachability.framework */; };
 		6FA62D602204389A008569DC /* SRGIdentity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FA62D5D2204389A008569DC /* SRGIdentity.framework */; };
 		6FA62D612204389A008569DC /* UICKeyChainStore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FA62D5E2204389A008569DC /* UICKeyChainStore.framework */; };
@@ -338,6 +339,8 @@
 		6F938023227C0CE600315A83 /* NSSet+SRGUserData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSSet+SRGUserData.m"; sourceTree = "<group>"; };
 		6FA1D10C220C7A21003976D9 /* SRGUserObject+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserObject+Subclassing.h"; sourceTree = "<group>"; };
 		6FA1D10E220C7DA9003976D9 /* SRGUserDataService+Subclassing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRGUserDataService+Subclassing.h"; sourceTree = "<group>"; };
+		6FA3931423A41C4200D22C56 /* SettingsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
+		6FA3931523A41C4200D22C56 /* SettingsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		6FA62D5C2204389A008569DC /* FXReachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FXReachability.framework; path = Carthage/Build/iOS/FXReachability.framework; sourceTree = "<group>"; };
 		6FA62D5D2204389A008569DC /* SRGIdentity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SRGIdentity.framework; path = Carthage/Build/iOS/SRGIdentity.framework; sourceTree = "<group>"; };
 		6FA62D5E2204389A008569DC /* UICKeyChainStore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UICKeyChainStore.framework; path = Carthage/Build/iOS/UICKeyChainStore.framework; sourceTree = "<group>"; };
@@ -740,6 +743,7 @@
 				6F41C9A72216C3CB003F434A /* Player */,
 				086320E52257F05200C719A6 /* Playlists */,
 				6F5C6362228AAEF00001CC4C /* Preferences */,
+				6FA3931323A41C1E00D22C56 /* Settings */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -782,6 +786,15 @@
 				6F41C9992216BBB0003F434A /* YYWebImage.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6FA3931323A41C1E00D22C56 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				6FA3931423A41C4200D22C56 /* SettingsViewController.h */,
+				6FA3931523A41C4200D22C56 /* SettingsViewController.m */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		6FB521BD2208838E0042FCC3 /* Data */ = {
@@ -1210,6 +1223,7 @@
 				6F5C6365228AAF190001CC4C /* PreferencesViewController.m in Sources */,
 				6F8A93FE20FDCAA800AA6434 /* AppDelegate.m in Sources */,
 				6F8A93FD20FDCAA800AA6434 /* main.m in Sources */,
+				6FA3931723A41C4200D22C56 /* SettingsViewController.m in Sources */,
 				6F17A496228499DA001C4CC2 /* DeepDiffBridge.swift in Sources */,
 				6F5C638D228B3DD70001CC4C /* DataViewController.m in Sources */,
 				086320EF2257FDB300C719A6 /* PlaylistViewController.m in Sources */,
