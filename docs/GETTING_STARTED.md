@@ -5,7 +5,7 @@ This getting started guide discusses all concepts required to use the SRG User D
 
 ### Service instantiation
 
-SRG User Data provides an efficient way to save and retrieve user-specific data from local storage. This data can be optionally and transparently synchronized with a user account, provided an [identity service](https://github.com/SRGSSR/srgidentity-ios) has been bound at instantiation time.
+SRG User Data provides an efficient way to save and retrieve user-specific data from local storage. This data can be optionally and transparently synchronized with a user account, provided an [identity service](https://github.com/SRGSSR/srgidentity-apple) has been bound at instantiation time.
 
 #### Offline user data
 
