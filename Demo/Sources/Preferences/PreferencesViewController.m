@@ -84,13 +84,18 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 #pragma mark UITableViewDataSourceProtocol
 
+#if TARGET_OS_TV
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 2;
+}
+
+#endif
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-#if TARGET_OS_IOS
-    return self.keys.count;
-#else
-    return self.keys.count + 1;
-#endif
+    return (section == 0) ? self.keys.count : 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -109,7 +114,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row < self.keys.count) {
+    if (indexPath.section == 0) {
         NSString *key = self.keys[indexPath.row];
         cell.textLabel.text = key;
 
@@ -157,7 +162,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    if (indexPath.row < self.keys.count) {
+    if (indexPath.section == 0) {
         NSString *key = self.keys[indexPath.row];
         NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
         
@@ -218,7 +223,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return (indexPath.row < self.keys.count);
+    return indexPath.section == 0;
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath

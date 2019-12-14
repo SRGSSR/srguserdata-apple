@@ -44,13 +44,13 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if (SRGIdentityService.currentIdentityService.loggedIn) {
+    if (section == 0 && SRGIdentityService.currentIdentityService.loggedIn) {
         NSDate *synchronizationDate = SRGUserData.currentUserData.user.synchronizationDate;
         NSString *synchronizationDateString = synchronizationDate ? [NSDateFormatter.demo_relativeDateAndTimeFormatter stringFromDate:synchronizationDate] : NSLocalizedString(@"Never", nil);
         return [NSString stringWithFormat:NSLocalizedString(@"Last synchronization: %@", nil), synchronizationDateString];
     }
     else {
-        return nil;
+        return NSLocalizedString(@"Actions", nil);
     }
 }
 
