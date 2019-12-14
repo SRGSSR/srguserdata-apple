@@ -63,9 +63,11 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
                                                name:SRGPreferencesDidChangeNotification
                                              object:SRGUserData.currentUserData.preferences];
     
+#if TARGET_OS_IOS
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(addPreference:)];
+#endif
 }
 
 #pragma mark Data
@@ -84,13 +86,18 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+#if TARGET_OS_IOS
     return self.keys.count;
+#else
+    return self.keys.count + 1;
+#endif
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString * const kCellIdentifier = @"PreferenceCell";
     
+    // Use old-fashioned instantiation to customize the cell style
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellIdentifier];
     if (! cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:kCellIdentifier];
@@ -102,41 +109,47 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *key = self.keys[indexPath.row];
-    cell.textLabel.text = key;
+    if (indexPath.row < self.keys.count) {
+        NSString *key = self.keys[indexPath.row];
+        cell.textLabel.text = key;
 
-    id value = self.dictionary[key];
-    if ([value isKindOfClass:NSString.class]) {
-        cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"String: %@", nil), value];
-        cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
-    }
-    else if ([value isKindOfClass:NSNumber.class]) {
-        if (value == (void *)kCFBooleanTrue || value == (void *)kCFBooleanFalse) {
-            cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Boolean: %@", nil), [value boolValue] ? @"true" : @"false"];
+        id value = self.dictionary[key];
+        if ([value isKindOfClass:NSString.class]) {
+            cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"String: %@", nil), value];
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+        }
+        else if ([value isKindOfClass:NSNumber.class]) {
+            if (value == (void *)kCFBooleanTrue || value == (void *)kCFBooleanFalse) {
+                cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Boolean: %@", nil), [value boolValue] ? @"true" : @"false"];
+                cell.accessoryType = UITableViewCellAccessoryNone;
+                cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+            }
+            else {
+                cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Number: %@", nil), [PreferencesNumberFormatter() stringFromNumber:value]];
+                cell.accessoryType = UITableViewCellAccessoryNone;
+                cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+            }
+        }
+        else if ([value isKindOfClass:NSDictionary.class]) {
+            cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Dictionary", nil)];
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        }
+        else if ([value isKindOfClass:NSArray.class]) {
+            cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Array (%@ objects)", nil), [value count]];
+            cell.accessoryType = UITableViewCellAccessoryNone;
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
         else {
-            cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Number: %@", nil), [PreferencesNumberFormatter() stringFromNumber:value]];
+            cell.detailTextLabel.text = nil;
             cell.accessoryType = UITableViewCellAccessoryNone;
-            cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
     }
-    else if ([value isKindOfClass:NSDictionary.class]) {
-        cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Dictionary", nil)];
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    }
-    else if ([value isKindOfClass:NSArray.class]) {
-        cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Array (%@ objects)", nil), [value count]];
-        cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    }
     else {
-        cell.detailTextLabel.text = nil;
+        cell.textLabel.text = NSLocalizedString(@"Add preference", nil);
         cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
 }
 
@@ -144,40 +157,13 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    NSString *key = self.keys[indexPath.row];
-    NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
-    
-    id value = self.dictionary[key];
-    if ([value isKindOfClass:NSString.class]) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Edit string", nil)
-                                                                                 message:nil
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-            textField.placeholder = NSLocalizedString(@"Value", nil);
-        }];
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            NSString *string = [alertController.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-            [SRGUserData.currentUserData.preferences setString:string atPath:subpath inDomain:self.domain];
-        }]];
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
-    else if ([value isKindOfClass:NSNumber.class]) {
-        if (value == (void *)kCFBooleanTrue || value == (void *)kCFBooleanFalse) {
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Edit boolean", nil)
-                                                                                     message:nil
-                                                                              preferredStyle:UIAlertControllerStyleAlert];
-            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
-            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"True", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [SRGUserData.currentUserData.preferences setNumber:@YES atPath:subpath inDomain:self.domain];
-            }]];
-            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"False", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [SRGUserData.currentUserData.preferences setNumber:@NO atPath:subpath inDomain:self.domain];
-            }]];
-            [self presentViewController:alertController animated:YES completion:nil];
-        }
-        else {
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Edit number", nil)
+    if (indexPath.row < self.keys.count) {
+        NSString *key = self.keys[indexPath.row];
+        NSString *subpath = [self.path stringByAppendingPathComponent:key] ?: key;
+        
+        id value = self.dictionary[key];
+        if ([value isKindOfClass:NSString.class]) {
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Edit string", nil)
                                                                                      message:nil
                                                                               preferredStyle:UIAlertControllerStyleAlert];
             [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
@@ -185,17 +171,54 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
             }];
             [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
             [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                NSString *numberString = [alertController.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-                NSNumber *number = [PreferencesNumberFormatter() numberFromString:numberString];
-                [SRGUserData.currentUserData.preferences setNumber:number atPath:subpath inDomain:self.domain];
+                NSString *string = [alertController.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+                [SRGUserData.currentUserData.preferences setString:string atPath:subpath inDomain:self.domain];
             }]];
             [self presentViewController:alertController animated:YES completion:nil];
         }
+        else if ([value isKindOfClass:NSNumber.class]) {
+            if (value == (void *)kCFBooleanTrue || value == (void *)kCFBooleanFalse) {
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Edit boolean", nil)
+                                                                                         message:nil
+                                                                                  preferredStyle:UIAlertControllerStyleAlert];
+                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"True", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                    [SRGUserData.currentUserData.preferences setNumber:@YES atPath:subpath inDomain:self.domain];
+                }]];
+                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"False", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                    [SRGUserData.currentUserData.preferences setNumber:@NO atPath:subpath inDomain:self.domain];
+                }]];
+                [self presentViewController:alertController animated:YES completion:nil];
+            }
+            else {
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Edit number", nil)
+                                                                                         message:nil
+                                                                                  preferredStyle:UIAlertControllerStyleAlert];
+                [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+                    textField.placeholder = NSLocalizedString(@"Value", nil);
+                }];
+                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                    NSString *numberString = [alertController.textFields.lastObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+                    NSNumber *number = [PreferencesNumberFormatter() numberFromString:numberString];
+                    [SRGUserData.currentUserData.preferences setNumber:number atPath:subpath inDomain:self.domain];
+                }]];
+                [self presentViewController:alertController animated:YES completion:nil];
+            }
+        }
+        else if ([value isKindOfClass:NSDictionary.class]) {
+            PreferencesViewController *preferencesViewController = [[PreferencesViewController alloc] initWithPath:subpath inDomain:self.domain];
+            [self.navigationController pushViewController:preferencesViewController animated:YES];
+        }
     }
-    else if ([value isKindOfClass:NSDictionary.class]) {
-        PreferencesViewController *preferencesViewController = [[PreferencesViewController alloc] initWithPath:subpath inDomain:self.domain];
-        [self.navigationController pushViewController:preferencesViewController animated:YES];
+    else {
+        [self addPreference:nil];
     }
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return (indexPath.row < self.keys.count);
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -217,8 +240,8 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
 - (void)addPreference:(id)sender
 {
     UIAlertController *alertController1 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add setting", nil)
-                                                                             message:nil
-                                                                      preferredStyle:UIAlertControllerStyleActionSheet];
+                                                                              message:nil
+                                                                       preferredStyle:UIAlertControllerStyleActionSheet];
     [alertController1 addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"String", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         UIAlertController *alertController2 = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add string", nil)
                                                                                   message:nil

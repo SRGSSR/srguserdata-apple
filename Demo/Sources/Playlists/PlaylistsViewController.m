@@ -41,9 +41,11 @@
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"PlaylistCell"];
     
+#if TARGET_OS_IOS
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(addPlaylist:)];
+#endif
 }
 
 #pragma mark Subclassing hooks
@@ -63,7 +65,11 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+#if TARGET_OS_IOS
     return self.playlists.count;
+#else
+    return self.playlists.count + 1;
+#endif
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -75,25 +81,41 @@
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    SRGPlaylist *playlist = self.playlists[indexPath.row];
-    cell.textLabel.text = playlist.name;
-    cell.imageView.image = [playlist.uid isEqualToString:SRGPlaylistUidWatchLater] ? [UIImage imageNamed:@"watch_later"] : [UIImage imageNamed:@"playlist"];
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    if (indexPath.row < self.playlists.count) {
+        SRGPlaylist *playlist = self.playlists[indexPath.row];
+        cell.textLabel.text = playlist.name;
+        cell.imageView.image = [playlist.uid isEqualToString:SRGPlaylistUidWatchLater] ? [UIImage imageNamed:@"watch_later"] : [UIImage imageNamed:@"playlist"];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    }
+    else {
+        cell.textLabel.text = NSLocalizedString(@"Add playlist", nil);
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    SRGPlaylist *playlist = self.playlists[indexPath.row];
-    PlaylistViewController *playlistViewController = [[PlaylistViewController alloc] initWithPlaylist:playlist];
-    [self.navigationController pushViewController:playlistViewController animated:YES];
+    if (indexPath.row < self.playlists.count) {
+        SRGPlaylist *playlist = self.playlists[indexPath.row];
+        PlaylistViewController *playlistViewController = [[PlaylistViewController alloc] initWithPlaylist:playlist];
+        [self.navigationController pushViewController:playlistViewController animated:YES];
+    }
+    else {
+        [self addPlaylist:nil];
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    SRGPlaylist *playlist = self.playlists[indexPath.row];
-    return playlist.type == SRGPlaylistTypeStandard;
+    if (indexPath.row < self.playlists.count) {
+        SRGPlaylist *playlist = self.playlists[indexPath.row];
+        return playlist.type == SRGPlaylistTypeStandard;
+    }
+    else {
+        return NO;
+    }
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
