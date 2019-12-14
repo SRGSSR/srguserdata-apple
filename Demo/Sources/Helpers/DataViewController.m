@@ -31,6 +31,13 @@
     [self.view addSubview:tableView];
     self.tableView = tableView;
     
+#if TARGET_OS_TV
+    if (@available(tvOS 13, *)) {
+        // Automatically enabled for UITableViewController by default. Adopt the same behavior.
+        self.tabBarObservedScrollView = tableView;
+    }
+#endif
+    
 #if TARGET_OS_IOS
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
     refreshControl.layer.zPosition = -1.f;          // Ensure the refresh control appears behind the cells, see http://stackoverflow.com/a/25829016/760435
