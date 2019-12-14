@@ -71,12 +71,6 @@ static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString
     return [NSURL URLWithString:URLString];
 }
 
-static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSString *token)
-{
-    NSString *URLString = [NSString stringWithFormat:@"srguserdata-tests://%@?identity_service=%@&action=log_out", TestWebserviceURL().host, identityService.identifier];
-    return [NSURL URLWithString:URLString];
-}
-
 #else
 
 @interface SRGIdentityService (Private)

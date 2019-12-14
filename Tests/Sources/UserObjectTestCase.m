@@ -8,6 +8,7 @@
 
 // Private headers
 #import "NSBundle+SRGUserData.h"
+#import "NSPersistentStore+SRGUserData.h"
 #import "SRGPersistentContainer.h"
 #import "SRGUserObject+Private.h"
 
@@ -29,14 +30,18 @@
     NSURL *storeFileURL = [self URLForStoreFromPackage:package];
     
     id<SRGPersistentContainer> persistentContainer = nil;
+#if TARGET_OS_IOS
     if (@available(iOS 10, *)) {
+#endif
         NSPersistentContainer *nativePersistentContainer = [NSPersistentContainer persistentContainerWithName:storeFileURL.lastPathComponent managedObjectModel:model];
         nativePersistentContainer.persistentStoreDescriptions = @[ [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeFileURL] ];
         persistentContainer = nativePersistentContainer;
+#if TARGET_OS_IOS
     }
     else {
         persistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:storeFileURL model:model];
     }
+#endif
     
     [persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
