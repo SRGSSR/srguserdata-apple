@@ -61,7 +61,6 @@
         cell.textLabel.text = NSLocalizedString(@"Logout", nil);
 #endif
     }
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
