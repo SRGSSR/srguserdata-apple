@@ -7,7 +7,7 @@
 #import "SRGUserData.h"
 
 #import "NSBundle+SRGUserData.h"
-#import "NSPersistentStore+SRGUserData.h"
+#import "NSPersistentContainer+SRGUserData.h"
 #import "NSTimer+SRGUserData.h"
 #import "SRGDataStore.h"
 #import "SRGHistory.h"

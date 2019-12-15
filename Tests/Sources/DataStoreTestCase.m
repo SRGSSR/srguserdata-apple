@@ -8,7 +8,7 @@
 #import "UserDataBaseTestCase.h"
 
 // Private headers
-#import "NSPersistentStore+SRGUserData.h"
+#import "NSPersistentContainer+SRGUserData.h"
 #import "SRGDataStore.h"
 
 @interface DataStoreTestCase : UserDataBaseTestCase

@@ -4,7 +4,7 @@
 //  License information is available from the LICENSE file.
 //
 
-#import "NSPersistentStore+SRGUserData.h"
+#import "NSPersistentContainer+SRGUserData.h"
 
 @implementation NSPersistentContainer (SRGUserData)
 

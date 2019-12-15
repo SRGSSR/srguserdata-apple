@@ -8,7 +8,7 @@
 
 // Private headers
 #import "NSBundle+SRGUserData.h"
-#import "NSPersistentStore+SRGUserData.h"
+#import "NSPersistentContainer+SRGUserData.h"
 #import "SRGPersistentContainer.h"
 #import "SRGUserObject+Private.h"
 
