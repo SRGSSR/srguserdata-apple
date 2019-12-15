@@ -2,7 +2,7 @@
 
 CARTHAGE_FOLDER=Carthage
 CARTHAGE_RESOLUTION_FLAGS=--new-resolver --no-build
-CARTHAGE_BUILD_FLAGS=--platform iOS --cache-builds
+CARTHAGE_BUILD_FLAGS=--platform iOS,tvOS --cache-builds
 
 CARTFILE_PRIVATE=Cartfile.private
 CARTFILE_RESOLVED=Cartfile.resolved

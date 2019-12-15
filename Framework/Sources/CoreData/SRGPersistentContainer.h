@@ -49,11 +49,4 @@ API_DEPRECATED_WITH_REPLACEMENT("Use NSPersistentContainer instead", ios(9.0, 10
 
 @end
 
-/**
- *  Compatibility layer with `NSPersistentContainer`.
- */
-@interface NSPersistentContainer (SRGPersistentContainerCompatibility) <SRGPersistentContainer>
-
-@end
-
 NS_ASSUME_NONNULL_END

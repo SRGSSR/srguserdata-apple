@@ -1,8 +1,12 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
+      "idiom" : "iphone",
       "filename" : "playlist_22.pdf"
+    },
+    {
+      "idiom" : "ipad",
+      "filename" : "playlist_22-1.pdf"
     }
   ],
   "info" : {

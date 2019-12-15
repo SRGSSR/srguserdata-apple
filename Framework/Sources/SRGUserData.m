@@ -7,6 +7,7 @@
 #import "SRGUserData.h"
 
 #import "NSBundle+SRGUserData.h"
+#import "NSPersistentContainer+SRGUserData.h"
 #import "NSTimer+SRGUserData.h"
 #import "SRGDataStore.h"
 #import "SRGHistory.h"
@@ -106,7 +107,10 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
         NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
         
         id<SRGPersistentContainer> persistentContainer = nil;
+        
+#if TARGET_OS_IOS
         if (@available(iOS 10, *)) {
+#endif
             NSPersistentContainer *nativePersistentContainer = [NSPersistentContainer persistentContainerWithName:storeFileURL.lastPathComponent managedObjectModel:model];
             
             NSPersistentStoreDescription *persistentStoreDescription = [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeFileURL];
@@ -115,10 +119,12 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
             nativePersistentContainer.persistentStoreDescriptions = @[ persistentStoreDescription ];
             
             persistentContainer = nativePersistentContainer;
+#if TARGET_OS_IOS
         }
         else {
             persistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:storeFileURL model:model];
         }
+#endif
         
         __block BOOL success = YES;
         [persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {

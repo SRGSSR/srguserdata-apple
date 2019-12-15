@@ -7,6 +7,7 @@
 #import "PlayerViewController.h"
 
 #import "PlayerPlaylist.h"
+#import "Resources.h"
 
 #import <libextobjc/libextobjc.h>
 #import <SRGLetterbox/SRGLetterbox.h>
@@ -32,7 +33,7 @@
 
 - (instancetype)initWithURN:(nullable NSString *)URN time:(CMTime)time playerPlaylist:(nullable PlayerPlaylist *)playerPlaylist
 {
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:ResourceNameForUIClass(self.class) bundle:nil];
     PlayerViewController *viewController = [storyboard instantiateInitialViewController];
     viewController.URN = URN;
     viewController.position = [SRGPosition positionBeforeTime:time];
@@ -59,7 +60,15 @@
         
         NSString *URN = self.letterboxController.URN;
         if (URN) {
-            [SRGUserData.currentUserData.history saveHistoryEntryWithUid:URN lastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+            SRGSubdivision *subdivision = self.letterboxController.subdivision;
+            if ([subdivision isKindOfClass:SRGSegment.class]) {
+                SRGSegment *segment = (SRGSegment *)subdivision;
+                CMTime segmentPlaybackTime = CMTimeMaximum(CMTimeSubtract(time, CMTimeMakeWithSeconds(segment.markIn / 1000., NSEC_PER_SEC)), kCMTimeZero);
+                [SRGUserData.currentUserData.history saveHistoryEntryWithUid:URN lastPlaybackTime:segmentPlaybackTime deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+            }
+            else {
+                [SRGUserData.currentUserData.history saveHistoryEntryWithUid:URN lastPlaybackTime:time deviceUid:UIDevice.currentDevice.name completionBlock:nil];
+            }
         }
     }];
     

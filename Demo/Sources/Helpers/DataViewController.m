@@ -8,7 +8,10 @@
 
 @interface DataViewController ()
 
+#if TARGET_OS_IOS
 @property (nonatomic, weak) UIRefreshControl *refreshControl;
+#endif
+
 @property (nonatomic, getter=isRefreshTriggered) BOOL refreshTriggered;
 
 @end
@@ -21,14 +24,27 @@
 {
     [super viewDidLoad];
     
-    self.tableView.dataSource = self;
-    self.tableView.delegate = self;
+    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
+    tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    tableView.dataSource = self;
+    tableView.delegate = self;
+    [self.view addSubview:tableView];
+    self.tableView = tableView;
     
+#if TARGET_OS_TV
+    if (@available(tvOS 13, *)) {
+        // Automatically enabled for UITableViewController by default. Adopt the same behavior.
+        self.tabBarObservedScrollView = tableView;
+    }
+#endif
+    
+#if TARGET_OS_IOS
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
     refreshControl.layer.zPosition = -1.f;          // Ensure the refresh control appears behind the cells, see http://stackoverflow.com/a/25829016/760435
     [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
     [self.tableView insertSubview:refreshControl atIndex:0];
     self.refreshControl = refreshControl;
+#endif
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -83,6 +99,7 @@
 
 - (void)refresh:(id)sender
 {
+#if TARGET_OS_IOS
     // When reloading a table view with animations and if a refresh control is used to trigger the reload,
     // a glitch makes the table jump down when the refresh control value changed event is triggered. To
     // solve this issue, we only mark the table as required a refresh when this event is triggered, and
@@ -93,6 +110,7 @@
     if (self.refreshControl.refreshing) {
         [self.refreshControl endRefreshing];
     }
+#endif
     self.refreshTriggered = YES;
 }
 

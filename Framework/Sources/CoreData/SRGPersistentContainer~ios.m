@@ -74,19 +74,3 @@
 }
 
 @end
-
-@implementation NSPersistentContainer (SRGPersistentContainerCompatibility)
-
-- (void)srg_loadPersistentStoreWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler
-{
-    [self loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription * _Nonnull persistentStoreDescription, NSError * _Nullable error) {
-        completionHandler(error);
-    }];
-}
-
-- (NSURL *)srg_fileURL
-{
-    return self.persistentStoreDescriptions.firstObject.URL;
-}
-
-@end

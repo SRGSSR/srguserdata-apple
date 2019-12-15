@@ -20,14 +20,6 @@
 
 @end
 
-@interface SRGIdentityService (Private)
-
-- (BOOL)handleCallbackURL:(NSURL *)callbackURL;
-
-@property (nonatomic, readonly, copy) NSString *identifier;
-
-@end
-
 static NSURL *TestServiceURL(void)
 {
     return [NSURL URLWithString:@"https://profil.rts.ch/api"];
@@ -48,18 +40,6 @@ static NSURL *TestDataServiceURL(void)
     return [TestServiceURL() URLByAppendingPathComponent:@"data"];
 }
 
-static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString *token)
-{
-    NSString *URLString = [NSString stringWithFormat:@"srguserdata-tests://%@?identity_service=%@&token=%@", TestWebserviceURL().host, identityService.identifier, token];
-    return [NSURL URLWithString:URLString];
-}
-
-static NSURL *TestLogoutCallbackURL(SRGIdentityService *identityService, NSString *token)
-{
-    NSString *URLString = [NSString stringWithFormat:@"srguserdata-tests://%@?identity_service=%@&action=log_out", TestWebserviceURL().host, identityService.identifier];
-    return [NSURL URLWithString:URLString];
-}
-
 NSURL *TestHistoryServiceURL(void)
 {
     return [TestServiceURL() URLByAppendingPathComponent:@"history"];
@@ -74,6 +54,32 @@ NSURL *TestPreferencesServiceURL(void)
 {
     return [TestServiceURL() URLByAppendingPathComponent:@"preference"];
 }
+
+#if TARGET_OS_IOS
+
+@interface SRGIdentityService (Private)
+
+- (BOOL)handleCallbackURL:(NSURL *)callbackURL;
+
+@property (nonatomic, readonly, copy) NSString *identifier;
+
+@end
+
+static NSURL *TestLoginCallbackURL(SRGIdentityService *identityService, NSString *token)
+{
+    NSString *URLString = [NSString stringWithFormat:@"srguserdata-tests://%@?identity_service=%@&token=%@", TestWebserviceURL().host, identityService.identifier, token];
+    return [NSURL URLWithString:URLString];
+}
+
+#else
+
+@interface SRGIdentityService (Private)
+
+- (BOOL)handleSessionToken:(NSString *)sessionToken;
+
+@end
+
+#endif
 
 @interface UserDataBaseTestCase ()
 
@@ -262,8 +268,12 @@ NSURL *TestPreferencesServiceURL(void)
 {
     XCTAssertNotNil(self.sessionToken);
         
+#if TARGET_OS_IOS
     BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, self.sessionToken)];
     XCTAssertTrue(hasHandledCallbackURL);
+#else
+    [self.identityService handleSessionToken:self.sessionToken];
+#endif
 }
 
 - (void)loginAndWait
@@ -273,8 +283,12 @@ NSURL *TestPreferencesServiceURL(void)
     [self expectationForSingleNotification:SRGIdentityServiceUserDidLoginNotification object:self.identityService handler:nil];
     [self expectationForSingleNotification:SRGIdentityServiceDidUpdateAccountNotification object:self.identityService handler:nil];
     
+#if TARGET_OS_IOS
     BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, self.sessionToken)];
     XCTAssertTrue(hasHandledCallbackURL);
+#else
+    [self.identityService handleSessionToken:self.sessionToken];
+#endif
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
@@ -290,8 +304,12 @@ NSURL *TestPreferencesServiceURL(void)
     [self expectationForSingleNotification:SRGIdentityServiceDidUpdateAccountNotification object:self.identityService handler:nil];
     [self expectationForSingleNotification:SRGUserDataDidFinishSynchronizationNotification object:self.userData handler:nil];
     
+#if TARGET_OS_IOS
     BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLoginCallbackURL(self.identityService, self.sessionToken)];
     XCTAssertTrue(hasHandledCallbackURL);
+#else
+    [self.identityService handleSessionToken:self.sessionToken];
+#endif
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     
@@ -302,9 +320,7 @@ NSURL *TestPreferencesServiceURL(void)
 - (void)logout
 {
     XCTAssertNotNil(self.sessionToken);
-    
-    BOOL hasHandledCallbackURL = [self.identityService handleCallbackURL:TestLogoutCallbackURL(self.identityService, self.sessionToken)];
-    XCTAssertTrue(hasHandledCallbackURL);
+    [self.identityService logout];
     XCTAssertNil(self.identityService.sessionToken);
 }
 
