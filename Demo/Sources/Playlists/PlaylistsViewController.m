@@ -94,6 +94,7 @@
     }
     else {
         cell.textLabel.text = NSLocalizedString(@"Add playlist", nil);
+        cell.imageView.image = nil;
         cell.accessoryType = UITableViewCellAccessoryNone;
     }
 }

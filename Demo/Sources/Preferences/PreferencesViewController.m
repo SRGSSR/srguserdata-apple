@@ -154,7 +154,9 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
     }
     else {
         cell.textLabel.text = NSLocalizedString(@"Add preference", nil);
+        cell.detailTextLabel.text = nil;
         cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
     }
 }
 
