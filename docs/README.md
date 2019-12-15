@@ -1,6 +1,6 @@
 [![SRG User Data logo](README-images/logo.png)](https://github.com/SRGSSR/srguserdata-apple)
 
-[![GitHub releases](https://img.shields.io/github/v/release/SRGSSR/srguserdata-apple)](https://github.com/SRGSSR/srguserdata-apple/releases) [![platform](https://img.shields.io/badge/platfom-ios%20%7C%20tvos-blue)](https://github.com/SRGSSR/srguserdata-apple) [![Build Status](https://travis-ci.org/SRGSSR/srguserdata-apple.svg?branch=master)](https://travis-ci.org/SRGSSR/srguserdata-apple/branches) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![GitHub license](https://img.shields.io/github/license/SRGSSR/srguserdata-apple)](https://github.com/SRGSSR/srguserdata-apple/blob/master/LICENSE)
+[![GitHub releases](https://img.shields.io/github/v/release/SRGSSR/srguserdata-apple)](https://github.com/SRGSSR/srguserdata-apple/releases) [![platform](https://img.shields.io/badge/platfom-ios%20%7C%20tvos-blue)](https://github.com/SRGSSR/srguserdata-apple) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![GitHub license](https://img.shields.io/github/license/SRGSSR/srguserdata-apple)](https://github.com/SRGSSR/srguserdata-apple/blob/master/LICENSE)
 
 ## About
 
