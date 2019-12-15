@@ -49,6 +49,9 @@
         NSString *synchronizationDateString = synchronizationDate ? [NSDateFormatter.demo_relativeDateAndTimeFormatter stringFromDate:synchronizationDate] : NSLocalizedString(@"Never", nil);
         return [NSString stringWithFormat:NSLocalizedString(@"Last synchronization: %@", nil), synchronizationDateString];
     }
+    else if (section == 0) {
+        return NSLocalizedString(@"Not logged", nil);
+    }
     else {
         return NSLocalizedString(@"Actions", nil);
     }
