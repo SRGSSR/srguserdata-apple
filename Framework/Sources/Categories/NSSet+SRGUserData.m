@@ -12,9 +12,9 @@
 
 - (NSSet *)srguserdata_setByRemovingObjectsInArray:(NSArray *)array
 {
-    NSMutableSet *mutableSet = [self mutableCopy];
+    NSMutableSet *mutableSet = self.mutableCopy;
     [mutableSet minusSet:[NSSet setWithArray:array]];
-    return [mutableSet copy];
+    return mutableSet.copy;
 }
 
 @end

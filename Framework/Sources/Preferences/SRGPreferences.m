@@ -33,7 +33,7 @@ static NSDictionary *SRGDictionaryMakeImmutableCopy(NSDictionary *dictionary)
             mutableDictionary[key] = object;
         }
     }];
-    return [mutableDictionary copy];
+    return mutableDictionary.copy;
 }
 
 static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
@@ -549,7 +549,7 @@ static NSDictionary *SRGDictionaryMakeMutableCopy(NSDictionary *dictionary)
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p; dictionary = %@>",
-            [self class],
+            self.class,
             self,
             self.dictionary];
 }

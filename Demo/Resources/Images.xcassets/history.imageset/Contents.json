@@ -1,0 +1,19 @@
+{
+  "images" : [
+    {
+      "idiom" : "iphone",
+      "filename" : "history_25.pdf"
+    },
+    {
+      "idiom" : "ipad",
+      "filename" : "history_25-1.pdf"
+    }
+  ],
+  "info" : {
+    "version" : 1,
+    "author" : "xcode"
+  },
+  "properties" : {
+    "template-rendering-intent" : "template"
+  }
+}

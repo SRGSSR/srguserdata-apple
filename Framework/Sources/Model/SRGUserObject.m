@@ -49,7 +49,7 @@
         [objectsSortDescriptor addObjectsFromArray:sortDescriptors];
     }
     [objectsSortDescriptor addObject:[NSSortDescriptor sortDescriptorWithKey:@keypath(SRGUserObject.new, uid) ascending:NO]];
-    fetchRequest.sortDescriptors = [objectsSortDescriptor copy];
+    fetchRequest.sortDescriptors = objectsSortDescriptor.copy;
     
     fetchRequest.fetchBatchSize = 100;
     return [managedObjectContext executeFetchRequest:fetchRequest error:NULL];
@@ -142,7 +142,7 @@
     }
     
     [mergedDictionaries addObjectsFromArray:dictionaryIndex.allValues];
-    return [mergedDictionaries copy];
+    return mergedDictionaries.copy;
 }
 
 + (NSArray<NSString *> *)discardObjectsWithUids:(NSArray<NSString *> *)uids
@@ -225,16 +225,16 @@
     JSONDictionary[self.class.uidKey] = self.uid;
     JSONDictionary[@"date"] = @(round(self.date.timeIntervalSince1970 * 1000.));
     JSONDictionary[@"deleted"] = @(self.discarded);
-    return [JSONDictionary copy];
+    return JSONDictionary.copy;
 }
 
 #pragma mark Helpers
 
 - (NSDictionary *)deletedDictionary
 {
-    NSMutableDictionary *JSONDictionary = [self.dictionary mutableCopy];
+    NSMutableDictionary *JSONDictionary = self.dictionary.mutableCopy;
     JSONDictionary[@"deleted"] = @YES;
-    return [JSONDictionary copy];
+    return JSONDictionary.copy;
 }
 
 @end

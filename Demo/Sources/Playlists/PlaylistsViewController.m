@@ -21,14 +21,6 @@
 
 @implementation PlaylistsViewController
 
-#pragma mark Object lifecycle
-
-- (instancetype)init
-{
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
-    return [storyboard instantiateInitialViewController];
-}
-
 #pragma mark Getters and setters
 
 - (NSString *)title
@@ -49,9 +41,11 @@
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"PlaylistCell"];
     
+#if TARGET_OS_IOS
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(addPlaylist:)];
+#endif
 }
 
 #pragma mark Subclassing hooks
@@ -69,9 +63,18 @@
 
 #pragma mark UITableViewDataSource protocol
 
+#if TARGET_OS_TV
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 2;
+}
+
+#endif
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.playlists.count;
+    return (section == 0) ? self.playlists.count : 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -83,25 +86,42 @@
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    SRGPlaylist *playlist = self.playlists[indexPath.row];
-    cell.textLabel.text = playlist.name;
-    cell.imageView.image = [playlist.uid isEqualToString:SRGPlaylistUidWatchLater] ? [UIImage imageNamed:@"watch_later_22"] : [UIImage imageNamed:@"playlist_22"];
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    if (indexPath.section == 0) {
+        SRGPlaylist *playlist = self.playlists[indexPath.row];
+        cell.textLabel.text = playlist.name;
+        cell.imageView.image = [playlist.uid isEqualToString:SRGPlaylistUidWatchLater] ? [UIImage imageNamed:@"watch_later"] : [UIImage imageNamed:@"playlist"];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    }
+    else {
+        cell.textLabel.text = NSLocalizedString(@"Add playlist", nil);
+        cell.imageView.image = nil;
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    SRGPlaylist *playlist = self.playlists[indexPath.row];
-    PlaylistViewController *playlistViewController = [[PlaylistViewController alloc] initWithPlaylist:playlist];
-    [self.navigationController pushViewController:playlistViewController animated:YES];
+    if (indexPath.section == 0) {
+        SRGPlaylist *playlist = self.playlists[indexPath.row];
+        PlaylistViewController *playlistViewController = [[PlaylistViewController alloc] initWithPlaylist:playlist];
+        [self.navigationController pushViewController:playlistViewController animated:YES];
+    }
+    else {
+        [self addPlaylist:nil];
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    SRGPlaylist *playlist = self.playlists[indexPath.row];
-    return playlist.type == SRGPlaylistTypeStandard;
+    if (indexPath.section == 0) {
+        SRGPlaylist *playlist = self.playlists[indexPath.row];
+        return playlist.type == SRGPlaylistTypeStandard;
+    }
+    else {
+        return NO;
+    }
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath

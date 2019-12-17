@@ -27,10 +27,10 @@
 
 - (instancetype)initWithPlaylist:(SRGPlaylist *)playlist
 {
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:NSStringFromClass(self.class) bundle:nil];
-    PlaylistViewController *viewController = [storyboard instantiateInitialViewController];
-    viewController.playlist = playlist;
-    return viewController;
+    if (self = [super init]) {
+        self.playlist = playlist;
+    }
+    return self;
 }
 
 - (instancetype)init
@@ -129,10 +129,13 @@
     
     SRGMedia *media = self.medias[indexPath.row];
     SRGHistoryEntry *historyEntry = [SRGUserData.currentUserData.history historyEntryWithUid:media.URN];
-    
     PlayerPlaylist *playerPlaylist = [[PlayerPlaylist alloc] initWithMedias:self.medias currentIndex:indexPath.row];
+#if TARGET_OS_IOS
     PlayerViewController *playerViewController = [[PlayerViewController alloc] initWithURN:media.URN time:historyEntry.lastPlaybackTime playerPlaylist:playerPlaylist];
     playerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+#else
+    SRGLetterboxViewController *playerViewController = LetterboxPlayerViewController(media.URN, historyEntry.lastPlaybackTime, playerPlaylist);
+#endif
     [self presentViewController:playerViewController animated:YES completion:nil];
 }
 

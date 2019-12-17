@@ -358,7 +358,7 @@
         for (NSUInteger i = start; i < end; i++) {
             [uids addObject:@(i).stringValue];
         }
-        return [uids copy];
+        return uids.copy;
     };
     
     for (NSUInteger i = 0; i < 100; ++i) {
@@ -427,7 +427,7 @@
         return playlistANotificationReceived && playlistBNotificationReceived && playlistWatchLaterNotificationReceived;
     }];
     
-    [self.identityService logout];
+    [self logout];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     

@@ -196,7 +196,7 @@
         for (NSUInteger i = start; i < end; i++) {
             [uids addObject:@(i).stringValue];
         }
-        return [uids copy];
+        return uids.copy;
     };
     
     [self insertLocalHistoryEntriesWithUids:uidsBuilder(0, 1000)];
@@ -226,7 +226,7 @@
         return YES;
     }];
     
-    [self.identityService logout];
+    [self logout];
     
     [self waitForExpectationsWithTimeout:10. handler:nil];
     

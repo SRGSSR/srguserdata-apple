@@ -65,10 +65,10 @@ SRGPlaylistUid const SRGPlaylistUidWatchLater = @"watch_later";
 
 - (NSDictionary *)dictionary
 {
-    NSMutableDictionary *JSONDictionary = [[super dictionary] mutableCopy];
+    NSMutableDictionary *JSONDictionary = super.dictionary.mutableCopy;
     JSONDictionary[@"name"] = self.name;
     JSONDictionary[@"type"] = [SRGPlaylistTypeJSONTransformer() reverseTransformedValue:@(self.type)];
-    return [JSONDictionary copy];
+    return JSONDictionary.copy;
 }
 
 @end

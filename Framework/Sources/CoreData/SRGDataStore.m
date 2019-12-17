@@ -36,7 +36,7 @@
         // (there is no parent - child relationship in this implementation). To merge changes from sibling contexts,
         // we still have to register for NSManagedObjectContextDidSaveNotification.
         NSManagedObjectContext *viewContext = persistentContainer.viewContext;
-        if (@available(iOS 10, *)) {
+        if (@available(iOS 10, tvOS 10, *)) {
             viewContext.automaticallyMergesChangesFromParent = YES;
         }
         viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy;
@@ -135,7 +135,7 @@
         // transactions can never be made in parallel. But if this happens for some reason, provide a meaningful
         // setup (context is the reference).
         NSManagedObjectContext *managedObjectContext = self.persistentContainer.newBackgroundContext;
-        if (@available(iOS 10, *)) {
+        if (@available(iOS 10, tvOS 10, *)) {
             managedObjectContext.automaticallyMergesChangesFromParent = YES;
         }
         managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
@@ -229,7 +229,7 @@
 
 - (void)cancelAllBackgroundTasks
 {
-    for (NSString *handle in [[self.operations copy] keyEnumerator]) {
+    for (NSString *handle in [self.operations.copy keyEnumerator]) {
         [self cancelBackgroundTaskWithHandle:handle];
     }
 }

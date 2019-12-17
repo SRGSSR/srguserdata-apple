@@ -10,6 +10,7 @@ xcuserdata
 /Cartfile.private
 /Cartfile.resolved
 
+/fastlane/*.xcresult
 /fastlane/*.xml
 
 /vendor
