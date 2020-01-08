@@ -12,6 +12,7 @@
 #import "PreferencesViewController.h"
 #import "SettingsViewController.h"
 
+#import <AVFoundation/AVFoundation.h>
 #import <SRGDataProvider/SRGDataProvider.h>
 #import <SRGIdentity/SRGIdentity.h>
 #import <SRGUserData/SRGUserData.h>
@@ -24,6 +25,8 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
     [self.window makeKeyAndVisible];
+    
+    [AVAudioSession.sharedInstance setCategory:AVAudioSessionCategoryPlayback error:nil];
     
     SRGIdentityService.currentIdentityService = [[SRGIdentityService alloc] initWithWebserviceURL:[NSURL URLWithString:@"https://hummingbird.rts.ch/api/profile"]
                                                                                        websiteURL:[NSURL URLWithString:@"https://www.rts.ch/profile"]];
