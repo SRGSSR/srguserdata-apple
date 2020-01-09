@@ -1,5 +1,5 @@
 github "AliSoftware/OHHTTPStubs" ~> 8.0.0
-github "SRGSSR/srgletterbox-apple" "2.0.0"
+github "SRGSSR/srgletterbox-apple" "0624b3a1dc59334c0758f7258ab7840c0a33da52"
 
 # Fix to have a common framework name for all platforms; should be submitted as pull request
 github "SRGSSR/DeepDiff" "2.3.1_srg1"
