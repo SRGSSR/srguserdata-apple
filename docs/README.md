@@ -42,7 +42,7 @@ The library requires the following frameworks to be added to any target requirin
 * `SRGIdentity`: The framework used to manage the user identity.
 * `SRGLogger`: The framework used for internal logging.
 * `SRGNetwork`: A networking framework.
-* `UICKeyChainStore `: A keychain management framework.
+* `UICKeyChainStore`: A keychain management framework.
 
 ### Dynamic framework integration
 
