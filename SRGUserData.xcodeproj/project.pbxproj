@@ -20,9 +20,6 @@
 		084ACC2E22535F48008ACBD0 /* SRGPlaylist.h in Headers */ = {isa = PBXBuildFile; fileRef = 084ACC2C22535F48008ACBD0 /* SRGPlaylist.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0850E2C5223043C4003BDCB8 /* UserData_DB_v1 in Resources */ = {isa = PBXBuildFile; fileRef = 0850E2C4223043C4003BDCB8 /* UserData_DB_v1 */; };
 		0850E2C92230499A003BDCB8 /* UserDataTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0850E2C822304999003BDCB8 /* UserDataTestCase.m */; };
-		0858B69822010C9E000F00CF /* SRGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69522010C9E000F00CF /* SRGLogger.framework */; };
-		0858B69B22010C9E000F00CF /* libextobjc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69622010C9E000F00CF /* libextobjc.framework */; };
-		0858B69E22010C9E000F00CF /* MAKVONotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0858B69722010C9E000F00CF /* MAKVONotificationCenter.framework */; };
 		08624E63223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08624E62223B0C50007D919A /* SRGUserData_v3_v4.xcmappingmodel */; };
 		08624E65223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 08624E64223B0CB9007D919A /* SRGUserData_v4_v5.xcmappingmodel */; };
 		08624E67223B114D007D919A /* UserData_DB_v5 in Resources */ = {isa = PBXBuildFile; fileRef = 08624E66223B114D007D919A /* UserData_DB_v5 */; };
@@ -47,7 +44,6 @@
 		6F0178D02208199800B4BCD9 /* SRGUserDataTimerTarget.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0178CE2208199800B4BCD9 /* SRGUserDataTimerTarget.h */; };
 		6F0178D12208199800B4BCD9 /* SRGUserDataTimerTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F0178CF2208199800B4BCD9 /* SRGUserDataTimerTarget.m */; };
 		6F0178D822086F6D00B4BCD9 /* SRGUser+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0178D722086F6D00B4BCD9 /* SRGUser+Private.h */; };
-		6F0432BD21006E7A002B090A /* SRGNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F0432BC21006E7A002B090A /* SRGNetwork.framework */; };
 		6F0C98EE2121E1D600073AB6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6FCBFEF7210B578B006BC355 /* Localizable.strings */; };
 		6F0C98F12121E26A00073AB6 /* SRGUserData.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6F0C98E62121E1C200073AB6 /* SRGUserData.bundle */; };
 		6F0EB54020FC7FA9009C02CF /* SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F0EB53E20FC7FA9009C02CF /* SRGUserData.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -98,10 +94,6 @@
 		6FA3931723A41C4200D22C56 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FA3931523A41C4200D22C56 /* SettingsViewController.m */; };
 		6FA3931B23A4E42300D22C56 /* NSPersistentContainer+SRGUserData.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA3931923A4E42300D22C56 /* NSPersistentContainer+SRGUserData.h */; };
 		6FA3931C23A4E42300D22C56 /* NSPersistentContainer+SRGUserData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FA3931A23A4E42300D22C56 /* NSPersistentContainer+SRGUserData.m */; };
-		6FA62D5F2204389A008569DC /* FXReachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FA62D5C2204389A008569DC /* FXReachability.framework */; };
-		6FA62D602204389A008569DC /* SRGIdentity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FA62D5D2204389A008569DC /* SRGIdentity.framework */; };
-		6FA62D612204389A008569DC /* UICKeyChainStore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FA62D5E2204389A008569DC /* UICKeyChainStore.framework */; };
-		6FA62D692204394B008569DC /* Mantle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FA62D682204394B008569DC /* Mantle.framework */; };
 		6FA9ADFF222C4944007446BD /* SRGUserDataError.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FA9ADFD222C4944007446BD /* SRGUserDataError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6FA9AE00222C4944007446BD /* SRGUserDataError.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FA9ADFE222C4944007446BD /* SRGUserDataError.m */; };
 		6FB19597221442BF00D3BF88 /* UserObjectTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FB19596221442BF00D3BF88 /* UserObjectTestCase.m */; };
@@ -368,14 +360,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6FA62D692204394B008569DC /* Mantle.framework in Frameworks */,
-				6FA62D5F2204389A008569DC /* FXReachability.framework in Frameworks */,
-				6FA62D602204389A008569DC /* SRGIdentity.framework in Frameworks */,
-				6FA62D612204389A008569DC /* UICKeyChainStore.framework in Frameworks */,
-				0858B69E22010C9E000F00CF /* MAKVONotificationCenter.framework in Frameworks */,
-				6F0432BD21006E7A002B090A /* SRGNetwork.framework in Frameworks */,
-				0858B69B22010C9E000F00CF /* libextobjc.framework in Frameworks */,
-				0858B69822010C9E000F00CF /* SRGLogger.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

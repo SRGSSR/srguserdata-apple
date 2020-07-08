@@ -105,7 +105,7 @@
 - (void)letterboxViewWillAnimateUserInterface:(SRGLetterboxView *)letterboxView
 {
     [self.view layoutIfNeeded];
-    [letterboxView animateAlongsideUserInterfaceWithAnimations:^(BOOL hidden, BOOL minimal, CGFloat heightOffset) {
+    [letterboxView animateAlongsideUserInterfaceWithAnimations:^(BOOL hidden, BOOL minimal, CGFloat aspectRatio, CGFloat heightOffset) {
         CGFloat alpha = (minimal || ! hidden) ? 1.f : 0.f;
         self.closeButton.alpha = alpha;
         self.playlistsButton.alpha = alpha;
