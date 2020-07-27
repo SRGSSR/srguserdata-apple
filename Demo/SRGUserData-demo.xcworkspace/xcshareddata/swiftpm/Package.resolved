@@ -1,0 +1,187 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "ComScore",
+        "repositoryURL": "https://github.com/SRGSSR/ComScore-xcframework-apple.git",
+        "state": {
+          "branch": null,
+          "revision": "86bc427330768e5803ae98d39d8a3d756d01bc9d",
+          "version": "6.5.0"
+        }
+      },
+      {
+        "package": "DeepDiff",
+        "repositoryURL": "https://github.com/onmyway133/DeepDiff.git",
+        "state": {
+          "branch": null,
+          "revision": "010ebbe1ce5ebeaee37a3d2f4a8c03f0e75b8045",
+          "version": "2.3.1"
+        }
+      },
+      {
+        "package": "FXReachability",
+        "repositoryURL": "https://github.com/SRGSSR/FXReachability.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "1eac916df0045630e779fa60eef22ed0d185e15f",
+          "version": null
+        }
+      },
+      {
+        "package": "libextobjc",
+        "repositoryURL": "https://github.com/SRGSSR/libextobjc.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "30ee5b73bdf57a826978aa146881277f22369be1",
+          "version": null
+        }
+      },
+      {
+        "package": "MAKVONotificationCenter",
+        "repositoryURL": "https://github.com/SRGSSR/MAKVONotificationCenter.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "60395e0601ffd4a784856b423d4cac558366276d",
+          "version": null
+        }
+      },
+      {
+        "package": "Mantle",
+        "repositoryURL": "https://github.com/SRGSSR/Mantle.git",
+        "state": {
+          "branch": "swift-package-manager-support",
+          "revision": "cd18bf7f9c6c5a0d2f4aec6012fe1615b86032fe",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGAnalytics",
+        "repositoryURL": "https://github.com/SRGSSR/srganalytics-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "50a304d27fdb2a391c8813cd3a1fd81de134e5c3",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGAppearance",
+        "repositoryURL": "https://github.com/SRGSSR/srgappearance-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "1de76c7c2349878195725a563dd03c4b3ac5e8ed",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGContentProtection",
+        "repositoryURL": "https://github.com/SRGSSR/srgcontentprotection-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "8c3b9acc297c4a5a28073a4edb5b821ec47c2b79",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGDataProvider",
+        "repositoryURL": "https://github.com/SRGSSR/srgdataprovider-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "16fb4495413e3a05c881caa952176d60ce00b24f",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGDiagnostics",
+        "repositoryURL": "https://github.com/SRGSSR/srgdiagnostics-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "16584a136f60fcb1c55167548276bfee4a594d6a",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGIdentity",
+        "repositoryURL": "https://github.com/SRGSSR/srgidentity-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "a6db657bb565c2b672e14c4433001480fd9e8e93",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGLetterbox",
+        "repositoryURL": "https://github.com/SRGSSR/srgletterbox-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "30e8cab040196302a5abc95b3cde69788a3d65b8",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGLogger",
+        "repositoryURL": "https://github.com/SRGSSR/srglogger-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "f362dff71515f75ebe098f993d6951af067516fa",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGMediaPlayer",
+        "repositoryURL": "https://github.com/SRGSSR/srgmediaplayer-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "0805a8fd17ec20c6aeb8adfdd8fca996010bdaa9",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGNetwork",
+        "repositoryURL": "https://github.com/SRGSSR/srgnetwork-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "6a643bf3b7b18835798eec4784d15218e79b66d3",
+          "version": null
+        }
+      },
+      {
+        "package": "TCCore",
+        "repositoryURL": "https://github.com/SRGSSR/TCCore-xcframework-apple.git",
+        "state": {
+          "branch": null,
+          "revision": "be5774e8e68bbf29a9da93506e6bfa6de1177268",
+          "version": "4.5.4-srg3"
+        }
+      },
+      {
+        "package": "TCSDK",
+        "repositoryURL": "https://github.com/SRGSSR/TCSDK-xcframework-apple.git",
+        "state": {
+          "branch": null,
+          "revision": "391dbdc47db04f4049fdabca6b5d1f5446589d3f",
+          "version": "4.4.1-srg3"
+        }
+      },
+      {
+        "package": "UICKeyChainStore",
+        "repositoryURL": "https://github.com/kishikawakatsumi/UICKeyChainStore.git",
+        "state": {
+          "branch": null,
+          "revision": "2f0380d539ec53b66eef211b3c983749ad9e2686",
+          "version": "2.2.0"
+        }
+      },
+      {
+        "package": "YYWebImage",
+        "repositoryURL": "https://github.com/SRGSSR/YYWebImage.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "f7408c97fd0e897e1bb8b3e8b01e0c8e9dc22123",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}

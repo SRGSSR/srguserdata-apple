@@ -9,9 +9,9 @@
 #import "PlayerViewController.h"
 #import "SRGUserData_demo-Swift.h"
 
-#import <libextobjc/libextobjc.h>
-#import <SRGDataProvider/SRGDataProvider.h>
-#import <SRGUserData/SRGUserData.h>
+@import libextobjc;
+@import SRGDataProvider;
+@import SRGUserData;
 
 @interface HistoryViewController ()
 

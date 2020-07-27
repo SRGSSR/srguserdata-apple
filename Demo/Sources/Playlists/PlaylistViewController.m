@@ -9,8 +9,8 @@
 #import "PlayerViewController.h"
 #import "SRGUserData_demo-Swift.h"
 
-#import <libextobjc/libextobjc.h>
-#import <SRGDataProvider/SRGDataProvider.h>
+@import libextobjc;
+@import SRGDataProvider;
 
 @interface PlaylistViewController ()
 

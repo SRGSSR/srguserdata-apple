@@ -6,8 +6,8 @@
 
 #import "PlayerPlaylist.h"
 
-#import <CoreMedia/CoreMedia.h>
-#import <UIKit/UIKit.h>
+@import CoreMedia;
+@import UIKit;
 
 NS_ASSUME_NONNULL_BEGIN
 

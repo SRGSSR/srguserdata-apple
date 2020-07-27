@@ -6,7 +6,7 @@
 
 #import "UserDataViewController.h"
 
-#import <SRGUserData/SRGUserData.h>
+@import SRGUserData;
 
 NS_ASSUME_NONNULL_BEGIN
 

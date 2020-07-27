@@ -1,14 +1,12 @@
 .DS_Store
 
+/.build
+/Packages
+/*.xcodeproj
+xcuserdata/
+
 *.xcscmblueprint
 xcuserdata
-
-/archive
-/build
-
-/Carthage
-/Cartfile.private
-/Cartfile.resolved
 
 /fastlane/*.xcresult
 /fastlane/*.xml

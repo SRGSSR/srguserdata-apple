@@ -1,0 +1,88 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "FXReachability",
+        "repositoryURL": "https://github.com/SRGSSR/FXReachability.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "1eac916df0045630e779fa60eef22ed0d185e15f",
+          "version": null
+        }
+      },
+      {
+        "package": "libextobjc",
+        "repositoryURL": "https://github.com/SRGSSR/libextobjc.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "30ee5b73bdf57a826978aa146881277f22369be1",
+          "version": null
+        }
+      },
+      {
+        "package": "MAKVONotificationCenter",
+        "repositoryURL": "https://github.com/SRGSSR/MAKVONotificationCenter.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "60395e0601ffd4a784856b423d4cac558366276d",
+          "version": null
+        }
+      },
+      {
+        "package": "Mantle",
+        "repositoryURL": "https://github.com/SRGSSR/Mantle.git",
+        "state": {
+          "branch": "swift-package-manager-support",
+          "revision": "cd18bf7f9c6c5a0d2f4aec6012fe1615b86032fe",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGAppearance",
+        "repositoryURL": "https://github.com/SRGSSR/srgappearance-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "1de76c7c2349878195725a563dd03c4b3ac5e8ed",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGIdentity",
+        "repositoryURL": "https://github.com/SRGSSR/srgidentity-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "a6db657bb565c2b672e14c4433001480fd9e8e93",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGLogger",
+        "repositoryURL": "https://github.com/SRGSSR/srglogger-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "f362dff71515f75ebe098f993d6951af067516fa",
+          "version": null
+        }
+      },
+      {
+        "package": "SRGNetwork",
+        "repositoryURL": "https://github.com/SRGSSR/srgnetwork-apple.git",
+        "state": {
+          "branch": "feature/spm-support",
+          "revision": "6a643bf3b7b18835798eec4784d15218e79b66d3",
+          "version": null
+        }
+      },
+      {
+        "package": "UICKeyChainStore",
+        "repositoryURL": "https://github.com/kishikawakatsumi/UICKeyChainStore.git",
+        "state": {
+          "branch": null,
+          "revision": "2f0380d539ec53b66eef211b3c983749ad9e2686",
+          "version": "2.2.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
