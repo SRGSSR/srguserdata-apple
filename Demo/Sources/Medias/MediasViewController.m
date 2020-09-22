@@ -9,7 +9,7 @@
 #import "PlayerViewController.h"
 #import "SRGUserData_demo-Swift.h"
 
-@import SRGDataProvider;
+@import SRGDataProviderNetwork;
 @import SRGUserData;
 
 @interface MediasViewController ()

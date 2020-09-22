@@ -10,7 +10,7 @@
 #import "SRGUserData_demo-Swift.h"
 
 @import libextobjc;
-@import SRGDataProvider;
+@import SRGDataProviderNetwork;
 @import SRGUserData;
 
 @interface HistoryViewController ()
