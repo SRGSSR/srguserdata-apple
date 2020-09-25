@@ -6,8 +6,8 @@
 
 #import "PlayerViewController.h"
 
-#import <libextobjc/libextobjc.h>
-#import <SRGUserData/SRGUserData.h>
+@import libextobjc;
+@import SRGUserData;
 
 SRGLetterboxViewController *LetterboxPlayerViewController(NSString *URN, CMTime time, PlayerPlaylist *playerPlaylist)
 {

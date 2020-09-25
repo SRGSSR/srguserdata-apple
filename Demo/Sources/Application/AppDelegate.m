@@ -12,10 +12,10 @@
 #import "PreferencesViewController.h"
 #import "SettingsViewController.h"
 
-#import <AVFoundation/AVFoundation.h>
-#import <SRGDataProvider/SRGDataProvider.h>
-#import <SRGIdentity/SRGIdentity.h>
-#import <SRGUserData/SRGUserData.h>
+@import AVFoundation;
+@import SRGDataProvider;
+@import SRGIdentity;
+@import SRGUserData;
 
 @implementation AppDelegate
 

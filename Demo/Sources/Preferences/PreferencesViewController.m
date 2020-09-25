@@ -8,8 +8,8 @@
 
 #import "SRGUserData_demo-Swift.h"
 
-#import <SRGIdentity/SRGIdentity.h>
-#import <SRGUserData/SRGUserData.h>
+@import SRGIdentity;
+@import SRGUserData;
 
 static NSNumberFormatter *PreferencesNumberFormatter(void)
 {
@@ -142,7 +142,7 @@ static NSNumberFormatter *PreferencesNumberFormatter(void)
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
         else if ([value isKindOfClass:NSArray.class]) {
-            cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Array (%@ objects)", nil), [value count]];
+            cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Array (%@ objects)", nil), @([value count])];
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }

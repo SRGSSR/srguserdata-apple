@@ -10,8 +10,8 @@
 #import "PlaylistViewController.h"
 #import "SRGUserData_demo-Swift.h"
 
-#import <libextobjc/libextobjc.h>
-#import <SRGUserData/SRGUserData.h>
+@import libextobjc;
+@import SRGUserData;
 
 @interface PlaylistsViewController ()
 

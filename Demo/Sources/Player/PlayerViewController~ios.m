@@ -9,9 +9,9 @@
 #import "PlayerPlaylist.h"
 #import "Resources.h"
 
-#import <libextobjc/libextobjc.h>
-#import <SRGLetterbox/SRGLetterbox.h>
-#import <SRGUserData/SRGUserData.h>
+@import libextobjc;
+@import SRGLetterbox;
+@import SRGUserData;
 
 @interface PlayerViewController ()
 

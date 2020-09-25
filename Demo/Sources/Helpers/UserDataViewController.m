@@ -8,8 +8,8 @@
 
 #import "NSDateFormatter+Demo.h"
 
-#import <SRGIdentity/SRGIdentity.h>
-#import <SRGUserData/SRGUserData.h>
+@import SRGIdentity;
+@import SRGUserData;
 
 @implementation UserDataViewController
 
