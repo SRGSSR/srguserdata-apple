@@ -240,6 +240,7 @@
 				6F8A93D420FDCA0800AA6434 /* Sources */,
 				6F8A93D520FDCA0800AA6434 /* Frameworks */,
 				6F8A93D620FDCA0800AA6434 /* Resources */,
+				0881B5972523D3E5003F6FD5 /* Extract Signing Identity */,
 			);
 			buildRules = (
 			);
@@ -308,6 +309,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0881B5972523D3E5003F6FD5 /* Extract Signing Identity */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Extract Signing Identity";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"${EXPANDED_CODE_SIGN_IDENTITY}\" > /tmp/user-data-signing-identity\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6F8A93D420FDCA0800AA6434 /* Sources */ = {
