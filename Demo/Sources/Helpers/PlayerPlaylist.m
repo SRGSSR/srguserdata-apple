@@ -6,7 +6,7 @@
 
 #import "PlayerPlaylist.h"
 
-#import <SRGUserData/SRGUserData.h>
+@import SRGUserData;
 
 @interface PlayerPlaylist ()
 
