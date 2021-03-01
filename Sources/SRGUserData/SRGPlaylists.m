@@ -31,7 +31,7 @@ static NSString *SRGPlaylistNameForPlaylistWithUid(NSString *uid)
     static dispatch_once_t s_onceToken;
     static NSDictionary<NSString *, NSString *>  *s_names;
     dispatch_once(&s_onceToken, ^{
-        s_names = @{ SRGPlaylistUidWatchLater : SRGUserDataLocalizedString(@"Watch later", @"Default Watch later playlist name") };
+        s_names = @{ SRGPlaylistUidWatchLater : SRGUserDataLocalizedString(@"Later", @"Default Watch later playlist name (can contain video and audio)") };
     });
     return s_names[uid];
 }
