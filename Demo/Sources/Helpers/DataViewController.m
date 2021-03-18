@@ -102,7 +102,7 @@
 #if TARGET_OS_IOS
     // When reloading a table view with animations and if a refresh control is used to trigger the reload,
     // a glitch makes the table jump down when the refresh control value changed event is triggered. To
-    // solve this issue, we only mark the table as required a refresh when this event is triggered, and
+    // solve this issue, we only mark the table as requiring a refresh when this event is triggered, and
     // perform the refresh when the table is released.
     //
     // Note that applying the same strategy with a UITableViewController does not work, we have to build
