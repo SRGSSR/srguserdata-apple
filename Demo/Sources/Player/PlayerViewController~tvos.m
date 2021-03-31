@@ -9,6 +9,8 @@
 @import libextobjc;
 @import SRGUserData;
 
+static PlayerPlaylist *s_playerPlaylist = nil;
+
 SRGLetterboxViewController *LetterboxPlayerViewController(NSString *URN, CMTime time, PlayerPlaylist *playerPlaylist)
 {
     SRGLetterboxViewController *playerViewController = [[SRGLetterboxViewController alloc] init];
@@ -16,6 +18,7 @@ SRGLetterboxViewController *LetterboxPlayerViewController(NSString *URN, CMTime 
     SRGLetterboxController *controller = playerViewController.controller;
     controller.playlistDataSource = playerPlaylist;
     controller.playbackTransitionDelegate = playerPlaylist;
+    s_playerPlaylist = playerPlaylist;
     
     @weakify(controller)
     [controller addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1., NSEC_PER_SEC) queue:NULL usingBlock:^(CMTime time) {
