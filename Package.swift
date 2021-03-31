@@ -10,7 +10,7 @@ let package = Package(
     name: "SRGUserData",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v9),
+        .iOS(.v12),
         .tvOS(.v12)
     ],
     products: [
@@ -20,7 +20,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(name: "SRGIdentity", url: "https://github.com/SRGSSR/srgidentity-apple.git", .upToNextMinor(from: "3.0.0"))
+        .package(name: "SRGIdentity", url: "https://github.com/SRGSSR/srgidentity-apple.git", .branch("feature/font-overhaul"))
     ],
     targets: [
         .target(

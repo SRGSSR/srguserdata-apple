@@ -28,7 +28,7 @@
     return self;
 }
 
-#pragma SRGLetterboxControllerPlaylistDataSource protocol
+#pragma mark SRGLetterboxControllerPlaylistDataSource protocol
 
 - (SRGMedia *)previousMediaForController:(SRGLetterboxController *)controller
 {
@@ -40,9 +40,14 @@
     return (self.currentIndex < self.medias.count - 1) ? self.medias[self.currentIndex + 1] : nil;
 }
 
-- (NSTimeInterval)continuousPlaybackTransitionDurationForController:(SRGLetterboxController *)controller
+- (void)controller:(SRGLetterboxController *)controller didChangeToMedia:(SRGMedia *)media
 {
-    return 5.;
+    if ([media isEqual:[self previousMediaForController:controller]]) {
+        self.currentIndex -= 1;
+    }
+    else if ([media isEqual:[self nextMediaForController:controller]]) {
+        self.currentIndex += 1;
+    }
 }
 
 - (SRGPosition *)controller:(SRGLetterboxController *)controller startPositionForMedia:(SRGMedia *)media
@@ -56,14 +61,11 @@
     }
 }
 
-- (void)controller:(SRGLetterboxController *)controller didTransitionToMedia:(SRGMedia *)media automatically:(BOOL)automatically
+#pragma mark SRGLetterboxControllerPlaybackTransitionDelegate protocol
+
+- (NSTimeInterval)continuousPlaybackTransitionDurationForController:(SRGLetterboxController *)controller
 {
-    if ([media isEqual:[self previousMediaForController:controller]]) {
-        self.currentIndex -= 1;
-    }
-    else if ([media isEqual:[self nextMediaForController:controller]]) {
-        self.currentIndex += 1;
-    }
+    return 5.;
 }
 
 @end

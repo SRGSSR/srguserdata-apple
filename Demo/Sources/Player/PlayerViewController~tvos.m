@@ -15,6 +15,7 @@ SRGLetterboxViewController *LetterboxPlayerViewController(NSString *URN, CMTime 
     
     SRGLetterboxController *controller = playerViewController.controller;
     controller.playlistDataSource = playerPlaylist;
+    controller.playbackTransitionDelegate = playerPlaylist;
     
     @weakify(controller)
     [controller addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1., NSEC_PER_SEC) queue:NULL usingBlock:^(CMTime time) {

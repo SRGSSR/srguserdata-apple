@@ -8,7 +8,6 @@
 #import "UserDataBaseTestCase.h"
 
 // Private framework headers
-#import "NSPersistentContainer+SRGUserData.h"
 #import "SRGDataStore.h"
 
 @interface DataStoreTestCase : UserDataBaseTestCase
@@ -26,22 +25,10 @@
     NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
     NSURL *storeFileURL = [self URLForStoreFromPackage:package];
     
-    id<SRGPersistentContainer> persistentContainer = nil;
+    NSPersistentContainer *persistentContainer = [NSPersistentContainer persistentContainerWithName:storeFileURL.lastPathComponent managedObjectModel:model];
+    persistentContainer.persistentStoreDescriptions = @[ [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeFileURL] ];
     
-#if TARGET_OS_IOS
-    if (@available(iOS 10, *)) {
-#endif
-        NSPersistentContainer *nativePersistentContainer = [NSPersistentContainer persistentContainerWithName:storeFileURL.lastPathComponent managedObjectModel:model];
-        nativePersistentContainer.persistentStoreDescriptions = @[ [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeFileURL] ];
-        persistentContainer = nativePersistentContainer;
-#if TARGET_OS_IOS
-    }
-    else {
-        persistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:storeFileURL model:model];
-    }
-#endif
-    
-    [persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+    [persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription * _Nonnull description, NSError * _Nullable error) {
         XCTAssertNil(error);
     }];
     
