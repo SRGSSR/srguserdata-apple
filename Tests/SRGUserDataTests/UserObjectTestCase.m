@@ -8,8 +8,6 @@
 
 // Private framework headers
 #import "NSBundle+SRGUserData.h"
-#import "NSPersistentContainer+SRGUserData.h"
-#import "SRGPersistentContainer.h"
 #import "SRGUserObject+Private.h"
 
 @import libextobjc;
@@ -22,28 +20,17 @@
 
 #pragma mark Helpers
 
-- (id<SRGPersistentContainer>)persistentContainerFromPackage:(NSString *)package
+- (NSPersistentContainer *)persistentContainerFromPackage:(NSString *)package
 {
     NSString *modelFilePath = [NSBundle.srg_userDataBundle pathForResource:@"SRGUserData" ofType:@"momd"];
     NSURL *modelFileURL = [NSURL fileURLWithPath:modelFilePath];
     NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
     NSURL *storeFileURL = [self URLForStoreFromPackage:package];
     
-    id<SRGPersistentContainer> persistentContainer = nil;
-#if TARGET_OS_IOS
-    if (@available(iOS 10, *)) {
-#endif
-        NSPersistentContainer *nativePersistentContainer = [NSPersistentContainer persistentContainerWithName:storeFileURL.lastPathComponent managedObjectModel:model];
-        nativePersistentContainer.persistentStoreDescriptions = @[ [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeFileURL] ];
-        persistentContainer = nativePersistentContainer;
-#if TARGET_OS_IOS
-    }
-    else {
-        persistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:storeFileURL model:model];
-    }
-#endif
+    NSPersistentContainer *persistentContainer = [NSPersistentContainer persistentContainerWithName:storeFileURL.lastPathComponent managedObjectModel:model];
+    persistentContainer.persistentStoreDescriptions = @[ [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeFileURL] ];
     
-    [persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+    [persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription * _Nonnull description, NSError * _Nullable error) {
         XCTAssertNil(error);
     }];
     
@@ -54,7 +41,7 @@
 
 - (void)testObjectsMatchingPredicate
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -70,7 +57,7 @@
 
 - (void)testObjectWithUid
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -86,7 +73,7 @@
 
 - (void)testUpsert
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -102,7 +89,7 @@
 
 - (void)testSynchronizeWithInvalidData
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -113,7 +100,7 @@
 
 - (void)testSynchronizeNewServerEntry
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -128,7 +115,7 @@
 
 - (void)testSynchronizeNonDirtyLocalEntry
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -143,7 +130,7 @@
 
 - (void)testSynchronizeOlderDirtyLocalEntry
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -158,7 +145,7 @@
 
 - (void)testSynchronizeMoreRecentDirtyLocalEntry
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -173,7 +160,7 @@
 
 - (void)testSynchronizeDeletedEntryExistingLocally
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -188,7 +175,7 @@
 
 - (void)testSynchronizeDeletedEntryMoreRecentLocally
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -204,7 +191,7 @@
 
 - (void)testDiscardForLoggedOutUser
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedOut"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedOut"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -230,7 +217,7 @@
 
 - (void)testDiscardForLoggedInUser
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -256,7 +243,7 @@
 
 - (void)testDeleteAllForLoggedInUser
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{
@@ -272,7 +259,7 @@
 
 - (void)testDeleteAllForLoggedOutUser
 {
-    id<SRGPersistentContainer> persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedOut"];
+    NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedOut"];
     
     NSManagedObjectContext *viewContext = persistentContainer.viewContext;
     [viewContext performBlockAndWait:^{

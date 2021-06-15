@@ -41,18 +41,18 @@
         "package": "SRGAppearance",
         "repositoryURL": "https://github.com/SRGSSR/srgappearance-apple.git",
         "state": {
-          "branch": null,
-          "revision": "48258a788952348c7fa38b5b8e9181b25f3c87b8",
-          "version": "3.0.0"
+          "branch": "feature/font-overhaul",
+          "revision": "975a51fb7c43354289c24a814abdd1abd097f6f0",
+          "version": null
         }
       },
       {
         "package": "SRGIdentity",
         "repositoryURL": "https://github.com/SRGSSR/srgidentity-apple.git",
         "state": {
-          "branch": null,
-          "revision": "e1fe679ea1aefb5b4c80445ae70aa86b9a497aea",
-          "version": "3.0.0"
+          "branch": "feature/font-overhaul",
+          "revision": "e612e611411fcc9fb88dec8d56acf803ae51696a",
+          "version": null
         }
       },
       {
@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/SRGSSR/srglogger-apple.git",
         "state": {
           "branch": null,
-          "revision": "cfc39d1223ed039aeb7df38c6c7570977b22d1aa",
-          "version": "3.0.0"
+          "revision": "9e5bf082222f5499996b931a8651aac6ea17ba4a",
+          "version": "3.0.1"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/SRGSSR/srgnetwork-apple.git",
         "state": {
           "branch": null,
-          "revision": "734fe399088b2f846e9e69d48a43118f6a8dc0d2",
-          "version": "3.0.0"
+          "revision": "46c78b8cb5738e0286e18f35c586547b1458bdcf",
+          "version": "3.0.2"
         }
       },
       {

@@ -7,7 +7,6 @@
 #import "SRGUserData.h"
 
 #import "NSBundle+SRGUserData.h"
-#import "NSPersistentContainer+SRGUserData.h"
 #import "NSTimer+SRGUserData.h"
 #import "SRGDataStore.h"
 #import "SRGHistory.h"
@@ -106,32 +105,19 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
         NSURL *modelFileURL = [NSURL fileURLWithPath:modelFilePath];
         NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelFileURL];
         
-        id<SRGPersistentContainer> persistentContainer = nil;
+        NSPersistentContainer *persistentContainer = [NSPersistentContainer persistentContainerWithName:storeFileURL.lastPathComponent managedObjectModel:model];
         
-#if TARGET_OS_IOS
-        if (@available(iOS 10, *)) {
-#endif
-            NSPersistentContainer *nativePersistentContainer = [NSPersistentContainer persistentContainerWithName:storeFileURL.lastPathComponent managedObjectModel:model];
-            
-            NSPersistentStoreDescription *persistentStoreDescription = [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeFileURL];
-            persistentStoreDescription.shouldInferMappingModelAutomatically = NO;
-            persistentStoreDescription.shouldMigrateStoreAutomatically = NO;
-            nativePersistentContainer.persistentStoreDescriptions = @[ persistentStoreDescription ];
-            
-            persistentContainer = nativePersistentContainer;
-#if TARGET_OS_IOS
-        }
-        else {
-            persistentContainer = [[SRGPersistentContainer alloc] initWithFileURL:storeFileURL model:model];
-        }
-#endif
+        NSPersistentStoreDescription *persistentStoreDescription = [NSPersistentStoreDescription persistentStoreDescriptionWithURL:storeFileURL];
+        persistentStoreDescription.shouldInferMappingModelAutomatically = NO;
+        persistentStoreDescription.shouldMigrateStoreAutomatically = NO;
+        persistentContainer.persistentStoreDescriptions = @[ persistentStoreDescription ];
         
         __block BOOL success = YES;
-        [persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+        [persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription * _Nonnull description, NSError * _Nullable error) {
             if ([error.domain isEqualToString:NSCocoaErrorDomain] && error.code == NSPersistentStoreIncompatibleVersionHashError) {
                 BOOL migrated = [self migratePersistentStoreWithFileURL:storeFileURL];
                 if (migrated) {
-                    [persistentContainer srg_loadPersistentStoreWithCompletionHandler:^(NSError * _Nullable error) {
+                    [persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription * _Nonnull description, NSError * _Nullable error) {
                         if (error) {
                             success = NO;
                             SRGUserDataLogError(@"user_data", @"Data store failed to load after migration. Reason: %@", error);
@@ -231,7 +217,7 @@ static BOOL SRGUserDataIsUnauthorizationError(NSError *error)
 
 - (NSURL *)storeFileURL
 {
-    return self.dataStore.persistentContainer.srg_fileURL;
+    return self.dataStore.persistentContainer.persistentStoreDescriptions.firstObject.URL;
 }
 
 - (SRGUser *)user
