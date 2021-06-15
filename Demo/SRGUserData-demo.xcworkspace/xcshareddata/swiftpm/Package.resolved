@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/comScore/Comscore-Swift-Package-Manager.git",
         "state": {
           "branch": null,
-          "revision": "d57938089a95f54468c32c9d8034a277a602d060",
-          "version": "6.7.1"
+          "revision": "1bdfebcc54cef4ae96e3627f9014446218e806ca",
+          "version": "6.8.1"
         }
       },
       {
@@ -59,8 +59,8 @@
         "package": "SRGAnalytics",
         "repositoryURL": "https://github.com/SRGSSR/srganalytics-apple.git",
         "state": {
-          "branch": "feature/font-overhaul",
-          "revision": "19b3e498b0e97bd2b70ea9dc0c856d5c2a64face",
+          "branch": "develop",
+          "revision": "f3854faf59ec6edcdd6d4db2f41204b84c68b16b",
           "version": null
         }
       },
@@ -68,8 +68,8 @@
         "package": "SRGAppearance",
         "repositoryURL": "https://github.com/SRGSSR/srgappearance-apple.git",
         "state": {
-          "branch": "feature/font-overhaul",
-          "revision": "975a51fb7c43354289c24a814abdd1abd097f6f0",
+          "branch": "develop",
+          "revision": "960ce81ff9c6c180d9d6af765eb0ce8da2637572",
           "version": null
         }
       },
@@ -104,8 +104,8 @@
         "package": "SRGIdentity",
         "repositoryURL": "https://github.com/SRGSSR/srgidentity-apple.git",
         "state": {
-          "branch": "feature/font-overhaul",
-          "revision": "e612e611411fcc9fb88dec8d56acf803ae51696a",
+          "branch": "develop",
+          "revision": "a64d28fcfbc550f4991b0d85762d8e7ad7da389f",
           "version": null
         }
       },
@@ -113,8 +113,8 @@
         "package": "SRGLetterbox",
         "repositoryURL": "https://github.com/SRGSSR/srgletterbox-apple.git",
         "state": {
-          "branch": "feature/font-overhaul",
-          "revision": "294717caf9db0aa47c01aee91e6598011b1a0347",
+          "branch": "develop",
+          "revision": "787e383fb15d287d3c872b55fc855df768ff7114",
           "version": null
         }
       },
