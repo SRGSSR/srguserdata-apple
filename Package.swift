@@ -20,7 +20,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(name: "SRGIdentity", url: "https://github.com/SRGSSR/srgidentity-apple.git", .branch("develop"))
+        .package(name: "SRGIdentity", url: "https://github.com/SRGSSR/srgidentity-apple.git", .upToNextMinor(from: "3.1.0"))
     ],
     targets: [
         .target(
