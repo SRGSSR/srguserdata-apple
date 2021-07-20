@@ -4,7 +4,7 @@
 //  License information is available from the LICENSE file.
 //
 
-#import "SRGPersistentContainer.h"
+@import CoreData;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -34,12 +34,12 @@ typedef void (^SRGDataStoreWriteCompletionBlock)(NSError * _Nullable error);
 /**
  *  Create an SQLite datastore from the specified persistent container.
  */
-- (instancetype)initWithPersistentContainer:(id<SRGPersistentContainer>)persistentContainer;
+- (instancetype)initWithPersistentContainer:(NSPersistentContainer *)persistentContainer;
 
 /**
  *  The persistent container used by the data store.
  */
-@property (nonatomic, readonly) id<SRGPersistentContainer> persistentContainer;
+@property (nonatomic, readonly) NSPersistentContainer *persistentContainer;
 
 /**
  *  Perform a read operation on the main thread. The read should be efficient since slow operations might block the main

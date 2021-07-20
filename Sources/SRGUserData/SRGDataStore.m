@@ -12,7 +12,7 @@
 
 @interface SRGDataStore ()
 
-@property (nonatomic) id<SRGPersistentContainer> persistentContainer;
+@property (nonatomic) NSPersistentContainer *persistentContainer;
 
 @property (nonatomic) NSOperationQueue *serialOperationQueue;
 @property (nonatomic) NSMapTable<NSString *, NSOperation *> *operations;
@@ -28,7 +28,7 @@
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithPersistentContainer:(id<SRGPersistentContainer>)persistentContainer
+- (instancetype)initWithPersistentContainer:(NSPersistentContainer *)persistentContainer
 {
     if (self = [super init]) {
         // The main context is for reads only. A merge policy has to be set (default throws errors), here a meaningful
@@ -36,9 +36,7 @@
         // (there is no parent - child relationship in this implementation). To merge changes from sibling contexts,
         // we still have to register for NSManagedObjectContextDidSaveNotification.
         NSManagedObjectContext *viewContext = persistentContainer.viewContext;
-        if (@available(iOS 10, tvOS 10, *)) {
-            viewContext.automaticallyMergesChangesFromParent = YES;
-        }
+        viewContext.automaticallyMergesChangesFromParent = YES;
         viewContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy;
         viewContext.undoManager = nil;
         
@@ -135,9 +133,7 @@
         // transactions can never be made in parallel. But if this happens for some reason, provide a meaningful
         // setup (context is the reference).
         NSManagedObjectContext *managedObjectContext = self.persistentContainer.newBackgroundContext;
-        if (@available(iOS 10, tvOS 10, *)) {
-            managedObjectContext.automaticallyMergesChangesFromParent = YES;
-        }
+        managedObjectContext.automaticallyMergesChangesFromParent = YES;
         managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
         managedObjectContext.undoManager = nil;
         

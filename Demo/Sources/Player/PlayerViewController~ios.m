@@ -31,7 +31,7 @@
 
 #pragma mark Object lifecycle
 
-- (instancetype)initWithURN:(nullable NSString *)URN time:(CMTime)time playerPlaylist:(nullable PlayerPlaylist *)playerPlaylist
+- (instancetype)initWithURN:(NSString *)URN time:(CMTime)time playerPlaylist:(PlayerPlaylist *)playerPlaylist
 {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:ResourceNameForUIClass(self.class) bundle:nil];
     PlayerViewController *viewController = [storyboard instantiateInitialViewController];
@@ -48,6 +48,7 @@
     [super viewDidLoad];
     
     self.letterboxController.playlistDataSource = self.playerPlaylist;
+    self.letterboxController.playbackTransitionDelegate = self.playerPlaylist;
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(metadataDidChange:)
@@ -111,9 +112,7 @@
         self.playlistsButton.alpha = alpha;
         [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
-        if (@available(iOS 11, *)) {
-            [self setNeedsUpdateOfHomeIndicatorAutoHidden];
-        }
+        [self setNeedsUpdateOfHomeIndicatorAutoHidden];
     }];
 }
 

@@ -8,7 +8,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PlayerPlaylist : NSObject <SRGLetterboxControllerPlaylistDataSource>
+@interface PlayerPlaylist : NSObject <SRGLetterboxControllerPlaylistDataSource, SRGLetterboxControllerPlaybackTransitionDelegate>
 
 - (instancetype)initWithMedias:(NSArray<SRGMedia *> *)medias currentIndex:(NSInteger)currentIndex;
 

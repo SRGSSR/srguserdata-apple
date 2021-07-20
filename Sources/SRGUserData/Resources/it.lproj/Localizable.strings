@@ -1,3 +1,6 @@
+/* Default Watch later playlist name (can contain video and audio) */
+"Later" = "Dopo";
+
 /* Error message returned when an operation has been cancelled */
 "The operation has been cancelled" = "L'operazione è stata annullata";
 
@@ -7,6 +10,3 @@
 /* Error message returned when adding an entry to an unknown playlist.
    Error message returned when removing some entries from an unknown playlist. */
 "The playlist does not exist" = "La playlist non esiste";
-
-/* Default Watch later playlist name */
-"Watch later" = "Guardare dopo";
