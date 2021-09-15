@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/onmyway133/DeepDiff.git",
         "state": {
           "branch": null,
-          "revision": "010ebbe1ce5ebeaee37a3d2f4a8c03f0e75b8045",
-          "version": "2.3.1"
+          "revision": "2639b3a11054d666a4c5ec1b7dd2808e437f3289",
+          "version": "2.3.3"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/Mantle/Mantle.git",
         "state": {
           "branch": null,
-          "revision": "eb4ad298d81c023bcba20810ceffba695378ded4",
-          "version": "2.1.6"
+          "revision": "bbe0cbe68582a18a6df7516778196ba3cf420ad3",
+          "version": "2.1.7"
         }
       },
       {
@@ -132,8 +132,8 @@
         "repositoryURL": "https://github.com/SRGSSR/srgmediaplayer-apple.git",
         "state": {
           "branch": null,
-          "revision": "7ba6b8f78205ec9186d67aa9d1c40e376ffd4909",
-          "version": "6.1.2"
+          "revision": "4bab9588d7cd695a7a466c013c6019c3966c1e9d",
+          "version": "6.1.3"
         }
       },
       {
