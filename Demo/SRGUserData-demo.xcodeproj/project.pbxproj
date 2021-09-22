@@ -22,6 +22,8 @@
 		6F5C6365228AAF190001CC4C /* PreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C6364228AAF190001CC4C /* PreferencesViewController.m */; };
 		6F5C638D228B3DD70001CC4C /* DataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C638B228B3DD70001CC4C /* DataViewController.m */; };
 		6F5C6392228B3DE90001CC4C /* UserDataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5C6390228B3DE90001CC4C /* UserDataViewController.m */; };
+		6F6C754026E0D99000B6BB74 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6C753D26E0D99000B6BB74 /* SceneDelegate.m */; };
+		6F6C754126E0D99000B6BB74 /* Application.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F6C753E26E0D99000B6BB74 /* Application.m */; };
 		6F8A93FB20FDCAA800AA6434 /* LaunchScreen~ios.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F020FDCAA800AA6434 /* LaunchScreen~ios.storyboard */; };
 		6F8A93FC20FDCAA800AA6434 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F8A93F120FDCAA800AA6434 /* Images.xcassets */; };
 		6F8A93FD20FDCAA800AA6434 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8A93F520FDCAA800AA6434 /* main.m */; };
@@ -55,6 +57,10 @@
 		6F5C638B228B3DD70001CC4C /* DataViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DataViewController.m; sourceTree = "<group>"; };
 		6F5C638F228B3DE90001CC4C /* UserDataViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserDataViewController.h; sourceTree = "<group>"; };
 		6F5C6390228B3DE90001CC4C /* UserDataViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserDataViewController.m; sourceTree = "<group>"; };
+		6F6C753C26E0D99000B6BB74 /* Application.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Application.h; sourceTree = "<group>"; };
+		6F6C753D26E0D99000B6BB74 /* SceneDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		6F6C753E26E0D99000B6BB74 /* Application.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Application.m; sourceTree = "<group>"; };
+		6F6C753F26E0D99000B6BB74 /* SceneDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
 		6F8A93D820FDCA0800AA6434 /* SRGUserData-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SRGUserData-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8A93F020FDCAA800AA6434 /* LaunchScreen~ios.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "LaunchScreen~ios.storyboard"; sourceTree = "<group>"; };
 		6F8A93F120FDCAA800AA6434 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -209,7 +215,11 @@
 			children = (
 				6F8A93F420FDCAA800AA6434 /* AppDelegate.h */,
 				6F8A93F620FDCAA800AA6434 /* AppDelegate.m */,
+				6F6C753C26E0D99000B6BB74 /* Application.h */,
+				6F6C753E26E0D99000B6BB74 /* Application.m */,
 				6F8A93F520FDCAA800AA6434 /* main.m */,
+				6F6C753F26E0D99000B6BB74 /* SceneDelegate.h */,
+				6F6C753D26E0D99000B6BB74 /* SceneDelegate.m */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -262,7 +272,7 @@
 		6F0EB52820FC7F58009C02CF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = "SRG SSR";
 				TargetAttributes = {
 					6F8A93D720FDCA0800AA6434 = {
@@ -336,7 +346,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F6C754126E0D99000B6BB74 /* Application.m in Sources */,
 				6F5C6365228AAF190001CC4C /* PreferencesViewController.m in Sources */,
+				6F6C754026E0D99000B6BB74 /* SceneDelegate.m in Sources */,
 				6F8A93FE20FDCAA800AA6434 /* AppDelegate.m in Sources */,
 				6F8A93FD20FDCAA800AA6434 /* main.m in Sources */,
 				6FA3931723A41C4200D22C56 /* SettingsViewController.m in Sources */,

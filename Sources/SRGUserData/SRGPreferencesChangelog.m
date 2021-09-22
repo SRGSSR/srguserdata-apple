@@ -11,7 +11,7 @@
 @interface SRGPreferencesChangelog ()
 
 @property (nonatomic) NSURL *fileURL;
-@property (nonatomic) NSMutableArray<SRGPreferencesChangelogEntry *> *changelogEntries;
+@property (nonatomic) NSArray<SRGPreferencesChangelogEntry *> *changelogEntries;
 
 @end
 
@@ -44,7 +44,7 @@
     SRGUserDataLogInfo(@"preference_changelog", @"Changelog successfully saved");
 }
 
-+ (NSMutableArray<SRGPreferencesChangelogEntry *> *)savedChangelogEntriesFromFileURL:(NSURL *)fileURL
++ (NSArray<SRGPreferencesChangelogEntry *> *)savedChangelogEntriesFromFileURL:(NSURL *)fileURL
 {
     if (! [NSFileManager.defaultManager fileExistsAtPath:fileURL.path]) {
         return nil;
@@ -74,7 +74,7 @@
         return nil;
     }
     
-    return entries.mutableCopy;
+    return entries;
 }
 
 #pragma mark Object lifecycle
@@ -83,7 +83,7 @@
 {
     if (self = [super init]) {
         self.fileURL = [preferencesFileURL URLByAppendingPathExtension:@"changes"];
-        self.changelogEntries = [SRGPreferencesChangelog savedChangelogEntriesFromFileURL:self.fileURL] ?: [NSMutableArray array];
+        self.changelogEntries = [SRGPreferencesChangelog savedChangelogEntriesFromFileURL:self.fileURL] ?: [NSArray array];
     }
     return self;
 }
@@ -101,20 +101,20 @@
 {
     // TODO: Could be optimized. Some operations (e.g. a deletion followed by an insertion) could namely be coalesced
     //       into a single operation, reducing the number of operations to be submitted afterwards.
-    [self.changelogEntries addObject:entry];
+    self.changelogEntries = [self.changelogEntries arrayByAddingObject:entry];
     [SRGPreferencesChangelog saveChangelogEntries:self.changelogEntries toFileURL:self.fileURL];
 }
 
 - (void)removeEntry:(SRGPreferencesChangelogEntry *)entry
 {
-    [self.changelogEntries removeObject:entry];
+    self.changelogEntries = [self.changelogEntries mtl_arrayByRemovingObject:entry];
     [SRGPreferencesChangelog saveChangelogEntries:self.changelogEntries toFileURL:self.fileURL];
 }
 
 - (void)removeAllEntries
 {
     [NSFileManager.defaultManager removeItemAtURL:self.fileURL error:NULL];
-    [self.changelogEntries removeAllObjects];
+    self.changelogEntries = @[];
 }
 
 @end
