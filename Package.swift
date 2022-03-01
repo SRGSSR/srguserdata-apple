@@ -28,7 +28,7 @@ let package = Package(
             dependencies: ["SRGIdentity"],
             resources: [
                 .process("Data"),
-                .process("Resources"),
+                .process("Resources")
             ],
             cSettings: [
                 .define("MARKETING_VERSION", to: "\"\(ProjectSettings.marketingVersion)\""),
