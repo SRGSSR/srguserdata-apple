@@ -24,7 +24,7 @@
 {
     [super viewDidLoad];
     
-    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
+    UITableView *tableView = [[UITableView alloc] init];
     tableView.dataSource = self;
     tableView.delegate = self;
     [self.view addSubview:tableView];
