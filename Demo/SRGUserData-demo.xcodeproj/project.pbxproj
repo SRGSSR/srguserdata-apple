@@ -567,7 +567,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SRGSSR/srgletterbox-apple.git";
 			requirement = {
-				branch = "feature/ios16-tvos16-xcode14";
+				branch = develop;
 				kind = branch;
 			};
 		};

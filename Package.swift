@@ -20,7 +20,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(name: "SRGIdentity", url: "https://github.com/SRGSSR/srgidentity-apple.git", .branch("feature/ios16-tvos16-xcode14"))
+        .package(name: "SRGIdentity", url: "https://github.com/SRGSSR/srgidentity-apple.git", .branch("develop"))
     ],
     targets: [
         .target(
