@@ -3,7 +3,7 @@
 import PackageDescription
 
 struct ProjectSettings {
-    static let marketingVersion: String = "3.2.0"
+    static let marketingVersion: String = "3.3.0"
 }
 
 let package = Package(
@@ -20,7 +20,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(name: "SRGIdentity", url: "https://github.com/SRGSSR/srgidentity-apple.git", .upToNextMinor(from: "3.2.0"))
+        .package(name: "SRGIdentity", url: "https://github.com/SRGSSR/srgidentity-apple.git", .upToNextMinor(from: "3.3.0"))
     ],
     targets: [
         .target(
@@ -28,7 +28,7 @@ let package = Package(
             dependencies: ["SRGIdentity"],
             resources: [
                 .process("Data"),
-                .process("Resources"),
+                .process("Resources")
             ],
             cSettings: [
                 .define("MARKETING_VERSION", to: "\"\(ProjectSettings.marketingVersion)\""),

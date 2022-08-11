@@ -24,12 +24,19 @@
 {
     [super viewDidLoad];
     
-    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
-    tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    UITableView *tableView = [[UITableView alloc] init];
     tableView.dataSource = self;
     tableView.delegate = self;
     [self.view addSubview:tableView];
     self.tableView = tableView;
+    
+    tableView.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+        [tableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+        [tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
+    ]];
     
 #if TARGET_OS_TV
     if (@available(tvOS 13, *)) {
