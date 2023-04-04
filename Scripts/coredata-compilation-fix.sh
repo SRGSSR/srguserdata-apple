@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # This script attempts to apply write permission on XC mapping files, to avoid MappingModelCompile errors.
-# It should be applied as a pre action of a target build. 
+# It should be applied as a pre-action of a target build. 
 
 REPOSITORY_FOLDER=$1
 
-echo "SRGUserData: pre action started."
+echo "SRGUserData: pre-action started."
 
 if [[ -z "${REPOSITORY_FOLDER}" ]]; then
     echo "SRGUserData: a repository folder must be provided."
