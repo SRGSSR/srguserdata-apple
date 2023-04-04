@@ -140,13 +140,13 @@ For information purposes, the last successful synchronization date can be retrie
 
 When retrieving data asynchronously, beware that returned objects are most probably Core Data managed objects. Such objects cannot be exchanged between threads and must be consumed where they are received.
 
-### Core Data compile errors
+### Core Data compilation errors
 
-Running on Mac OS Ventura, some non blocking errors could appeared during the compilation. `xcodebuild archive` is impacted and failed.
-Add write permissions on mapping models fix it. A proposed solution is explained:
+Running on Mac OS Ventura, some non-blocking errors might appear during the compilation. `xcodebuild archive` is impacted and fails.
+Adding write permissions on mapping models fixes this issue. In a project using SRG User Data:
 
-- Add a new run script action as a pre action on scheme build.
-- Past this script:
+- Add a new run script action as a pre-action for the build scheme.
+- Paste this script:
 
 ```
 # Get SRGUserData checkout path.
