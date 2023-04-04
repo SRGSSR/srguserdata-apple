@@ -16,8 +16,6 @@ User data storage can be bound to an [SRG Identity](https://github.com/SRGSSR/sr
 
 The library is suitable for applications running on iOS 12, tvOS 12 and above. The project is meant to be compiled with the latest Xcode version.
 
-Starting Mac OS Ventura and SPM integration, some Core Data compile errors could appeared. A proposed script `Scripts/coredata-compilation-fix.sh` helps if executed has a build pre action. 
-
 ## Contributing
 
 If you want to contribute to the project, have a look at our [contributing guide](CONTRIBUTING.md).
