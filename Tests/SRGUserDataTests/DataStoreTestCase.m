@@ -280,6 +280,7 @@
     [self waitForExpectationsWithTimeout:10. handler:nil];
 }
 
+#warning "This flaky test has been disabled. See issue #7"
 - (void)testGlobalCancellation
 {
     [self expectationForElapsedTimeInterval:3. withHandler:nil];

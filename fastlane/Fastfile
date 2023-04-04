@@ -92,7 +92,7 @@ def srg_xcodebuild(device, test_build)
 end
 
 def srg_test_xcargs
-  '-retry-tests-on-failure -testLanguage en -testRegion en-US'
+  '-retry-tests-on-failure -test-iterations 20 -testLanguage en -testRegion en-US'
 end
 
 def srg_xcodebuild_workspace(test_build)

@@ -27,7 +27,6 @@ let package = Package(
             name: "SRGUserData",
             dependencies: ["SRGIdentity"],
             resources: [
-                .process("Data"),
                 .process("Resources")
             ],
             cSettings: [

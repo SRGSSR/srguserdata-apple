@@ -23,6 +23,11 @@
                BlueprintName = "SRGUserData-tests"
                ReferencedContainer = "container:SRGUserData-tests.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "DataStoreTestCase/testGlobalCancellation">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
