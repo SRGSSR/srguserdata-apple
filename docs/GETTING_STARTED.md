@@ -150,7 +150,7 @@ Adding write permissions on mapping models fixes this issue. In a project using 
 
 ```
 # Get SRGUserData checkout path.
-SRG_USER_DATA="${DERIVED_DATA_DIR}/SourcePackages/checkouts/srguserdata-apple"
+SRG_USER_DATA=$(find "$DERIVED_DATA_DIR" -path "*/SourcePackages/checkouts/srguserdata-apple" -type d)
 
 # Apply SRGUserData script.
 sh "$SRG_USER_DATA/Scripts/coredata-compilation-fix.sh" "$SRG_USER_DATA"
