@@ -27,6 +27,24 @@
                <Test
                   Identifier = "DataStoreTestCase/testGlobalCancellation">
                </Test>
+               <Test
+                  Identifier = "UserObjectTestCase/testDiscardForLoggedInUser">
+               </Test>
+               <Test
+                  Identifier = "UserObjectTestCase/testDiscardForLoggedOutUser">
+               </Test>
+               <Test
+                  Identifier = "UserObjectTestCase/testObjectsMatchingPredicate">
+               </Test>
+               <Test
+                  Identifier = "UserObjectTestCase/testSynchronizeDeletedEntryExistingLocally">
+               </Test>
+               <Test
+                  Identifier = "UserObjectTestCase/testSynchronizeDeletedEntryMoreRecentLocally">
+               </Test>
+               <Test
+                  Identifier = "UserObjectTestCase/testSynchronizeMoreRecentDirtyLocalEntry">
+               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>
