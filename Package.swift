@@ -3,7 +3,7 @@
 import PackageDescription
 
 struct ProjectSettings {
-    static let marketingVersion: String = "3.3.0"
+    static let marketingVersion: String = "3.3.1"
 }
 
 let package = Package(
@@ -27,7 +27,6 @@ let package = Package(
             name: "SRGUserData",
             dependencies: ["SRGIdentity"],
             resources: [
-                .process("Data"),
                 .process("Resources")
             ],
             cSettings: [

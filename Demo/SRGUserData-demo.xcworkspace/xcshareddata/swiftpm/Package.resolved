@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/SRGSSR/srganalytics-apple.git",
         "state": {
           "branch": null,
-          "revision": "1ae66aa9dc392c5dbf2cd9dd7be72d277c73c685",
-          "version": "7.9.0"
+          "revision": "45a2a1b1a879ad60b9857c1bc3fa5b4e314f6565",
+          "version": "7.10.0"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/SRGSSR/srgappearance-apple.git",
         "state": {
           "branch": null,
-          "revision": "72d9475b46d97ecde0298b5bc80a654e8b424ebb",
-          "version": "5.2.0"
+          "revision": "37858eb83365f498d3861cc546ba86a51e061293",
+          "version": "5.2.1"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/SRGSSR/srgdataprovider-apple.git",
         "state": {
           "branch": null,
-          "revision": "340c676f77eec1bd437bed91f30165736fc10abb",
-          "version": "16.1.0"
+          "revision": "75818e9de479d6cc460840d6f924be9f144513d8",
+          "version": "17.0.1"
         }
       },
       {
@@ -114,8 +114,8 @@
         "repositoryURL": "https://github.com/SRGSSR/srgletterbox-apple.git",
         "state": {
           "branch": null,
-          "revision": "2db25a0d0729b7f93c137906ea9f921a107d8334",
-          "version": "8.3.0"
+          "revision": "601ba160f29ef4fe8bf024d65c64963b5faf5c9f",
+          "version": "8.4.0"
         }
       },
       {
