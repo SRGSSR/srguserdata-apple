@@ -39,6 +39,7 @@
 
 #pragma mark Tests
 
+#warning "This flaky test has been disabled. See issue #7"
 - (void)testObjectsMatchingPredicate
 {
     NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
@@ -143,6 +144,7 @@
     }];
 }
 
+#warning "This flaky test has been disabled. See issue #7"
 - (void)testSynchronizeMoreRecentDirtyLocalEntry
 {
     NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
@@ -158,6 +160,7 @@
     }];
 }
 
+#warning "This flaky test has been disabled. See issue #7"  
 - (void)testSynchronizeDeletedEntryExistingLocally
 {
     NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
@@ -173,6 +176,7 @@
     }];
 }
 
+#warning "This flaky test has been disabled. See issue #7"
 - (void)testSynchronizeDeletedEntryMoreRecentLocally
 {
     NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
@@ -189,6 +193,7 @@
     }];
 }
 
+#warning "This flaky test has been disabled. See issue #7"
 - (void)testDiscardForLoggedOutUser
 {
     NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedOut"];
@@ -215,6 +220,7 @@
     }];
 }
 
+#warning "This flaky test has been disabled. See issue #7"
 - (void)testDiscardForLoggedInUser
 {
     NSPersistentContainer *persistentContainer = [self persistentContainerFromPackage:@"UserData_DB_loggedIn"];
