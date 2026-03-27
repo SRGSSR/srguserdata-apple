@@ -7,7 +7,7 @@
 import DeepDiff
 import UIKit
 
-extension NSObject: DiffAware {
+extension NSObject: @retroactive DiffAware {
     public var diffId: Int {
         return self.hashValue
     }
